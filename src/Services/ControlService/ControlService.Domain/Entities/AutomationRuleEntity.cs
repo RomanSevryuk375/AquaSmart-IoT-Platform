@@ -5,8 +5,6 @@ namespace Control.Domain.Entities;
 
 public class AutomationRuleEntity : IEntity
 {
-    private readonly List<RuleConditionEntity> _conditions = [];
-
     private AutomationRuleEntity(
         Guid id,
         Guid ecosystemId,
@@ -36,13 +34,7 @@ public class AutomationRuleEntity : IEntity
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public virtual IReadOnlyCollection<RuleConditionEntity> Conditions
-    {
-        get
-        {
-            return _conditions.AsReadOnly();
-        }
-    }
+    public virtual ICollection<RuleConditionEntity> Conditions { get; private set; } = [];
 
     public static (AutomationRuleEntity? rule, List<string> errors) Create(
         Guid ecosystemId,
@@ -140,6 +132,6 @@ public class AutomationRuleEntity : IEntity
             return;
         }
 
-        _conditions.Add(condition);
+        Conditions.Add(condition);
     }
 }

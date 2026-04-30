@@ -4,7 +4,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Control.Infrastructure.Configurations;
 
-public class ScheduleEntityConfiguration : IEntityTypeConfiguration<ScheduleEntity>
+public sealed class ScheduleEntityConfiguration 
+    : IEntityTypeConfiguration<ScheduleEntity>
 {
     public void Configure(EntityTypeBuilder<ScheduleEntity> builder)
     {

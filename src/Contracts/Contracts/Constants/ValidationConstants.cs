@@ -19,3 +19,13 @@ public static class RelayConstants
     public const int NameLength = 128;
     public const int ConnectionAddressLength = 32;
 }
+
+public static class RuleConstants
+{
+    public const int NameLength = 128;
+}
+
+public static class EcosystemConstants
+{
+    public const int NameLength = 128;
+}
