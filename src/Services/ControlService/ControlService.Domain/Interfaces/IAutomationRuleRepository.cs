@@ -6,5 +6,6 @@ namespace Control.Domain.Interfaces;
 public interface IAutomationRuleRepository : IRepository<AutomationRuleEntity>
 {
     Task<IReadOnlyList<AutomationRuleEntity>?> GetBySensorIdAsync(
-        Guid sensorId, CancellationToken cancellationToken);
+        Guid sensorId, 
+        CancellationToken cancellationToken);
 }
