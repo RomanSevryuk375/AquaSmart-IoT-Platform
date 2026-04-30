@@ -7,12 +7,11 @@ namespace Control.Domain.Specifications;
 public class AutomationRuleFilterSpecification 
     : BaseSpecification<AutomationRuleEntity>
 {
-    public AutomationRuleFilterSpecification(AutomatizationRuleFilterParams @params) 
+    public AutomationRuleFilterSpecification(AutomationRuleFilterParams @params) 
         : base(data => 
-            (!@params.AquariumId.HasValue || data.AquariumId == @params.AquariumId.Value)
-            && (!@params.SensorId.HasValue || data.SensorId == @params.SensorId.Value)
+            (!@params.EcosystemId.HasValue || data.EcosystemId == @params.EcosystemId.Value)
             && (!@params.RelayId.HasValue || data.RelayId == @params.RelayId.Value)
-            && (!@params.Condition.HasValue || data.Condition == @params.Condition.Value)
+            && (!@params.Operator.HasValue || data.Operator == @params.Operator.Value)
             && (!@params.Action.HasValue || data.Action == @params.Action.Value))
     {
         

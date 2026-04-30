@@ -11,8 +11,8 @@ public class SensorEntityConfiguration : IEntityTypeConfiguration<SensorEntity>
         builder.ToTable("sensors");
 
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.AquariumId).IsRequired();
-        builder.HasIndex(x => x.AquariumId);
+        builder.Property(x => x.EcosystemId).IsRequired();
+        builder.HasIndex(x => x.EcosystemId);
 
         builder.Property(x => x.State)
             .HasConversion<int>()

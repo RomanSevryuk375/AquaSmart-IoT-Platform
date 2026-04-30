@@ -17,7 +17,7 @@ public sealed class EcosystemService(
         var existingEcosystem = await ecosystemRepository
             .GetByIdAsync(ecosystem.EcosystemId, cancellationToken);
 
-        if (existingEcosystem is null)
+        if (existingEcosystem is not null)
         {
             return ConsumerResult.Success();
         }

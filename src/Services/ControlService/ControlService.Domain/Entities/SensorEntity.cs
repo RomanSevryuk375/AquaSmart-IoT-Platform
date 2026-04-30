@@ -7,27 +7,35 @@ public class SensorEntity : IEntity
 {
     private SensorEntity(
         Guid id, 
-        Guid aquariumId, 
+        Guid controllerId,
+        Guid ecosystemId, 
+        string name,
         SensorStateEnum state,
         SensorTypeEnum type, 
         DateTime createdAt)
     {
         Id = id;
-        AquariumId = aquariumId;
+        ControllerId = controllerId;
+        EcosystemId = ecosystemId;
+        Name = name;
         State = state;
         Type = type;
         CreatedAt = createdAt;
     }
 
     public Guid Id { get; private set; }
-    public Guid AquariumId { get; private set; }
+    public Guid ControllerId { get; private set; }
+    public Guid EcosystemId { get; private set; }
+    public string Name { get; private set; }
     public SensorStateEnum State { get; private set; }
     public SensorTypeEnum Type { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
     public static (SensorEntity? sensor, List<string> errors) Create(
         Guid id,
-        Guid aquariumId,
+        Guid controllerId,
+        Guid ecosystemId,
+        string name,
         SensorStateEnum state,
         SensorTypeEnum type,
         DateTime createdAt)
@@ -39,9 +47,19 @@ public class SensorEntity : IEntity
             errors.Add("id must not be empty.");
         }
 
-        if (aquariumId == Guid.Empty)
+        if (ecosystemId == Guid.Empty)
         {
-            errors.Add("aquariumId must not be empty.");
+            errors.Add("ecosystemId must not be empty.");
+        }
+
+        if (controllerId == Guid.Empty)
+        {
+            errors.Add("controllerId must not be empty.");
+        }
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            errors.Add("name must not be empty.");
         }
 
         if (errors.Count > 0)
@@ -51,7 +69,9 @@ public class SensorEntity : IEntity
 
         var sensor = new SensorEntity(
             id,
-            aquariumId,
+            controllerId,
+            ecosystemId,
+            name,
             state,
             type,
             createdAt);
@@ -77,5 +97,24 @@ public class SensorEntity : IEntity
         }
 
         Type = type;
+    }
+
+    public List<string>? SetName(string name)
+    {
+        var errors = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            errors.Add("name must not be empty.");
+        }
+
+        if (errors.Count != 0)
+        {
+            return errors;
+        }
+
+        Name = name;
+
+        return null;
     }
 }

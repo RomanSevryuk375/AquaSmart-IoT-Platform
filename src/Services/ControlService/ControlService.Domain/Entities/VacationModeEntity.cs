@@ -6,7 +6,7 @@ public class VacationModeEntity : IEntity
 {
     private VacationModeEntity(
         Guid id, 
-        Guid aquariumId,
+        Guid ecosystemId,
         DateTime startDate,
         DateTime endDate,
         bool isActive,
@@ -14,7 +14,7 @@ public class VacationModeEntity : IEntity
         DateTime createdAt)
     {
         Id = id;
-        AquariumId = aquariumId;
+        EcosystemId = ecosystemId;
         StartDate = startDate;
         EndDate = endDate;
         IsActive = isActive;
@@ -23,7 +23,7 @@ public class VacationModeEntity : IEntity
     }
 
     public Guid Id { get; private set; }
-    public Guid AquariumId { get; private set; }
+    public Guid EcosystemId { get; private set; }
     public DateTime StartDate { get; private set; }
     public DateTime EndDate { get; private set; }
     public bool IsActive { get; private set; }

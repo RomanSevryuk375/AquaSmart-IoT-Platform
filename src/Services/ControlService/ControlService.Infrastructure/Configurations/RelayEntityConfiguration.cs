@@ -12,8 +12,8 @@ public class RelayEntityConfiguration : IEntityTypeConfiguration<RelayEntity>
 
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.AquariumId).IsRequired();
-        builder.HasIndex(x => x.AquariumId);
+        builder.Property(x => x.EcosystemId).IsRequired();
+        builder.HasIndex(x => x.EcosystemId);
 
         builder.Property(x => x.Purpose)
             .HasConversion<int>()

@@ -12,11 +12,17 @@ public sealed class RelayCommandsQueueRepository(SystemDbContext dbContext)
         Guid controllerId,
         CancellationToken cancellationToken)
     {
+        var retryThreshold = DateTime.UtcNow.AddMinutes(-1);
+        var now = DateTime.UtcNow;
+
         return await Context.RelayCommands
-            .AsNoTracking()
-            .Where(x =>
-                x.ControllerId == controllerId &&
-                x.Status == CommandStatusEnum.Pending)
+            .Where(x => x.ControllerId == controllerId &&
+                        (x.ExpireAt == null || x.ExpireAt > now) &&
+                        (x.Status == CommandStatusEnum.Pending ||
+                        (x.Status == CommandStatusEnum.Sent &&
+                         x.AttemptCount < 3 &&
+                         x.ProcessedAt < retryThreshold)))
+            .OrderBy(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
     }
 

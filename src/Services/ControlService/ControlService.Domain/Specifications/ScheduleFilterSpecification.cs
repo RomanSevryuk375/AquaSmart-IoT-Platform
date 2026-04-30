@@ -8,7 +8,7 @@ public class ScheduleFilterSpecification : BaseSpecification<ScheduleEntity>
 {
     public ScheduleFilterSpecification(ScheduleFilterParams @params) 
         : base(data =>
-            (!@params.AquariumId.HasValue || data.AquariumId == @params.AquariumId.Value)
+            (!@params.EcosystemId.HasValue || data.EcosystemId == @params.EcosystemId.Value)
             && (!@params.RelayId.HasValue || data.RelayId == @params.RelayId.Value)
             && (!@params.IsFadeMode.HasValue || data.IsFadeMode == @params.IsFadeMode.Value)
             && (!@params.IsEnable.HasValue || data.IsEnable == @params.IsEnable.Value)) 

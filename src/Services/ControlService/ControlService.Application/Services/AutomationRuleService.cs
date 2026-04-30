@@ -24,7 +24,7 @@ public class AutomationRuleService(
         var specification = new AutomationRuleFilterSpecification(
             new AutomatizationRuleFilterParams
             {
-                AquariumId = filter.AquariumId,
+                EcosystemId = filter.AquariumId,
                 SensorId = filter.SensorId,
                 RelayId = filter.RelayId,
                 Condition = filter.Condition,
@@ -40,7 +40,7 @@ public class AutomationRuleService(
         return rules.Select(x => new AutomationRuleResponseDto
         {
             Id = x.Id,
-            AquariumId = x.AquariumId,
+            AquariumId = x.EcosystemId,
             SensorId = x.SensorId,
             RelayId = x.RelayId,
             Condition = x.Condition,
@@ -61,7 +61,7 @@ public class AutomationRuleService(
         return new AutomationRuleResponseDto
         {
             Id = rule.Id,
-            AquariumId = rule.AquariumId,
+            AquariumId = rule.EcosystemId,
             SensorId = rule.SensorId,
             RelayId = rule.RelayId,
             Condition = rule.Condition,

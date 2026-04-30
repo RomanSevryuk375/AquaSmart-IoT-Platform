@@ -80,11 +80,13 @@ public sealed class RelayCommandsQueueEntity : IEntity
 
     public void MarkAsSent()
     {
-        if (Status == CommandStatusEnum.Sent)
-        { 
-            return; 
+        if (Status == CommandStatusEnum.Completed || 
+            Status == CommandStatusEnum.Failed)
+        {
+            return;
         }
 
+        ProcessedAt = DateTime.UtcNow;
         AttemptCount++;
         Status = CommandStatusEnum.Sent;
     }

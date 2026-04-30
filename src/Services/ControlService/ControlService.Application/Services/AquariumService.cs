@@ -22,8 +22,8 @@ public class AquariumService(
         int? take,
         CancellationToken cancellationToken)
     {
-        var specification = new AquariumFilterSpecification(
-            new AquariumFilterParams
+        var specification = new EcosystemFilterSpecification(
+            new EcosystemFilterParams
             {
                 ControllerId = filter.ControllerId,
                 Name = filter.Name,
@@ -50,7 +50,7 @@ public class AquariumService(
     {
         var aquarium = await aquariumRepository
             .GetByIdAsync(id, cancellationToken)
-            ?? throw new NotFoundException($"{nameof(AquariumEntity)} not found");
+            ?? throw new NotFoundException($"{nameof(EcosystemEntity)} not found");
 
         return new AquariumResponseDto
         {
@@ -65,7 +65,7 @@ public class AquariumService(
         AquariumRequestDto request,
         CancellationToken cancellationToken)
     {
-        var (aquarium, errors) = AquariumEntity.Create(
+        var (aquarium, errors) = EcosystemEntity.Create(
             userContext.UserId,
             request.Name,
             request.ControllerId);
@@ -73,7 +73,7 @@ public class AquariumService(
         if (aquarium is null)
         {
             throw new DomainValidationException(
-                $"Failed to create {nameof(AquariumEntity)}: {string.Join(", ", errors)}");
+                $"Failed to create {nameof(EcosystemEntity)}: {string.Join(", ", errors)}");
         }
 
         var result = await aquariumRepository.AddAsync(aquarium, cancellationToken);
@@ -98,7 +98,7 @@ public class AquariumService(
     {
         var aquarium = await aquariumRepository
             .GetByIdAsync(id, cancellationToken)
-            ?? throw new NotFoundException($"{nameof(AquariumEntity)} not found");
+            ?? throw new NotFoundException($"{nameof(EcosystemEntity)} not found");
 
         aquarium.SetName(request.Name);
 

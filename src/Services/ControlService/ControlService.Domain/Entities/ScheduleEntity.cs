@@ -6,7 +6,7 @@ public class ScheduleEntity : IEntity
 {
     private ScheduleEntity(
         Guid id, 
-        Guid aquariumId,
+        Guid ecosystemId,
         Guid relayId,
         string cronExpression,
         double durationMin,
@@ -15,7 +15,7 @@ public class ScheduleEntity : IEntity
         DateTime createdAt)
     {
         Id = id;
-        AquariumId = aquariumId;
+        EcosystemId = ecosystemId;
         RelayId = relayId;
         CronExpression = cronExpression;
         DurationMin = durationMin;
@@ -25,7 +25,7 @@ public class ScheduleEntity : IEntity
     }
 
     public Guid Id { get; private set; }
-    public Guid AquariumId { get; private set; }
+    public Guid EcosystemId { get; private set; }
     public Guid RelayId { get; private set; }
     public string CronExpression { get; private set; } = string.Empty;
     public double DurationMin { get; private set; }
@@ -34,7 +34,7 @@ public class ScheduleEntity : IEntity
     public DateTime CreatedAt { get; private set; }
 
     public static (ScheduleEntity? schedule, List<string> errors) Create(
-        Guid aquariumId,
+        Guid ecosystemId,
         Guid relayId,
         string cronExpression,
         double durationMin,
@@ -43,9 +43,9 @@ public class ScheduleEntity : IEntity
     {
         var errors = new List<string>();
 
-        if (aquariumId == Guid.Empty)
+        if (ecosystemId == Guid.Empty)
         {
-            errors.Add("aquariumId must not be empty.");
+            errors.Add("ecosystemId must not be empty.");
         }
 
         if (relayId == Guid.Empty)
@@ -75,7 +75,7 @@ public class ScheduleEntity : IEntity
 
         var schedule = new ScheduleEntity(
             Guid.NewGuid(),
-            aquariumId,
+            ecosystemId,
             relayId,
             cronExpression,
             durationMin,

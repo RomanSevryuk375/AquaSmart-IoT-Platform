@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Control.Infrastructure.Repositories;
 
 public class AquariumRepository(SystemDbContext dbContext)
-    : BaseRepository<AquariumEntity>(dbContext), IAquariumRepository
+    : BaseRepository<EcosystemEntity>(dbContext), IAquariumRepository
 {
     public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken)
     {
@@ -14,7 +14,7 @@ public class AquariumRepository(SystemDbContext dbContext)
             .AnyAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<AquariumEntity?> GetByControllerIdAsync(
+    public async Task<EcosystemEntity?> GetByControllerIdAsync(
         Guid controllerId, CancellationToken cancellationToken)
     {
         return await Context.Aquariums

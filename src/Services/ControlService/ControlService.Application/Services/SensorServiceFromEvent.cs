@@ -96,7 +96,7 @@ public class SensorServiceFromEvent(
         }
 
         var existingAquarium = await aquariumRepository.GetByIdAsync(
-            existingSensor.AquariumId, cancellationToken);
+            existingSensor.EcosystemId, cancellationToken);
 
         if (existingAquarium is null)
         {
@@ -128,7 +128,7 @@ public class SensorServiceFromEvent(
             await publishEndpoint.Publish(new SensorNoDataAlertEvent
             {
                 UserId = existingAquarium.UserId,
-                AquariumId = rule.AquariumId,
+                AquariumId = rule.EcosystemId,
                 SensorId = existingSensor.Id,
                 LastSeenAt = DateTime.UtcNow,
             }, cancellationToken);

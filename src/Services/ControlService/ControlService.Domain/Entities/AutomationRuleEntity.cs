@@ -5,67 +5,68 @@ namespace Control.Domain.Entities;
 
 public class AutomationRuleEntity : IEntity
 {
+    private readonly List<RuleConditionEntity> _conditions = [];
+
     private AutomationRuleEntity(
-        Guid id, 
-        Guid aquariumId, 
-        Guid sensorId, 
-        Guid relayId, 
-        RuleConditionEnum condition, 
-        double threshold, 
-        double hysteresis, 
+        Guid id,
+        Guid ecosystemId,
+        Guid relayId,
+        string name,
+        OperatorEnum @operator,
         RuleActionEnum action, 
+        bool isActive,
         DateTime createdAt)
     {
         Id = id;
-        AquariumId = aquariumId;
-        SensorId = sensorId;
+        EcosystemId = ecosystemId;
         RelayId = relayId;
-        Condition = condition;
-        Threshold = threshold;
-        Hysteresis = hysteresis;
+        Name = name;
+        Operator = @operator;
         Action = action;
+        IsActive = isActive;
         CreatedAt = createdAt;
     }
 
     public Guid Id { get; private set; }
-    public Guid AquariumId { get; private set; }
-    public Guid SensorId { get; private set; }
+    public Guid EcosystemId { get; private set; }
     public Guid RelayId { get; private set; }
-    public RuleConditionEnum Condition { get; private set; }
-    public double Threshold { get; private set; }
-    public double Hysteresis { get; private set; }
+    public string Name { get; private set; }
+    public OperatorEnum Operator { get; private set; }
     public RuleActionEnum Action { get; private set; }
+    public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
+    public virtual IReadOnlyCollection<RuleConditionEntity> Conditions
+    {
+        get
+        {
+            return _conditions.AsReadOnly();
+        }
+    }
+
     public static (AutomationRuleEntity? rule, List<string> errors) Create(
-        Guid aquariumId,
-        Guid sensorId,
+        Guid ecosystemId,
+        string name,
         Guid relayId,
-        RuleConditionEnum condition,
-        double threshold,
-        double hysteresis,
-        RuleActionEnum action)
+        OperatorEnum @operator,
+        RuleActionEnum action,
+        bool isActive)
     {
         var errors = new List<string>();
 
-        if (sensorId == Guid.Empty)
+        if (string.IsNullOrWhiteSpace(name))
         {
-            errors.Add("sensorId must not be empty.");
+            errors.Add("name must not be empty.");
         }
 
-        if (aquariumId == Guid.Empty)
+        if (ecosystemId == Guid.Empty)
         {
-            errors.Add("aquariumId must not be empty.");
+            errors.Add("ecosystemId must not be empty.");
         }
 
         if (relayId == Guid.Empty)
         {
             errors.Add("relayId must not be empty.");
-        }
-
-        if (hysteresis < 0)
-        {
-            errors.Add("hysteresis must not be less then zero.");
         }
 
         if (errors.Count > 0)
@@ -75,29 +76,33 @@ public class AutomationRuleEntity : IEntity
 
         var rule = new AutomationRuleEntity(
             Guid.NewGuid(),
-            aquariumId,
-            sensorId,
+            ecosystemId,
             relayId,
-            condition,
-            threshold,
-            hysteresis,
+            name,
+            @operator,
             action,
+            isActive,
             DateTime.UtcNow);
 
         return (rule, errors);
     }
 
     public List<string>? Update (
-        RuleConditionEnum condition,
-        double threshold,
-        double hysteresis,
+        string name,
+        Guid relayId,
+        OperatorEnum @operator,
         RuleActionEnum action)
     {
         var errors = new List<string>();
 
-        if (hysteresis < 0)
+        if (string.IsNullOrWhiteSpace(name))
         {
-            errors.Add("hysteresis must not be less then zero.");
+            errors.Add("name must not be empty.");
+        }
+
+        if (relayId == Guid.Empty)
+        {
+            errors.Add("relayId must not be empty.");
         }
 
         if (errors.Count > 0)
@@ -105,22 +110,12 @@ public class AutomationRuleEntity : IEntity
             return errors;
         }
 
-        Condition = condition;
-        Threshold = threshold;
-        Hysteresis = hysteresis;
+        Name = name;
+        RelayId = relayId;
+        Operator = @operator;
         Action = action;
 
         return null;
-    }
-
-    public void SetCondition(RuleConditionEnum condition)
-    {
-        if (Condition == condition)
-        {
-            return;
-        }
-
-        Condition = condition;
     }
 
     public void SetAction(RuleActionEnum action)
@@ -133,20 +128,18 @@ public class AutomationRuleEntity : IEntity
         Action = action;
     }
 
-    public void SetThreshold(double threshold)
+    public void SetIsActive(bool isActive)
     {
-        Threshold = threshold;
+        IsActive = isActive;
     }
 
-    public string? SetHysteresis(double hysteresis)
+    public void AddCondition(RuleConditionEntity condition)
     {
-        if (hysteresis < 0)
+        if (condition is null)
         {
-            return("hysteresis must not be less then zero.");
+            return;
         }
 
-        Hysteresis = hysteresis;
-
-        return null;
+        _conditions.Add(condition);
     }
 }

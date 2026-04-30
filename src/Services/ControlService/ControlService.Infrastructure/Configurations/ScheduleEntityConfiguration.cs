@@ -11,7 +11,7 @@ public class ScheduleEntityConfiguration : IEntityTypeConfiguration<ScheduleEnti
         builder.ToTable("schedules");
 
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.AquariumId).IsRequired();
+        builder.Property(x => x.EcosystemId).IsRequired();
         builder.Property(x => x.RelayId).IsRequired();
 
         builder.Property(x => x.CronExpression)

@@ -38,7 +38,7 @@ public class TelemetryServiceFromEvent(
             }
 
             var aquarium = await aquariumRepository
-                .GetByIdAsync(relay.AquariumId, cancellationToken);
+                .GetByIdAsync(relay.EcosystemId, cancellationToken);
 
             if (aquarium is null)
             {
@@ -63,7 +63,7 @@ public class TelemetryServiceFromEvent(
                 await publishEndpoint.Publish(new CriticalTelemetryThresholdAlertEvent
                 {
                     UserId = aquarium.UserId,
-                    AquariumId = rule.AquariumId,
+                    AquariumId = rule.EcosystemId,
                     SensorId = telemetry.SensorId,
                     Value = telemetry.Value,
                     RecordedAt = telemetry.RecordedAt,

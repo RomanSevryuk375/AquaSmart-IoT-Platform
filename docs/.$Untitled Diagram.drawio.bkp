@@ -1,0 +1,376 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.1 Chrome/142.0.7444.265 Electron/39.8.0 Safari/537.36" version="29.6.1">
+  <diagram name="Page-1" id="lOyzzob8zbXeKWzVfDsp">
+    <mxGraphModel dx="163" dy="406" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="2339" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-6" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;background-color: rgb(40, 44, 52); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-weight: normal; font-size: 14px; line-height: 19px; white-space: pre;&quot;&gt;&lt;span&gt;&lt;font style=&quot;color: rgb(255, 255, 255);&quot;&gt;Telemetry Service&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="330" width="450" x="190" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-1" parent="VU9Vfkcs6LlIBZAhdO9N-6" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;inline-code ng-star-inserted&quot;&gt;Sensors&lt;/span&gt;&lt;/h4&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="240" width="140" x="40" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-2" parent="VU9Vfkcs6LlIBZAhdO9N-1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Id (PK)" vertex="1">
+          <mxGeometry height="30" width="140" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-3" parent="VU9Vfkcs6LlIBZAhdO9N-1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;ControllerId&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-4" parent="VU9Vfkcs6LlIBZAhdO9N-1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Type" vertex="1">
+          <mxGeometry height="30" width="140" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-7" parent="VU9Vfkcs6LlIBZAhdO9N-1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Unit" vertex="1">
+          <mxGeometry height="30" width="140" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-13" parent="VU9Vfkcs6LlIBZAhdO9N-1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="LastValue" vertex="1">
+          <mxGeometry height="30" width="140" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-14" parent="VU9Vfkcs6LlIBZAhdO9N-1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;UpdatedAt&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="I1HaHTgOFo1_BCEIiB5s-1" parent="VU9Vfkcs6LlIBZAhdO9N-1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="CreatedAt" vertex="1">
+          <mxGeometry height="30" width="140" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-8" parent="VU9Vfkcs6LlIBZAhdO9N-6" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;inline-code ng-star-inserted&quot;&gt;TelemetryData&lt;/span&gt;&lt;/h4&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="210" width="140" x="260" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-9" parent="VU9Vfkcs6LlIBZAhdO9N-8" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Id (PK)" vertex="1">
+          <mxGeometry height="30" width="140" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-10" parent="VU9Vfkcs6LlIBZAhdO9N-8" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;SensorId (FK)&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-11" parent="VU9Vfkcs6LlIBZAhdO9N-8" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;Value&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-12" parent="VU9Vfkcs6LlIBZAhdO9N-8" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;Timestamp&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-15" parent="VU9Vfkcs6LlIBZAhdO9N-8" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;ExternalMessageId&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="I1HaHTgOFo1_BCEIiB5s-2" parent="VU9Vfkcs6LlIBZAhdO9N-8" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="CreatedAt" vertex="1">
+          <mxGeometry height="30" width="140" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-16" edge="1" parent="VU9Vfkcs6LlIBZAhdO9N-6" source="VU9Vfkcs6LlIBZAhdO9N-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="VU9Vfkcs6LlIBZAhdO9N-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-17" parent="1" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" value="Device Service" vertex="1">
+          <mxGeometry height="560" width="450" x="190" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-18" parent="VU9Vfkcs6LlIBZAhdO9N-17" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;inline-code ng-star-inserted&quot;&gt;Controllers&lt;/span&gt;&lt;/h4&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="210" width="140" x="40" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-19" parent="VU9Vfkcs6LlIBZAhdO9N-18" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Id (PK)" vertex="1">
+          <mxGeometry height="30" width="140" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-20" parent="VU9Vfkcs6LlIBZAhdO9N-18" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;MacAddress&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-21" parent="VU9Vfkcs6LlIBZAhdO9N-18" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Name" vertex="1">
+          <mxGeometry height="30" width="140" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-22" parent="VU9Vfkcs6LlIBZAhdO9N-18" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="IsOnline" vertex="1">
+          <mxGeometry height="30" width="140" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-23" parent="VU9Vfkcs6LlIBZAhdO9N-18" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="LastSeenAt" vertex="1">
+          <mxGeometry height="30" width="140" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-24" parent="VU9Vfkcs6LlIBZAhdO9N-18" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="CreatedAt" vertex="1">
+          <mxGeometry height="30" width="140" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-25" parent="VU9Vfkcs6LlIBZAhdO9N-17" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;inline-code ng-star-inserted&quot;&gt;Sensors&lt;/span&gt;&lt;/h4&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="180" width="140" x="260" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-26" parent="VU9Vfkcs6LlIBZAhdO9N-25" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Id (PK)" vertex="1">
+          <mxGeometry height="30" width="140" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-27" parent="VU9Vfkcs6LlIBZAhdO9N-25" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;ControllerId (FK)&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-28" parent="VU9Vfkcs6LlIBZAhdO9N-25" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;HardwarePin&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-29" parent="VU9Vfkcs6LlIBZAhdO9N-25" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;Type&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-30" parent="VU9Vfkcs6LlIBZAhdO9N-25" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;CreatedAt&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-31" edge="1" parent="VU9Vfkcs6LlIBZAhdO9N-17" source="VU9Vfkcs6LlIBZAhdO9N-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="VU9Vfkcs6LlIBZAhdO9N-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-32" parent="VU9Vfkcs6LlIBZAhdO9N-17" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;inline-code ng-star-inserted&quot;&gt;Relays&lt;/span&gt;&lt;/h4&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="210" width="140" x="40" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-33" parent="VU9Vfkcs6LlIBZAhdO9N-32" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Id (PK)" vertex="1">
+          <mxGeometry height="30" width="140" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-34" parent="VU9Vfkcs6LlIBZAhdO9N-32" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="ControllerId (FK)" vertex="1">
+          <mxGeometry height="30" width="140" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-35" parent="VU9Vfkcs6LlIBZAhdO9N-32" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;HardwarePin&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-36" parent="VU9Vfkcs6LlIBZAhdO9N-32" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Purpose" vertex="1">
+          <mxGeometry height="30" width="140" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-37" parent="VU9Vfkcs6LlIBZAhdO9N-32" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;CurrentState&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-38" parent="VU9Vfkcs6LlIBZAhdO9N-32" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;IsManualOverride&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-39" edge="1" parent="VU9Vfkcs6LlIBZAhdO9N-17" source="VU9Vfkcs6LlIBZAhdO9N-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="VU9Vfkcs6LlIBZAhdO9N-34">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-40" parent="1" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" value="Control Service" vertex="1">
+          <mxGeometry height="600" width="450" x="760" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-41" parent="VU9Vfkcs6LlIBZAhdO9N-40" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;inline-code ng-star-inserted&quot;&gt;AutomationRules&lt;/span&gt;&lt;/h4&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="270" width="140" x="40" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-42" parent="VU9Vfkcs6LlIBZAhdO9N-41" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Id (PK)" vertex="1">
+          <mxGeometry height="30" width="140" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-43" parent="VU9Vfkcs6LlIBZAhdO9N-41" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;&lt;/span&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;AquariumId (FK)&lt;/span&gt;&lt;/strong&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;&lt;/span&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-44" parent="VU9Vfkcs6LlIBZAhdO9N-41" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;&lt;/span&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;SensorId&lt;/span&gt;&lt;/strong&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;&lt;/span&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-45" parent="VU9Vfkcs6LlIBZAhdO9N-41" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;&lt;/span&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;Condition&lt;/span&gt;&lt;/strong&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;&lt;/span&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-46" parent="VU9Vfkcs6LlIBZAhdO9N-41" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;&lt;/span&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;Threshold&lt;/span&gt;&lt;/strong&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;&lt;/span&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-47" parent="VU9Vfkcs6LlIBZAhdO9N-41" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;&lt;/span&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;TargetRelayId&lt;/span&gt;&lt;/strong&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;&lt;/span&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-66" parent="VU9Vfkcs6LlIBZAhdO9N-41" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;&lt;/span&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;Action&lt;/span&gt;&lt;/strong&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;&lt;/span&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-109" parent="VU9Vfkcs6LlIBZAhdO9N-41" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;CreatedAt&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-48" parent="VU9Vfkcs6LlIBZAhdO9N-40" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;inline-code ng-star-inserted&quot;&gt;Aquariums&lt;/span&gt;&lt;/h4&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="150" width="140" x="260" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-49" parent="VU9Vfkcs6LlIBZAhdO9N-48" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Id (PK)" vertex="1">
+          <mxGeometry height="30" width="140" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-50" parent="VU9Vfkcs6LlIBZAhdO9N-48" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;&lt;/span&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;Name&lt;/span&gt;&lt;/strong&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;&lt;/span&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-51" parent="VU9Vfkcs6LlIBZAhdO9N-48" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;&lt;/span&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;ControllerId&lt;/span&gt;&lt;/strong&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;&lt;/span&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-53" parent="VU9Vfkcs6LlIBZAhdO9N-48" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;CreatedAt&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-55" parent="VU9Vfkcs6LlIBZAhdO9N-40" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;inline-code ng-star-inserted&quot;&gt;Schedules&lt;/span&gt;&lt;/h4&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="270" width="140" x="40" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-56" parent="VU9Vfkcs6LlIBZAhdO9N-55" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Id (PK)" vertex="1">
+          <mxGeometry height="30" width="140" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-115" parent="VU9Vfkcs6LlIBZAhdO9N-55" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;AquariumId (FK)&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-57" parent="VU9Vfkcs6LlIBZAhdO9N-55" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;TargetRelayId&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-58" parent="VU9Vfkcs6LlIBZAhdO9N-55" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;CronExpression&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-59" parent="VU9Vfkcs6LlIBZAhdO9N-55" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;DurationMin&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-60" parent="VU9Vfkcs6LlIBZAhdO9N-55" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;IsFadeMode&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-61" parent="VU9Vfkcs6LlIBZAhdO9N-55" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;IsEnabled&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-75" parent="VU9Vfkcs6LlIBZAhdO9N-55" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;CreatedAt&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-65" edge="1" parent="VU9Vfkcs6LlIBZAhdO9N-40" source="VU9Vfkcs6LlIBZAhdO9N-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="VU9Vfkcs6LlIBZAhdO9N-43">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-67" parent="VU9Vfkcs6LlIBZAhdO9N-40" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;inline-code ng-star-inserted&quot;&gt;VacationModes&lt;/span&gt;&lt;/h4&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="240" width="140" x="230" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-68" parent="VU9Vfkcs6LlIBZAhdO9N-67" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Id (PK)" vertex="1">
+          <mxGeometry height="30" width="140" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-69" parent="VU9Vfkcs6LlIBZAhdO9N-67" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;AquariumId (FK)&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-70" parent="VU9Vfkcs6LlIBZAhdO9N-67" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;StartDate&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-71" parent="VU9Vfkcs6LlIBZAhdO9N-67" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;EndDate&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-72" parent="VU9Vfkcs6LlIBZAhdO9N-67" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;IsActive&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-73" parent="VU9Vfkcs6LlIBZAhdO9N-67" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;CalculatedFeed&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-74" parent="VU9Vfkcs6LlIBZAhdO9N-67" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;CreatedAt&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-76" edge="1" parent="VU9Vfkcs6LlIBZAhdO9N-40" source="VU9Vfkcs6LlIBZAhdO9N-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="VU9Vfkcs6LlIBZAhdO9N-69">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="220" y="125" />
+              <mxPoint x="220" y="385" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-116" edge="1" parent="VU9Vfkcs6LlIBZAhdO9N-40" source="VU9Vfkcs6LlIBZAhdO9N-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="VU9Vfkcs6LlIBZAhdO9N-115">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="220" y="125" />
+              <mxPoint x="220" y="395" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-77" parent="1" style="swimlane;whiteSpace=wrap;html=1;startSize=23;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;h3 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;ng-star-inserted&quot;&gt;Notification&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-size: 12px;&quot;&gt;Service&lt;/span&gt;&lt;/h3&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="830" width="220" x="1390" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-78" parent="VU9Vfkcs6LlIBZAhdO9N-77" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;inline-code ng-star-inserted&quot;&gt;Notifications&lt;/span&gt;&lt;/h4&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="210" width="140" x="40" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-79" parent="VU9Vfkcs6LlIBZAhdO9N-78" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Id (PK)" vertex="1">
+          <mxGeometry height="30" width="140" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-80" parent="VU9Vfkcs6LlIBZAhdO9N-78" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;AquariumId&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-81" parent="VU9Vfkcs6LlIBZAhdO9N-78" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;Level&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-82" parent="VU9Vfkcs6LlIBZAhdO9N-78" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;Message&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-83" parent="VU9Vfkcs6LlIBZAhdO9N-78" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;IsRead&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-84" parent="VU9Vfkcs6LlIBZAhdO9N-78" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="CreatedAt" vertex="1">
+          <mxGeometry height="30" width="140" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-85" parent="VU9Vfkcs6LlIBZAhdO9N-77" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;inline-code ng-star-inserted&quot;&gt;Reminders&lt;/span&gt;&lt;/h4&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="240" width="140" x="40" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-86" parent="VU9Vfkcs6LlIBZAhdO9N-85" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Id (PK)" vertex="1">
+          <mxGeometry height="30" width="140" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-87" parent="VU9Vfkcs6LlIBZAhdO9N-85" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;AquariumId&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-88" parent="VU9Vfkcs6LlIBZAhdO9N-85" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;TaskName&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-89" parent="VU9Vfkcs6LlIBZAhdO9N-85" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;IntervalDays&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-102" parent="VU9Vfkcs6LlIBZAhdO9N-85" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;LastDoneAt&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-103" parent="VU9Vfkcs6LlIBZAhdO9N-85" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;NextDueAt&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-90" parent="VU9Vfkcs6LlIBZAhdO9N-85" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;CreatedAt&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-92" parent="VU9Vfkcs6LlIBZAhdO9N-77" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;/span&gt;&lt;/h4&gt;&lt;h4 class=&quot;ng-star-inserted&quot;&gt;&lt;span class=&quot;inline-code ng-star-inserted&quot;&gt;MaintenanceLogs&lt;/span&gt;&lt;/h4&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="270" width="140" x="40" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-93" parent="VU9Vfkcs6LlIBZAhdO9N-92" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Id (PK)" vertex="1">
+          <mxGeometry height="30" width="140" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-94" parent="VU9Vfkcs6LlIBZAhdO9N-92" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;AquariumId&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-95" parent="VU9Vfkcs6LlIBZAhdO9N-92" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;ActionDate&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-96" parent="VU9Vfkcs6LlIBZAhdO9N-92" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;PhLevel&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-97" parent="VU9Vfkcs6LlIBZAhdO9N-92" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="KhLevel" vertex="1">
+          <mxGeometry height="30" width="140" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-98" parent="VU9Vfkcs6LlIBZAhdO9N-92" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="No3Level" vertex="1">
+          <mxGeometry height="30" width="140" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-100" parent="VU9Vfkcs6LlIBZAhdO9N-92" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="&lt;span class=&quot;router-outlet-wrapper ng-tns-c1959715094-0&quot;&gt;&lt;strong class=&quot;ng-star-inserted&quot;&gt;Notes&lt;/strong&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="140" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-101" parent="VU9Vfkcs6LlIBZAhdO9N-92" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="CreatedAt" vertex="1">
+          <mxGeometry height="30" width="140" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-104" edge="1" parent="1" source="VU9Vfkcs6LlIBZAhdO9N-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;dashed=1;" target="VU9Vfkcs6LlIBZAhdO9N-80">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-105" edge="1" parent="1" source="VU9Vfkcs6LlIBZAhdO9N-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="VU9Vfkcs6LlIBZAhdO9N-94">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-106" edge="1" parent="1" source="VU9Vfkcs6LlIBZAhdO9N-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="VU9Vfkcs6LlIBZAhdO9N-87">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-108" edge="1" parent="1" source="VU9Vfkcs6LlIBZAhdO9N-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="VU9Vfkcs6LlIBZAhdO9N-44">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-110" edge="1" parent="1" source="VU9Vfkcs6LlIBZAhdO9N-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="VU9Vfkcs6LlIBZAhdO9N-47">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="710" y="785" />
+              <mxPoint x="710" y="540" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-111" edge="1" parent="1" source="VU9Vfkcs6LlIBZAhdO9N-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="VU9Vfkcs6LlIBZAhdO9N-57">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="710" y="785" />
+              <mxPoint x="710" y="735" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-112" edge="1" parent="1" source="VU9Vfkcs6LlIBZAhdO9N-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="VU9Vfkcs6LlIBZAhdO9N-2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="670" y="545" />
+              <mxPoint x="670" y="70" />
+              <mxPoint x="400" y="70" />
+              <mxPoint x="400" y="155" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-113" edge="1" parent="1" source="VU9Vfkcs6LlIBZAhdO9N-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="VU9Vfkcs6LlIBZAhdO9N-51">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="170" y="545" />
+              <mxPoint x="170" y="1010" />
+              <mxPoint x="1230" y="1010" />
+              <mxPoint x="1230" y="495" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VU9Vfkcs6LlIBZAhdO9N-114" edge="1" parent="1" source="VU9Vfkcs6LlIBZAhdO9N-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="VU9Vfkcs6LlIBZAhdO9N-3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="170" y="545" />
+              <mxPoint x="170" y="185" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

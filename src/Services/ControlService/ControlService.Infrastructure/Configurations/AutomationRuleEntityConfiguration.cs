@@ -13,7 +13,7 @@ internal class AutomationRuleEntityConfiguration
 
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.AquariumId).IsRequired();
+        builder.Property(x => x.EcosystemId).IsRequired();
 
         builder.Property(x => x.SensorId).IsRequired();
         builder.HasIndex(x => x.SensorId);
