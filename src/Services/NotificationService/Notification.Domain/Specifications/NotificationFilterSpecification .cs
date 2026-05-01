@@ -11,7 +11,7 @@ public class NotificationFilterSpecification
         NotificationSpecificationParams @params)
         : base(data =>
             (!@params.UserId.HasValue || data.UserId == @params.UserId.Value) &&
-            (!@params.AquariumId.HasValue || data.AquariumId == @params.AquariumId.Value) &&
+            (!@params.EcosystemId.HasValue || data.EcosystemId == @params.EcosystemId.Value) &&
             (!@params.Level.HasValue || data.Level == @params.Level.Value) &&
             (!@params.IsRead.HasValue || data.IsRead == @params.IsRead.Value) &&
             (string.IsNullOrWhiteSpace(@params.SearchTerm) ||

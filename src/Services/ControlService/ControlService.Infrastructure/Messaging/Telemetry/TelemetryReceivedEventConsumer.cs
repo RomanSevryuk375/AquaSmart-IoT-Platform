@@ -4,7 +4,7 @@ using MassTransit;
 
 namespace Control.Infrastructure.Messaging.Telemetry;
 
-public class TelemetryReceivedEventConsumer(ITelemetryServiceFromEvent service) 
+public class TelemetryReceivedEventConsumer(ITelemetryService service) 
     : IConsumer<TelemetryReceivedEvent>
 {
     public async Task Consume(ConsumeContext<TelemetryReceivedEvent> context)

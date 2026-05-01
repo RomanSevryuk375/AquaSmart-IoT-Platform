@@ -9,7 +9,7 @@ public class SensorDeletedEventConsume(ISensorService service)
 {
     public async Task Consume(ConsumeContext<SensorDeletedEvent> context)
     {
-        await service.DeletedSensorFromEventAsync(
+        await service.DeletedSensorAsync(
             context.Message, context.CancellationToken);
     }
 }

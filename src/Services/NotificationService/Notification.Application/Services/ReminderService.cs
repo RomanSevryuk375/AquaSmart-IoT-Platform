@@ -62,7 +62,7 @@ public class ReminderService(
             new ReminderSpecificationParams
             {
                 UserId = filter.UserId,
-                AquariumId = filter.AquariumId,
+                EcosystemId = filter.AquariumId,
                 SearchTerm = filter.SearchTerm,
                 LastDoneAtFrom = filter.LastDoneAtFrom,
                 LastDoneAtTo = filter.LastDoneAtTo,
@@ -80,7 +80,7 @@ public class ReminderService(
         {
             Id = r.Id,
             UserId = r.UserId,
-            AquariumId = r.AquariumId,
+            AquariumId = r.EcosystemId,
             TaskName = r.TaskName,
             IntervalDays = r.IntervalDays,
             NextDueAt = r.NextDueAt,
@@ -100,7 +100,7 @@ public class ReminderService(
         {
             Id = reminder.Id,
             UserId = reminder.UserId,
-            AquariumId = reminder.AquariumId,
+            AquariumId = reminder.EcosystemId,
             TaskName = reminder.TaskName,
             IntervalDays = reminder.IntervalDays,
             NextDueAt = reminder.NextDueAt,

@@ -16,7 +16,7 @@ public class ReminderEntityConfiguration
         builder.Property(x => x.UserId).IsRequired();
         builder.HasIndex(x => x.UserId);
 
-        builder.Property(x => x.AquariumId).IsRequired();
+        builder.Property(x => x.EcosystemId).IsRequired();
 
         builder.Property(x => x.TaskName)
             .HasMaxLength(128)

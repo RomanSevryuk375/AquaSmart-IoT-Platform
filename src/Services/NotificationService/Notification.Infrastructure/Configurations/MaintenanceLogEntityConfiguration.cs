@@ -16,8 +16,8 @@ public class MaintenanceLogEntityConfiguration
         builder.Property(x => x.UserId).IsRequired();
         builder.HasIndex(x => x.UserId);
 
-        builder.Property(x => x.AquariumId).IsRequired();
-        builder.HasIndex(x => x.AquariumId);
+        builder.Property(x => x.EcosystemId).IsRequired();
+        builder.HasIndex(x => x.EcosystemId);
 
         builder.Property(x => x.ActionDate).IsRequired();
 

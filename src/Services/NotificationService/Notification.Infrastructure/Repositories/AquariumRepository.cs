@@ -5,7 +5,7 @@ using Notification.Domain.Interfaces;
 namespace Notification.Infrastructure.Repositories;
 
 public class AquariumRepository(SystemDbContext dbContext)
-    : BaseRepository<AquariumEntity>(dbContext), IAquariumRepository
+    : BaseRepository<EcosystemEntity>(dbContext), IAquariumRepository
 {
     public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken)
     {
@@ -14,7 +14,7 @@ public class AquariumRepository(SystemDbContext dbContext)
             .AnyAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<AquariumEntity?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+    public async Task<EcosystemEntity?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken)
     {
         return await Context.Aquariums
             .AsNoTracking()

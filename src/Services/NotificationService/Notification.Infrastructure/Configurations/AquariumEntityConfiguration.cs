@@ -5,9 +5,9 @@ using Notification.Domain.Entities;
 namespace Notification.Infrastructure.Configurations;
 
 public class AquariumEntityConfiguration
-    : IEntityTypeConfiguration<AquariumEntity>
+    : IEntityTypeConfiguration<EcosystemEntity>
 {
-    public void Configure(EntityTypeBuilder<AquariumEntity> builder)
+    public void Configure(EntityTypeBuilder<EcosystemEntity> builder)
     {
         builder.ToTable("aquariums");
 
@@ -24,17 +24,17 @@ public class AquariumEntityConfiguration
 
         builder.HasMany<NotificationEntity>()
             .WithOne()
-            .HasForeignKey(n => n.AquariumId)
+            .HasForeignKey(n => n.EcosystemId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany<ReminderEntity>()
             .WithOne()
-            .HasForeignKey(n => n.AquariumId)
+            .HasForeignKey(n => n.EcosystemId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany<MaintenanceLogEntity>()
             .WithOne()
-            .HasForeignKey(n => n.AquariumId)
+            .HasForeignKey(n => n.EcosystemId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

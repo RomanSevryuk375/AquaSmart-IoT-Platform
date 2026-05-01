@@ -9,7 +9,7 @@ public class SensorStateChangedComandConsumer(
 {
     public async Task Consume(ConsumeContext<SensorStateChangedCommand> context)
     {
-        await service.ChangedStateFromEventAsync(
+        await service.ChangedStateAsync(
             context.Message, context.CancellationToken);
     }
 }

@@ -31,7 +31,7 @@ public class AquariumServiceFromEvent(
             return;
         }
 
-        var (aquarium, errors) = AquariumEntity.Create(
+        var (aquarium, errors) = EcosystemEntity.Create(
             aquariumCreated.AquriumId,
             aquariumCreated.UserId,
             aquariumCreated.Name,
@@ -40,7 +40,7 @@ public class AquariumServiceFromEvent(
         if (aquarium is null)
         {
             throw new DomainValidationException(
-                $"Failed to create {nameof(AquariumEntity)}: {string.Join(", ", errors)}");
+                $"Failed to create {nameof(EcosystemEntity)}: {string.Join(", ", errors)}");
         }
 
         await aquariumRepository.AddAsync(aquarium, cancellationToken);
@@ -64,7 +64,7 @@ public class AquariumServiceFromEvent(
                 return;
             }
 
-            var (aquarium, errors) = AquariumEntity.Create(
+            var (aquarium, errors) = EcosystemEntity.Create(
                 aquarimUdated.AquriumId,
                 aquarimUdated.UserId,
                 aquarimUdated.Name,
@@ -73,7 +73,7 @@ public class AquariumServiceFromEvent(
             if (aquarium is null)
             {
                 throw new DomainValidationException(
-                    $"Failed to create {nameof(AquariumEntity)}: {string.Join(", ", errors)}");
+                    $"Failed to create {nameof(EcosystemEntity)}: {string.Join(", ", errors)}");
             }
 
             await aquariumRepository.AddAsync(aquarium, cancellationToken);

@@ -17,9 +17,10 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddRepositories (this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<IEcosystemRepository, EcosystemRepository>();
         services.AddScoped<IAutomationRuleRepository, AutomationRuleRepository>();
+        services.AddScoped<IEcosystemRepository, EcosystemRepository>();
         services.AddScoped<IRelayRepository, RelayRepository>();
+        services.AddScoped<IRuleConditionRepository, RuleConditionRepository>();
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
         services.AddScoped<ISensorRepository, SensorRepository>();
         services.AddScoped<IVacationModeRepository, VacationModeRepository>();

@@ -57,7 +57,7 @@ public class MaintenanceLogService(
             new MaintenanceLogSpecificationParams
             {
                 UserId = filter.UserId,
-                AquariumId = filter.AquariumId,
+                EcosystemId = filter.AquariumId,
                 ActionDateFrom = filter.ActionDateFrom,
                 ActionDateTo = filter.ActionDateTo,
             });
@@ -72,7 +72,7 @@ public class MaintenanceLogService(
         {
             Id = log.Id,
             UserId = log.UserId,
-            AquariumId = log.AquariumId,
+            AquariumId = log.EcosystemId,
             ActionDate = log.ActionDate,
             PhLevel = log.PhLevel,
             KhLevel = log.KhLevel,
@@ -92,7 +92,7 @@ public class MaintenanceLogService(
         {
             Id = log.Id,
             UserId = log.UserId,
-            AquariumId = log.AquariumId,
+            AquariumId = log.EcosystemId,
             ActionDate = log.ActionDate,
             PhLevel = log.PhLevel,
             KhLevel = log.KhLevel,

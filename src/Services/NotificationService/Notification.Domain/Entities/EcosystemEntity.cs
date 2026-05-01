@@ -2,9 +2,9 @@
 
 namespace Notification.Domain.Entities;
 
-public class AquariumEntity : IEntity
+public sealed class EcosystemEntity : IEntity
 {
-    private AquariumEntity(
+    private EcosystemEntity(
         Guid id,
         Guid userId,
         string name,
@@ -21,7 +21,7 @@ public class AquariumEntity : IEntity
     public string Name { get; private set; } = string.Empty;
     public DateTime CreatedAt { get; private set; }
 
-    public static (AquariumEntity? aquarium, List<string> errors) Create(
+    public static (EcosystemEntity? aquarium, List<string> errors) Create(
         Guid id,
         Guid userId,
         string name,
@@ -49,7 +49,7 @@ public class AquariumEntity : IEntity
             return (null, errors);
         }
 
-        var aquarium = new AquariumEntity(
+        var aquarium = new EcosystemEntity(
             id,
             userId,
             name,
@@ -58,16 +58,23 @@ public class AquariumEntity : IEntity
         return (aquarium, errors);
     }
 
-    public string? SetName(string name)
+    public List<string>? SetName(string name)
     {
+        var errors = new List<string>();
+
         if (string.IsNullOrWhiteSpace(name))
         {
-            return("name must not be empty.");
+            errors.Add("name must not be empty.");
         }
 
         if (Name == name)
         {
             return null;
+        }
+
+        if (errors.Count > 0)
+        {
+            return errors;
         }
 
         Name = name;

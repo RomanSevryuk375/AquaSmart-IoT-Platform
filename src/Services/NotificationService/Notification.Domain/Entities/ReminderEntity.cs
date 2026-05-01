@@ -2,12 +2,12 @@
 
 namespace Notification.Domain.Entities;
 
-public class ReminderEntity : IEntity
+public sealed class ReminderEntity : IEntity
 {
     private ReminderEntity(
         Guid id, 
         Guid userId, 
-        Guid aquariumId, 
+        Guid ecosystemId, 
         string taskName, 
         int intervalDays, 
         DateTime nextDueAt, 
@@ -15,7 +15,7 @@ public class ReminderEntity : IEntity
     {
         Id = id;
         UserId = userId;
-        AquariumId = aquariumId;
+        EcosystemId = ecosystemId;
         TaskName = taskName;
         IntervalDays = intervalDays;
         NextDueAt = nextDueAt;
@@ -24,7 +24,7 @@ public class ReminderEntity : IEntity
 
     public Guid Id { get; private set; }
     public Guid UserId { get; private set; }
-    public Guid AquariumId { get; private set; }
+    public Guid EcosystemId { get; private set; }
     public string TaskName { get; private set; } = string.Empty;
     public int IntervalDays { get; private set; }
     public DateTime? LastDoneAt { get; private set; }
@@ -34,7 +34,7 @@ public class ReminderEntity : IEntity
 
     public static (ReminderEntity? reminder, List<string> errors) Create(
         Guid userId, 
-        Guid aquariumId, 
+        Guid ecosystemId, 
         string taskName, 
         int intervalDays)
     {
@@ -45,7 +45,7 @@ public class ReminderEntity : IEntity
             errors.Add("userId must not be empty.");
         }
 
-        if (aquariumId == Guid.Empty)
+        if (ecosystemId == Guid.Empty)
         {
             errors.Add("aquariumId must not be empty.");
         }
@@ -68,7 +68,7 @@ public class ReminderEntity : IEntity
         var reminder = new ReminderEntity(
             Guid.NewGuid(),
             userId,
-            aquariumId,
+            ecosystemId,
             taskName,
             intervalDays,
             DateTime.UtcNow.AddDays(intervalDays),

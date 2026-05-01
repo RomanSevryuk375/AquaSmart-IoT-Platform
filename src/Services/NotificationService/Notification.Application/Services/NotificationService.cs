@@ -21,7 +21,7 @@ public class NotificationService(
             new NotificationSpecificationParams
             {
                 UserId = filter.UserId,
-                AquariumId = filter.AquariumId,
+                EcosystemId = filter.AquariumId,
                 Level = filter.Level,
                 IsRead = filter.IsRead,
                 SearchTerm = filter.SearchTerm,
@@ -37,7 +37,7 @@ public class NotificationService(
         {
             Id = n.Id,
             UserId = n.UserId,
-            AquariumId = n.AquariumId,
+            AquariumId = n.EcosystemId,
             Level = n.Level,
             Message = n.Message,
             IsRead = n.IsRead,
@@ -57,7 +57,7 @@ public class NotificationService(
         {
             Id = notification.Id,
             UserId = notification.UserId,
-            AquariumId = notification.AquariumId,
+            AquariumId = notification.EcosystemId,
             Level = notification.Level,
             Message = notification.Message,
             IsRead = notification.IsRead,

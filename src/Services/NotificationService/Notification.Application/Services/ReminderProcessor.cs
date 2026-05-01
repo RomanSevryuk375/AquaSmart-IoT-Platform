@@ -30,7 +30,7 @@ public class ReminderProcessor(
 
             var (notification, errors) = NotificationEntity.Create(
                 reminder.UserId,
-                reminder.AquariumId,
+                reminder.EcosystemId,
                 ReminderImportanceFactory.Evaluate(reminder.NextDueAt),
                 $"{reminder.TaskName} should be done at {reminder.NextDueAt:dd.MM.yyyy}");
 

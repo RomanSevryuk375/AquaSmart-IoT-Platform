@@ -9,7 +9,7 @@ public class SensorNoDataEventConsumer(ISensorService service)
 {
     public async Task Consume(ConsumeContext<SensorNoDataEvent> context)
     {
-        await service.HandleSensorNoDataEvent(
+        await service.HandleSensorNoDataEventAsync(
             context.Message, context.CancellationToken);
     }
 }

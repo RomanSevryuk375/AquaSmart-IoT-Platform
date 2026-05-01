@@ -123,33 +123,26 @@ public sealed class SensorService(
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         var affectedRules = await ruleRepository
-            .GetBySensorIdAsync(existingSensor.Id, cancellationToken);
+            .GetBySensorIdWithConditionsAsync(existingSensor.Id, cancellationToken);
 
         if (affectedRules is null)
         {
-            return ConsumerResult.FatalError("System do not have any rules for this situation");
+            return ConsumerResult.Success();
         }
 
         foreach (var rule in affectedRules)
         {
-            var affectedEcosystem = await ecosystemRepository.GetByIdAsync(
-            rule.EcosystemId, cancellationToken);
-
-            if (affectedEcosystem is null)
-            {
-                continue;
-            }
-
             await publishEndpoint.Publish(new ChangeRelayStateCommand
             {
-                ControllerId = affectedEcosystem.ControllerId,
+                ControllerId = existingEcosystem.ControllerId,
                 RelayId = rule.RelayId,
                 Action = RuleActionEnum.SwitchOff,
+                ExpireAt = DateTime.UtcNow.AddMinutes(5)
             }, cancellationToken);
 
             await publishEndpoint.Publish(new SensorNoDataAlertEvent
             {
-                UserId = affectedEcosystem.UserId,
+                UserId = existingEcosystem.UserId,
                 AquariumId = rule.EcosystemId,
                 SensorId = existingSensor.Id,
                 LastSeenAt = DateTime.UtcNow,

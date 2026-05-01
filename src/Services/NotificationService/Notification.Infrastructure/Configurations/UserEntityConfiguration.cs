@@ -29,7 +29,7 @@ public class UserEntityConfiguration
         builder.Property(x => x.IsNotifyEnabled).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
 
-        builder.HasMany<AquariumEntity>()
+        builder.HasMany<EcosystemEntity>()
             .WithOne()
             .HasForeignKey(n => n.UserId)
             .OnDelete(DeleteBehavior.Cascade);

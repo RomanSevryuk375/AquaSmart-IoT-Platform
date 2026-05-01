@@ -9,7 +9,7 @@ public class SensorUpdatedEventConsumer(ISensorService service)
 {
     public async Task Consume(ConsumeContext<SensorUpdatedEvent> context)
     {
-        await service.UpdatedSensorFromEventAsync(
+        await service.UpdatedSensorAsync(
             context.Message, context.CancellationToken);
     }
 }

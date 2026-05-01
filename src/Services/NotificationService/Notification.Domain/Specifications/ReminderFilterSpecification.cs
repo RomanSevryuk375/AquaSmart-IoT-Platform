@@ -11,7 +11,7 @@ public class ReminderFilterSpecification
         ReminderSpecificationParams @params)
         : base(data =>
             (!@params.UserId.HasValue || data.UserId == @params.UserId.Value) &&
-            (!@params.AquariumId.HasValue || data.AquariumId == @params.AquariumId.Value) &&
+            (!@params.EcosystemId.HasValue || data.EcosystemId == @params.EcosystemId.Value) &&
             (string.IsNullOrWhiteSpace(@params.SearchTerm) ||
              data.TaskName.ToLower().Contains(@params.SearchTerm.ToLower())) &&
             (!@params.LastDoneAtFrom.HasValue || (data.LastDoneAt.HasValue 
