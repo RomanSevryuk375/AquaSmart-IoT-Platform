@@ -3,13 +3,13 @@ using Notification.Domain.Entities;
 
 namespace Notification.Domain.Interfaces;
 
-public interface IUserRepository : IRepository<UserEntity>
+public interface IEcosystemRepository : IRepository<EcosystemEntity>
 {
     Task<bool> ExistsAsync(
-        Guid userId, 
+        Guid ecosystemId, 
         CancellationToken cancellationToken);
 
-    Task<List<UserEntity>> GetAllUsersByIdAsync(
-        List<Guid> userIds,
+    Task<EcosystemEntity?> GetByUserIdAsync(
+        Guid userId, 
         CancellationToken cancellationToken);
 }

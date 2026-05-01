@@ -4,7 +4,7 @@ using Notification.Domain.Interfaces;
 
 namespace Notification.Infrastructure.Repositories;
 
-public class ReminderRepository(SystemDbContext dbContext)
+public sealed class ReminderRepository(SystemDbContext dbContext)
     : BaseRepository<ReminderEntity>(dbContext), IReminderRepository
 {
     public async Task<IReadOnlyList<ReminderEntity>> GetPendingRemindersAsync(

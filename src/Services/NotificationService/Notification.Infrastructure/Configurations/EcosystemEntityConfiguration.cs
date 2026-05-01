@@ -4,12 +4,12 @@ using Notification.Domain.Entities;
 
 namespace Notification.Infrastructure.Configurations;
 
-public class AquariumEntityConfiguration
+public sealed class EcosystemEntityConfiguration
     : IEntityTypeConfiguration<EcosystemEntity>
 {
     public void Configure(EntityTypeBuilder<EcosystemEntity> builder)
     {
-        builder.ToTable("aquariums");
+        builder.ToTable("ecosystems");
 
         builder.HasKey(x => x.Id);
 

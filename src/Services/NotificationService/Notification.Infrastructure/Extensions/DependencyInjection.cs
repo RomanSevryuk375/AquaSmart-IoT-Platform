@@ -29,13 +29,14 @@ public static class DependencyInjection
         services.AddHttpClient<INotificationProvider, TgProvider>();
         services.AddSingleton<INotificationProvider, EmailProvider>();
 
-        services.AddScoped<IAquariumRepository, AquariumRepository>();
+        services.AddScoped<IEcosystemRepository, EcosystemRepository>();
         services.AddScoped<IMaintenanceLogRepository, MaintenanceLogRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IReminderRepository, ReminderRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IUserContext, UserContext>();
 
         return services;
     }
@@ -52,9 +53,9 @@ public static class DependencyInjection
         {
             busConfigurator.SetKebabCaseEndpointNameFormatter();
 
-            busConfigurator.AddConsumer<AquariumCreatedEventConsumer>();
-            busConfigurator.AddConsumer<AquariumDeletedEventConsumer>();
-            busConfigurator.AddConsumer<AquariumUpdatedEventConsumer>();
+            busConfigurator.AddConsumer<EcosystemCreatedEventConsumer>();
+            busConfigurator.AddConsumer<EcosystemDeletedEventConsumer>();
+            busConfigurator.AddConsumer<EcosystemUpdatedEventConsumer>();
 
             busConfigurator.AddConsumer<UserCreatedEventConsumer>();
             busConfigurator.AddConsumer<UserUpdatedEventConsumer>();

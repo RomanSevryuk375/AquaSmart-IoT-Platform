@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Contracts.Constants;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notification.Domain.Entities;
+using System.Text.Json;
 
 namespace Notification.Infrastructure.Configurations;
 
-public class MaintenanceLogEntityConfiguration
+public sealed class MaintenanceLogEntityConfiguration
     : IEntityTypeConfiguration<MaintenanceLogEntity>
 {
     public void Configure(EntityTypeBuilder<MaintenanceLogEntity> builder)
@@ -14,28 +16,25 @@ public class MaintenanceLogEntityConfiguration
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.UserId).IsRequired();
-        builder.HasIndex(x => x.UserId);
-
         builder.Property(x => x.EcosystemId).IsRequired();
-        builder.HasIndex(x => x.EcosystemId);
-
         builder.Property(x => x.ActionDate).IsRequired();
 
-        builder.Property(x => x.PhLevel)
-            .HasPrecision(4, 2)
-            .IsRequired(false);
-
-        builder.Property(x => x.KhLevel)
-            .HasPrecision(4, 2)
-            .IsRequired(false);
-
-        builder.Property(x => x.No3Level)
-            .HasPrecision(4, 2)
-            .IsRequired(false);
+        builder.Property(x => x.Metrics)
+            .HasColumnType("jsonb")
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, null as JsonSerializerOptions),
+                v => JsonSerializer.Deserialize<Dictionary<string, double>>(v, null as JsonSerializerOptions)
+                    ?? new Dictionary<string, double>()
+            )
+            .IsRequired();
 
         builder.Property(x => x.Notes)
-            .HasMaxLength(1024)
+            .HasMaxLength(MaintenanceLogConstants.Length)
             .IsRequired();
+
         builder.Property(x => x.CreatedAt).IsRequired();
+
+        builder.HasIndex(x => x.UserId);
+        builder.HasIndex(x => x.EcosystemId);
     }
 }

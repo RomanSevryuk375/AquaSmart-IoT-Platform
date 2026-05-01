@@ -1,18 +1,19 @@
 ﻿using Contracts.Enums;
 using Contracts.Events.ControllerEvents;
+using Contracts.Results;
 using Notification.Application.Interfaces;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
 
 namespace Notification.Application.Services;
 
-public class ControllerAlertSender(
+public sealed class ControllerAlertSender(
     INotificationRepository notificationRepository,
     IUserRepository userRepository,
-    IAquariumRepository aquariumRepository,
+    IEcosystemRepository ecosystemRepository,
     IUnitOfWork unitOfWork) : IControllerAlertSender
 {
-    public async Task SendControllerNotOnlineAlert(
+    public async Task<ConsumerResult> SendControllerNotOnlineAlert(
         ControllerNotOnlineEvent controllerEvent,
         CancellationToken cancellationToken)
     {
@@ -21,30 +22,35 @@ public class ControllerAlertSender(
 
         if (existingUser is null)
         {
-            return;
+            return ConsumerResult
+                .RetryableError($"User {controllerEvent.UserId} not found");
         }
 
-        var existingAquarium = await aquariumRepository
+        var existingEcosystem = await ecosystemRepository
             .GetByUserIdAsync(existingUser.Id, cancellationToken);
 
-        if (existingAquarium is null)
+        if (existingEcosystem is null)
         {
-            return;
+            return ConsumerResult
+                .RetryableError($"Ecosystem {existingUser.Id} not found");
         }
 
         var (notification, errors) = NotificationEntity.Create(
             controllerEvent.UserId,
-            existingAquarium.Id,
+            existingEcosystem.Id,
             NotificationLevelEnum.Critical,
             $"Controller {controllerEvent.ControllerId} " +
             $"was last online at {controllerEvent.LastSeenAt:HH:mm:ss}");
 
         if (notification is null)
         {
-            return;
+            return ConsumerResult
+                .FatalError($"Failed to create {nameof(NotificationEntity)}: {string.Join(", ", errors)}");
         }
 
         await notificationRepository.AddAsync(notification, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return ConsumerResult.Success();
     }
 }
