@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Contracts.Results;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Notification.Application.DTOs.Notification;
 using Notification.Application.Interfaces;
 
 namespace Notification.API.Controllers;
 
 [ApiController]
+[Authorize] 
 [Route("api/notification/v1/notifications")]
 public class NotificationController(
     INotificationService notificationService) : ControllerBase
@@ -19,7 +22,7 @@ public class NotificationController(
         var result = await notificationService
             .GetAllNotificationsAsync(filter, skip, take, cancellationToken);
 
-        return Ok(result);
+        return this.ToActionResult(result);
     }
 
     [HttpGet("{id:guid}")]
@@ -29,16 +32,16 @@ public class NotificationController(
     {
         var result = await notificationService.GetNotificationByIdAsync(id, cancellationToken);
 
-        return Ok(result);
+        return this.ToActionResult(result);
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPut("{id:guid}/read")] 
     public async Task<IActionResult> MarkNotificationAsReadAsync(
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        await notificationService.MarkNotificationAsReadAsync(id, cancellationToken);
+        var result = await notificationService.MarkNotificationAsReadAsync(id, cancellationToken);
 
-        return NoContent();
+        return this.ToActionResult(result);
     }
 }
