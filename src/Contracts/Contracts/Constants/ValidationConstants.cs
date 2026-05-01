@@ -29,3 +29,24 @@ public static class EcosystemConstants
 {
     public const int NameLength = 128;
 }
+
+public static class MaintenanceLogConstants
+{
+    public const int Length = 1024;
+}
+
+public static class NotificationConstants
+{
+    public const int messageLength = 2048;
+}
+
+public static class ReminderConstants
+{
+    public const int NameLength = 128;
+}
+
+public static class UserConstants
+{
+    public const int PhoneNumberLength = 128;
+    public const int EmailLength = 64;
+}

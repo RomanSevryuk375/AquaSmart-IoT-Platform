@@ -1,14 +1,15 @@
 ﻿using Contracts.Events.UserEvents;
+using Contracts.Results;
 
 namespace Notification.Application.Interfaces;
 
-public interface IUserServiceFromEvent
+public interface IUserService
 {
-    Task CreateUserFromEventAsync(
+    Task<ConsumerResult> CreateUserAsync(
         UserCreatedEvent userCreated, 
         CancellationToken cancellationToken);
 
-    Task UpdateUserFromEventAsync(
+    Task<ConsumerResult> UpdateUserAsync(
         UserUpdatedEvent user,
         CancellationToken cancellationToken);
 }

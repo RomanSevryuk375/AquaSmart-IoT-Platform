@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Contracts.Constants;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notification.Domain.Entities;
 
 namespace Notification.Infrastructure.Configurations;
 
-public class NotificationEntityConfiguration 
+public sealed class NotificationEntityConfiguration 
     : IEntityTypeConfiguration<NotificationEntity>
 {
     public void Configure(EntityTypeBuilder<NotificationEntity> builder)
@@ -14,24 +15,23 @@ public class NotificationEntityConfiguration
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.UserId).IsRequired();
-        builder.HasIndex(x => x.UserId);
-
-        builder.Property(x => x.EcosystemId).IsRequired();
+        builder.Property(x => x.EcosystemId).IsRequired(false);
 
         builder.Property(x => x.Level)
             .HasConversion<int>()
             .IsRequired();
-        builder.HasIndex(x => x.Level);
 
         builder.Property(x => x.Message)
-            .HasMaxLength(2048)
+            .HasMaxLength(NotificationConstants.messageLength)
             .IsRequired();
 
         builder.Property(x => x.IsRead).IsRequired();
-        builder.HasIndex(x => x.IsRead);
-
         builder.Property(x => x.CreatedAt).IsRequired();
         builder.Property(x => x.IsPublished).IsRequired();
         builder.Property(x => x.PublishedAt).IsRequired(false);
+
+        builder.HasIndex(x => x.Level);
+        builder.HasIndex(x => x.IsRead);
+        builder.HasIndex(x => x.UserId);
     }
 }

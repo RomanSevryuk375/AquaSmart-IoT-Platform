@@ -4,12 +4,17 @@ using Notification.Application.Interfaces;
 
 namespace Notification.Infrastructure.Messaging;
 
-public class UserUpdatedEventConsumer(
-    IUserServiceFromEvent userService) : IConsumer<UserUpdatedEvent>
+public sealed class UserUpdatedEventConsumer(
+    IUserService userService) : IConsumer<UserUpdatedEvent>
 {
     public async Task Consume(ConsumeContext<UserUpdatedEvent> context)
     {
-        await userService
-            .UpdateUserFromEventAsync(context.Message, context.CancellationToken);
+        var result = await userService.UpdateUserAsync(
+            context.Message, context.CancellationToken);
+
+        if (!result.IsSuccess && result.IsRetryable)
+        {
+            throw new Exception(result.Error);
+        }
     }
 }

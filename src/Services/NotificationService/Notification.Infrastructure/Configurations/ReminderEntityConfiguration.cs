@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Contracts.Constants;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notification.Domain.Entities;
 
 namespace Notification.Infrastructure.Configurations;
 
-public class ReminderEntityConfiguration
+public sealed class ReminderEntityConfiguration
     : IEntityTypeConfiguration<ReminderEntity>
 {
     public void Configure(EntityTypeBuilder<ReminderEntity> builder)
@@ -14,21 +15,19 @@ public class ReminderEntityConfiguration
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.UserId).IsRequired();
-        builder.HasIndex(x => x.UserId);
-
         builder.Property(x => x.EcosystemId).IsRequired();
 
         builder.Property(x => x.TaskName)
-            .HasMaxLength(128)
+            .HasMaxLength(ReminderConstants.NameLength)
             .IsRequired();
 
         builder.Property(x => x.IntervalDays).IsRequired();
-
         builder.Property(x => x.NextDueAt).IsRequired();
-        builder.HasIndex(x => x.NextDueAt);
-
         builder.Property(x => x.LastNotifiedAt).IsRequired(false);
         builder.Property(x => x.LastDoneAt).IsRequired(false);
         builder.Property(x => x.CreatedAt).IsRequired();
+
+        builder.HasIndex(x => x.NextDueAt);
+        builder.HasIndex(x => x.UserId);
     }
 }

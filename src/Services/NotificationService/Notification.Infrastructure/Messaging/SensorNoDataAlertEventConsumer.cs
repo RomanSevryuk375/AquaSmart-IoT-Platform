@@ -4,12 +4,17 @@ using Notification.Application.Interfaces;
 
 namespace Notification.Infrastructure.Messaging;
 
-public class SensorNoDataAlertEventConsumer(
+public sealed class SensorNoDataAlertEventConsumer(
     ISensorAlertSender alertSender) : IConsumer<SensorNoDataAlertEvent>
 {
     public async Task Consume(ConsumeContext<SensorNoDataAlertEvent> context)
     {
-        await alertSender.SendSensorNoDataAlertAsync(
+        var result = await alertSender.SendSensorNoDataAlertAsync(
             context.Message, context.CancellationToken);
+
+        if (!result.IsSuccess && result.IsRetryable)
+        {
+            throw new Exception(result.Error);
+        }
     }
 }

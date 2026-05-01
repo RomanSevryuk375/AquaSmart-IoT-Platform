@@ -1,20 +1,21 @@
-﻿using Notification.Application.DTOs.MaintenanceLog;
+﻿using Contracts.Results;
+using Notification.Application.DTOs.MaintenanceLog;
 
 namespace Notification.Application.Interfaces;
 
 public interface IMaintenanceLogService
 {
-    Task<IReadOnlyList<MaintenanceLogResponseDto>> GetAllLogs(
+    Task<Result<IReadOnlyList<MaintenanceLogResponseDto>>> GetAllLogs(
         MaintenanceLogFilterDto filter,
         int? skip,
         int? take,
         CancellationToken cancellationToken);
 
-    Task<MaintenanceLogResponseDto> GetLogById(
-        Guid id,
+    Task<Result<MaintenanceLogResponseDto>> GetLogById(
+        Guid logId,
         CancellationToken cancellationToken);
 
-    Task<Guid> AddLogAsync(
+    Task<Result<Guid>> AddLogAsync(
         MaintenanceLogRequestDto request,
         CancellationToken cancellationToken);
 }

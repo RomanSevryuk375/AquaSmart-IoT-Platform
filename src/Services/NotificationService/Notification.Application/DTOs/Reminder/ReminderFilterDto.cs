@@ -3,7 +3,7 @@
 public record ReminderFilterDto
 {
     public Guid? UserId { get; init; }
-    public Guid? AquariumId { get; init; }
+    public Guid? EcosystemId { get; init; }
     public string? SearchTerm { get; init; } = string.Empty;
 
     public DateTime? LastDoneAtFrom { get; init; }

@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Contracts.Constants;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notification.Domain.Entities;
 
 namespace Notification.Infrastructure.Configurations;
 
-public class UserEntityConfiguration
+public sealed class UserEntityConfiguration
     : IEntityTypeConfiguration<UserEntity>
 {
     public void Configure(EntityTypeBuilder<UserEntity> builder)
@@ -13,14 +14,14 @@ public class UserEntityConfiguration
 
         builder.HasKey(x => x.Id);
 
+        builder.Property(x => x.TimeZone).IsRequired();
+
         builder.Property(x => x.Email)
-            .HasMaxLength(128)
+            .HasMaxLength(UserConstants.EmailLength)
             .IsRequired();
-        builder.HasIndex(x => x.Email)
-            .IsUnique();
 
         builder.Property(x => x.PhoneNumber)
-            .HasMaxLength(64)
+            .HasMaxLength(UserConstants.PhoneNumberLength)
             .IsRequired();
 
         builder.Property(x => x.EmailEnable).IsRequired();
@@ -28,6 +29,9 @@ public class UserEntityConfiguration
         builder.Property(x => x.TelegramChatId).IsRequired(false);
         builder.Property(x => x.IsNotifyEnabled).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
+
+        builder.HasIndex(x => x.Email).IsUnique();
+        builder.HasIndex(x => x.PhoneNumber).IsUnique();
 
         builder.HasMany<EcosystemEntity>()
             .WithOne()
