@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Contracts.Events.EcosystemEvents;
 using Contracts.Results;
+using Control.Application.DTOs.AutomationRule;
 using Control.Application.DTOs.Ecosystem;
 using Control.Application.Interfaces;
 using Control.Domain.Entities;
@@ -27,7 +28,7 @@ public sealed class EcosystemService(
         var specification = new EcosystemFilterSpecification(
             new EcosystemFilterParams
             {
-                UserId = filter.UserId,
+                UserId = userContext.UserId,
                 Name = filter.Name,
                 ControllerId = filter.ControllerId,
                 Type = filter.Type,
@@ -55,6 +56,14 @@ public sealed class EcosystemService(
                 .Failure(Error.NotFound(
                     "Ecosystem.NotFound",
                     $"{nameof(EcosystemEntity)} not found"));
+        }
+
+        if (ecosystem.UserId != userContext.UserId)
+        {
+            return Result<EcosystemResponseDto>
+                .Failure(Error.Conflict(
+                    "Access.Denied",
+                    "You are not the owner of this ecosystem"));
         }
 
         return Result<EcosystemResponseDto>
@@ -105,6 +114,13 @@ public sealed class EcosystemService(
                 $"{nameof(EcosystemEntity)} not found"));
         }
 
+        if (ecosystem.UserId != userContext.UserId)
+        {
+            return Result.Failure(Error.Conflict(
+                    "Access.Denied",
+                    "You are not the owner of this ecosystem"));
+        }
+
         var nameErrors = ecosystem.SetName(request.Name);
 
         if (nameErrors is not null)
@@ -135,6 +151,23 @@ public sealed class EcosystemService(
         Guid ecosystemId,
         CancellationToken cancellationToken)
     {
+        var ecosystem = await ecosystemRepository
+            .GetByIdAsync(ecosystemId, cancellationToken);
+
+        if (ecosystem is null)
+        {
+            return Result.Failure(Error.NotFound(
+                    "Ecosystem.NotFound",
+                    $"{nameof(EcosystemEntity)} not found"));
+        }
+
+        if (ecosystem.UserId != userContext.UserId)
+        {
+            return Result.Failure(Error.Conflict(
+                    "Access.Denied",
+                    "You are not the owner of this ecosystem"));
+        }
+
         await ecosystemRepository.DeleteAsync(ecosystemId, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

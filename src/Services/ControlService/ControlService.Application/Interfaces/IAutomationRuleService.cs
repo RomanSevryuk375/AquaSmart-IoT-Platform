@@ -13,10 +13,10 @@ public interface IAutomationRuleService
         Guid ruleId, 
         CancellationToken cancellationToken);
 
-    Task<IReadOnlyList<AutomationRuleResponseDto>> GetAllRulesAsync(
-        AutomationRuleFilterDto filter, 
-        int? skip, 
-        int? take, 
+    Task<Result<IReadOnlyList<AutomationRuleResponseDto>>> GetAllRulesAsync(
+        AutomationRuleFilterDto filter,
+        int? skip,
+        int? take,
         CancellationToken cancellationToken);
 
     Task<Result<AutomationRuleResponseDto>> GetRuleByIdAsync(
