@@ -30,6 +30,10 @@ public sealed class SensorEntityConfiguration
             .HasConversion<int>()
             .IsRequired();
 
+        builder.Property(x => x.LastValue)
+            .HasPrecision(10, 4)
+            .IsRequired();
+
         builder.Property(x => x.CreatedAt).IsRequired();
     }
 }

@@ -1,10 +1,10 @@
-﻿namespace Contracts.Events.AquariumEvents;
+﻿namespace Contracts.Events.EcosystemEvents;
 
-public class AquarimUdatedEvent
+public class EcosystemUdatedEvent
 {
     public Guid EventId { get; init; } = Guid.NewGuid();
     public DateTime OccurredOn { get; init; } = DateTime.UtcNow;
-    public Guid AquriumId { get; init; }
+    public Guid EcosystemId { get; init; }
     public Guid UserId { get; init; }
     public string Name { get; init; } = string.Empty;
     public Guid ControllerId { get; init; }

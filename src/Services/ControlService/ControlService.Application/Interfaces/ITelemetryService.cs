@@ -1,10 +1,11 @@
 ﻿using Contracts.Events.TelemetryEvents;
+using Contracts.Results;
 
 namespace Control.Application.Interfaces;
 
-public interface ITelemetryServiceFromEvent
+public interface ITelemetryService
 {
-    Task ProcessTelemetryAsync(
+    Task<ConsumerResult> ProcessTelemetryAsync(
         TelemetryReceivedEvent telemetry, 
         CancellationToken cancellationToken);
 }

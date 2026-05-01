@@ -1,6 +1,5 @@
 ﻿using Control.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Control.Infrastructure.Configurations;

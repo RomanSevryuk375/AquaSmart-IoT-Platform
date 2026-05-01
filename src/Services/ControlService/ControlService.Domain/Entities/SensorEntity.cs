@@ -12,6 +12,7 @@ public class SensorEntity : IEntity
         string name,
         SensorStateEnum state,
         SensorTypeEnum type, 
+        double lastValue,
         DateTime createdAt)
     {
         Id = id;
@@ -20,6 +21,7 @@ public class SensorEntity : IEntity
         Name = name;
         State = state;
         Type = type;
+        LastValue = lastValue;
         CreatedAt = createdAt;
     }
 
@@ -29,6 +31,7 @@ public class SensorEntity : IEntity
     public string Name { get; private set; }
     public SensorStateEnum State { get; private set; }
     public SensorTypeEnum Type { get; private set; }
+    public double LastValue { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
     public static (SensorEntity? sensor, List<string> errors) Create(
@@ -74,6 +77,7 @@ public class SensorEntity : IEntity
             name,
             state,
             type,
+            0.0,
             createdAt);
 
         return (sensor, errors);
@@ -87,6 +91,11 @@ public class SensorEntity : IEntity
         }
 
         State = state;
+    }
+
+    public void SetLastValue(double value)
+    {
+        LastValue = value;
     }
 
     public void SetType(SensorTypeEnum type)

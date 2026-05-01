@@ -1,4 +1,4 @@
-﻿using Control.Application.DTOs.Aquarium;
+﻿using Control.Application.DTOs.Ecosystem;
 using Control.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,23 +6,23 @@ namespace Control.API.Controllers;
 
 [ApiController]
 [Route("api/control/v1/aquariums")]
-public class AquariumsController(IAquariumService aquariumService) : ControllerBase
+public class AquariumsController(IEcosystemService aquariumService) : ControllerBase
 {
     private const string NameGetById = "GetAquariumById";
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<AquariumResponseDto>>> GetAllAquariumsAsync(
-        [FromQuery] AquariumFilterDto filter,
+    public async Task<ActionResult<IReadOnlyList<EcosystemResponseDto>>> GetAllAquariumsAsync(
+        [FromQuery] EcosystemFilterDto filter,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 10,
         CancellationToken cancellationToken = default)
     {
-        var result = await aquariumService.GetAllAquariumsAsync(filter, skip, take, cancellationToken);
+        var result = await aquariumService.GetAllEcosystemsAsync(filter, skip, take, cancellationToken);
         return Ok(result);
     }
 
     [HttpGet("{id:guid}", Name = NameGetById)]
-    public async Task<ActionResult<AquariumResponseDto>> GetAquariumByIdAsync(
+    public async Task<ActionResult<EcosystemResponseDto>> GetAquariumByIdAsync(
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
@@ -32,10 +32,10 @@ public class AquariumsController(IAquariumService aquariumService) : ControllerB
 
     [HttpPost]
     public async Task<ActionResult> CreateAquariumAsync(
-        [FromBody] AquariumRequestDto request,
+        [FromBody] EcosystemRequestDto request,
         CancellationToken cancellationToken = default)
     {
-        var id = await aquariumService.CreateAquariumAsync(request, cancellationToken);
+        var id = await aquariumService.CreateEcosystemAsync(request, cancellationToken);
         var createdData = await aquariumService.GetAquariumByIdAsync(id, cancellationToken);
 
         return CreatedAtRoute(
@@ -46,10 +46,10 @@ public class AquariumsController(IAquariumService aquariumService) : ControllerB
 
     [HttpPut("{id:guid}")]
     public async Task<ActionResult> UpdateAquariumAsync([FromRoute] Guid id,
-        [FromBody] AquariumUpdateRequestDto request,
+        [FromBody] EcosystemUpdateRequestDto request,
         CancellationToken cancellationToken = default)
     {
-        await aquariumService.UpdateAquariumAsync(id, request, cancellationToken);
+        await aquariumService.UpdateEcosystemAsync(id, request, cancellationToken);
         return NoContent(); 
     }
 
@@ -58,7 +58,7 @@ public class AquariumsController(IAquariumService aquariumService) : ControllerB
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        await aquariumService.DeleteAquariumAsync(id, cancellationToken);
+        await aquariumService.DeleteEcosystemAsync(id, cancellationToken);
         return NoContent(); 
     }
 }

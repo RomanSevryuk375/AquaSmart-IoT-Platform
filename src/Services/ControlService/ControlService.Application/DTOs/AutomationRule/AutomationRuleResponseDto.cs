@@ -1,16 +1,18 @@
 ﻿using Contracts.Enums;
+using Control.Domain.Entities;
 
 namespace Control.Application.DTOs.AutomationRule;
 
 public record AutomationRuleResponseDto
 {
-    public Guid Id { get; init; }
-    public Guid AquariumId { get; init; }
-    public Guid SensorId { get; init; }
-    public Guid RelayId { get; init; }
-    public RuleConditionEnum Condition { get; init; }
-    public double Threshold { get; init; }
-    public double Hysteresis { get; init; }
-    public RuleActionEnum Action { get; init; }
-    public DateTime CreatedAt { get; init; }
+    public Guid Id { get; private set; }
+    public Guid EcosystemId { get; private set; }
+    public Guid RelayId { get; private set; }
+    public string Name { get; private set; } = string.Empty;
+    public OperatorEnum Operator { get; private set; }
+    public RuleActionEnum Action { get; private set; }
+    public bool IsActive { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+
+    public IReadOnlyList<RuleConditionResponseDto> Conditions { get; private set; } = [];
 }

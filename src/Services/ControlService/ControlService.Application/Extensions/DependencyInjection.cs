@@ -8,12 +8,12 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddScoped<IAquariumService, AquariumService>();
+        services.AddScoped<IEcosystemService, EcosystemService>();
         services.AddScoped<IAutomationRuleService, AutomationRuleService>();
-        services.AddScoped<IRelayServiceFromEvent, RelayServiceFromEvent>();
+        services.AddScoped<IRelayService, RelayService>();
         services.AddScoped<IScheduleProcessor, ScheduleProcessor>();
-        services.AddScoped<ISensorServiceFromEvent, SensorServiceFromEvent>();
-        services.AddScoped<ITelemetryServiceFromEvent, TelemetryServiceFromEvent>();
+        services.AddScoped<ISensorService, SensorService>();
+        services.AddScoped<ITelemetryServiceFromEvent, TelemetryService>();
 
         return services;
     }

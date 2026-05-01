@@ -3,7 +3,7 @@ using Control.Domain.Entities;
 
 namespace Control.Domain.Interfaces;
 
-public interface IAquariumRepository : IRepository<EcosystemEntity>
+public interface IEcosystemRepository : IRepository<EcosystemEntity>
 {
     Task<bool> ExistsAsync(
         Guid ecosystemId, 

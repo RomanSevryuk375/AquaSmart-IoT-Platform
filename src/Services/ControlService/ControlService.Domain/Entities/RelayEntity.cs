@@ -9,7 +9,7 @@ public class RelayEntity : IEntity
         Guid id,
         Guid ecosystemId,
         Guid controllerId,
-        Guid powerSensorId,
+        Guid? powerSensorId,
         string name,
         RelayPurposeEnum purpose,
         bool isManual,
@@ -29,7 +29,7 @@ public class RelayEntity : IEntity
     public Guid Id { get; private set; }
     public Guid ControllerId { get; private set; }
     public Guid EcosystemId { get; private set; }
-    public Guid PowerSensorId { get; private set; }
+    public Guid? PowerSensorId { get; private set; }
     public string Name { get; private set; }
     public RelayPurposeEnum Purpose { get; private set; }
     public bool IsManual { get; private set; }
@@ -40,7 +40,7 @@ public class RelayEntity : IEntity
         Guid id,
         Guid ecosystemId,
         Guid controllerId,
-        Guid powerSensorId,
+        Guid? powerSensorId,
         string name,
         RelayPurposeEnum purpose,
         bool isManual,

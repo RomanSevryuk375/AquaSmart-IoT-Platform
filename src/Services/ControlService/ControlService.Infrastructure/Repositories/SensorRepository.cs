@@ -15,4 +15,14 @@ public sealed class SensorRepository(SystemDbContext dbContext)
             .AsNoTracking()
             .AnyAsync(x => x.Id == sensorId, cancellationToken);
     }
+
+    public async Task<IReadOnlyList<SensorEntity>> GetManyByIdsAsync(
+        List<Guid> sensorIds,
+        CancellationToken cancellationToken)
+    {
+        return await Context.Sensors
+            .AsNoTracking()
+            .Where(x => sensorIds.Contains(x.Id))
+            .ToListAsync(cancellationToken);
+    }
 }

@@ -8,4 +8,8 @@ public interface ISensorRepository : IRepository<SensorEntity>
     Task<bool> ExistsAsync(
         Guid id, 
         CancellationToken cancellationToken);
+
+    Task<IReadOnlyList<SensorEntity>> GetManyByIdsAsync(
+        List<Guid> sensorIds,
+        CancellationToken cancellationToken);
 }

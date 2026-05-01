@@ -4,7 +4,7 @@ using MassTransit;
 
 namespace Control.Infrastructure.Messaging.Sensor;
 
-public class SensorCreatedEventconsumer(ISensorServiceFromEvent service) 
+public class SensorCreatedEventconsumer(ISensorService service) 
     : IConsumer<SensorCreatedEvent>
 {
     public async Task Consume(ConsumeContext<SensorCreatedEvent> context)
