@@ -143,7 +143,7 @@ public sealed class SensorService(
             await publishEndpoint.Publish(new SensorNoDataAlertEvent
             {
                 UserId = existingEcosystem.UserId,
-                AquariumId = rule.EcosystemId,
+                EcosytemId = rule.EcosystemId,
                 SensorId = existingSensor.Id,
                 LastSeenAt = DateTime.UtcNow,
             }, cancellationToken);

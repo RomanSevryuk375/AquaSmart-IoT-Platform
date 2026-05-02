@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Notification.Infrastructure.Migrations
 {
     [DbContext(typeof(SystemDbContext))]
-    [Migration("20260422201229_UpdateUserAndAquariumOwnership")]
-    partial class UpdateUserAndAquariumOwnership
+    [Migration("20260501202445_RealInitialCreate")]
+    partial class RealInitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace Notification.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Notification.Domain.Entities.AquariumEntity", b =>
+            modelBuilder.Entity("Notification.Domain.Entities.EcosystemEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -47,12 +47,12 @@ namespace Notification.Infrastructure.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
-                        .HasName("pk_aquariums");
+                        .HasName("pk_ecosystems");
 
                     b.HasIndex("UserId")
-                        .HasDatabaseName("ix_aquariums_user_id");
+                        .HasDatabaseName("ix_ecosystems_user_id");
 
-                    b.ToTable("aquariums", (string)null);
+                    b.ToTable("ecosystems", (string)null);
                 });
 
             modelBuilder.Entity("Notification.Domain.Entities.MaintenanceLogEntity", b =>
@@ -66,34 +66,24 @@ namespace Notification.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("action_date");
 
-                    b.Property<Guid>("AquariumId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("aquarium_id");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<double?>("KhLevel")
-                        .HasPrecision(4, 2)
-                        .HasColumnType("double precision")
-                        .HasColumnName("kh_level");
+                    b.Property<Guid>("EcosystemId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("ecosystem_id");
 
-                    b.Property<double?>("No3Level")
-                        .HasPrecision(4, 2)
-                        .HasColumnType("double precision")
-                        .HasColumnName("no3level");
+                    b.Property<string>("Metrics")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("metrics");
 
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasMaxLength(1024)
                         .HasColumnType("character varying(1024)")
                         .HasColumnName("notes");
-
-                    b.Property<double?>("PhLevel")
-                        .HasPrecision(4, 2)
-                        .HasColumnType("double precision")
-                        .HasColumnName("ph_level");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
@@ -102,8 +92,8 @@ namespace Notification.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_maintenance_logs");
 
-                    b.HasIndex("AquariumId")
-                        .HasDatabaseName("ix_maintenance_logs_aquarium_id");
+                    b.HasIndex("EcosystemId")
+                        .HasDatabaseName("ix_maintenance_logs_ecosystem_id");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_maintenance_logs_user_id");
@@ -118,13 +108,13 @@ namespace Notification.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<Guid>("AquariumId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("aquarium_id");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
+
+                    b.Property<Guid?>("EcosystemId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("ecosystem_id");
 
                     b.Property<string>("FailureReason")
                         .HasColumnType("text")
@@ -163,8 +153,8 @@ namespace Notification.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_notifications");
 
-                    b.HasIndex("AquariumId")
-                        .HasDatabaseName("ix_notifications_aquarium_id");
+                    b.HasIndex("EcosystemId")
+                        .HasDatabaseName("ix_notifications_ecosystem_id");
 
                     b.HasIndex("IsRead")
                         .HasDatabaseName("ix_notifications_is_read");
@@ -185,13 +175,13 @@ namespace Notification.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<Guid>("AquariumId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("aquarium_id");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
+
+                    b.Property<Guid>("EcosystemId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("ecosystem_id");
 
                     b.Property<int>("IntervalDays")
                         .HasColumnType("integer")
@@ -222,8 +212,8 @@ namespace Notification.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_reminders");
 
-                    b.HasIndex("AquariumId")
-                        .HasDatabaseName("ix_reminders_aquarium_id");
+                    b.HasIndex("EcosystemId")
+                        .HasDatabaseName("ix_reminders_ecosystem_id");
 
                     b.HasIndex("NextDueAt")
                         .HasDatabaseName("ix_reminders_next_due_at");
@@ -247,8 +237,8 @@ namespace Notification.Infrastructure.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
                         .HasColumnName("email");
 
                     b.Property<bool>("EmailEnable")
@@ -261,8 +251,8 @@ namespace Notification.Infrastructure.Migrations
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
                         .HasColumnName("phone_number");
 
                     b.Property<long?>("TelegramChatId")
@@ -273,6 +263,11 @@ namespace Notification.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("tg_enable");
 
+                    b.Property<string>("TimeZone")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("time_zone");
+
                     b.HasKey("Id")
                         .HasName("pk_users");
 
@@ -280,27 +275,31 @@ namespace Notification.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_users_email");
 
+                    b.HasIndex("PhoneNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_phone_number");
+
                     b.ToTable("users", (string)null);
                 });
 
-            modelBuilder.Entity("Notification.Domain.Entities.AquariumEntity", b =>
+            modelBuilder.Entity("Notification.Domain.Entities.EcosystemEntity", b =>
                 {
                     b.HasOne("Notification.Domain.Entities.UserEntity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_aquariums_users_user_id");
+                        .HasConstraintName("fk_ecosystems_users_user_id");
                 });
 
             modelBuilder.Entity("Notification.Domain.Entities.MaintenanceLogEntity", b =>
                 {
-                    b.HasOne("Notification.Domain.Entities.AquariumEntity", null)
+                    b.HasOne("Notification.Domain.Entities.EcosystemEntity", null)
                         .WithMany()
-                        .HasForeignKey("AquariumId")
+                        .HasForeignKey("EcosystemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_maintenance_logs_aquariums_aquarium_id");
+                        .HasConstraintName("fk_maintenance_logs_ecosystems_ecosystem_id");
 
                     b.HasOne("Notification.Domain.Entities.UserEntity", null)
                         .WithMany()
@@ -312,12 +311,11 @@ namespace Notification.Infrastructure.Migrations
 
             modelBuilder.Entity("Notification.Domain.Entities.NotificationEntity", b =>
                 {
-                    b.HasOne("Notification.Domain.Entities.AquariumEntity", null)
+                    b.HasOne("Notification.Domain.Entities.EcosystemEntity", null)
                         .WithMany()
-                        .HasForeignKey("AquariumId")
+                        .HasForeignKey("EcosystemId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_notifications_aquariums_aquarium_id");
+                        .HasConstraintName("fk_notifications_ecosystems_ecosystem_id");
 
                     b.HasOne("Notification.Domain.Entities.UserEntity", null)
                         .WithMany()
@@ -329,12 +327,12 @@ namespace Notification.Infrastructure.Migrations
 
             modelBuilder.Entity("Notification.Domain.Entities.ReminderEntity", b =>
                 {
-                    b.HasOne("Notification.Domain.Entities.AquariumEntity", null)
+                    b.HasOne("Notification.Domain.Entities.EcosystemEntity", null)
                         .WithMany()
-                        .HasForeignKey("AquariumId")
+                        .HasForeignKey("EcosystemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_reminders_aquariums_aquarium_id");
+                        .HasConstraintName("fk_reminders_ecosystems_ecosystem_id");
 
                     b.HasOne("Notification.Domain.Entities.UserEntity", null)
                         .WithMany()

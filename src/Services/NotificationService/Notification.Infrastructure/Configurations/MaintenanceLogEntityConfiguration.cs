@@ -1,5 +1,6 @@
 ﻿using Contracts.Constants;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notification.Domain.Entities;
 using System.Text.Json;
@@ -11,6 +12,8 @@ public sealed class MaintenanceLogEntityConfiguration
 {
     public void Configure(EntityTypeBuilder<MaintenanceLogEntity> builder)
     {
+        var serializerOptions = new JsonSerializerOptions { WriteIndented = false };
+
         builder.ToTable("maintenance_logs");
 
         builder.HasKey(x => x.Id);
@@ -22,11 +25,15 @@ public sealed class MaintenanceLogEntityConfiguration
         builder.Property(x => x.Metrics)
             .HasColumnType("jsonb")
             .HasConversion(
-                v => JsonSerializer.Serialize(v, null as JsonSerializerOptions),
-                v => JsonSerializer.Deserialize<Dictionary<string, double>>(v, null as JsonSerializerOptions)
-                    ?? new Dictionary<string, double>()
+                v => JsonSerializer.Serialize(v, serializerOptions),
+                v => JsonSerializer.Deserialize<Dictionary<string, double>>(v, serializerOptions)
+                     ?? new Dictionary<string, double>()
             )
-            .IsRequired();
+            .Metadata.SetValueComparer(new ValueComparer<Dictionary<string, double>>(
+                (c1, c2) => c1!.SequenceEqual(c2!),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                c => c.ToDictionary(entry => entry.Key, entry => entry.Value)
+            ));
 
         builder.Property(x => x.Notes)
             .HasMaxLength(MaintenanceLogConstants.Length)

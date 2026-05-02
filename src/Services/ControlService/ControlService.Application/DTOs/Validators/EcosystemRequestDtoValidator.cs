@@ -19,7 +19,7 @@ public sealed class EcosystemRequestDtoValidator
 
         RuleFor(x => x.Volume)
             .NotEmpty()
-            .GreaterThan(0);
+            .GreaterThan(0.0);
 
         RuleFor(x => x.ControllerId)
             .NotEmpty();

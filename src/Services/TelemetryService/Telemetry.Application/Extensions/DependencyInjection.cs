@@ -14,6 +14,7 @@ public static class DependencyInjection
         services.AddScoped<ISensorStateCheckerService, SensorStateCheckerService>();
         services.AddScoped<ITelemetryDataService, TelemetryDataService>();
         services.AddScoped<ITelemetryRetentionService, TelemetryRetentionService>();
+        services.AddScoped<IDataAggregateService, DataAggregateService>();
 
         return services;
     }

@@ -28,22 +28,22 @@ public class RuleConditionService(
 
         if (rule is null)
         {
-            return Result<Guid>
-                .Failure(Error.NotFound(
-                    "Rule.NotFound",
+            return Result<Guid>.Failure(
+                Error.NotFound(
+                    "Rule.NotFound", 
                     $"Rule {ruleId} not found"));
         }
 
         var ecosystem = await ecosystemRepository
             .GetByIdAsync(rule.EcosystemId, cancellationToken);
-
-        if (ecosystem is null ||
+        
+        if (ecosystem is null || 
             ecosystem.UserId != userContext.UserId)
         {
-            return Result<Guid>
-                .Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You do not own this rule's ecosystem"));
+            return Result<Guid>.Failure(
+                Error.Conflict(
+                    "Access.Denied", 
+                    "You do not own this ecosystem"));
         }
 
         var sensor = await sensorRepository
@@ -51,17 +51,17 @@ public class RuleConditionService(
 
         if (sensor is null)
         {
-            return Result<Guid>
-                .Failure(Error.NotFound(
-                    "Sensor.NotFound",
+            return Result<Guid>.Failure(
+                Error.NotFound(
+                    "Sensor.NotFound", 
                     "Sensor not found"));
         }
 
         if (sensor.EcosystemId != rule.EcosystemId)
         {
-            return Result<Guid>
-                .Failure(Error.Validation(
-                    "Condition.InvalidSensor",
+            return Result<Guid>.Failure(
+                Error.Validation(
+                    "Condition.InvalidSensor", 
                     "Sensor must belong to the same ecosystem as the rule"));
         }
 
@@ -74,13 +74,14 @@ public class RuleConditionService(
 
         if (condition is null)
         {
-            return Result<Guid>
-                .Failure(Error.Validation(
-                    "Condition.Invalid",
+            return Result<Guid>.Failure(
+                Error.Validation(
+                    "Condition.Invalid", 
                     string.Join(", ", errors!)));
         }
 
-        await ruleConditionRepository.UpdateAsync(condition, cancellationToken);
+        await ruleConditionRepository.AddAsync(condition, cancellationToken);
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<Guid>.Success(condition.Id);

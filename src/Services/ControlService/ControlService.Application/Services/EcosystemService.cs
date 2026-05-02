@@ -8,6 +8,7 @@ using Control.Domain.Entities;
 using Control.Domain.Interfaces;
 using Control.Domain.SpecificationParams;
 using Control.Domain.Specifications;
+using FluentValidation;
 using MassTransit;
 
 namespace Control.Application.Services;
@@ -17,7 +18,8 @@ public sealed class EcosystemService(
     IPublishEndpoint publishEndpoint,
     IUserContext userContext,
     IMapper mapper,
-    IUnitOfWork unitOfWork) : IEcosystemService
+    IUnitOfWork unitOfWork,
+    IValidator<EcosystemRequestDto> validator) : IEcosystemService
 {
     public async Task<IReadOnlyList<EcosystemResponseDto>> GetAllEcosystemsAsync(
         EcosystemFilterDto filter,
@@ -74,6 +76,16 @@ public sealed class EcosystemService(
         EcosystemRequestDto request,
         CancellationToken cancellationToken)
     {
+        var validationResult = validator.Validate(request);
+
+        if(!validationResult.IsValid)
+        {
+            return Result<Guid>
+                .Failure(Error.NotFound(
+                    "Ecosystem.Invalid",
+                    $"Failed to validate {nameof(EcosystemEntity)}: {string.Join(", ", validationResult.Errors)}"));
+        }
+
         var (ecosystem, errors) = EcosystemEntity.Create(
             userContext.UserId,
             request.Type,

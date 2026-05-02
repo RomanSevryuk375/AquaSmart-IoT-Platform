@@ -8,6 +8,7 @@ services:
       - POSTGRES_DB=telemetry_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
+      - POSTGRES_HOST_AUTH_METHOD=trust 
     ports:
       - "5438:5432"
     volumes:
@@ -27,6 +28,7 @@ services:
       - POSTGRES_DB=device_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
+      - POSTGRES_HOST_AUTH_METHOD=trust  
     ports:
       - "5439:5432"
     volumes:
@@ -46,6 +48,7 @@ services:
         - POSTGRES_DB=control_db
         - POSTGRES_USER=postgres
         - POSTGRES_PASSWORD=password
+        - POSTGRES_HOST_AUTH_METHOD=trust 
       ports:
         - "5440:5432"
       volumes:
@@ -65,6 +68,7 @@ services:
         - POSTGRES_DB=identity_db
         - POSTGRES_USER=postgres
         - POSTGRES_PASSWORD=password
+        - POSTGRES_HOST_AUTH_METHOD=trust 
       ports:
         - "5441:5432"
       volumes:
@@ -84,6 +88,7 @@ services:
         - POSTGRES_DB=notification_db
         - POSTGRES_USER=postgres
         - POSTGRES_PASSWORD=password
+        - POSTGRES_HOST_AUTH_METHOD=trust
       ports:
         - "5442:5432"
       volumes:
