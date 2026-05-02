@@ -79,12 +79,20 @@ namespace Device.Infrastructure.Migrations
                     b.ToTable("controllers", (string)null);
                 });
 
-            modelBuilder.Entity("Device.Domain.Entities.RelayEntity", b =>
+            modelBuilder.Entity("Device.Domain.Entities.RelayCommandsQueueEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
+
+                    b.Property<int>("Action")
+                        .HasColumnType("integer")
+                        .HasColumnName("action");
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("attempt_count");
 
                     b.Property<Guid>("ControllerId")
                         .HasColumnType("uuid")
@@ -94,11 +102,62 @@ namespace Device.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("HardwarePin")
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text")
+                        .HasColumnName("error_message");
+
+                    b.Property<DateTime?>("ExpireAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expire_at");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("processed_at");
+
+                    b.Property<Guid>("RelayId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("relay_id");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.HasKey("Id")
+                        .HasName("pk_relay_command_queues");
+
+                    b.HasIndex("RelayId")
+                        .HasDatabaseName("ix_relay_command_queues_relay_id");
+
+                    b.HasIndex("ControllerId", "Status")
+                        .HasDatabaseName("ix_relay_command_queues_controller_id_status");
+
+                    b.ToTable("relay_command_queues", (string)null);
+                });
+
+            modelBuilder.Entity("Device.Domain.Entities.RelayEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ConnectionAddress")
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)")
-                        .HasColumnName("hardware_pin");
+                        .HasColumnName("connection_address");
+
+                    b.Property<int>("ConnectionProtocol")
+                        .HasColumnType("integer")
+                        .HasColumnName("connection_protocol");
+
+                    b.Property<Guid>("ControllerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("controller_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
@@ -108,6 +167,20 @@ namespace Device.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_manual");
 
+                    b.Property<bool>("IsNormalyOpen")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_normaly_open");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid?>("PowerSensorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("power_sensor_id");
+
                     b.Property<int>("Purpose")
                         .HasColumnType("integer")
                         .HasColumnName("purpose");
@@ -115,9 +188,13 @@ namespace Device.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_relays");
 
-                    b.HasIndex("ControllerId", "HardwarePin")
+                    b.HasIndex("PowerSensorId")
                         .IsUnique()
-                        .HasDatabaseName("ix_relays_controller_id_hardware_pin");
+                        .HasDatabaseName("ix_relays_power_sensor_id");
+
+                    b.HasIndex("ControllerId", "PowerSensorId", "ConnectionAddress")
+                        .IsUnique()
+                        .HasDatabaseName("ix_relays_controller_id_power_sensor_id_connection_address");
 
                     b.ToTable("relays", (string)null);
                 });
@@ -129,6 +206,16 @@ namespace Device.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("ConnectionAddress")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("connection_address");
+
+                    b.Property<int>("ConnectionProtocol")
+                        .HasColumnType("integer")
+                        .HasColumnName("connection_protocol");
+
                     b.Property<Guid>("ControllerId")
                         .HasColumnType("uuid")
                         .HasColumnName("controller_id");
@@ -137,11 +224,11 @@ namespace Device.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("HardwarePin")
+                    b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
-                        .HasColumnName("hardware_pin");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("name");
 
                     b.Property<int>("State")
                         .HasColumnType("integer")
@@ -153,18 +240,35 @@ namespace Device.Infrastructure.Migrations
 
                     b.Property<string>("Unit")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
                         .HasColumnName("unit");
 
                     b.HasKey("Id")
                         .HasName("pk_sensors");
 
-                    b.HasIndex("ControllerId", "HardwarePin")
+                    b.HasIndex("ControllerId", "ConnectionAddress")
                         .IsUnique()
-                        .HasDatabaseName("ix_sensors_controller_id_hardware_pin");
+                        .HasDatabaseName("ix_sensors_controller_id_connection_address");
 
                     b.ToTable("sensors", (string)null);
+                });
+
+            modelBuilder.Entity("Device.Domain.Entities.RelayCommandsQueueEntity", b =>
+                {
+                    b.HasOne("Device.Domain.Entities.ControllerEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ControllerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_relay_command_queues_controllers_controller_id");
+
+                    b.HasOne("Device.Domain.Entities.RelayEntity", null)
+                        .WithMany()
+                        .HasForeignKey("RelayId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_relay_command_queues_relays_relay_id");
                 });
 
             modelBuilder.Entity("Device.Domain.Entities.RelayEntity", b =>
@@ -175,6 +279,12 @@ namespace Device.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_relays_controllers_controller_id");
+
+                    b.HasOne("Device.Domain.Entities.SensorEntity", null)
+                        .WithOne()
+                        .HasForeignKey("Device.Domain.Entities.RelayEntity", "PowerSensorId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_relays_sensors_power_sensor_id");
                 });
 
             modelBuilder.Entity("Device.Domain.Entities.SensorEntity", b =>

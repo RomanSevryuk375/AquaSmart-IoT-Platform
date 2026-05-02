@@ -1,13 +1,19 @@
-﻿using Device.Application.DTOs.Controller;
+﻿using Contracts.Authorization;
+using Contracts.Results;
+using Device.Application.DTOs.Configurations;
+using Device.Application.DTOs.Controller;
 using Device.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Device.API.Controllers;
 
 [ApiController]
+[Authorize(Policy = SubPermissions.DeviceControl)]
 [Route("api/device/v1/controllers")]
 public class ControllersController(
-    IControllerService controllerService) : ControllerBase
+    IControllerService controllerService,
+    IDeviceConfigurationService deviceConfigurationService) : ControllerBase
 {
     private const string NameGetById = "GetControllerById";
 
@@ -27,6 +33,20 @@ public class ControllersController(
         return Ok(result);
     }
 
+    [HttpGet("me/config")]
+    public async Task<ActionResult<ConfigResponseDto>> GetAllControllersAsync(
+        [FromBody] string macAddress,
+        [FromHeader(Name = "X-Device-Token")] string deviceToken,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await deviceConfigurationService.GetControllerConfigAsync(
+            macAddress,
+            deviceToken,
+            cancellationToken);
+
+        return this.ToActionResult(result);
+    }
+
     [HttpGet("{id:guid}", Name = NameGetById)]
     public async Task<ActionResult<ControllerResponseDto>> GetControllerByIdAsync(
         [FromRoute] Guid id,
@@ -44,20 +64,14 @@ public class ControllersController(
         var response = await controllerService
             .AddControllerAsync(request, cancellationToken);
 
-        var createdData = await controllerService
-            .GetControllerByIdAsync(response.ControllerId, cancellationToken);
-
         return CreatedAtRoute(
             NameGetById,
-            new 
-            { 
-                response.ControllerId,
-                response.DeviceToken,
-            },
-            createdData);
+            new { id = response.ControllerId },
+            response);
     }
 
     [HttpPost("{id:guid}/ping")]
+    [AllowAnonymous]
     public async Task<ActionResult<ControllerPingResponseDto>> PingControllerAsync(
         [FromRoute] Guid id,
         [FromHeader(Name = "X-Device-Token")] string deviceToken,
@@ -78,16 +92,6 @@ public class ControllersController(
         await controllerService.UpdateControllerAsync(id, request, cancellationToken);
 
         return NoContent();
-    }
-
-    [HttpPatch("{id:guid}")]
-    public async Task<ActionResult<bool>> ToggleControllerStateAsync(
-        [FromRoute] Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        var result = await controllerService.ToggleControllerStateAsync(id, cancellationToken);
-
-        return Ok(result);
     }
 
     [HttpDelete("{id:guid}")]

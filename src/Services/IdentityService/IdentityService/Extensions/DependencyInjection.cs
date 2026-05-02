@@ -1,10 +1,10 @@
-﻿using Contracts.JwtToken;
+﻿using Contracts.Authorization;
 using IdentityService.Application.Extensions;
-using IdentityService.Application.Interfaces;
 using IdentityService.Domain.Entities;
 using IdentityService.Infrastructure;
+using IdentityService.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 namespace IdentityService.API.Extensions;
 
@@ -14,17 +14,37 @@ public static class DependencyInjection
     {
         services.AddHttpContextAccessor();
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Enter a valid JWT access token."
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    []
+                }
+            });
+        });
 
         services.AddControllers();
 
-        services.AddDbContext<IdentityDbContext>(options =>
-        {
-            options.UseNpgsql(configuration.GetConnectionString(nameof(IdentityDbContext)))
-                .UseSnakeCaseNamingConvention();
-        });
-
-        services.AddRabbitMq(configuration);
+        services.AddServices(configuration);
 
         services.AddIdentity<UserEntity, IdentityRole<Guid>>(options =>
         {
@@ -35,11 +55,11 @@ public static class DependencyInjection
         })
         .AddEntityFrameworkStores<IdentityDbContext>() 
         .AddDefaultTokenProviders();
+        services.AddCommonAuthentication(configuration);
 
-        services.Configure<JwtOptions>(configuration.GetSection("JwtOptions"));
-        services.AddScoped<IJwtProvider, JwtProvider>();
-
-        services.AddServices();
+        services.AddQuartzJobs();
+        services.AddRabbitMq(configuration);
+        services.AddRepositories(configuration);
 
         return services;
     }

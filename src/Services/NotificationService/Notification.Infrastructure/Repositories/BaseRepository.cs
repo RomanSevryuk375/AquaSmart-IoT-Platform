@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Notification.Domain.Interfaces;
-using Notification.Domain.Specifications;
+﻿using Contracts.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Notification.Infrastructure.Repositories;
 

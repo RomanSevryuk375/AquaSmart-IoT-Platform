@@ -1,5 +1,6 @@
 ﻿using Contracts.Enums;
 using Contracts.Events.SensorEvents;
+using Contracts.Results;
 using Telemetry.Application.Interfaces;
 using Telemetry.Domain.Entities;
 using Telemetry.Domain.Interfaces;
@@ -8,114 +9,173 @@ namespace Telemetry.Application.Services;
 
 public class SensorService(
     ISensorRepository sensorRepository,
+    IEcosystemRepository ecosystemRepository,
     IUnitOfWork unitOfWork) : ISensorService
 {
-    public async Task CreateSensorFromEventAsync(
-        SensorCreatedEvent sensorCreated, 
+    public async Task<ConsumerResult> CreateSensorAsync(
+        SensorCreatedEvent sensor, 
         CancellationToken cancellationToken)
     {
         var exists = await sensorRepository
-            .ExistsAsync(sensorCreated.Id, cancellationToken);
+            .ExistsAsync(sensor.SensorId, cancellationToken);
 
         if (exists)
         {
-            return;
+            return ConsumerResult.Success();
         }
 
-        var (sensor, errors) = SensorEntity.Create(
-            sensorCreated.Id,
-            sensorCreated.ControllerId,
-            sensorCreated.Type,
-            sensorCreated.State,
-            sensorCreated.Unit,
+        var ecosystem = await ecosystemRepository
+            .GetByControllerIdAsync(sensor.ControllerId, cancellationToken);
+
+        if (ecosystem is null)
+        {
+            return ConsumerResult
+                .RetryableError($"Ecosystem for controller {sensor.ControllerId} not found.");
+        }
+
+        var (newSensor, errors) = SensorEntity.Create(
+            sensor.SensorId,
+            sensor.ControllerId,
+            ecosystem.Id,
+            sensor.Name,
+            sensor.Type,
+            sensor.State,
+            sensor.Unit,
             0.0,
             DateTime.UtcNow,
-            sensorCreated.CreatedAt);
+            sensor.CreatedAt);
 
-        if (sensor is null)
+        if (newSensor is null)
         {
-            return;
+            return ConsumerResult
+                .FatalError($"Failed to create {nameof(SensorEntity)}: " +
+                $"{string.Join(", ", errors!)}"); ;
         }
 
-        await sensorRepository.AddAsync(sensor, cancellationToken);
+        await sensorRepository.AddAsync(newSensor, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return ConsumerResult.Success();
     }
 
-    public async Task DeleteSensorFromEventAsync(
-        SensorDeletedEvent sensorDeleted, 
+    public async Task<ConsumerResult> DeleteSensorAsync(
+        SensorDeletedEvent sensor, 
         CancellationToken cancellationToken)
     {
         var existingSensor = await sensorRepository
-            .GetByIdAsync(sensorDeleted.Id, cancellationToken);
+            .GetByIdAsync(sensor.SensorId, cancellationToken);
 
         if (existingSensor is null)
         {
-            return;
+            return ConsumerResult.Success();
         }
 
         await sensorRepository.DeleteAsync(existingSensor.Id, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return ConsumerResult.Success();
     }
 
-    public async Task UpdateSensorFromEventAsync(
-        SensorUpdatedEvent updatedEvent, 
+    public async Task<ConsumerResult> UpdateSensorAsync(
+        SensorUpdatedEvent sensor, 
         CancellationToken cancellationToken)
     {
         var existingSensor = await sensorRepository
-            .GetByIdAsync(updatedEvent.Id, cancellationToken);
+            .GetByIdAsync(sensor.SensorId, cancellationToken);
 
         if (existingSensor is null)
         {
-            var (sensor, createErrors) = SensorEntity.Create(
-            updatedEvent.Id,
-            updatedEvent.ControllerId,
-            updatedEvent.Type,
-            SensorStateEnum.NoData,
-            updatedEvent.Unit,
-            updatedEvent.LastValue,
-            updatedEvent.UpdatedAt,
-            updatedEvent.CreatedAt);
+            var ecosystem = await ecosystemRepository
+            .GetByControllerIdAsync(sensor.ControllerId, cancellationToken);
 
-            if (sensor is null)
+            if (ecosystem is null)
             {
-                return;
+                return ConsumerResult
+                    .RetryableError($"Ecosystem for controller {sensor.ControllerId} not found.");
             }
 
-            await sensorRepository.AddAsync(sensor, cancellationToken);
+            var (newSensor, validationErrors) = SensorEntity.Create(
+                sensor.SensorId,
+                sensor.ControllerId,
+                ecosystem.Id,
+                sensor.Name,
+                sensor.Type,
+                sensor.State,
+                sensor.Unit,
+                0.0,
+                DateTime.UtcNow,
+                sensor.CreatedAt);
+
+            if (newSensor is null)
+            {
+                return ConsumerResult
+                    .FatalError($"Failed to create {nameof(SensorEntity)}: " +
+                    $"{string.Join(", ", validationErrors!)}");
+            }
+
+            await sensorRepository.AddAsync(newSensor, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return;
+            return ConsumerResult.Success();
         }
 
         var errors = existingSensor!.Update(
-            updatedEvent.ControllerId,
-            updatedEvent.Type,
-            updatedEvent.Unit);
+            sensor.ControllerId,
+            sensor.Type,
+            sensor.Unit);
 
         if (errors is not null && errors.Count > 0)
         {
-            return;
+            return ConsumerResult
+                    .FatalError($"Failed to create {nameof(EcosystemEntity)}: " +
+                    $"{string.Join(", ", errors!)}");
         }
 
         await sensorRepository.UpdateAsync(existingSensor, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return ConsumerResult.Success();
     }
 
-    public async Task SetSensorStateFromEventAsync(
-        SensorStateChangedCommand sensorStateChanged,
+    public async Task<ConsumerResult> SetSensorStateAsync(
+        SensorStateChangedCommand sensor,
         CancellationToken cancellationToken)
     {
         var existingSensor = await sensorRepository
-            .GetByIdAsync(sensorStateChanged.Id, cancellationToken);
+            .GetByIdAsync(sensor.SensorId, cancellationToken);
 
         if (existingSensor is null)
         {
-            return;
+            return ConsumerResult
+                .FatalError($"Sensor {sensor.SensorId} not found.");
         }
 
-        existingSensor.SetState(sensorStateChanged.State);
+        existingSensor.SetState(sensor.State);
 
         await sensorRepository.UpdateAsync(existingSensor, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return ConsumerResult.Success();
+    }
+
+    public async Task<ConsumerResult> SetSensorNameAsync(
+        SensorRenamedEvent sensor,
+        CancellationToken cancellationToken)
+    {
+        var existingSensor = await sensorRepository
+            .GetByIdAsync(sensor.SensorId, cancellationToken);
+
+        if (existingSensor is null)
+        {
+            return ConsumerResult
+                .RetryableError($"Sensor {sensor.SensorId} not found.");
+        }
+
+        existingSensor.Rename(sensor.Name);
+
+        await sensorRepository.UpdateAsync(existingSensor, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return ConsumerResult.Success();
     }
 }

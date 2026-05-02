@@ -1,4 +1,6 @@
-﻿using Contracts.Exceptions;
+﻿using AutoMapper;
+using Contracts.Results;
+using FluentValidation;
 using Notification.Application.DTOs.MaintenanceLog;
 using Notification.Application.Interfaces;
 using Notification.Domain.Entities;
@@ -6,99 +8,105 @@ using Notification.Domain.Interfaces;
 using Notification.Domain.SpecificationParams;
 using Notification.Domain.Specifications;
 
+
 namespace Notification.Application.Services;
 
 public class MaintenanceLogService(
     IMaintenanceLogRepository logRepository,
-    IUserRepository userRepository,
-    IAquariumRepository aquariumRepository,
-    IUnitOfWork unitOfWork) : IMaintenanceLogService
+    IEcosystemRepository ecosystemRepository,
+    IUnitOfWork unitOfWork,
+    IUserContext userContext,
+    IMapper mapper,
+    IValidator<MaintenanceLogRequestDto> validator) : IMaintenanceLogService
 {
-    public async Task<Guid> AddLogAsync(
-        MaintenanceLogRequestDto request, 
+    public async Task<Result<Guid>> AddLogAsync(
+        MaintenanceLogRequestDto request,
         CancellationToken cancellationToken)
     {
-        var existingAquarium = await aquariumRepository
-            .GetByIdAsync(request.AquariumId, cancellationToken)
-            ?? throw new NotFoundException($"Aquarium {request.AquariumId} not found");
+        validator.ValidateAndThrow(request);
 
-        var existingUser = await userRepository
-            .GetByIdAsync(request.UserId, cancellationToken)
-            ?? throw new NotFoundException($"User {request.UserId} not found");
+        var existingEcosystem = await ecosystemRepository
+            .GetByIdAsync(request.EcosystemId, cancellationToken);
+
+        if (existingEcosystem is null)
+        {
+            return Result<Guid>
+                .Failure(Error.NotFound(
+                    "Ecosystem.NotFound",
+                    $"Ecosystem {request.EcosystemId} not found"));
+        }
+
+        if (existingEcosystem.UserId != userContext.UserId)
+        {
+            return Result<Guid>
+                .Failure(Error.Conflict(
+                    "Access.Denied", 
+                    "You are not the owner of this ecosystem"));
+        }
 
         var (log, errors) = MaintenanceLogEntity.Create(
-            request.UserId,
-            request.AquariumId,
+            userContext.UserId,
+            request.EcosystemId,
             request.ActionDate,
-            request.PhLevel,
-            request.KhLevel,
-            request.No3Level,
+            request.Metrics,
             request.Notes);
 
         if (log is null)
         {
-            throw new DomainValidationException(
-                $"Failed to create {nameof(MaintenanceLogEntity)}: {string.Join(", ", errors)}");
+            return Result<Guid>
+                .Failure(Error.Validation(
+                    "Log.Invalid",
+                    $"Failed to create {nameof(MaintenanceLogEntity)}: {string.Join(", ", errors)}"));
         }
 
         var result = await logRepository.AddAsync(log, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return result;
+        return Result<Guid>.Success(result);
     }
 
-    public async Task<IReadOnlyList<MaintenanceLogResponseDto>> GetAllLogs(
-        MaintenanceLogFilterDto filter, 
-        int? skip, 
-        int? take, 
+    public async Task<Result<IReadOnlyList<MaintenanceLogResponseDto>>> GetAllLogs(
+        MaintenanceLogFilterDto filter,
+        int? skip,
+        int? take,
         CancellationToken cancellationToken)
     {
         var specification = new MaintenanceLogFilterSpecification(
             new MaintenanceLogSpecificationParams
             {
-                UserId = filter.UserId,
-                AquariumId = filter.AquariumId,
+                UserId = userContext.UserId,
+                EcosystemId = filter.EcosystemId,
                 ActionDateFrom = filter.ActionDateFrom,
                 ActionDateTo = filter.ActionDateTo,
             });
 
         var logs = await logRepository.GetAllAsync(
-            specification, 
-            skip, 
-            take, 
+            specification,
+            skip,
+            take,
             cancellationToken);
 
-        return logs.Select(log => new MaintenanceLogResponseDto
-        {
-            Id = log.Id,
-            UserId = log.UserId,
-            AquariumId = log.AquariumId,
-            ActionDate = log.ActionDate,
-            PhLevel = log.PhLevel,
-            KhLevel = log.KhLevel,
-            No3Level = log.No3Level,
-            Notes = log.Notes,
-            CreatedAt = log.CreatedAt
-        }).ToList();
+        return Result<IReadOnlyList<MaintenanceLogResponseDto>>.Success(
+            mapper.Map<IReadOnlyList<MaintenanceLogResponseDto>>(logs));
     }
 
-    public async Task<MaintenanceLogResponseDto> GetLogById(Guid id, CancellationToken cancellationToken)
+    public async Task<Result<MaintenanceLogResponseDto>> GetLogById(
+        Guid logId, 
+        CancellationToken cancellationToken)
     {
         var log = await logRepository
-            .GetByIdAsync(id, cancellationToken) 
-            ?? throw new NotFoundException($"{nameof(MaintenanceLogEntity)} not found");
+            .GetByIdAsync(logId, cancellationToken);
 
-        return new MaintenanceLogResponseDto
+        if (log is null ||
+            log.UserId != userContext.UserId)
         {
-            Id = log.Id,
-            UserId = log.UserId,
-            AquariumId = log.AquariumId,
-            ActionDate = log.ActionDate,
-            PhLevel = log.PhLevel,
-            KhLevel = log.KhLevel,
-            No3Level = log.No3Level,
-            Notes = log.Notes,
-            CreatedAt = log.CreatedAt
-        };
+            return Result<MaintenanceLogResponseDto>
+                .Failure(Error.NotFound(
+                    "Log.NotFound",
+                    $"Log {logId} not found"));
+        }
+
+        return Result<MaintenanceLogResponseDto>
+            .Success(mapper.Map<MaintenanceLogResponseDto>(log));
     }
 }

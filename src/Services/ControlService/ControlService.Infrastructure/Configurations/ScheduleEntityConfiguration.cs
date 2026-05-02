@@ -4,14 +4,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Control.Infrastructure.Configurations;
 
-public class ScheduleEntityConfiguration : IEntityTypeConfiguration<ScheduleEntity>
+public sealed class ScheduleEntityConfiguration 
+    : IEntityTypeConfiguration<ScheduleEntity>
 {
     public void Configure(EntityTypeBuilder<ScheduleEntity> builder)
     {
         builder.ToTable("schedules");
 
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.AquariumId).IsRequired();
+        builder.Property(x => x.EcosystemId).IsRequired();
         builder.Property(x => x.RelayId).IsRequired();
 
         builder.Property(x => x.CronExpression)

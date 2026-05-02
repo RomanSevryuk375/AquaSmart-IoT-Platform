@@ -1,13 +1,14 @@
-﻿using Notification.Domain.Interfaces;
+﻿using Contracts.Abstractions;
 using System.Text.RegularExpressions;
 
 namespace Notification.Domain.Entities;
 
-public class UserEntity : IEntity
+public sealed class UserEntity : IEntity
 {
     private UserEntity(
         Guid id,
         string email,
+        string timeZone,
         string phoneNumber,
         bool emailEnable,
         bool tgEnable,
@@ -17,6 +18,7 @@ public class UserEntity : IEntity
     {
         Id = id;
         Email = email;
+        TimeZone = timeZone;
         PhoneNumber = phoneNumber;
         EmailEnable = emailEnable;
         TgEnable = tgEnable;
@@ -27,6 +29,7 @@ public class UserEntity : IEntity
 
     public Guid Id { get; private set; }
     public string Email { get; private set; } = string.Empty;
+    public string TimeZone { get; private set; } = string.Empty;
     public string PhoneNumber { get; private set; } = string.Empty;
     public bool EmailEnable { get; private set; }
     public bool TgEnable { get; private set; }
@@ -37,6 +40,7 @@ public class UserEntity : IEntity
     public static (UserEntity? user, List<string> errors) Create(
         Guid id,
         string email,
+        string timeZone,
         string phoneNumber,
         bool emailEnable,
         bool tgEnable,
@@ -54,6 +58,11 @@ public class UserEntity : IEntity
         if (string.IsNullOrWhiteSpace(email))
         {
             errors.Add("email must not be empty.");
+        }
+
+        if (string.IsNullOrWhiteSpace(timeZone))
+        {
+            errors.Add("timeZone must not be empty.");
         }
 
         if (string.IsNullOrWhiteSpace(phoneNumber))
@@ -79,6 +88,7 @@ public class UserEntity : IEntity
         var user = new UserEntity(
             id, 
             email,
+            timeZone,
             phoneNumber,
             emailEnable,
             tgEnable,
@@ -89,13 +99,22 @@ public class UserEntity : IEntity
         return (user, errors);
     }
 
-    public string? UpdateContacts(string email, string phoneNumber)
+    public List<string>? UpdateContacts(
+        string email, 
+        string phoneNumber)
     {
         Email = email.Trim();
 
+        var errors = new List<string>();
+
         if (!Regex.IsMatch(phoneNumber, @"^(\+375|80)(29|44|33|25)\d{7}$"))
         {
-            return("Phone number should be in format +375XXXXXXXXX or 80XXXXXXXXX");
+            errors.Add("Phone number should be in format +375XXXXXXXXX or 80XXXXXXXXX");
+        }
+
+        if (errors.Count > 0)
+        {
+            return errors;
         }
 
         PhoneNumber = phoneNumber.Trim();
@@ -103,7 +122,10 @@ public class UserEntity : IEntity
         return null;
     }
 
-    public void SetNotificationPreferences(bool emailEnable, bool tgEnable, long? tgChatId)
+    public void SetNotificationPreferences(
+        bool emailEnable, 
+        bool tgEnable, 
+        long? tgChatId)
     {
         EmailEnable = emailEnable;
         TgEnable = tgEnable;

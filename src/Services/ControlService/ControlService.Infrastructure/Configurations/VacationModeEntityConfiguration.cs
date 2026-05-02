@@ -12,7 +12,7 @@ public class VacationModeEntityConfiguration : IEntityTypeConfiguration<Vacation
 
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.AquariumId).IsRequired();
+        builder.Property(x => x.EcosystemId).IsRequired();
         builder.Property(x => x.StartDate).IsRequired();
         builder.Property(x => x.EndDate).IsRequired();
         builder.Property(x => x.IsActive).IsRequired();

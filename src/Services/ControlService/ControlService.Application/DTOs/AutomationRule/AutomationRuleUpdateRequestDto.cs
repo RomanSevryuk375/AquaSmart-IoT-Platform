@@ -4,8 +4,8 @@ namespace Control.Application.DTOs.AutomationRule;
 
 public record AutomationRuleUpdateRequestDto
 {
-    public RuleConditionEnum Condition { get; private set; }
-    public double Threshold { get; private set; }
-    public double Hysteresis { get; private set; }
-    public RuleActionEnum Action { get; private set; }
+    public string Name { get; init; } = string.Empty;
+    public Guid RelayId { get; init; }
+    public OperatorEnum Operator { get; init; }
+    public RuleActionEnum Action { get; init; }
 }

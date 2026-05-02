@@ -1,4 +1,5 @@
-﻿using Contracts.Events.ControllerEvents;
+﻿using AutoMapper;
+using Contracts.Events.ControllerEvents;
 using Contracts.Exceptions;
 using Device.Application.DTOs.Controller;
 using Device.Application.Interfaces;
@@ -6,38 +7,43 @@ using Device.Domain.Entities;
 using Device.Domain.Interfaces;
 using Device.Domain.SpecificationParams;
 using Device.Domain.Specifications;
+using FluentValidation;
 using MassTransit;
 
 namespace Device.Application.Services;
 
-public class ControllerService(
+public sealed class ControllerService(
     IControllerRepository controllerRepository,
     IPublishEndpoint publishEndpoint,
     IUserContext userContext,
     IUnitOfWork unitOfWork,
-    IMyHasher myHasher) : IControllerService
+    IMyHasher myHasher,
+    IMapper mapper,
+    IValidator<ControllerRequestDto> createValidator,
+    IValidator<ControllerUpdateRequestDto> updateValidator) : IControllerService
 {
-    public async Task<ControllerRegistredResponseDto> AddControllerAsync(ControllerRequestDto request, CancellationToken cancellationToken)
+    public async Task<ControllerRegistredResponseDto> AddControllerAsync(
+        ControllerRequestDto request, 
+        CancellationToken cancellationToken)
     {
-        var userId = userContext.UserId; 
-
+        createValidator.ValidateAndThrow(request);
+                
         var deviceToken = Guid.NewGuid().ToString();
 
-
         var (controller, errors) = ControllerEntity.Create(
-            userId,
+            userContext.UserId,
             request.MacAddress,
             myHasher.Generate(deviceToken),
             request.Name,
             request.IsOnline);
 
-        if (errors is not null && errors.Count > 0)
+        if (controller is null)
         {
             throw new DomainValidationException(
-                $"Failed to create {nameof(ControllerEntity)}: {string.Join(", ", errors)}");
+                $"Failed to create {nameof(ControllerEntity)}: {string.Join(", ", errors!)}");
         }
 
-        var result = await controllerRepository.AddAsync(controller!, cancellationToken);
+        var result = await controllerRepository.AddAsync(controller, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new ControllerRegistredResponseDto
@@ -47,13 +53,15 @@ public class ControllerService(
         };
     }
 
-    public async Task DeleteControllerAsync(Guid id, CancellationToken cancellationToken)
+    public async Task DeleteControllerAsync(
+        Guid controllerId, 
+        CancellationToken cancellationToken)
     {
-        await controllerRepository.DeleteAsync(id, cancellationToken);
+        await controllerRepository.DeleteAsync(controllerId, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<List<ControllerResponseDto>> GetAllControllersAsync(
+    public async Task<IReadOnlyList<ControllerResponseDto>> GetAllControllersAsync(
         ControllerFilterDto filter, 
         int? skip, 
         int? take, 
@@ -73,38 +81,27 @@ public class ControllerService(
             take, 
             cancellationToken);
 
-        return controllers.Select(controller => new ControllerResponseDto 
-        {
-            Id = controller.Id,
-            MacAddress = controller.MacAddress,
-            Name = controller.Name,
-            IsOnline = controller.IsOnline,
-            LastSeenAt = controller.LastSeenAt,
-            CreatedAt = controller.CreatedAt,
-        }).ToList();
+        return mapper.Map<IReadOnlyList<ControllerResponseDto>>(controllers);
     }
 
     public async Task<ControllerResponseDto> GetControllerByIdAsync(
-        Guid id, 
+        Guid controllerId, 
         CancellationToken cancellationToken)
     {
-        var controller = await controllerRepository.GetByIdAsync(id, cancellationToken)
+        var controller = await controllerRepository
+            .GetByIdAsync(controllerId, cancellationToken)
             ?? throw new NotFoundException($"{nameof(ControllerEntity)} not found");
 
-        return new ControllerResponseDto
-        {
-            Id = controller.Id,
-            MacAddress = controller.MacAddress,
-            Name = controller.Name,
-            IsOnline = controller.IsOnline,
-            LastSeenAt = controller.LastSeenAt,
-            CreatedAt = controller.CreatedAt,
-        };
+        return mapper.Map<ControllerResponseDto>(controller);
     }
 
-    public async Task<ControllerPingResponseDto> PingControllerAsync(Guid id, string deviceToken, CancellationToken cancellationToken)
+    public async Task<ControllerPingResponseDto> PingControllerAsync(
+        Guid controllerId,
+        string deviceToken, 
+        CancellationToken cancellationToken)
     {
-        var controller = await controllerRepository.GetByIdAsync(id, cancellationToken)
+        var controller = await controllerRepository
+            .GetByIdAsync(controllerId, cancellationToken)
             ?? throw new NotFoundException($"{nameof(ControllerEntity)} not found");
 
         var verify = myHasher
@@ -123,9 +120,12 @@ public class ControllerService(
         return new ControllerPingResponseDto();
     }
 
-    public async Task<bool> ToggleControllerStateAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<bool> ToggleControllerStateAsync(
+        Guid controllerId, 
+        CancellationToken cancellationToken)
     {
-        var controller = await controllerRepository.GetByIdAsync(id, cancellationToken)
+        var controller = await controllerRepository
+            .GetByIdAsync(controllerId, cancellationToken)
             ?? throw new NotFoundException($"{nameof(ControllerEntity)} not found");
 
         controller.ToggleState();
@@ -147,11 +147,14 @@ public class ControllerService(
     }
 
     public async Task UpdateControllerAsync(
-        Guid id,
+        Guid controllerId,
         ControllerUpdateRequestDto updateRequestDto, 
         CancellationToken cancellationToken)
     {
-        var controller = await controllerRepository.GetByIdAsync(id, cancellationToken)
+        updateValidator.ValidateAndThrow(updateRequestDto);
+
+        var controller = await controllerRepository
+            .GetByIdAsync(controllerId, cancellationToken)
             ?? throw new NotFoundException($"{nameof(ControllerEntity)} not found");
 
         var errors = controller.Update(

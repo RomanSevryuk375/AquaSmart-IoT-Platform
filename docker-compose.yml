@@ -8,6 +8,7 @@ services:
       - POSTGRES_DB=telemetry_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
+      - POSTGRES_HOST_AUTH_METHOD=trust 
     ports:
       - "5438:5432"
     volumes:
@@ -27,6 +28,7 @@ services:
       - POSTGRES_DB=device_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
+      - POSTGRES_HOST_AUTH_METHOD=trust  
     ports:
       - "5439:5432"
     volumes:
@@ -46,6 +48,7 @@ services:
         - POSTGRES_DB=control_db
         - POSTGRES_USER=postgres
         - POSTGRES_PASSWORD=password
+        - POSTGRES_HOST_AUTH_METHOD=trust 
       ports:
         - "5440:5432"
       volumes:
@@ -65,6 +68,7 @@ services:
         - POSTGRES_DB=identity_db
         - POSTGRES_USER=postgres
         - POSTGRES_PASSWORD=password
+        - POSTGRES_HOST_AUTH_METHOD=trust 
       ports:
         - "5441:5432"
       volumes:
@@ -84,6 +88,7 @@ services:
         - POSTGRES_DB=notification_db
         - POSTGRES_USER=postgres
         - POSTGRES_PASSWORD=password
+        - POSTGRES_HOST_AUTH_METHOD=trust
       ports:
         - "5442:5432"
       volumes:
@@ -157,9 +162,13 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080  
       - ConnectionStrings__SystemDbContext=Host=telemetry-db;Database=telemetry_db;Username=postgres;Password=password
-      - MessageBroker__Host=amqp://rabbitmq:5672
-      - MessageBroker__UserName=guest
-      - MessageBroker__Password=guest
+      - RabbitMqOptions__Host=amqp://rabbitmq:5672
+      - RabbitMqOptions__UserName=guest
+      - RabbitMqOptions__Password=guest
+      - JwtOptions__SecretKey=super-secret-key-must-be-at-least-32-characters-long
+      - JwtOptions__Issuer=AquaSmart.Identity
+      - JwtOptions__Audience=AquaSmart.Gateway
+      - JwtOptions__ExpiresHours=12
       - MT_LICENSE=community  
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
@@ -175,6 +184,8 @@ services:
     build:
       context: . 
       dockerfile: src/Services/DeviceService/DeviceService/Dockerfile
+    ports:
+      - "5237:8080"
     depends_on:
       device-db:
         condition: service_healthy
@@ -184,9 +195,13 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ConnectionStrings__SystemDbContext=Host=device-db;Database=device_db;Username=postgres;Password=password
-      - MessageBroker__Host=amqp://rabbitmq:5672
-      - MessageBroker__UserName=guest
-      - MessageBroker__Password=guest
+      - RabbitMqOptions__Host=amqp://rabbitmq:5672
+      - RabbitMqOptions__UserName=guest
+      - RabbitMqOptions__Password=guest
+      - JwtOptions__SecretKey=super-secret-key-must-be-at-least-32-characters-long
+      - JwtOptions__Issuer=AquaSmart.Identity
+      - JwtOptions__Audience=AquaSmart.Gateway
+      - JwtOptions__ExpiresHours=12
       - MT_LICENSE=community  
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
@@ -211,9 +226,13 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ConnectionStrings__SystemDbContext=Host=control-db;Database=control_db;Username=postgres;Password=password
-      - MessageBroker__Host=amqp://rabbitmq:5672
-      - MessageBroker__UserName=guest
-      - MessageBroker__Password=guest
+      - RabbitMqOptions__Host=amqp://rabbitmq:5672
+      - RabbitMqOptions__UserName=guest
+      - RabbitMqOptions__Password=guest
+      - JwtOptions__SecretKey=super-secret-key-must-be-at-least-32-characters-long
+      - JwtOptions__Issuer=AquaSmart.Identity
+      - JwtOptions__Audience=AquaSmart.Gateway
+      - JwtOptions__ExpiresHours=12
       - MT_LICENSE=community
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
@@ -237,6 +256,9 @@ services:
       - JwtOptions__Issuer=AquaSmart.Identity
       - JwtOptions__Audience=AquaSmart.Gateway
       - JwtOptions__ExpiresHours=12
+      - RabbitMqOptions__Host=amqp://rabbitmq:5672
+      - RabbitMqOptions__UserName=guest
+      - RabbitMqOptions__Password=guest
     depends_on:
       identity-db:
         condition: service_healthy
@@ -267,6 +289,9 @@ services:
       - RabbitMqOptions__UserName=guest
       - RabbitMqOptions__Password=guest
       - JwtOptions__SecretKey=super-secret-key-must-be-at-least-32-characters-long
+      - JwtOptions__Issuer=AquaSmart.Identity
+      - JwtOptions__Audience=AquaSmart.Gateway
+      - JwtOptions__ExpiresHours=12
       - TelegramOptions__BotToken=test
       - EmailOptions__Host=test
       - EmailOptions__UserName=test

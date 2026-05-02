@@ -2,7 +2,7 @@
 
 public record TelemetryResponse
 {
-    public int AcceptedCount { get; init; }
-    public List<string> ValidationErrors { get; init; } = [];
-    public int SkippedCount { get; init; }
+    public int AcceptedCount { get; set; }
+    public List<string> ValidationErrors { get; set; } = [];
+    public int SkippedCount { get; set; }
 }

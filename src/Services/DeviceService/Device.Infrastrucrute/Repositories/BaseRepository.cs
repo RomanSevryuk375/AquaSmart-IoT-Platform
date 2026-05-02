@@ -1,4 +1,4 @@
-﻿using Device.Domain.Interfaces;
+﻿using Contracts.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Device.Infrastructure.Repositories;

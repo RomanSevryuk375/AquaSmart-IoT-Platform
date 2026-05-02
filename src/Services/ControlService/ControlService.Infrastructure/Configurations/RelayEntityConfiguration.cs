@@ -1,10 +1,12 @@
-﻿using Control.Domain.Entities;
+﻿using Contracts.Constants;
+using Control.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Control.Infrastructure.Configurations;
 
-public class RelayEntityConfiguration : IEntityTypeConfiguration<RelayEntity>
+public sealed class RelayEntityConfiguration 
+    : IEntityTypeConfiguration<RelayEntity>
 {
     public void Configure(EntityTypeBuilder<RelayEntity> builder)
     {
@@ -12,8 +14,13 @@ public class RelayEntityConfiguration : IEntityTypeConfiguration<RelayEntity>
 
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.AquariumId).IsRequired();
-        builder.HasIndex(x => x.AquariumId);
+        builder.Property(x => x.EcosystemId).IsRequired();
+        builder.Property(x => x.ControllerId).IsRequired();
+        builder.Property(x => x.PowerSensorId).IsRequired(false);
+
+        builder.Property(x => x.Name)
+            .HasMaxLength(RelayConstants.NameLength)
+            .IsRequired();
 
         builder.Property(x => x.Purpose)
             .HasConversion<int>()
@@ -22,5 +29,9 @@ public class RelayEntityConfiguration : IEntityTypeConfiguration<RelayEntity>
         builder.Property(x => x.IsManual).IsRequired();
         builder.Property(x => x.IsActive).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
+
+        builder.HasIndex(x => x.EcosystemId);
+        builder.HasIndex(x => x.PowerSensorId)
+            .HasFilter("power_sensor_id IS NOT NULL");
     }
 }

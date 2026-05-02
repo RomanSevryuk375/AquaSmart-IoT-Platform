@@ -9,6 +9,7 @@ public class ReminderProcessor(
     IReminderRepository reminderRepository,
     INotificationRepository notificationRepository,
     INotificationSender notificationSender,
+    IUserRepository userRepository,
     IUnitOfWork unitOfWork) : IReminderProcessor
 {
     public async Task CheckAsync(CancellationToken cancellationToken)
@@ -21,30 +22,58 @@ public class ReminderProcessor(
             return;
         }
 
+        var userIds = pendingReminders.Select(x => x.UserId).Distinct().ToList();
+        var users = (await userRepository.GetAllUsersByIdAsync(userIds, cancellationToken))
+            .ToDictionary(u => u.Id);
+
         foreach (var reminder in pendingReminders)
         {
-            if (reminder.LastNotifiedAt?.Date == DateTime.UtcNow.Date)
+            if (!users.TryGetValue(reminder.UserId, out var user))
             {
                 continue;
             }
 
-            var (notification, errors) = NotificationEntity.Create(
+            TimeZoneInfo tzInfo;
+            try
+            {
+                tzInfo = TimeZoneInfo.FindSystemTimeZoneById(user.TimeZone ?? "UTC");
+            }
+            catch (TimeZoneNotFoundException)
+            {
+                tzInfo = TimeZoneInfo.Utc;
+            }
+
+            var userLocalTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tzInfo);
+
+            if (reminder.LastNotifiedAt.HasValue)
+            {
+                var lastNotifiedLocal = TimeZoneInfo.ConvertTimeFromUtc(reminder.LastNotifiedAt.Value, tzInfo);
+                if (lastNotifiedLocal.Date == userLocalTime.Date)
+                {
+                    continue; 
+                }
+            }
+
+            if (userLocalTime.Hour >= 9 && userLocalTime.Hour <= 21)
+            {
+                var (notification, errors) = NotificationEntity.Create(
                 reminder.UserId,
-                reminder.AquariumId,
+                reminder.EcosystemId,
                 ReminderImportanceFactory.Evaluate(reminder.NextDueAt),
                 $"{reminder.TaskName} should be done at {reminder.NextDueAt:dd.MM.yyyy}");
 
-            if (notification is null)
-            {
-                continue;
+                if (notification is null)
+                {
+                    continue;
+                }
+
+                await notificationSender.ProcessSingleNotificationAsync(notification, cancellationToken);
+
+                reminder.MarkAsNotified();
+
+                await reminderRepository.UpdateAsync(reminder, cancellationToken);
+                await notificationRepository.AddAsync(notification, cancellationToken);
             }
-
-            await notificationSender.ProcessSingleNotificationAsync(notification, cancellationToken);
-
-            reminder.MarkAsNotified();
-
-            await reminderRepository.UpdateAsync(reminder, cancellationToken);
-            await notificationRepository.AddAsync(notification, cancellationToken);
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);

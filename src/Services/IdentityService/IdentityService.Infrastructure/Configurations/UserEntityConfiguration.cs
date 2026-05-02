@@ -19,6 +19,7 @@ public class UserEntityConfiguration
         builder.Property(x => x.SubscriptionEndDate).IsRequired();
         builder.Property(x => x.SubscriptionId).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
+        builder.Property(x => x.TimeZone).IsRequired();
 
         builder.HasOne<SubscriptionEntity>()
             .WithMany()

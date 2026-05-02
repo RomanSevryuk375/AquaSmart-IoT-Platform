@@ -6,3 +6,4 @@ public record ControllerRequestDto
     public string Name { get; init; } = string.Empty;
     public bool IsOnline { get; init; }
 }
+

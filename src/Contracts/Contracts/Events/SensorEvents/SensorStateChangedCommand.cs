@@ -6,6 +6,6 @@ public class SensorStateChangedCommand
 {
     public Guid EventId { get; init; } = Guid.NewGuid();
     public DateTime OccurredOn { get; init; } = DateTime.UtcNow;
-    public Guid Id { get; init; }
+    public Guid SensorId { get; init; }
     public SensorStateEnum State { get; init; }
 }

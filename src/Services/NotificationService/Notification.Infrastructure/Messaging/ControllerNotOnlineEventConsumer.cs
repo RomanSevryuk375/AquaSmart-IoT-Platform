@@ -4,12 +4,17 @@ using Notification.Application.Interfaces;
 
 namespace Notification.Infrastructure.Messaging;
 
-public class ControllerNotOnlineEventConsumer(
+public sealed class ControllerNotOnlineEventConsumer(
     IControllerAlertSender alertSender) : IConsumer<ControllerNotOnlineEvent>
 {
     public async Task Consume(ConsumeContext<ControllerNotOnlineEvent> context)
     {
-        await alertSender.SendControllerNotOnlineAlert(
+        var result = await alertSender.SendControllerNotOnlineAlert(
             context.Message, context.CancellationToken);
+
+        if (!result.IsSuccess && result.IsRetryable)
+        {
+            throw new Exception(result.Error);
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Telemetry.Domain.SpecificationParams;
 
-public record TelemetryFilterParams
+public sealed record TelemetryFilterParams
 {
     public Guid? SensorId { get; init; }
     public DateTime? From { get; init; }

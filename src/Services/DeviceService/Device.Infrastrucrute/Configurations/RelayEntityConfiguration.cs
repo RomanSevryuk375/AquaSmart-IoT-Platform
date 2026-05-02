@@ -1,4 +1,5 @@
-﻿using Device.Domain.Entities;
+﻿using Contracts.Constants;
+using Device.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,10 +14,21 @@ public class RelayEntityConfiguration : IEntityTypeConfiguration<RelayEntity>
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.ControllerId).IsRequired();
+        builder.Property(x => x.PowerSensorId).IsRequired(false);
 
-        builder.Property(x => x.HardwarePin)
-            .HasMaxLength(32)
+        builder.Property(x => x.Name)
+            .HasMaxLength(RelayConstants.NameLength)
             .IsRequired();
+
+        builder.Property(x => x.ConnectionProtocol)
+            .HasConversion<int>()
+            .IsRequired();
+
+        builder.Property(x => x.ConnectionAddress)
+           .HasMaxLength(RelayConstants.ConnectionAddressLength)
+           .IsRequired();
+
+        builder.Property(x => x.IsNormalyOpen).IsRequired();
 
         builder.Property(x => x.Purpose)
             .HasConversion<int>()
@@ -29,7 +41,21 @@ public class RelayEntityConfiguration : IEntityTypeConfiguration<RelayEntity>
         builder.HasIndex(x => new 
         { 
             x.ControllerId, 
-            x.HardwarePin 
+            x.PowerSensorId,
+            x.ConnectionAddress
         }).IsUnique();
+
+        builder.HasIndex(x => x.PowerSensorId)
+            .IsUnique();
+
+        builder.HasMany<RelayCommandsQueueEntity>()
+            .WithOne()
+            .HasForeignKey(x => x.RelayId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne<SensorEntity>()
+            .WithOne()
+            .HasForeignKey<RelayEntity>(x => x.PowerSensorId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

@@ -1,41 +1,47 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Contracts.Constants;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notification.Domain.Entities;
+using System.Text.Json;
 
 namespace Notification.Infrastructure.Configurations;
 
-public class MaintenanceLogEntityConfiguration
+public sealed class MaintenanceLogEntityConfiguration
     : IEntityTypeConfiguration<MaintenanceLogEntity>
 {
     public void Configure(EntityTypeBuilder<MaintenanceLogEntity> builder)
     {
+        var serializerOptions = new JsonSerializerOptions { WriteIndented = false };
+
         builder.ToTable("maintenance_logs");
 
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.UserId).IsRequired();
-        builder.HasIndex(x => x.UserId);
-
-        builder.Property(x => x.AquariumId).IsRequired();
-        builder.HasIndex(x => x.AquariumId);
-
+        builder.Property(x => x.EcosystemId).IsRequired();
         builder.Property(x => x.ActionDate).IsRequired();
 
-        builder.Property(x => x.PhLevel)
-            .HasPrecision(4, 2)
-            .IsRequired(false);
-
-        builder.Property(x => x.KhLevel)
-            .HasPrecision(4, 2)
-            .IsRequired(false);
-
-        builder.Property(x => x.No3Level)
-            .HasPrecision(4, 2)
-            .IsRequired(false);
+        builder.Property(x => x.Metrics)
+            .HasColumnType("jsonb")
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, serializerOptions),
+                v => JsonSerializer.Deserialize<Dictionary<string, double>>(v, serializerOptions)
+                     ?? new Dictionary<string, double>()
+            )
+            .Metadata.SetValueComparer(new ValueComparer<Dictionary<string, double>>(
+                (c1, c2) => c1!.SequenceEqual(c2!),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                c => c.ToDictionary(entry => entry.Key, entry => entry.Value)
+            ));
 
         builder.Property(x => x.Notes)
-            .HasMaxLength(1024)
+            .HasMaxLength(MaintenanceLogConstants.Length)
             .IsRequired();
+
         builder.Property(x => x.CreatedAt).IsRequired();
+
+        builder.HasIndex(x => x.UserId);
+        builder.HasIndex(x => x.EcosystemId);
     }
 }

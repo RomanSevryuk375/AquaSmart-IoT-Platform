@@ -3,7 +3,7 @@ using Notification.Domain.Interfaces;
 
 namespace Notification.Infrastructure.Repositories;
 
-public class MaintenanceLogRepository(SystemDbContext dbContext)
+public sealed class MaintenanceLogRepository(SystemDbContext dbContext)
     : BaseRepository<MaintenanceLogEntity>(dbContext), IMaintenanceLogRepository
 {
 }

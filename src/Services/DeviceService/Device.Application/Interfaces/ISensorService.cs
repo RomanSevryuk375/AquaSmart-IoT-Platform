@@ -1,6 +1,5 @@
 ﻿using Contracts.Enums;
 using Device.Application.DTOs.Sensor;
-using Device.Application.DTOs.Telemetry;
 
 namespace Device.Application.Interfaces;
 
@@ -13,7 +12,7 @@ public interface ISensorService
         CancellationToken cancellationToken);
 
     Task<SensorResponseDto> GetSensorByIdAsync(
-        Guid id, 
+        Guid sensorId, 
         CancellationToken cancellationToken);
 
     Task<Guid> AddSensorAsync(
@@ -21,21 +20,16 @@ public interface ISensorService
         CancellationToken cancellationToken);
 
     Task UpdateSensorAsync(
-        Guid id,
+        Guid sensorId,
         SensorUpdateRequestDto updateRequestDto,
         CancellationToken cancellationToken);
 
     Task DeleteSensorAsync(
-        Guid id, 
+        Guid sensorId, 
         CancellationToken cancellationToken);
 
     Task SetSensorStateAsync(
-        Guid id,
+        Guid sensorId,
         SensorStateEnum state,
-        CancellationToken cancellationToken);
-
-    Task<TelemetryResponse> ProcessTelemetryBatchAsync(
-        TelemetryBatchRequest request,
-        string deviceToken,
         CancellationToken cancellationToken);
 }

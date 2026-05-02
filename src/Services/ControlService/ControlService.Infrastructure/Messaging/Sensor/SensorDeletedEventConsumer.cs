@@ -4,12 +4,12 @@ using MassTransit;
 
 namespace Control.Infrastructure.Messaging.Sensor;
 
-public class SensorDeletedEventConsume(ISensorServiceFromEvent service)
+public class SensorDeletedEventConsume(ISensorService service)
     : IConsumer<SensorDeletedEvent>
 {
     public async Task Consume(ConsumeContext<SensorDeletedEvent> context)
     {
-        await service.DeletedSensorFromEventAsync(
+        await service.DeletedSensorAsync(
             context.Message, context.CancellationToken);
     }
 }

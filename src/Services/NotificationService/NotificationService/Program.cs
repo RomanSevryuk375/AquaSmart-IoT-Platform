@@ -7,10 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddHealthChecks()
-    .AddNpgSql(builder.Configuration.GetConnectionString("SystemDbContext")!)
-    .AddRabbitMQ(new Uri(builder.Configuration["RabbitMqOptions:Host"]!));
-
 var app = builder.Build();
 
 app.UseGlobalExceptionHandler();
@@ -21,11 +17,8 @@ using (var scope = app.Services.CreateScope())
     context.Database.Migrate();
 }
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseAuthentication();
 app.UseAuthorization();

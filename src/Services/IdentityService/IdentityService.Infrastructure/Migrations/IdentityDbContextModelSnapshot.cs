@@ -22,16 +22,58 @@ namespace IdentityService.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("IdentityService.Domain.Entities.SubscriptionEntity", b =>
+            modelBuilder.Entity("IdentityService.Domain.Entities.RefreshTokenEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<bool>("CanUseAnalytics")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("ExpiredAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expired_at");
+
+                    b.Property<bool>("IsRevoked")
                         .HasColumnType("boolean")
-                        .HasColumnName("can_use_analytics");
+                        .HasColumnName("is_revoked");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_used");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("token_hash");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_refresh_tokens");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique()
+                        .HasDatabaseName("ix_refresh_tokens_token_hash");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_refresh_tokens_user_id");
+
+                    b.ToTable("refresh_tokens", (string)null);
+                });
+
+            modelBuilder.Entity("IdentityService.Domain.Entities.SubscriptionEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -41,14 +83,15 @@ namespace IdentityService.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("duration_days");
 
-                    b.Property<int>("MaxAquariums")
-                        .HasColumnType("integer")
-                        .HasColumnName("max_aquariums");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
+
+                    b.Property<string>("Permissions")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("permissions");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
@@ -64,31 +107,28 @@ namespace IdentityService.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
-                            CanUseAnalytics = false,
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DurationDays = 36500,
-                            MaxAquariums = 1,
                             Name = "Free",
+                            Permissions = "[\"tank:read\",\"tank:create\",\"tank:update\",\"tank:delete\",\"tank:limit:1\",\"device:control\",\"auto:rule:create\",\"auto:rule:limit:5\",\"auto:schedule:create\",\"data:view\",\"notify:log:read\",\"notify:log:write\",\"account:update\",\"account:view\"]",
                             Price = 0m
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000002"),
-                            CanUseAnalytics = true,
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DurationDays = 30,
-                            MaxAquariums = 10,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DurationDays = 31,
                             Name = "Professional",
+                            Permissions = "[\"tank:read\",\"tank:create\",\"tank:update\",\"tank:delete\",\"tank:limit:10\",\"device:control\",\"auto:rule:create\",\"auto:rule:limit:10\",\"auto:schedule:create\",\"data:view\",\"data:history\",\"notify:tg\",\"notify:log:read\",\"notify:log:write\",\"notify:reminder\",\"account:update\",\"account:view\"]",
                             Price = 9.99m
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000003"),
-                            CanUseAnalytics = true,
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DurationDays = 30,
-                            MaxAquariums = 30,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DurationDays = 31,
                             Name = "Elite",
+                            Permissions = "[\"tank:read\",\"tank:create\",\"tank:update\",\"tank:delete\",\"tank:limit:unlim\",\"device:control\",\"device:manual\",\"auto:rule:create\",\"auto:rule:limit:unlim\",\"auto:schedule:create\",\"auto:vacation\",\"data:view\",\"data:history\",\"data:diag\",\"data:rt\",\"notify:log:read\",\"notify:log:write\",\"notify:reminder\",\"notify:email\",\"notify:tg\"]",
                             Price = 19.99m
                         });
                 });
@@ -150,7 +190,8 @@ namespace IdentityService.Infrastructure.Migrations
                         .HasColumnName("password_hash");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("text")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("phone_number");
 
                     b.Property<bool>("PhoneNumberConfirmed")
@@ -168,6 +209,11 @@ namespace IdentityService.Infrastructure.Migrations
                     b.Property<Guid>("SubscriptionId")
                         .HasColumnType("uuid")
                         .HasColumnName("subscription_id");
+
+                    b.Property<string>("TimeZone")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("time_zone");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean")
@@ -354,6 +400,16 @@ namespace IdentityService.Infrastructure.Migrations
                         .HasName("pk_usertokens");
 
                     b.ToTable("usertokens", (string)null);
+                });
+
+            modelBuilder.Entity("IdentityService.Domain.Entities.RefreshTokenEntity", b =>
+                {
+                    b.HasOne("IdentityService.Domain.Entities.UserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_refresh_tokens_asp_net_users_user_id");
                 });
 
             modelBuilder.Entity("IdentityService.Domain.Entities.UserEntity", b =>

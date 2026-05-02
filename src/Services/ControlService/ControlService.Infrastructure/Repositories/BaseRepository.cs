@@ -1,4 +1,4 @@
-﻿using Control.Domain.Interfaces;
+﻿using Contracts.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Control.Infrastructure.Repositories;

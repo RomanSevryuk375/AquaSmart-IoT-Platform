@@ -1,14 +1,14 @@
-﻿using Contracts.Enums;
-using Notification.Domain.Interfaces;
+﻿using Contracts.Abstractions;
+using Contracts.Enums;
 
 namespace Notification.Domain.Entities;
 
-public class NotificationEntity : IEntity
+public sealed class NotificationEntity : IEntity
 {
     private NotificationEntity(
         Guid id, 
         Guid userId, 
-        Guid aquariumId, 
+        Guid? ecosystemId, 
         NotificationLevelEnum level, 
         string message, 
         bool isRead,
@@ -20,7 +20,7 @@ public class NotificationEntity : IEntity
     {
         Id = id;
         UserId = userId;
-        AquariumId = aquariumId;
+        EcosystemId = ecosystemId;
         Level = level;
         Message = message;
         IsRead = isRead;
@@ -33,7 +33,7 @@ public class NotificationEntity : IEntity
 
     public Guid Id { get; private set; }
     public Guid UserId { get; private set; }
-    public Guid AquariumId { get; private set; }
+    public Guid? EcosystemId { get; private set; }
     public NotificationLevelEnum Level { get; private set; }
     public string Message { get; private set; } = string.Empty;
     public bool IsRead { get; private set; }
@@ -46,7 +46,7 @@ public class NotificationEntity : IEntity
 
     public static (NotificationEntity? notification, List<string> errors) Create(
         Guid userId, 
-        Guid aquariumId, 
+        Guid? ecosystemId, 
         NotificationLevelEnum level, 
         string message)
     {
@@ -57,7 +57,7 @@ public class NotificationEntity : IEntity
             errors.Add("userId must not be empty.");
         }
 
-        if (aquariumId == Guid.Empty)
+        if (ecosystemId == Guid.Empty)
         {
             errors.Add("aquariumId must not be empty.");
         }
@@ -75,7 +75,7 @@ public class NotificationEntity : IEntity
         var notification = new NotificationEntity(
             Guid.NewGuid(),
             userId,
-            aquariumId,
+            ecosystemId,
             level,
             message,
             false,

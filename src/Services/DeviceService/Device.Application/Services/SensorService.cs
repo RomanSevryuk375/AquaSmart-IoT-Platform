@@ -1,38 +1,42 @@
-﻿using Contracts.Enums;
+﻿using AutoMapper;
+using Contracts.Enums;
 using Contracts.Events.SensorEvents;
-using Contracts.Events.TelemetryEvents;
 using Contracts.Exceptions;
 using Device.Application.DTOs.Sensor;
-using Device.Application.DTOs.Telemetry;
-using Device.Application.Extesions;
 using Device.Application.Interfaces;
 using Device.Domain.Entities;
 using Device.Domain.Interfaces;
 using Device.Domain.SpecificationParams;
 using Device.Domain.Specifications;
+using FluentValidation;
 using MassTransit;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Device.Application.Services;
 
-public class SensorService(
+public sealed class SensorService(
     ISensorRepository sensorRepository,
     IControllerRepository controllerRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publishEndpoint,
-    IMyHasher myHasher) : ISensorService
+    IMapper mapper,
+    IValidator<SensorRequestDto> createValidator,
+    IValidator<SensorUpdateRequestDto> updateValidator) : ISensorService
 {
     public async Task<Guid> AddSensorAsync(
         SensorRequestDto request,
         CancellationToken cancellationToken)
     {
+        createValidator.ValidateAndThrow(request);
+
         var existingController = await controllerRepository
             .GetByIdAsync(request.ControllerId, cancellationToken)
             ?? throw new NotFoundException($"Controller {request.ControllerId} not found");
 
         var (sensor, errors) = SensorEntity.Create(
             request.ControllerId,
-            request.HardwarePin,
+            request.Name,
+            request.ConnectionProtocol,
+            request.ConnectionAddress,
             request.Type,
             request.Unit);
 
@@ -45,29 +49,23 @@ public class SensorService(
         var result = await sensorRepository.AddAsync(sensor, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        await publishEndpoint.Publish(new SensorCreatedEvent
-        {
-            Id = sensor.Id,
-            ControllerId = sensor.ControllerId,
-            Type = sensor.Type,
-            State = sensor.State,
-            Unit = sensor.Unit,
-            CreatedAt = sensor.CreatedAt
-        }, cancellationToken);
+        await publishEndpoint.Publish(
+            mapper.Map<SensorCreatedEvent>(sensor), 
+            cancellationToken);
 
         return result;
     }
 
     public async Task DeleteSensorAsync(
-        Guid id,
+        Guid sensorId,
         CancellationToken cancellationToken)
     {
-        await sensorRepository.DeleteAsync(id, cancellationToken);
+        await sensorRepository.DeleteAsync(sensorId, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         await publishEndpoint.Publish(new SensorDeletedEvent
         {
-            Id = id,
+            SensorId = sensorId,
         }, cancellationToken);
     }
 
@@ -91,70 +89,53 @@ public class SensorService(
             take,
             cancellationToken);
 
-        return sensors.Select(entity => new SensorResponseDto
-        {
-            Id = entity.Id,
-            ControllerId = entity.ControllerId,
-            HardwarePin = entity.HardwarePin,
-            Type = entity.Type,
-            State = entity.State,
-            Unit = entity.Unit,
-            CreatedAt = entity.CreatedAt,
-        }).ToList();
+        return mapper.Map<IReadOnlyList<SensorResponseDto>>(sensors);
     }
 
     public async Task<SensorResponseDto> GetSensorByIdAsync(
-        Guid id,
+        Guid sensorId,
         CancellationToken cancellationToken)
     {
         var existingSensor = await sensorRepository
-            .GetByIdAsync(id, cancellationToken)
-            ?? throw new NotFoundException($"Sensor {id} not found");
+            .GetByIdAsync(sensorId, cancellationToken)
+            ?? throw new NotFoundException($"Sensor {sensorId} not found");
 
-        return new SensorResponseDto
-        {
-            Id = existingSensor.Id,
-            ControllerId = existingSensor.ControllerId,
-            HardwarePin = existingSensor.HardwarePin,
-            Type = existingSensor.Type,
-            State = existingSensor.State,
-            Unit = existingSensor.Unit,
-            CreatedAt = existingSensor.CreatedAt,
-        };
+        return mapper.Map<SensorResponseDto>(existingSensor);
     }
 
     public async Task SetSensorStateAsync(
-        Guid id,
+        Guid sensorId,
         SensorStateEnum state,
         CancellationToken cancellationToken)
     {
         var existingSensor = await sensorRepository
-            .GetByIdAsync(id, cancellationToken)
-            ?? throw new NotFoundException($"Sensor {id} not found");
+            .GetByIdAsync(sensorId, cancellationToken)
+            ?? throw new NotFoundException($"Sensor {sensorId} not found");
 
         existingSensor.SetState(state);
 
         await sensorRepository.UpdateAsync(existingSensor, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        await publishEndpoint.Publish(new SensorStateChangedCommand
-        {
-            Id = existingSensor.Id,
-            State = existingSensor.State,
-        }, cancellationToken);
+        await publishEndpoint.Publish(
+            mapper.Map<SensorStateChangedCommand>(existingSensor), 
+            cancellationToken);
     }
 
     public async Task UpdateSensorAsync(
-        Guid id,
+        Guid sensorId,
         SensorUpdateRequestDto updateRequestDto,
         CancellationToken cancellationToken)
     {
+        updateValidator.ValidateAndThrow(updateRequestDto);
+
         var existingSensor = await sensorRepository
-            .GetByIdAsync(id, cancellationToken)
-            ?? throw new NotFoundException($"Sensor {id} not found");
+            .GetByIdAsync(sensorId, cancellationToken)
+            ?? throw new NotFoundException($"Sensor {sensorId} not found");
 
         var errors = existingSensor.Update(
-            updateRequestDto.HardwarePin,
+            updateRequestDto.ConnectionProtocol,
+            updateRequestDto.ConnectionAddress,
             updateRequestDto.ControllerId,
             updateRequestDto.Type,
             updateRequestDto.Unit);
@@ -168,83 +149,8 @@ public class SensorService(
         await sensorRepository.UpdateAsync(existingSensor, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        await publishEndpoint.Publish(new SensorUpdatedEvent
-        {
-            Id = existingSensor.Id,
-            ControllerId = existingSensor.ControllerId,
-            Type = existingSensor.Type,
-            State = existingSensor.State,
-            Unit = existingSensor.Unit,
-            LastValue = 0.0,
-            UpdatedAt = DateTime.UtcNow,
-            CreatedAt = existingSensor.CreatedAt
-        }, cancellationToken);
-    }
-
-    public async Task<TelemetryResponse> ProcessTelemetryBatchAsync(
-        TelemetryBatchRequest request,
-        string deviceToken,
-        CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrWhiteSpace(request.MacAddress))
-        {
-            throw new DomainValidationException(
-                $"Controller MacAddress must not be empty or white space.");
-        }
-
-        var existingController = await controllerRepository
-            .GetByMacAddress(request.MacAddress, cancellationToken)
-            ?? throw new NotFoundException($"Controller {request.MacAddress} not found");
-
-        var verify = myHasher
-            .Verify(deviceToken, existingController.DeviceTokenHash);
-
-        if (!verify)
-        {
-            throw new InvalidCredentialsException("DeviceToken is not verified.");
-        }
-
-        var existingSensors = await sensorRepository
-            .GetAllSensorsAsync(existingController.Id, cancellationToken);
-
-        var acceptedCount = 0;
-        var validationErrors = new List<string>();
-        var skippedCount = 0;
-
-        foreach (var item in request.Items)
-        {
-            var sensor = existingSensors.FirstOrDefault(x => x.Id == item.SensorId);
-
-            if (item.RecordedAt > DateTime.UtcNow.AddMinutes(5))
-            {
-                validationErrors.Add($"RecordedAt can not be in future. (Sensor {item.SensorId})");
-                skippedCount++;
-                continue;
-            }
-
-            if (sensor is null)
-            {
-                validationErrors.Add($"Sensor {item.SensorId} not found. (Sensor {item.SensorId})");
-                skippedCount++;
-                continue;
-            }
-
-            await publishEndpoint.Publish(new TelemetryReportedFromHardwareEvent
-            {
-                SensorId = item.SensorId,
-                Value = item.Value,
-                ExternalMessageId = item.ExternalMessageId,
-                RecordedAt = item.RecordedAt,
-            }, cancellationToken);
-
-            acceptedCount++;
-        }
-
-        return new TelemetryResponse
-        {
-            AcceptedCount = acceptedCount,
-            ValidationErrors = validationErrors,
-            SkippedCount = skippedCount
-        };
+        await publishEndpoint.Publish(
+            mapper.Map<SensorUpdatedEvent>(existingSensor), 
+            cancellationToken);
     }
 }

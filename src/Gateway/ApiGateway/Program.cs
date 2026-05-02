@@ -1,5 +1,7 @@
 using ApiGateway;
+using Contracts.Authorization;
 using Contracts.Middlewares;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,9 +10,10 @@ builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddCustomSwagger();
 
 builder.Services.AddApiAuthentication(builder.Configuration);
+builder.Services.AddAquaAuthorizationPolicies();
 builder.Services.AddAuthorization();
 
 var app = builder.Build();

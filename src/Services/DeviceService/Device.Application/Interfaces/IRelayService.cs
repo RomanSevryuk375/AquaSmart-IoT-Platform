@@ -1,47 +1,35 @@
-﻿using Contracts.Events.RelayEvents;
-using Device.Application.DTOs.Relay;
+﻿using Device.Application.DTOs.Relay;
 
-namespace Device.Application.Interfaces;
-
-public interface IRelayService
+namespace Device.Application.Interfaces
 {
-    Task<IReadOnlyList<RelayResponseDto>> GetAllRelaysAsync(
-        RelayFilterDto filter,
-        int? skip,
-        int? take,
-        CancellationToken cancellationToken);
+    public interface IRelayService
+    {
+        Task<Guid> AddRelayAsync(
+            RelayRequestDto request, 
+            CancellationToken cancellationToken);
 
-    Task<RelayResponseDto> GetRelayByIdAsync(
-        Guid id, 
-        CancellationToken cancellationToken);
+        Task DeleteRelayAsync(
+            Guid relayId, 
+            CancellationToken cancellationToken);
 
-    Task<Guid> AddRelayAsync(
-        RelayRequestDto request, 
-        CancellationToken cancellationToken);
+        Task<IReadOnlyList<RelayResponseDto>> GetAllRelaysAsync(
+            RelayFilterDto filter, 
+            int? skip, 
+            int? take, 
+            CancellationToken cancellationToken);
 
-    Task UpdateRelayAsync(
-        Guid id,
-        RelayUpdateRequestDto updateRequestDto,
-        CancellationToken cancellationToken);
+        Task<RelayResponseDto> GetRelayByIdAsync(
+            Guid relayId, 
+            CancellationToken cancellationToken);
 
-    Task DeleteRelayAsync(
-        Guid id, 
-        CancellationToken cancellationToken);
+        Task SetRelayPowerSensorAsync(
+            Guid relayId, 
+            Guid powerSensorId, 
+            CancellationToken cancellationToken);
 
-    Task<bool> ToggleRelayStateAsync(
-        Guid id, 
-        CancellationToken cancellationToken);
-
-    Task<bool> ToggleRelayModeAsync(
-        Guid id, 
-        CancellationToken cancellationToken);
-
-    Task<bool> SetRelayStateAsync(
-        Guid id, 
-        bool state, 
-        CancellationToken cancellationToken);
-
-    Task SetRelayStateFromCommandAsync(
-        ChangeRelayStateCommand command,
-        CancellationToken cancellationToken);
+        Task UpdateRelayAsync(
+            Guid relayId, 
+            RelayUpdateRequestDto updateRequestDto, 
+            CancellationToken cancellationToken);
+    }
 }

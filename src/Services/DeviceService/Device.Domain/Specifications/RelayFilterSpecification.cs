@@ -1,5 +1,5 @@
-﻿using Device.Domain.Entities;
-using Device.Domain.Interfaces;
+﻿using Contracts.Abstractions;
+using Device.Domain.Entities;
 using Device.Domain.SpecificationParams;
 
 namespace Device.Domain.Specifications;

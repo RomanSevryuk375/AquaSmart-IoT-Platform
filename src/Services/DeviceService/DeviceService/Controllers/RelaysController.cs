@@ -1,10 +1,13 @@
-﻿using Device.Application.DTOs.Relay;
+﻿using Contracts.Authorization;
+using Device.Application.DTOs.Relay;
 using Device.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Device.API.Controllers;
 
 [ApiController]
+[Authorize(Policy = SubPermissions.DeviceControl)]
 [Route("api/device/v1/relays")]
 public class RelaysController(
     IRelayService relayService) : ControllerBase
@@ -48,7 +51,7 @@ public class RelaysController(
 
         return CreatedAtRoute(
             NameGetById, 
-            new { id = id },
+            new { id },
             createdData);
     }
 
@@ -61,37 +64,6 @@ public class RelaysController(
         await relayService.UpdateRelayAsync(id, request, cancellationToken);
 
         return NoContent();
-    }
-
-    [HttpPatch("{id:guid}/mode")]
-    public async Task<ActionResult<bool>> ToggleRelayModeAsync(
-        [FromRoute] Guid id, 
-        CancellationToken cancellationToken = default)
-    {
-        var result = await relayService.ToggleRelayModeAsync(id, cancellationToken);
-
-        return Ok(result);
-    }
-
-    [HttpPatch("{id:guid}/set-state")]
-    public async Task<ActionResult<bool>> SetRelayStateAsync(
-        [FromRoute] Guid id,
-        [FromQuery] bool state,
-        CancellationToken cancellationToken = default)
-    {
-        var result = await relayService.SetRelayStateAsync(id, state, cancellationToken);
-
-        return Ok(result);
-    }
-
-    [HttpPatch("{id:guid}/state")]
-    public async Task<ActionResult<bool>> ToggleRelayStateAsync(
-        [FromRoute] Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        var result = await relayService.ToggleRelayStateAsync(id, cancellationToken);
-
-        return Ok(result);
     }
 
     [HttpDelete("{id:guid}")]

@@ -4,14 +4,14 @@ namespace Device.Application.Interfaces;
 
 public interface IControllerService
 {
-    Task<List<ControllerResponseDto>> GetAllControllersAsync(
+    Task<IReadOnlyList<ControllerResponseDto>> GetAllControllersAsync(
         ControllerFilterDto filter,
         int? skip,
         int? take,
         CancellationToken cancellationToken);
 
     Task<ControllerResponseDto> GetControllerByIdAsync(
-        Guid id,
+        Guid controllerId,
         CancellationToken cancellationToken);
 
     Task<ControllerRegistredResponseDto> AddControllerAsync(
@@ -19,20 +19,20 @@ public interface IControllerService
         CancellationToken cancellationToken);
 
     Task UpdateControllerAsync(
-        Guid id,
+        Guid controllerId,
         ControllerUpdateRequestDto updateRequestDto,
         CancellationToken cancellationToken);
 
     Task DeleteControllerAsync(
-        Guid id, 
+        Guid controllerId, 
         CancellationToken cancellationToken);
 
     Task<ControllerPingResponseDto> PingControllerAsync(
-        Guid id,
+        Guid controllerId,
         string deviceToken,
         CancellationToken cancellationToken);
 
     Task<bool> ToggleControllerStateAsync(
-        Guid id, 
+        Guid controllerId, 
         CancellationToken cancellationToken);
 }

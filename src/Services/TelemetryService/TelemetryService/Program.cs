@@ -7,10 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddHealthChecks()
-    .AddNpgSql(builder.Configuration.GetConnectionString("SystemDbContext")!)
-    .AddRabbitMQ(new Uri(builder.Configuration["MessageBroker:Host"]!));
-
 var app = builder.Build();
 
 app.UseGlobalExceptionHandler();

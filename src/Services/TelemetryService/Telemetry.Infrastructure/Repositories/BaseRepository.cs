@@ -1,5 +1,5 @@
+using Contracts.Abstractions;
 using Microsoft.EntityFrameworkCore;
-using Telemetry.Domain.Interfaces;
 
 namespace Telemetry.Infrastructure.Repositories;
 

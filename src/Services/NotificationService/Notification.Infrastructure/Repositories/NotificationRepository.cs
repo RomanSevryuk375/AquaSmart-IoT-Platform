@@ -4,10 +4,11 @@ using Notification.Domain.Interfaces;
 
 namespace Notification.Infrastructure.Repositories;
 
-public class NotificationRepository(SystemDbContext dbContext)
+public sealed class NotificationRepository(SystemDbContext dbContext)
     : BaseRepository<NotificationEntity>(dbContext), INotificationRepository
 {
-    public async Task<IReadOnlyList<NotificationEntity>> GetUnpublishedNotificationsAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<NotificationEntity>> GetUnpublishedNotificationsAsync(
+        CancellationToken cancellationToken)
     {
         return await Context.Notifications
             .AsNoTracking()

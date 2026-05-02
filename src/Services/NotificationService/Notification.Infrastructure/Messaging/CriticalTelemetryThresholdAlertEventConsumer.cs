@@ -4,12 +4,17 @@ using Notification.Application.Interfaces;
 
 namespace Notification.Infrastructure.Messaging;
 
-internal class CriticalTelemetryThresholdAlertEventConsumer(
+public sealed class CriticalTelemetryThresholdAlertEventConsumer(
     ITelemetryAlertSender alertSender) : IConsumer<CriticalTelemetryThresholdAlertEvent>
 {
     public async Task Consume(ConsumeContext<CriticalTelemetryThresholdAlertEvent> context)
     {
-        await alertSender.SendTelemetryAlertAsync(
+        var result = await alertSender.SendTelemetryAlertAsync(
             context.Message, context.CancellationToken);
+
+        if (!result.IsSuccess && result.IsRetryable)
+        {
+            throw new Exception(result.Error);
+        }
     }
 }

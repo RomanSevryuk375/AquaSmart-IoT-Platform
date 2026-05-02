@@ -1,4 +1,6 @@
-﻿using Contracts.Exceptions;
+﻿using AutoMapper;
+using Contracts.Results;
+using FluentValidation;
 using Notification.Application.DTOs.Reminder;
 using Notification.Application.Interfaces;
 using Notification.Domain.Entities;
@@ -9,60 +11,59 @@ using Notification.Domain.Specifications;
 namespace Notification.Application.Services;
 
 public class ReminderService(
-    IAquariumRepository aquariumRepository,
-    IUserRepository userRepository,
+    IEcosystemRepository ecosystemRepository,
     IReminderRepository reminderRepository,
-    IUnitOfWork unitOfWork) : IReminderService
+    IUserContext userContext,
+    IMapper mapper,
+    IUnitOfWork unitOfWork,
+    IValidator<ReminderRequestDto> validator) : IReminderService
 {
-    public async Task<Guid> AddReminderAsync(
-        ReminderRequestDto request, 
+    public async Task<Result<Guid>> AddReminderAsync(
+        ReminderRequestDto request,
         CancellationToken cancellationToken)
     {
-        var existingAquarium = await aquariumRepository
-            .GetByIdAsync(request.AquariumId, cancellationToken)
-            ?? throw new NotFoundException($"Aquarium {request.AquariumId} not found");
+        validator.ValidateAndThrow(request);
 
-        var existingUser = await userRepository
-            .GetByIdAsync(request.UserId, cancellationToken)
-            ?? throw new NotFoundException($"User {request.UserId} not found");
+        var ecosystem = await ecosystemRepository
+            .GetByIdAsync(request.EcosystemId, cancellationToken);
+
+        if (ecosystem is null || ecosystem.UserId != userContext.UserId)
+        {
+            return Result<Guid>.Failure(Error.NotFound(
+                "Ecosystem.NotFound",
+                $"Ecosystem {request.EcosystemId} not found"));
+        }
 
         var (reminder, errors) = ReminderEntity.Create(
-            request.UserId,
-            request.AquariumId,
+            userContext.UserId,
+            request.EcosystemId,
             request.TaskName,
             request.IntervalDays);
 
         if (reminder is null)
         {
-            throw new DomainValidationException(
-                $"Failed to create {nameof(ReminderEntity)}: {string.Join(", ", errors)}");
+            return Result<Guid>.Failure(Error.Validation(
+                "Reminder.Invalid",
+                $"Failed to create {nameof(ReminderEntity)}: {string.Join(", ", errors)}"));
         }
 
         var result = await reminderRepository.AddAsync(reminder, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return result;
+        return Result<Guid>.Success(result);
     }
 
-    public async Task DeleteReminderAsync(
-        Guid id, 
-        CancellationToken cancellationToken)
-    {
-        await reminderRepository.DeleteAsync(id, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-    }
-
-    public async Task<IReadOnlyList<ReminderResponseDto>> GetAllRemindersAsync(
-        ReminderFilterDto filter, 
-        int? skip, 
-        int? take, 
+    public async Task<Result<IReadOnlyList<ReminderResponseDto>>> GetAllRemindersAsync(
+        ReminderFilterDto filter,
+        int? skip,
+        int? take,
         CancellationToken cancellationToken)
     {
         var specification = new ReminderFilterSpecification(
             new ReminderSpecificationParams
             {
-                UserId = filter.UserId,
-                AquariumId = filter.AquariumId,
+                UserId = userContext.UserId,
+                EcosystemId = filter.EcosystemId,
                 SearchTerm = filter.SearchTerm,
                 LastDoneAtFrom = filter.LastDoneAtFrom,
                 LastDoneAtTo = filter.LastDoneAtTo,
@@ -71,70 +72,98 @@ public class ReminderService(
             });
 
         var reminders = await reminderRepository.GetAllAsync(
-            specification, 
-            skip, 
-            take, 
+            specification,
+            skip,
+            take,
             cancellationToken);
 
-        return reminders.Select(r => new ReminderResponseDto
-        {
-            Id = r.Id,
-            UserId = r.UserId,
-            AquariumId = r.AquariumId,
-            TaskName = r.TaskName,
-            IntervalDays = r.IntervalDays,
-            NextDueAt = r.NextDueAt,
-            CreatedAt = r.CreatedAt,
-        }).ToList();
+        return Result<IReadOnlyList<ReminderResponseDto>>.Success(
+            mapper.Map<IReadOnlyList<ReminderResponseDto>>(reminders));
     }
 
-    public async Task<ReminderResponseDto> GetReminderByIdAsync(
-        Guid id, 
+    public async Task<Result<ReminderResponseDto>> GetReminderByIdAsync(
+        Guid reminderId,
+        CancellationToken cancellationToken)
+    {
+        var reminder = await reminderRepository.GetByIdAsync(reminderId, cancellationToken);
+
+        if (reminder is null ||
+            reminder.UserId != userContext.UserId)
+        {
+            return Result<ReminderResponseDto>.Failure(Error.NotFound(
+                "Reminder.NotFound",
+                $"Reminder {reminderId} not found"));
+        }
+
+        return Result<ReminderResponseDto>.Success(
+            mapper.Map<ReminderResponseDto>(reminder));
+    }
+
+    public async Task<Result> UpdateReminderAsync(
+        Guid reminderId,
+        ReminderUpdateRequestDto request,
         CancellationToken cancellationToken)
     {
         var reminder = await reminderRepository
-            .GetByIdAsync(id, cancellationToken)
-            ?? throw new NotFoundException($"{nameof(ReminderEntity)} not found");
+            .GetByIdAsync(reminderId, cancellationToken);
 
-        return new ReminderResponseDto
+        if (reminder is null ||
+            reminder.UserId != userContext.UserId)
         {
-            Id = reminder.Id,
-            UserId = reminder.UserId,
-            AquariumId = reminder.AquariumId,
-            TaskName = reminder.TaskName,
-            IntervalDays = reminder.IntervalDays,
-            NextDueAt = reminder.NextDueAt,
-            CreatedAt = reminder.CreatedAt,
-        };
+            return Result.Failure(Error.NotFound(
+                "Reminder.NotFound",
+                $"Reminder {reminderId} not found"));
+        }
+
+        reminder.UpdateSchedule(request.TaskName, request.IntervalDays);
+
+        await reminderRepository.UpdateAsync(reminder, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
     }
 
-    public async Task ReminderCompleteTaskAsync(
-        Guid id, CancellationToken cancellationToken)
+    public async Task<Result> ReminderCompleteTaskAsync(
+        Guid reminderId,
+        CancellationToken cancellationToken)
     {
         var reminder = await reminderRepository
-            .GetByIdAsync(id, cancellationToken)
-            ?? throw new NotFoundException($"{nameof(ReminderEntity)} not found");
+            .GetByIdAsync(reminderId, cancellationToken);
+
+        if (reminder is null ||
+            reminder.UserId != userContext.UserId)
+        {
+            return Result.Failure(Error.NotFound(
+                "Reminder.NotFound",
+                $"Reminder {reminderId} not found"));
+        }
 
         reminder.CompleteTask();
 
         await reminderRepository.UpdateAsync(reminder, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
     }
 
-    public async Task UpdateReminderAsync(
-        Guid id, 
-        ReminderUpdateRequestDto request, 
+    public async Task<Result> DeleteReminderAsync(
+        Guid reminderId,
         CancellationToken cancellationToken)
     {
         var reminder = await reminderRepository
-            .GetByIdAsync(id, cancellationToken)
-            ?? throw new NotFoundException($"{nameof(ReminderEntity)} not found");
+            .GetByIdAsync(reminderId, cancellationToken);
 
-        reminder.UpdateSchedule(
-            request.TaskName,
-            request.IntervalDays);
+        if (reminder is null ||
+            reminder.UserId != userContext.UserId)
+        {
+            return Result.Failure(Error.NotFound(
+                "Reminder.NotFound",
+                $"Reminder {reminderId} not found"));
+        }
 
-        await reminderRepository.UpdateAsync(reminder, cancellationToken);
+        await reminderRepository.DeleteAsync(reminderId, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
     }
 }

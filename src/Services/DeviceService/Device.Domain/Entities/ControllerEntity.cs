@@ -1,4 +1,4 @@
-﻿using Device.Domain.Interfaces;
+﻿using Contracts.Abstractions;
 
 namespace Device.Domain.Entities;
 

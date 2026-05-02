@@ -4,12 +4,17 @@ using Notification.Application.Interfaces;
 
 namespace Notification.Infrastructure.Messaging;
 
-public class UserCreatedEventConsumer(
-    IUserServiceFromEvent service) : IConsumer<UserCreatedEvent>
+public sealed class UserCreatedEventConsumer(
+    IUserService service) : IConsumer<UserCreatedEvent>
 {
     public async Task Consume(ConsumeContext<UserCreatedEvent> context)
     {
-        await service.CreateUserFromEventAsync(
+        var result = await service.CreateUserAsync(
             context.Message, context.CancellationToken);
+
+        if (!result.IsSuccess && result.IsRetryable)
+        {
+            throw new Exception(result.Error);
+        }
     }
 }

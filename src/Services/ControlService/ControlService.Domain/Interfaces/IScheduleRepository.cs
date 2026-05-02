@@ -1,4 +1,5 @@
-﻿using Control.Domain.Entities;
+﻿using Contracts.Abstractions;
+using Control.Domain.Entities;
 
 namespace Control.Domain.Interfaces;
 

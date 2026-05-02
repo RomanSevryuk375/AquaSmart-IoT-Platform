@@ -1,5 +1,5 @@
+using Contracts.Abstractions;
 using Contracts.Enums;
-using Telemetry.Domain.Interfaces;
 
 namespace Telemetry.Domain.Entities;
 
@@ -8,6 +8,8 @@ public sealed class SensorEntity : IEntity
     private SensorEntity(
         Guid id,
         Guid controllerId,
+        Guid ecosystemId,
+        string name,
         SensorTypeEnum type,
         SensorStateEnum state,
         string unit,
@@ -18,6 +20,8 @@ public sealed class SensorEntity : IEntity
     {
         Id = id;
         ControllerId = controllerId;
+        EcosystemId = ecosystemId;
+        Name = name;
         Type = type;
         State = state;
         Unit = unit;
@@ -29,6 +33,8 @@ public sealed class SensorEntity : IEntity
 
     public Guid Id { get; private set; }
     public Guid ControllerId { get; private set; }
+    public Guid EcosystemId { get; private set; }
+    public string Name { get; private set; }
     public SensorTypeEnum Type { get; private set; }
     public SensorStateEnum State { get; private set; }
     public string Unit { get; private set; }
@@ -40,6 +46,8 @@ public sealed class SensorEntity : IEntity
     public static (SensorEntity? sensor, List<string> errors) Create(
         Guid id,
         Guid controllerId,
+        Guid ecosystemId,
+        string name,
         SensorTypeEnum type,
         SensorStateEnum state,
         string unit,
@@ -59,9 +67,19 @@ public sealed class SensorEntity : IEntity
             errors.Add("Controller id must not be empty.");
         }
 
+        if (ecosystemId == Guid.Empty)
+        {
+            errors.Add("Ecosystem id must not be empty.");
+        }
+
         if (string.IsNullOrWhiteSpace(unit))
         {
             errors.Add("Unit must not be empty.");
+        }
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            errors.Add("Name must not be empty.");
         }
 
         if (errors.Count > 0)
@@ -72,6 +90,8 @@ public sealed class SensorEntity : IEntity
         var sensor = new SensorEntity(
             id,
             controllerId,
+            ecosystemId,
+            name.Trim(),
             type,
             state,
             unit.Trim(),
@@ -108,6 +128,25 @@ public sealed class SensorEntity : IEntity
         ControllerId = controllerId;
         Type = type;
         Unit = unit.Trim();
+
+        return null;
+    }
+
+    public List<string>? Rename(string name)
+    {
+        var errors = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            errors.Add("Name must not be empty.");
+        }
+
+        if (errors.Count > 0)
+        {
+            return errors;
+        }
+
+        Name = name;
 
         return null;
     }

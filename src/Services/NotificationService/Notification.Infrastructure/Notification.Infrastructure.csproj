@@ -6,6 +6,8 @@
 	<ItemGroup>
 		<PackageReference Include="EFCore.NamingConventions" Version="8.0.3" />
 		<PackageReference Include="MassTransit.RabbitMQ" Version="8.2.2" />
+		<PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="8.0.2" />
+		<PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="8.0.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.25" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.25">
 			<PrivateAssets>all</PrivateAssets>

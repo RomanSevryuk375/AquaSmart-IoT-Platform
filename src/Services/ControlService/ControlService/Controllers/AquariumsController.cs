@@ -1,64 +1,87 @@
-﻿using Control.Application.DTOs.Aquarium;
+﻿using Contracts.Authorization;
+using Contracts.Results;
+using Control.Application.DTOs.Ecosystem;
 using Control.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Control.API.Controllers;
 
 [ApiController]
-[Route("api/control/v1/aquariums")]
-public class AquariumsController(IAquariumService aquariumService) : ControllerBase
+[Route("api/control/v1/ecosystems")]
+public class EcosystemsController(
+    IEcosystemService ecosystemService) : ControllerBase
 {
-    private const string NameGetById = "GetAquariumById";
+    private const string GetByIdRoute = "GetEcosystemById";
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<AquariumResponseDto>>> GetAllAquariumsAsync(
-        [FromQuery] AquariumFilterDto filter,
+    [Authorize(Policy = SubPermissions.TankRead)]
+    public async Task<ActionResult<IReadOnlyList<EcosystemResponseDto>>> GetAllEcosystemsAsync(
+        [FromQuery] EcosystemFilterDto filter,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 10,
         CancellationToken cancellationToken = default)
     {
-        var result = await aquariumService.GetAllAquariumsAsync(filter, skip, take, cancellationToken);
+        var result = await ecosystemService
+            .GetAllEcosystemsAsync(filter, skip, take, cancellationToken);
+
         return Ok(result);
     }
 
-    [HttpGet("{id:guid}", Name = NameGetById)]
-    public async Task<ActionResult<AquariumResponseDto>> GetAquariumByIdAsync(
+    [HttpGet("{id:guid}", Name = GetByIdRoute)]
+    [Authorize(Policy = SubPermissions.TankRead)]
+    public async Task<ActionResult<EcosystemResponseDto>> GetEcosystemByIdAsync(
         [FromRoute] Guid id,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
-        var result = await aquariumService.GetAquariumByIdAsync(id, cancellationToken);
-        return Ok(result);
+        var result = await ecosystemService
+            .GetEcosystemByIdAsync(id, cancellationToken);
+
+        return this.ToActionResult(result);
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateAquariumAsync(
-        [FromBody] AquariumRequestDto request,
-        CancellationToken cancellationToken = default)
+    [Authorize(Policy = SubPermissions.TankCreate)]
+    public async Task<ActionResult<Guid>> CreateEcosystemAsync(
+        [FromBody] EcosystemRequestDto request,
+        CancellationToken cancellationToken)
     {
-        var id = await aquariumService.CreateAquariumAsync(request, cancellationToken);
-        var createdData = await aquariumService.GetAquariumByIdAsync(id, cancellationToken);
+        var result = await ecosystemService
+            .CreateEcosystemAsync(request, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return this.ToActionResult(result);
+        }
 
         return CreatedAtRoute(
-            NameGetById,
-            new { id },
-            createdData);
+            GetByIdRoute,
+            new { id = result.Value }, 
+            result.Value);
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult> UpdateAquariumAsync([FromRoute] Guid id,
-        [FromBody] AquariumUpdateRequestDto request,
-        CancellationToken cancellationToken = default)
+    [Authorize(Policy = SubPermissions.TankUpdate)]
+    public async Task<IActionResult> UpdateEcosystemAsync(
+        [FromRoute] Guid id,
+        [FromBody] EcosystemUpdateRequestDto request,
+        CancellationToken cancellationToken)
     {
-        await aquariumService.UpdateAquariumAsync(id, request, cancellationToken);
-        return NoContent(); 
+        var result = await ecosystemService
+            .UpdateEcosystemAsync(id, request, cancellationToken);
+
+        return this.ToActionResult(result);
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<ActionResult> DeleteAquariumAsync(
+    [Authorize(Policy = SubPermissions.TankDelete)]
+    public async Task<IActionResult> DeleteEcosystemAsync(
         [FromRoute] Guid id,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
-        await aquariumService.DeleteAquariumAsync(id, cancellationToken);
-        return NoContent(); 
+        var result = await ecosystemService
+            .DeleteEcosystemAsync(id, cancellationToken);
+
+        return this.ToActionResult(result);
     }
 }

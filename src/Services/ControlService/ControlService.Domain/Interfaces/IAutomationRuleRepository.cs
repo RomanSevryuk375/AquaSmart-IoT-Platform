@@ -1,9 +1,21 @@
-﻿using Control.Domain.Entities;
+﻿using Contracts.Abstractions;
+using Control.Domain.Entities;
 
 namespace Control.Domain.Interfaces;
 
 public interface IAutomationRuleRepository : IRepository<AutomationRuleEntity>
 {
-    Task<IReadOnlyList<AutomationRuleEntity>?> GetBySensorIdAsync(
-        Guid sensorId, CancellationToken cancellationToken);
+    Task<AutomationRuleEntity?> GetByIdWithConditionsAsync(
+        Guid id,
+        CancellationToken cancellationToken);
+
+    Task<IReadOnlyList<AutomationRuleEntity>> GetBySensorIdWithConditionsAsync(
+        Guid sensorId,
+        CancellationToken cancellationToken);
+
+    Task<IReadOnlyList<AutomationRuleEntity>> GetAllRulesAsync(
+        BaseSpecification<AutomationRuleEntity>? specification,
+        int? skip,
+        int? take,
+        CancellationToken cancellationToken);
 }

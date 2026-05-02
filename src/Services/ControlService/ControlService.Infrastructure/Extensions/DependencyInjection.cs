@@ -1,10 +1,12 @@
-﻿using Control.Domain.Interfaces;
+﻿using Contracts.Options;
+using Control.Domain.Interfaces;
 using Control.Infrastructure.BackgroundJobs;
 using Control.Infrastructure.Messaging.Relay;
 using Control.Infrastructure.Messaging.Sensor;
 using Control.Infrastructure.Messaging.Telemetry;
 using Control.Infrastructure.Repositories;
 using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
@@ -13,14 +15,24 @@ namespace Control.Infrastructure.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddRepositories (this IServiceCollection services)
+    public static IServiceCollection AddRepositories (this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<IAquariumRepository, AquariumRepository>();
         services.AddScoped<IAutomationRuleRepository, AutomationRuleRepository>();
+        services.AddScoped<IEcosystemRepository, EcosystemRepository>();
         services.AddScoped<IRelayRepository, RelayRepository>();
+        services.AddScoped<IRuleConditionRepository, RuleConditionRepository>();
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
         services.AddScoped<ISensorRepository, SensorRepository>();
         services.AddScoped<IVacationModeRepository, VacationModeRepository>();
+
+        var connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
+
+        services.AddDbContext<SystemDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
+        });
+
+        services.AddHealthChecks().AddNpgSql(connectionString!);
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -32,6 +44,12 @@ public static class DependencyInjection
 
     public static IServiceCollection AddRabbitMq(this IServiceCollection services, IConfiguration configuration)
     {
+        var rabbitSection = configuration.GetSection(RabbitMqOptions.SectionName);
+        var rabbitOgtions = rabbitSection.Get<RabbitMqOptions>()
+            ?? throw new InvalidOperationException("RabbitMQ configuration is missing.");
+
+        services.Configure<RabbitMqOptions>(rabbitSection);
+
         services.AddMassTransit(busConfigurator =>
         {
             busConfigurator.AddDelayedMessageScheduler();
@@ -55,15 +73,17 @@ public static class DependencyInjection
             {
                 configurator.UseDelayedMessageScheduler();
 
-                configurator.Host(new Uri(configuration["MessageBroker:Host"]!), h =>
+                configurator.Host(new Uri(rabbitOgtions.Host), h =>
                 {
-                    h.Username(configuration["MessageBroker:UserName"]!);
-                    h.Password(configuration["MessageBroker:Password"]!);
+                    h.Username(rabbitOgtions.UserName);
+                    h.Password(rabbitOgtions.Password);
                 });
 
                 configurator.ConfigureEndpoints(context);
             });
         });
+
+        services.AddHealthChecks().AddRabbitMQ(new Uri(rabbitOgtions.Host));
 
         return services;
     }

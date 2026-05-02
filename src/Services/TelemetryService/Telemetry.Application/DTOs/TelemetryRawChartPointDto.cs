@@ -1,0 +1,7 @@
+﻿namespace Telemetry.Application.DTOs;
+
+public record TelemetryRawChartPointDto
+{
+    public double Value { get; init; }
+    public DateTime RecordedAt { get; init; }
+}

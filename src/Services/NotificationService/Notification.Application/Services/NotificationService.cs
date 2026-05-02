@@ -1,4 +1,5 @@
-﻿using Contracts.Exceptions;
+﻿using AutoMapper;
+using Contracts.Results;
 using Notification.Application.DTOs.Notification;
 using Notification.Application.Interfaces;
 using Notification.Domain.Interfaces;
@@ -9,9 +10,11 @@ namespace Notification.Application.Services;
 
 public class NotificationService(
     INotificationRepository notificationRepository,
-    IUnitOfWork unitOfWork) : INotificationService
+    IUnitOfWork unitOfWork,
+    IUserContext userContext,
+    IMapper mapper) : INotificationService
 {
-    public async Task<IReadOnlyList<NotificationResponseDto>> GetAllNotificationsAsync(
+    public async Task<Result<IReadOnlyList<NotificationResponseDto>>> GetAllNotificationsAsync(
         NotificationFilterDto filter,
         int? skip,
         int? take,
@@ -20,8 +23,8 @@ public class NotificationService(
         var specification = new NotificationFilterSpecification(
             new NotificationSpecificationParams
             {
-                UserId = filter.UserId,
-                AquariumId = filter.AquariumId,
+                UserId = userContext.UserId,
+                EcosystemId = filter.EcosystemId,
                 Level = filter.Level,
                 IsRead = filter.IsRead,
                 SearchTerm = filter.SearchTerm,
@@ -33,49 +36,63 @@ public class NotificationService(
             take,
             cancellationToken);
 
-        return notifications.Select(n => new NotificationResponseDto
-        {
-            Id = n.Id,
-            UserId = n.UserId,
-            AquariumId = n.AquariumId,
-            Level = n.Level,
-            Message = n.Message,
-            IsRead = n.IsRead,
-            CreatedAt = n.CreatedAt,
-        }).ToList();
+        return Result<IReadOnlyList<NotificationResponseDto>>.Success(
+            mapper.Map<IReadOnlyList<NotificationResponseDto>>(notifications));
     }
 
-    public async Task<NotificationResponseDto> GetNotificationByIdAsync(
-        Guid id,
+    public async Task<Result<NotificationResponseDto>> GetNotificationByIdAsync(
+        Guid notificationId,
         CancellationToken cancellationToken)
     {
         var notification = await notificationRepository
-            .GetByIdAsync(id, cancellationToken)
-            ?? throw new NotFoundException($"Notification {id} not found");
+            .GetByIdAsync(notificationId, cancellationToken);
 
-        return new NotificationResponseDto
+
+        if (notification is null)
         {
-            Id = notification.Id,
-            UserId = notification.UserId,
-            AquariumId = notification.AquariumId,
-            Level = notification.Level,
-            Message = notification.Message,
-            IsRead = notification.IsRead,
-            CreatedAt = notification.CreatedAt,
-        };
+            return Result<NotificationResponseDto>
+                .Failure(Error.NotFound(
+                    "Notification.NotFound",
+                    $"Notification {notificationId} not found"));
+        }
+
+        if (notification.UserId != userContext.UserId)
+        {
+            return Result<NotificationResponseDto>
+                .Failure(Error.Validation(
+                    "Access.Denied",
+                    $"Invalid user id"));
+        }
+
+        return Result<NotificationResponseDto>.Success(
+            mapper.Map<NotificationResponseDto>(notification));
     }
 
-    public async Task MarkNotificationAsReadAsync(
-        Guid id,
+    public async Task<Result> MarkNotificationAsReadAsync(
+        Guid notificationId,
         CancellationToken cancellationToken)
     {
         var notification = await notificationRepository
-            .GetByIdAsync(id, cancellationToken)
-            ?? throw new NotFoundException($"Notification {id} not found");
+            .GetByIdAsync(notificationId, cancellationToken);
+
+        if (notification is null ||
+            notification.UserId != userContext.UserId)
+        {
+            return Result.Failure(Error.NotFound(
+                    "Notification.NotFound",
+                    $"Notification {notificationId} not found"));
+        }
+
+        if (notification.IsRead)
+        {
+            return Result.Success();
+        }
 
         notification.MarkAsRead();
 
         await notificationRepository.UpdateAsync(notification, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
     }
 }

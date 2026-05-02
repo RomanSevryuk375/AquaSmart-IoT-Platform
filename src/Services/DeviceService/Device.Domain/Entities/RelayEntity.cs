@@ -1,5 +1,5 @@
-﻿using Contracts.Enums;
-using Device.Domain.Interfaces;
+﻿using Contracts.Abstractions;
+using Contracts.Enums;
 
 namespace Device.Domain.Entities;
 
@@ -8,7 +8,11 @@ public sealed class RelayEntity : IEntity
     private RelayEntity(
         Guid id,
         Guid controllerId,
-        string hardwarePin,
+        Guid? powerSensorId, 
+        string name,
+        ConnectionProtocolEnum connectionProtocol,
+        string connectionAddress,
+        bool isNormalyOpen,
         RelayPurposeEnum purpose,
         bool isActive,
         bool isManual,
@@ -16,7 +20,11 @@ public sealed class RelayEntity : IEntity
     {
         Id = id;
         ControllerId = controllerId;
-        HardwarePin = hardwarePin;
+        PowerSensorId = powerSensorId;
+        Name = name;
+        ConnectionProtocol = connectionProtocol;
+        ConnectionAddress = connectionAddress;
+        IsNormalyOpen = isNormalyOpen;
         Purpose = purpose;
         IsActive = isActive;
         IsManual = isManual;
@@ -25,7 +33,11 @@ public sealed class RelayEntity : IEntity
     
     public Guid Id { get; private set; }
     public Guid ControllerId { get; private set; }
-    public string HardwarePin { get; private set; } = string.Empty;
+    public Guid? PowerSensorId { get; private set; }
+    public string Name { get; private set; }
+    public ConnectionProtocolEnum ConnectionProtocol { get; private set; }
+    public string ConnectionAddress { get; private set; }
+    public bool IsNormalyOpen { get; private set; }
     public RelayPurposeEnum Purpose { get; private set; }
     public bool IsActive { get; private set; }
     public bool IsManual { get; private set; }
@@ -33,7 +45,11 @@ public sealed class RelayEntity : IEntity
 
     public static (RelayEntity? relay, List<string>? errors) Create (
         Guid controllerId,
-        string hardwarePin,
+        Guid? powerSensorId,
+        string name,
+        ConnectionProtocolEnum connectionProtocol,
+        string connectionAddress,
+        bool isNormalyOpen,
         RelayPurposeEnum purpose,
         bool isActive,
         bool isManual)
@@ -45,9 +61,14 @@ public sealed class RelayEntity : IEntity
             errors.Add("controllerId must not be empty.");
         }
 
-        if (string.IsNullOrWhiteSpace(hardwarePin))
+        if (string.IsNullOrWhiteSpace(name))
         {
-            errors.Add("hardwarePin must not be empty.");
+            errors.Add("name must not be empty.");
+        }
+
+        if (string.IsNullOrWhiteSpace(connectionAddress))
+        {
+            errors.Add("connectionAddress must not be empty.");
         }
 
         if (errors.Count > 0)
@@ -58,7 +79,11 @@ public sealed class RelayEntity : IEntity
         var relay = new RelayEntity(
             Guid.NewGuid(),
             controllerId,
-            hardwarePin.Trim(),
+            powerSensorId,
+            name.Trim(),
+            connectionProtocol,
+            connectionAddress.Trim(),
+            isNormalyOpen,
             purpose,
             isActive,
             isManual,
@@ -69,8 +94,10 @@ public sealed class RelayEntity : IEntity
 
     public List<string>? Update(
         Guid controllerId,
-        string hardwarePin,
-        RelayPurposeEnum purpose)
+        ConnectionProtocolEnum connectionProtocol,
+        string connectionAddress,
+        RelayPurposeEnum purpose,
+        bool isNormalyOpen)
     {
         var errors = new List<string>();
 
@@ -79,9 +106,9 @@ public sealed class RelayEntity : IEntity
             errors.Add("controllerId must not be empty.");
         }
 
-        if (string.IsNullOrWhiteSpace(hardwarePin))
+        if (string.IsNullOrWhiteSpace(connectionAddress))
         {
-            errors.Add("hardwarePin must not be empty.");
+            errors.Add("connectionAddress must not be empty.");
         }
 
         if (errors.Count > 0)
@@ -90,7 +117,9 @@ public sealed class RelayEntity : IEntity
         }
 
         ControllerId = controllerId;
-        HardwarePin = hardwarePin.Trim();
+        ConnectionProtocol = connectionProtocol;
+        ConnectionAddress = connectionAddress.Trim();
+        IsNormalyOpen = isNormalyOpen;
         Purpose = purpose;
 
         return null;
@@ -99,6 +128,44 @@ public sealed class RelayEntity : IEntity
     public void ToggleState()
     {
         IsActive = !IsActive;
+    }
+
+    public List<string>? SetName(string name)
+    {
+        var errors = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            errors.Add("name must not be empty.");
+        }
+
+        if (errors.Count > 0)
+        {
+            return errors;
+        }
+
+        Name = name;
+
+        return null;
+    }
+
+    public List<string>? SetPowerSensor(Guid powerSensorId)
+    {
+        var errors = new List<string>();
+
+        if (powerSensorId == Guid.Empty)
+        {
+            errors.Add("powerSensorId must not be empty.");
+        }
+
+        if (errors.Count > 0)
+        {
+            return errors;
+        }
+
+        PowerSensorId = powerSensorId;
+
+        return null;
     }
 
     public void SetState(bool state)

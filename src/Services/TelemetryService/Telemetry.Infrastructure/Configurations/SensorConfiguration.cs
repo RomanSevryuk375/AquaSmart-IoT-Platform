@@ -1,18 +1,25 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Contracts.Constants;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Telemetry.Domain.Entities;
 
 namespace Telemetry.Infrastructure.Configurations;
 
-public class SensorConfiguration : IEntityTypeConfiguration<SensorEntity>
+public sealed class SensorConfiguration 
+    : IEntityTypeConfiguration<SensorEntity>
 {
-    void IEntityTypeConfiguration<SensorEntity>.Configure(EntityTypeBuilder<SensorEntity> builder)
+    public void Configure(EntityTypeBuilder<SensorEntity> builder)
     {
         builder.ToTable("sensors");
 
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.ControllerId).IsRequired();
+        builder.Property(x => x.EcosystemId).IsRequired();
+
+        builder.Property(x => x.Name)
+            .HasMaxLength(SensorConstants.NameLength)
+            .IsRequired();
 
         builder.Property(x => x.Type)
             .HasConversion<int>()
@@ -23,7 +30,7 @@ public class SensorConfiguration : IEntityTypeConfiguration<SensorEntity>
             .IsRequired();
 
         builder.Property(x => x.Unit)
-            .HasMaxLength(10)
+            .HasMaxLength(SensorConstants.NameLength)
             .IsRequired();
 
         builder.Property(x => x.LastValue)
@@ -34,7 +41,14 @@ public class SensorConfiguration : IEntityTypeConfiguration<SensorEntity>
         builder.Property(x => x.CreatedAt).IsRequired();
         builder.Property(x => x.IsDataDelayed).IsRequired();
 
-        builder.HasMany<TelemetryDataEntity>()
+        builder.HasIndex(x => x.EcosystemId);
+
+        builder.HasMany<TelemetryRawEntity>()
+            .WithOne()
+            .HasForeignKey(x => x.SensorId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany<TelemetryAggregateEntity>()
             .WithOne()
             .HasForeignKey(x => x.SensorId)
             .OnDelete(DeleteBehavior.Cascade);

@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Contracts.Options;
+using Microsoft.Extensions.Options;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
-using Notification.Infrastructure.Extensions;
 
 namespace Notification.Infrastructure.Providers;
 

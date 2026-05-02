@@ -5,7 +5,7 @@ namespace Notification.Infrastructure;
 
 public class SystemDbContext(DbContextOptions<SystemDbContext> options) : DbContext(options)
 {
-    public DbSet<AquariumEntity> Aquariums { get; set; }
+    public DbSet<EcosystemEntity> Aquariums { get; set; }
     public DbSet<MaintenanceLogEntity> MaintenanceLogs { get; set; }
     public DbSet<NotificationEntity> Notifications { get; set; }
     public DbSet<ReminderEntity> Reminders { get; set; }

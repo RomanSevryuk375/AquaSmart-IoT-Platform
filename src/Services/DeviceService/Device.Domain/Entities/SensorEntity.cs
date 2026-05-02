@@ -1,5 +1,5 @@
-﻿using Contracts.Enums;
-using Device.Domain.Interfaces;
+﻿using Contracts.Abstractions;
+using Contracts.Enums;
 
 namespace Device.Domain.Entities;
 
@@ -8,7 +8,9 @@ public sealed class SensorEntity : IEntity
     private SensorEntity(
         Guid id,
         Guid controllerId,
-        string hardwarePin,
+        string name,
+        ConnectionProtocolEnum connectionProtocol,
+        string connectionAddress,
         SensorTypeEnum type,
         SensorStateEnum state,
         string unit,
@@ -16,7 +18,9 @@ public sealed class SensorEntity : IEntity
     {
         Id = id;
         ControllerId = controllerId;
-        HardwarePin = hardwarePin;
+        Name = name;
+        ConnectionProtocol = connectionProtocol;
+        ConnectionAddress = connectionAddress;
         Type = type;
         State = state;
         Unit = unit;
@@ -25,7 +29,9 @@ public sealed class SensorEntity : IEntity
 
     public Guid Id { get; private set; }
     public Guid ControllerId { get; private set; }
-    public string HardwarePin { get; private set; } = string.Empty;
+    public string Name { get; private set; }
+    public ConnectionProtocolEnum ConnectionProtocol { get; private set; }
+    public string ConnectionAddress { get; private set; }
     public SensorTypeEnum Type { get; private set; }
     public SensorStateEnum State { get; private set; }
     public string Unit { get; private set; }
@@ -33,7 +39,9 @@ public sealed class SensorEntity : IEntity
 
     public static (SensorEntity? sensor, List<string> errors) Create(
         Guid controllerId,
-        string hardwarePin,
+        string name,
+        ConnectionProtocolEnum connectionProtocol,
+        string connectionAddress,
         SensorTypeEnum type,
         string unit)
     {
@@ -49,9 +57,14 @@ public sealed class SensorEntity : IEntity
             errors.Add("unit must not be empty.");
         }
 
-        if (string.IsNullOrWhiteSpace(hardwarePin))
+        if (string.IsNullOrWhiteSpace(name))
         {
-            errors.Add("hardwarePin must not be empty.");
+            errors.Add("name must not be empty.");
+        }
+
+        if (string.IsNullOrWhiteSpace(connectionAddress))
+        {
+            errors.Add("connectionAddress must not be empty.");
         }
 
         if (errors.Count > 0)
@@ -62,7 +75,9 @@ public sealed class SensorEntity : IEntity
         var sensor = new SensorEntity(
             Guid.NewGuid(),
             controllerId,
-            hardwarePin.Trim(),
+            name.Trim(),
+            connectionProtocol,
+            connectionAddress.Trim(),
             type,
             SensorStateEnum.NoData,
             unit.Trim(),
@@ -72,7 +87,8 @@ public sealed class SensorEntity : IEntity
     }
 
     public List<string>? Update(
-        string hardwarePin,
+        ConnectionProtocolEnum connectionProtocol,
+        string connectionAddress,
         Guid controllerId,
         SensorTypeEnum type,
         string unit)
@@ -89,9 +105,9 @@ public sealed class SensorEntity : IEntity
             errors.Add("unit must not be empty.");
         }
 
-        if (string.IsNullOrWhiteSpace(hardwarePin))
+        if (string.IsNullOrWhiteSpace(connectionAddress))
         {
-            errors.Add("hardwarePin must not be empty.");
+            errors.Add("connectionAddress must not be empty.");
         }
 
         if (errors.Count > 0)
@@ -99,7 +115,8 @@ public sealed class SensorEntity : IEntity
             return errors;
         }
 
-        HardwarePin = hardwarePin.Trim();
+        ConnectionProtocol = connectionProtocol;
+        ConnectionAddress = connectionAddress.Trim();
         ControllerId = controllerId;
         Type = type;
         Unit = unit.Trim();

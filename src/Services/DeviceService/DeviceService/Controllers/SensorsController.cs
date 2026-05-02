@@ -1,7 +1,8 @@
-﻿using Contracts.Enums;
+﻿using Contracts.Authorization;
 using Device.Application.DTOs.Sensor;
 using Device.Application.DTOs.Telemetry;
 using Device.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Device.API.Controllers;
@@ -9,11 +10,13 @@ namespace Device.API.Controllers;
 [ApiController]
 [Route("api/device/v1/sensors")]
 public class SensorsController(
-    ISensorService sensorService) : ControllerBase
+    ISensorService sensorService,
+    ITelemtryBatchService batchService) : ControllerBase
 {
     private const string NameGetById = "GetSensorByIdAsync";
 
     [HttpGet]
+    [Authorize(Policy = SubPermissions.DeviceControl)]
     public async Task<ActionResult<IReadOnlyList<SensorResponseDto>>> GetAllSensorsAsync(
         [FromQuery] SensorFilterDto filter,
         [FromQuery] int skip = 0,
@@ -30,6 +33,7 @@ public class SensorsController(
     }
 
     [HttpGet("{id:guid}", Name = NameGetById)]
+    [Authorize(Policy = SubPermissions.DeviceControl)]
     public async Task<ActionResult<SensorResponseDto>> GetSensorByIdAsync(
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
@@ -40,6 +44,7 @@ public class SensorsController(
     }
 
     [HttpPost]
+    [Authorize(Policy = SubPermissions.DeviceControl)]
     public async Task<ActionResult> AddSensorAsync(
         [FromBody] SensorRequestDto request,
         CancellationToken cancellationToken = default)
@@ -50,17 +55,18 @@ public class SensorsController(
 
         return CreatedAtRoute(
             NameGetById,
-            new { id = id },
+            new { id },
             createdData);
     }
 
-    [HttpPost("telemetry")] 
+    [HttpPost("telemetry")]
+    [AllowAnonymous]
     public async Task<ActionResult> ReceiveBatchTelemetryAsync(
     [FromBody] TelemetryBatchRequest request,
     [FromHeader(Name = "X-Device-Token")] string deviceToken,
     CancellationToken cancellationToken)
     {
-        var result = await sensorService
+        var result = await batchService
             .ProcessTelemetryBatchAsync(request, deviceToken, cancellationToken);
 
         return Accepted(new
@@ -72,6 +78,7 @@ public class SensorsController(
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Policy = SubPermissions.DeviceControl)]
     public async Task<ActionResult> UpdateSensorAsync(
         [FromRoute] Guid id,
         [FromBody] SensorUpdateRequestDto reuqest,
@@ -82,18 +89,8 @@ public class SensorsController(
         return NoContent();
     }
 
-    [HttpPatch("{id:guid}/state")]
-    public async Task<ActionResult> SetSensorStateAsync(
-        [FromRoute] Guid id,
-        [FromQuery] SensorStateEnum state,
-        CancellationToken cancellationToken = default)
-    {
-        await sensorService.SetSensorStateAsync(id, state, cancellationToken);
-
-        return NoContent();
-    }
-
     [HttpDelete("{id:guid}")]
+    [Authorize(Policy = SubPermissions.DeviceControl)]
     public async Task<ActionResult> DeleteSensorAsync(
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)

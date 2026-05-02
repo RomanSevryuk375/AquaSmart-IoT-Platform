@@ -22,7 +22,56 @@ namespace Control.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Control.Domain.Entities.AquariumEntity", b =>
+            modelBuilder.Entity("Control.Domain.Entities.AutomationRuleEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("Action")
+                        .HasColumnType("integer")
+                        .HasColumnName("action");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("EcosystemId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("ecosystem_id");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("name");
+
+                    b.Property<int>("Operator")
+                        .HasColumnType("integer")
+                        .HasColumnName("operator");
+
+                    b.Property<Guid>("RelayId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("relay_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_automation_rules");
+
+                    b.HasIndex("EcosystemId")
+                        .HasDatabaseName("ix_automation_rules_ecosystem_id");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("ix_automation_rules_is_active");
+
+                    b.ToTable("automation_rules", (string)null);
+                });
+
+            modelBuilder.Entity("Control.Domain.Entities.EcosystemEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -43,37 +92,95 @@ namespace Control.Infrastructure.Migrations
                         .HasColumnType("character varying(128)")
                         .HasColumnName("name");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
+                    b.Property<double?>("Volume")
+                        .HasColumnType("double precision")
+                        .HasColumnName("volume");
+
                     b.HasKey("Id")
-                        .HasName("pk_aquariums");
+                        .HasName("pk_ecosystems");
 
                     b.HasIndex("ControllerId")
                         .IsUnique()
-                        .HasDatabaseName("ix_aquariums_controller_id");
+                        .HasDatabaseName("ix_ecosystems_controller_id");
 
                     b.HasIndex("UserId")
-                        .HasDatabaseName("ix_aquariums_user_id");
+                        .HasDatabaseName("ix_ecosystems_user_id");
 
-                    b.ToTable("aquariums", (string)null);
+                    b.ToTable("ecosystems", (string)null);
                 });
 
-            modelBuilder.Entity("Control.Domain.Entities.AutomationRuleEntity", b =>
+            modelBuilder.Entity("Control.Domain.Entities.RelayEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<int>("Action")
-                        .HasColumnType("integer")
-                        .HasColumnName("action");
-
-                    b.Property<Guid>("AquariumId")
+                    b.Property<Guid>("ControllerId")
                         .HasColumnType("uuid")
-                        .HasColumnName("aquarium_id");
+                        .HasColumnName("controller_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("EcosystemId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("ecosystem_id");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsManual")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_manual");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid?>("PowerSensorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("power_sensor_id");
+
+                    b.Property<int>("Purpose")
+                        .HasColumnType("integer")
+                        .HasColumnName("purpose");
+
+                    b.HasKey("Id")
+                        .HasName("pk_relays");
+
+                    b.HasIndex("EcosystemId")
+                        .HasDatabaseName("ix_relays_ecosystem_id");
+
+                    b.HasIndex("PowerSensorId")
+                        .HasDatabaseName("ix_relays_power_sensor_id")
+                        .HasFilter("power_sensor_id IS NOT NULL");
+
+                    b.ToTable("relays", (string)null);
+                });
+
+            modelBuilder.Entity("Control.Domain.Entities.RuleConditionEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AutomationRuleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("automation_rule_id");
 
                     b.Property<int>("Condition")
                         .HasColumnType("integer")
@@ -84,72 +191,29 @@ namespace Control.Infrastructure.Migrations
                         .HasColumnName("created_at");
 
                     b.Property<double>("Hysteresis")
-                        .HasPrecision(18, 2)
+                        .HasPrecision(10, 4)
                         .HasColumnType("double precision")
                         .HasColumnName("hysteresis");
-
-                    b.Property<Guid>("RelayId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("relay_id");
 
                     b.Property<Guid>("SensorId")
                         .HasColumnType("uuid")
                         .HasColumnName("sensor_id");
 
                     b.Property<double>("Threshold")
-                        .HasPrecision(18, 2)
+                        .HasPrecision(10, 4)
                         .HasColumnType("double precision")
                         .HasColumnName("threshold");
 
                     b.HasKey("Id")
-                        .HasName("pk_automation_rules");
+                        .HasName("pk_rule_conditions");
 
-                    b.HasIndex("AquariumId")
-                        .HasDatabaseName("ix_automation_rules_aquarium_id");
-
-                    b.HasIndex("RelayId")
-                        .HasDatabaseName("ix_automation_rules_relay_id");
+                    b.HasIndex("AutomationRuleId")
+                        .HasDatabaseName("ix_rule_conditions_automation_rule_id");
 
                     b.HasIndex("SensorId")
-                        .HasDatabaseName("ix_automation_rules_sensor_id");
+                        .HasDatabaseName("ix_rule_conditions_sensor_id");
 
-                    b.ToTable("automation_rules", (string)null);
-                });
-
-            modelBuilder.Entity("Control.Domain.Entities.RelayEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid>("AquariumId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("aquarium_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
-
-                    b.Property<bool>("IsManual")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_manual");
-
-                    b.Property<int>("Purpose")
-                        .HasColumnType("integer")
-                        .HasColumnName("purpose");
-
-                    b.HasKey("Id")
-                        .HasName("pk_relays");
-
-                    b.HasIndex("AquariumId")
-                        .HasDatabaseName("ix_relays_aquarium_id");
-
-                    b.ToTable("relays", (string)null);
+                    b.ToTable("rule_conditions", (string)null);
                 });
 
             modelBuilder.Entity("Control.Domain.Entities.ScheduleEntity", b =>
@@ -158,10 +222,6 @@ namespace Control.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    b.Property<Guid>("AquariumId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("aquarium_id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -176,6 +236,10 @@ namespace Control.Infrastructure.Migrations
                     b.Property<double>("DurationMin")
                         .HasColumnType("double precision")
                         .HasColumnName("duration_min");
+
+                    b.Property<Guid>("EcosystemId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("ecosystem_id");
 
                     b.Property<bool>("IsEnable")
                         .HasColumnType("boolean")
@@ -192,8 +256,8 @@ namespace Control.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_schedules");
 
-                    b.HasIndex("AquariumId")
-                        .HasDatabaseName("ix_schedules_aquarium_id");
+                    b.HasIndex("EcosystemId")
+                        .HasDatabaseName("ix_schedules_ecosystem_id");
 
                     b.ToTable("schedules", (string)null);
                 });
@@ -205,13 +269,28 @@ namespace Control.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<Guid>("AquariumId")
+                    b.Property<Guid>("ControllerId")
                         .HasColumnType("uuid")
-                        .HasColumnName("aquarium_id");
+                        .HasColumnName("controller_id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
+
+                    b.Property<Guid>("EcosystemId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("ecosystem_id");
+
+                    b.Property<double>("LastValue")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("double precision")
+                        .HasColumnName("last_value");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("name");
 
                     b.Property<int>("State")
                         .HasColumnType("integer")
@@ -224,8 +303,8 @@ namespace Control.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_sensors");
 
-                    b.HasIndex("AquariumId")
-                        .HasDatabaseName("ix_sensors_aquarium_id");
+                    b.HasIndex("EcosystemId")
+                        .HasDatabaseName("ix_sensors_ecosystem_id");
 
                     b.ToTable("sensors", (string)null);
                 });
@@ -237,10 +316,6 @@ namespace Control.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<Guid>("AquariumId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("aquarium_id");
-
                     b.Property<double>("CalculatedFeed")
                         .HasColumnType("double precision")
                         .HasColumnName("calculated_feed");
@@ -248,6 +323,10 @@ namespace Control.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
+
+                    b.Property<Guid>("EcosystemId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("ecosystem_id");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone")
@@ -264,60 +343,75 @@ namespace Control.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_vacations");
 
-                    b.HasIndex("AquariumId")
-                        .HasDatabaseName("ix_vacations_aquarium_id");
+                    b.HasIndex("EcosystemId")
+                        .HasDatabaseName("ix_vacations_ecosystem_id");
 
                     b.ToTable("vacations", (string)null);
                 });
 
             modelBuilder.Entity("Control.Domain.Entities.AutomationRuleEntity", b =>
                 {
-                    b.HasOne("Control.Domain.Entities.AquariumEntity", null)
+                    b.HasOne("Control.Domain.Entities.EcosystemEntity", null)
                         .WithMany()
-                        .HasForeignKey("AquariumId")
+                        .HasForeignKey("EcosystemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_automation_rules_aquariums_aquarium_id");
+                        .HasConstraintName("fk_automation_rules_ecosystems_ecosystem_id");
                 });
 
             modelBuilder.Entity("Control.Domain.Entities.RelayEntity", b =>
                 {
-                    b.HasOne("Control.Domain.Entities.AquariumEntity", null)
+                    b.HasOne("Control.Domain.Entities.EcosystemEntity", null)
                         .WithMany()
-                        .HasForeignKey("AquariumId")
+                        .HasForeignKey("EcosystemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_relays_aquariums_aquarium_id");
+                        .HasConstraintName("fk_relays_ecosystems_ecosystem_id");
+                });
+
+            modelBuilder.Entity("Control.Domain.Entities.RuleConditionEntity", b =>
+                {
+                    b.HasOne("Control.Domain.Entities.AutomationRuleEntity", null)
+                        .WithMany("Conditions")
+                        .HasForeignKey("AutomationRuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_rule_conditions_automation_rules_automation_rule_id");
                 });
 
             modelBuilder.Entity("Control.Domain.Entities.ScheduleEntity", b =>
                 {
-                    b.HasOne("Control.Domain.Entities.AquariumEntity", null)
+                    b.HasOne("Control.Domain.Entities.EcosystemEntity", null)
                         .WithMany()
-                        .HasForeignKey("AquariumId")
+                        .HasForeignKey("EcosystemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_schedules_aquariums_aquarium_id");
+                        .HasConstraintName("fk_schedules_ecosystems_ecosystem_id");
                 });
 
             modelBuilder.Entity("Control.Domain.Entities.SensorEntity", b =>
                 {
-                    b.HasOne("Control.Domain.Entities.AquariumEntity", null)
+                    b.HasOne("Control.Domain.Entities.EcosystemEntity", null)
                         .WithMany()
-                        .HasForeignKey("AquariumId")
+                        .HasForeignKey("EcosystemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_sensors_aquariums_aquarium_id");
+                        .HasConstraintName("fk_sensors_ecosystems_ecosystem_id");
                 });
 
             modelBuilder.Entity("Control.Domain.Entities.VacationModeEntity", b =>
                 {
-                    b.HasOne("Control.Domain.Entities.AquariumEntity", null)
+                    b.HasOne("Control.Domain.Entities.EcosystemEntity", null)
                         .WithMany()
-                        .HasForeignKey("AquariumId")
+                        .HasForeignKey("EcosystemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_vacations_aquariums_aquarium_id");
+                        .HasConstraintName("fk_vacations_ecosystems_ecosystem_id");
+                });
+
+            modelBuilder.Entity("Control.Domain.Entities.AutomationRuleEntity", b =>
+                {
+                    b.Navigation("Conditions");
                 });
 #pragma warning restore 612, 618
         }

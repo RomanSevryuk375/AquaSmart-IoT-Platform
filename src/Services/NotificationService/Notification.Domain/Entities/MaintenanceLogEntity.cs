@@ -1,38 +1,32 @@
-﻿using Notification.Domain.Interfaces;
+﻿using Contracts.Abstractions;
 
 namespace Notification.Domain.Entities;
 
-public class MaintenanceLogEntity : IEntity
+public sealed class MaintenanceLogEntity : IEntity
 {
     private MaintenanceLogEntity(
         Guid id, 
         Guid userId, 
-        Guid aquariumId, 
+        Guid ecosystemId, 
         DateTime actionDate, 
-        double? phLevel, 
-        double? khLevel, 
-        double? no3Level, 
+        Dictionary<string, double> metrics,
         string notes, 
         DateTime createdAt)
     {
         Id = id;
         UserId = userId;
-        AquariumId = aquariumId;
+        EcosystemId = ecosystemId;
         ActionDate = actionDate;
-        PhLevel = phLevel;
-        KhLevel = khLevel;
-        No3Level = no3Level;
+        Metrics = metrics;
         Notes = notes;
         CreatedAt = createdAt;
     }
 
     public Guid Id { get; private set; }
     public Guid UserId { get; private set; }
-    public Guid AquariumId { get; private set; }
+    public Guid EcosystemId { get; private set; }
     public DateTime ActionDate { get; private set; } 
-    public double? PhLevel { get; private set; }
-    public double? KhLevel { get; private set; }
-    public double? No3Level { get; private set; }
+    public Dictionary<string, double> Metrics { get; private set; }
     public string Notes { get; private set; } = string.Empty;
     public DateTime CreatedAt { get; private set; }
 
@@ -40,16 +34,11 @@ public class MaintenanceLogEntity : IEntity
         Guid userId, 
         Guid aquariumId, 
         DateTime actionDate, 
-        double? ph, 
-        double? kh, 
-        double? no3, 
+        Dictionary<string, double>? metrics,
         string notes)
     {
         var errors = new List<string>();
-        if (ph is < 0 or > 14)
-        {
-            errors.Add("pH must be between 0 and 14");
-        }
+        
 
         if (errors.Count > 0)
         {
@@ -66,9 +55,7 @@ public class MaintenanceLogEntity : IEntity
             userId, 
             aquariumId, 
             actionDate, 
-            ph, 
-            kh, 
-            no3, 
+            metrics ?? [],
             notes.Trim(), 
             DateTime.UtcNow);
 

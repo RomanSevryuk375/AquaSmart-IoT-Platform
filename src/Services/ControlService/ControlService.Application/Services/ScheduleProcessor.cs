@@ -1,4 +1,5 @@
-﻿using Contracts.Events.RelayEvents;
+﻿using Contracts.Enums;
+using Contracts.Events.RelayEvents;
 using Control.Application.Interfaces;
 using Control.Domain.Interfaces;
 using Control.Domain.Specifications;
@@ -62,7 +63,7 @@ public class ScheduleProcessor(
                     await publishEndpoint.Publish(new ChangeRelayStateCommand
                     {
                         RelayId = relay.Id,
-                        IsActive = true,
+                        Action = RuleActionEnum.SwitchOn,
                     }, cancellationToken);
                 }
 
@@ -71,7 +72,7 @@ public class ScheduleProcessor(
                     new ChangeRelayStateCommand
                     {
                         RelayId = relay.Id,
-                        IsActive = false,
+                        Action = RuleActionEnum.SwitchOff,
                     }, cancellationToken);
             }
         }

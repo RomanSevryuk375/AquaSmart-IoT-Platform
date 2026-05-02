@@ -4,12 +4,17 @@ using MassTransit;
 
 namespace Device.Infrastructure.Messaging;
 
-public class RelayChangeStateConsumer(IRelayService service) 
+public class RelayChangeStateConsumer(IRelayCommandQueueService service)
     : IConsumer<ChangeRelayStateCommand>
 {
     public async Task Consume(ConsumeContext<ChangeRelayStateCommand> context)
     {
-        await service.SetRelayStateFromCommandAsync(
+        var result = await service.SetRelayStateAsync(
             context.Message, context.CancellationToken);
+
+        if (!result.IsSuccess && result.IsRetryable)
+        {
+            throw new Exception(result.Error);
+        }
     }
 }

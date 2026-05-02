@@ -1,4 +1,5 @@
-﻿using Contracts.Events.RelayEvents;
+﻿using AutoMapper;
+using Contracts.Events.RelayEvents;
 using Contracts.Exceptions;
 using Device.Application.DTOs.Relay;
 using Device.Application.Interfaces;
@@ -6,27 +7,38 @@ using Device.Domain.Entities;
 using Device.Domain.Interfaces;
 using Device.Domain.SpecificationParams;
 using Device.Domain.Specifications;
+using FluentValidation;
 using MassTransit;
 
 namespace Device.Application.Services;
 
-public class RelayService(
+public sealed class RelayService(
     IControllerRepository controllerRepository,
     IRelayRepository relayRepository,
+    ISensorRepository sensorRepository,
     IUnitOfWork unitOfWork,
-    IPublishEndpoint publisherEndpoint) : IRelayService
+    IMapper mapper,
+    IPublishEndpoint publisherEndpoint,
+    IValidator<RelayUpdateRequestDto> updateValidator,
+    IValidator<RelayRequestDto> createValidator) : IRelayService
 {
     public async Task<Guid> AddRelayAsync(
-        RelayRequestDto request, 
+        RelayRequestDto request,
         CancellationToken cancellationToken)
     {
+        createValidator.ValidateAndThrow(request);
+
         var existingController = await controllerRepository
             .GetByIdAsync(request.ControllerId, cancellationToken)
             ?? throw new NotFoundException($"Controller {request.ControllerId} not found");
 
         var (relay, errors) = RelayEntity.Create(
             request.ControllerId,
-            request.HardwarePin,
+            request.PowerSensorId,
+            request.Name,
+            request.ConnectionProtocol,
+            request.ConnectionAddress,
+            request.IsNormalyOpen,
             request.Purpose,
             request.IsActive,
             request.IsManual);
@@ -40,36 +52,30 @@ public class RelayService(
         var result = await relayRepository.AddAsync(relay, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        await publisherEndpoint.Publish(new RelayCreatedEvent
-        {
-            ControllerId = request.ControllerId,
-            RelayId = relay.Id,
-            Purpose = relay.Purpose,
-            IsManual = relay.IsActive,
-            IsActive = relay.IsActive,
-            CreatedAt = relay.CreatedAt,
-        }, cancellationToken);
+        await publisherEndpoint.Publish(
+            mapper.Map<RelayCreatedEvent>(relay),
+            cancellationToken);
 
         return result;
     }
 
     public async Task DeleteRelayAsync(
-        Guid id, 
+        Guid relayId,
         CancellationToken cancellationToken)
     {
-        await relayRepository.DeleteAsync(id, cancellationToken);
+        await relayRepository.DeleteAsync(relayId, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         await publisherEndpoint.Publish(new RelayDeletedEvent
         {
-            RelayId = id,
+            RelayId = relayId,
         }, cancellationToken);
     }
 
     public async Task<IReadOnlyList<RelayResponseDto>> GetAllRelaysAsync(
-        RelayFilterDto filter, 
-        int? skip, 
-        int? take, 
+        RelayFilterDto filter,
+        int? skip,
+        int? take,
         CancellationToken cancellationToken)
     {
         var specification = new RelayFilterSpecification(
@@ -77,147 +83,41 @@ public class RelayService(
             {
                 ControllerId = filter.ControllerId,
                 Purpose = filter.Purpose,
-                IsActive = filter.IsActive, 
+                IsActive = filter.IsActive,
                 IsManual = filter.IsManual,
             });
 
         var relays = await relayRepository.GetAllAsync(
-            specification, 
-            skip, 
-            take, 
+            specification,
+            skip,
+            take,
             cancellationToken);
 
-        return relays.Select(x => new RelayResponseDto
-        {
-            Id = x.Id,
-            ControllerId = x.ControllerId,
-            HardwarePin = x.HardwarePin,
-            Purpose = x.Purpose,
-            IsActive = x.IsActive,
-            IsManual = x.IsManual,
-            CreatedAt = x.CreatedAt,
-        }).ToList();
+        return mapper.Map<IReadOnlyList<RelayResponseDto>>(relays);
     }
 
     public async Task<RelayResponseDto> GetRelayByIdAsync(
-        Guid id, 
+        Guid relayId,
         CancellationToken cancellationToken)
     {
         var existingRelay = await relayRepository
-            .GetByIdAsync(id, cancellationToken)
-            ?? throw new NotFoundException($"Relay {id} not found");
+            .GetByIdAsync(relayId, cancellationToken)
+            ?? throw new NotFoundException($"Relay {relayId} not found");
 
-        return new RelayResponseDto
-        {
-            Id = existingRelay.Id,
-            ControllerId = existingRelay.ControllerId,
-            HardwarePin = existingRelay.HardwarePin,
-            Purpose = existingRelay.Purpose,
-            IsActive = existingRelay.IsActive,
-            IsManual = existingRelay.IsManual,
-            CreatedAt = existingRelay.CreatedAt,
-        };
-    }
-
-    public async Task<bool> SetRelayStateAsync(
-        Guid id, 
-        bool state, 
-        CancellationToken cancellationToken)
-    {
-        var existingRelay = await relayRepository
-            .GetByIdAsync(id, cancellationToken)
-            ?? throw new NotFoundException($"Relay {id} not found");
-
-        if (existingRelay.IsManual)
-        {
-            return existingRelay.IsActive;
-        }
-
-        existingRelay.SetState(state);
-
-        await relayRepository.UpdateAsync(existingRelay, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await publisherEndpoint.Publish(new ChangeRelayStateCommand
-        {
-            RelayId = existingRelay.Id,
-            IsActive = existingRelay.IsActive,
-        }, cancellationToken);
-
-        return existingRelay.IsActive;
-    }
-
-    public async Task SetRelayStateFromCommandAsync(
-        ChangeRelayStateCommand command,
-        CancellationToken cancellationToken)
-    {
-        var relay = await relayRepository
-            .GetByIdAsync(command.RelayId, cancellationToken);
-
-        if (relay is null || relay.IsManual)
-        {
-            return;
-        }
-
-        relay.SetState(command.IsActive);
-
-        await relayRepository.UpdateAsync(relay, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-    }
-
-    public async Task<bool> ToggleRelayModeAsync(
-        Guid id, 
-        CancellationToken cancellationToken)
-    {
-        var existingRelay = await relayRepository
-            .GetByIdAsync(id, cancellationToken)
-            ?? throw new NotFoundException($"Relay {id} not found");
-
-        existingRelay.ToggleMode();
-
-        await relayRepository.UpdateAsync(existingRelay, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await publisherEndpoint.Publish(new ChangeRelayModeCommand
-        {
-            RelayId = existingRelay.Id,
-            IsManual = existingRelay.IsManual,
-        }, cancellationToken);
-
-        return existingRelay.IsManual;
-    }
-
-    public async Task<bool> ToggleRelayStateAsync(
-        Guid id, 
-        CancellationToken cancellationToken)
-    {
-        var existingRelay = await relayRepository
-            .GetByIdAsync(id, cancellationToken)
-            ?? throw new NotFoundException($"Relay {id} not found");
-
-        existingRelay.ToggleState();
-
-        await relayRepository.UpdateAsync(existingRelay, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await publisherEndpoint.Publish(new ChangeRelayStateCommand
-        {
-            RelayId = existingRelay.Id,
-            IsActive = existingRelay.IsActive,
-        }, cancellationToken);
-
-        return existingRelay.IsActive;
+        return mapper.Map<RelayResponseDto>(existingRelay);
     }
 
     public async Task UpdateRelayAsync(
-        Guid id,
-        RelayUpdateRequestDto updateRequestDto, 
+        Guid relayId,
+        RelayUpdateRequestDto updateRequestDto,
         CancellationToken cancellationToken)
     {
+        updateValidator.Validate(updateRequestDto);
+
         var existingRelay = await relayRepository
-            .GetByIdAsync(id, cancellationToken)
+            .GetByIdAsync(relayId, cancellationToken)
             ?? throw new NotFoundException(
-                $"{nameof(RelayEntity)} {id} not found");
+                $"{nameof(RelayEntity)} {relayId} not found");
 
         var controller = await controllerRepository
             .GetByIdAsync(updateRequestDto.ControllerId, cancellationToken)
@@ -226,8 +126,10 @@ public class RelayService(
 
         var errors = existingRelay.Update(
             updateRequestDto.ControllerId,
-            updateRequestDto.HardwarePin,
-            updateRequestDto.Purpose);
+            updateRequestDto.ConnectionProtocol,
+            updateRequestDto.ConnectionAddress,
+            updateRequestDto.Purpose,
+            updateRequestDto.IsNormalyOpen);
 
         if (errors is not null && errors.Count > 0)
         {
@@ -238,14 +140,40 @@ public class RelayService(
         await relayRepository.UpdateAsync(existingRelay, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        await publisherEndpoint.Publish(new RelayUpdatedEvent
+        await publisherEndpoint.Publish(
+            mapper.Map<RelayUpdatedEvent>(errors),
+            cancellationToken);
+    }
+
+    public async Task SetRelayPowerSensorAsync(
+        Guid relayId,
+        Guid powerSensorId,
+        CancellationToken cancellationToken)
+    {
+        var existingRelay = await relayRepository
+            .GetByIdAsync(relayId, cancellationToken)
+            ?? throw new NotFoundException(
+                $"{nameof(RelayEntity)} {relayId} not found");
+
+        var existingSensor = await sensorRepository
+            .GetByIdAsync(powerSensorId, cancellationToken)
+            ?? throw new NotFoundException($"Sensor {powerSensorId} not found");
+
+        if (existingRelay.ControllerId != existingSensor.ControllerId)
         {
-            RelayId= existingRelay.Id,
-            ControllerId = existingRelay.ControllerId,
-            Purpose = existingRelay.Purpose,
-            IsActive = existingRelay.IsActive,
-            IsManual = existingRelay.IsManual,
-            CreatedAt = existingRelay.CreatedAt,
+            throw new DomainValidationException(
+                "Sensor and Relay must belong to the same controller");
+        }
+
+        existingRelay.SetPowerSensor(powerSensorId);
+
+        await relayRepository.UpdateAsync(existingRelay, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await publisherEndpoint.Publish(new SetRelayPowerSensorEvent
+        {
+            RelayId = relayId,
+            PowerSensorId = powerSensorId,
         }, cancellationToken);
     }
 }
