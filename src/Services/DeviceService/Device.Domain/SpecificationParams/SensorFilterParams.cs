@@ -2,7 +2,7 @@
 
 namespace Device.Domain.SpecificationParams;
 
-public class SensorFilterParams
+public sealed class SensorFilterParams
 {
     public Guid? ControllerId { get; init; }
     public SensorTypeEnum? Type { get; init; }

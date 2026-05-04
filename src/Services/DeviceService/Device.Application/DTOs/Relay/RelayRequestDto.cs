@@ -2,7 +2,7 @@
 
 namespace Device.Application.DTOs.Relay;
 
-public record RelayRequestDto
+public sealed record RelayRequestDto
 {
     public Guid ControllerId { get; init; }
     public Guid? PowerSensorId { get; init; }

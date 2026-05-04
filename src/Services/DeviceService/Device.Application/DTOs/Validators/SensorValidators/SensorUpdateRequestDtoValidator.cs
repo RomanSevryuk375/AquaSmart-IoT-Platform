@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace Device.Application.DTOs.Validators.SensorValidators;
 
-public class SensorUpdateRequestDtoValidator
+public sealed class SensorUpdateRequestDtoValidator
     : AbstractValidator<SensorUpdateRequestDto>
 {
     public SensorUpdateRequestDtoValidator()

@@ -4,7 +4,7 @@ using MassTransit;
 
 namespace Device.Infrastructure.Messaging;
 
-public class RelayChangeStateConsumer(IRelayCommandQueueService service)
+public sealed class RelayChangeStateConsumer(IRelayCommandQueueService service)
     : IConsumer<ChangeRelayStateCommand>
 {
     public async Task Consume(ConsumeContext<ChangeRelayStateCommand> context)

@@ -1,10 +1,11 @@
-﻿using Device.Application.DTOs.Telemetry;
+﻿using Contracts.Results;
+using Device.Application.DTOs.Telemetry;
 
 namespace Device.Application.Interfaces;
 
 public interface ITelemtryBatchService
 {
-    Task<TelemetryResponse> ProcessTelemetryBatchAsync(
+    Task<Result<TelemetryResponse>> ProcessTelemetryBatchAsync(
         TelemetryBatchRequest request,
         string deviceToken,
         CancellationToken cancellationToken);

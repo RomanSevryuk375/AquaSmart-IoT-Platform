@@ -1,38 +1,39 @@
-﻿using Device.Application.DTOs.Controller;
+﻿using Contracts.Results;
+using Device.Application.DTOs.Controller;
 
 namespace Device.Application.Interfaces;
 
 public interface IControllerService
 {
-    Task<IReadOnlyList<ControllerResponseDto>> GetAllControllersAsync(
+    Task<Result<IReadOnlyList<ControllerResponseDto>>> GetAllControllersAsync(
         ControllerFilterDto filter,
         int? skip,
         int? take,
         CancellationToken cancellationToken);
 
-    Task<ControllerResponseDto> GetControllerByIdAsync(
+    Task<Result<ControllerResponseDto>> GetControllerByIdAsync(
         Guid controllerId,
         CancellationToken cancellationToken);
 
-    Task<ControllerRegistredResponseDto> AddControllerAsync(
+    Task<Result<ControllerRegistredResponseDto>> AddControllerAsync(
         ControllerRequestDto request, 
         CancellationToken cancellationToken);
 
-    Task UpdateControllerAsync(
+    Task<Result> UpdateControllerAsync(
         Guid controllerId,
         ControllerUpdateRequestDto updateRequestDto,
         CancellationToken cancellationToken);
 
-    Task DeleteControllerAsync(
+    Task<Result> DeleteControllerAsync(
         Guid controllerId, 
         CancellationToken cancellationToken);
 
-    Task<ControllerPingResponseDto> PingControllerAsync(
+    Task<Result<ControllerPingResponseDto>> PingControllerAsync(
         Guid controllerId,
         string deviceToken,
         CancellationToken cancellationToken);
 
-    Task<bool> ToggleControllerStateAsync(
+    Task<Result<bool>> ToggleControllerStateAsync(
         Guid controllerId, 
         CancellationToken cancellationToken);
 }

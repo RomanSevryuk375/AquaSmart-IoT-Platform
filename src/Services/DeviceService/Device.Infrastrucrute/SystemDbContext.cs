@@ -3,7 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Device.Infrastructure;
 
-public sealed class SystemDbContext(DbContextOptions<SystemDbContext> options) : DbContext(options)
+public sealed class SystemDbContext(
+    DbContextOptions<SystemDbContext> options) : DbContext(options)
 {
     public DbSet<ControllerEntity> Controllers { get; set; }
     public DbSet<RelayCommandsQueueEntity> RelayCommands { get; set; }

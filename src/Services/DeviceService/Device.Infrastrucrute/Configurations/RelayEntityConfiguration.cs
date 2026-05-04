@@ -5,7 +5,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Device.Infrastructure.Configurations;
 
-public class RelayEntityConfiguration : IEntityTypeConfiguration<RelayEntity>
+public sealed class RelayEntityConfiguration 
+    : IEntityTypeConfiguration<RelayEntity>
 {
     public void Configure(EntityTypeBuilder<RelayEntity> builder)
     {

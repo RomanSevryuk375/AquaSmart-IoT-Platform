@@ -1,6 +1,6 @@
 ﻿namespace Device.Application.DTOs.Telemetry;
 
-public record TelemetryItemRequest
+public sealed record TelemetryItemRequest
 {
     public Guid SensorId { get; init; }
     public double Value { get; init; }

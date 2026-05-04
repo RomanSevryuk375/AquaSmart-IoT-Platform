@@ -2,7 +2,7 @@
 
 namespace Device.Application.DTOs.Sensor;
 
-public record SensorUpdateRequestDto
+public sealed record SensorUpdateRequestDto
 {
     public ConnectionProtocolEnum ConnectionProtocol { get; init; }
     public string ConnectionAddress { get; init; } = string.Empty;

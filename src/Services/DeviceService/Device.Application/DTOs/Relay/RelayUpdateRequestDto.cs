@@ -2,7 +2,7 @@
 
 namespace Device.Application.DTOs.Relay;
 
-public record RelayUpdateRequestDto
+public sealed record RelayUpdateRequestDto
 {
     public Guid ControllerId { get; init; }
     public ConnectionProtocolEnum ConnectionProtocol { get; init; }

@@ -5,7 +5,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Device.Infrastructure.Configurations;
 
-public class SensorConfiguration : IEntityTypeConfiguration<SensorEntity>
+public sealed class SensorConfiguration 
+    : IEntityTypeConfiguration<SensorEntity>
 {
     public void Configure(EntityTypeBuilder<SensorEntity> builder)
     {

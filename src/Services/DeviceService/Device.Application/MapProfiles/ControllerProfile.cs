@@ -4,7 +4,7 @@ using Device.Domain.Entities;
 
 namespace Device.Application.MapProfiles;
 
-public class ControllerProfile : Profile
+public sealed class ControllerProfile : Profile
 {
     public ControllerProfile()
     {

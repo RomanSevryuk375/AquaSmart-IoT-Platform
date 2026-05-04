@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Device.Application.DTOs.Validators.TelemtryValidators;
 
-public class TelemetryItemRequestValidator 
+public sealed class TelemetryItemRequestValidator 
     : AbstractValidator<TelemetryItemRequest>
 {
     public TelemetryItemRequestValidator()

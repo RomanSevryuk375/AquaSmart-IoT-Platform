@@ -8,20 +8,23 @@ namespace Device.Infrastructure.Repositories;
 public sealed class RelayCommandsQueueRepository(SystemDbContext dbContext)
     : BaseRepository<RelayCommandsQueueEntity>(dbContext), IRelayCommandsQueueRepository
 {
+    private const int maxAttemptCount = 3;
+
     public async Task<IReadOnlyList<RelayCommandsQueueEntity>> GetPendingByControllerIdAsync(
         Guid controllerId,
         CancellationToken cancellationToken)
     {
-        var retryThreshold = DateTime.UtcNow.AddMinutes(-1);
         var now = DateTime.UtcNow;
+        var retryThreshold = now.AddMinutes(-1);
 
         return await Context.RelayCommands
-            .Where(x => x.ControllerId == controllerId &&
-                        (x.ExpireAt == null || x.ExpireAt > now) &&
-                        (x.Status == CommandStatusEnum.Pending ||
-                        (x.Status == CommandStatusEnum.Sent &&
-                         x.AttemptCount < 3 &&
-                         x.ProcessedAt < retryThreshold)))
+            .Where(x => x.ControllerId == controllerId)
+            .Where(x => x.ExpireAt == null || x.ExpireAt > now)
+            .Where(x => 
+                x.Status == CommandStatusEnum.Pending ||
+                (x.Status == CommandStatusEnum.Sent &&
+                x.AttemptCount < maxAttemptCount &&
+                x.ProcessedAt < retryThreshold))
             .OrderBy(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
     }

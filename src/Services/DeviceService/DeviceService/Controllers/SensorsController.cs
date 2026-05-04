@@ -1,4 +1,5 @@
 ﻿using Contracts.Authorization;
+using Contracts.Results;
 using Device.Application.DTOs.Sensor;
 using Device.Application.DTOs.Telemetry;
 using Device.Application.Interfaces;
@@ -29,7 +30,7 @@ public class SensorsController(
             take, 
             cancellationToken);
 
-        return Ok(result);
+        return this.ToActionResult(result);
     }
 
     [HttpGet("{id:guid}", Name = NameGetById)]
@@ -40,7 +41,7 @@ public class SensorsController(
     {
         var result = await sensorService.GetSensorByIdAsync(id, cancellationToken);
 
-        return Ok(result);
+        return this.ToActionResult(result);
     }
 
     [HttpPost]
@@ -49,14 +50,19 @@ public class SensorsController(
         [FromBody] SensorRequestDto request,
         CancellationToken cancellationToken = default)
     {
-        var id = await sensorService.AddSensorAsync(request, cancellationToken);
+        var result = await sensorService.AddSensorAsync(request, cancellationToken);
 
-        var createdData = await sensorService.GetSensorByIdAsync(id, cancellationToken);
+        if (result.IsFailure)
+        {
+            return this.ToActionResult(result);
+        }
+
+        var createdData = await sensorService.GetSensorByIdAsync(result.Value, cancellationToken);
 
         return CreatedAtRoute(
             NameGetById,
-            new { id },
-            createdData);
+            new { id = result.Value },
+            createdData.Value);
     }
 
     [HttpPost("telemetry")]
@@ -69,11 +75,16 @@ public class SensorsController(
         var result = await batchService
             .ProcessTelemetryBatchAsync(request, deviceToken, cancellationToken);
 
+        if (result.IsFailure)
+        {
+            return this.ToActionResult(result);
+        }
+
         return Accepted(new
         {
-            result.AcceptedCount,
-            result.ValidationErrors,
-            result.SkippedCount
+            result.Value.AcceptedCount,
+            result.Value.ValidationErrors,
+            result.Value.SkippedCount
         });
     }
 
@@ -84,9 +95,9 @@ public class SensorsController(
         [FromBody] SensorUpdateRequestDto reuqest,
         CancellationToken cancellationToken = default)
     {
-        await sensorService.UpdateSensorAsync(id, reuqest, cancellationToken);
+        var result = await sensorService.UpdateSensorAsync(id, reuqest, cancellationToken);
 
-        return NoContent();
+        return this.ToActionResult(result);
     }
 
     [HttpDelete("{id:guid}")]
@@ -95,8 +106,8 @@ public class SensorsController(
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        await sensorService.DeleteSensorAsync(id, cancellationToken);
+        var result = await sensorService.DeleteSensorAsync(id, cancellationToken);
 
-        return NoContent();
+        return this.ToActionResult(result);
     }
 }

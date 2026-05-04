@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace Device.Application.DTOs.Validators.RelayValidators;
 
-public class RelayUpdateRequestDtoValidator
+public sealed class RelayUpdateRequestDtoValidator
     : AbstractValidator<RelayUpdateRequestDto>
 {
     public RelayUpdateRequestDtoValidator()

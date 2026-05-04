@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace Device.Application.DTOs.Validators.TelemtryValidators;
 
-public class TelemetryBatchRequestValidator 
+public sealed class TelemetryBatchRequestValidator 
     : AbstractValidator<TelemetryBatchRequest>
 {
     public TelemetryBatchRequestValidator()

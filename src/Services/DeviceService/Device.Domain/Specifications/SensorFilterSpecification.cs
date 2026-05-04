@@ -4,7 +4,8 @@ using Device.Domain.SpecificationParams;
 
 namespace Device.Domain.Specifications;
 
-public class SensorFilterSpecification : BaseSpecification<SensorEntity>
+public sealed class SensorFilterSpecification 
+    : BaseSpecification<SensorEntity>
 {
     public SensorFilterSpecification(SensorFilterParams @params) 
         : base(data => 
