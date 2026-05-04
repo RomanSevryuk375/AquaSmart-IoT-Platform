@@ -8,6 +8,7 @@ public sealed class SensorEntity : IEntity
     private SensorEntity(
         Guid id,
         Guid controllerId,
+        Guid userId,
         string name,
         ConnectionProtocolEnum connectionProtocol,
         string connectionAddress,
@@ -18,6 +19,7 @@ public sealed class SensorEntity : IEntity
     {
         Id = id;
         ControllerId = controllerId;
+        UserId = userId;
         Name = name;
         ConnectionProtocol = connectionProtocol;
         ConnectionAddress = connectionAddress;
@@ -29,6 +31,7 @@ public sealed class SensorEntity : IEntity
 
     public Guid Id { get; private set; }
     public Guid ControllerId { get; private set; }
+    public Guid UserId { get; private set; }
     public string Name { get; private set; }
     public ConnectionProtocolEnum ConnectionProtocol { get; private set; }
     public string ConnectionAddress { get; private set; }
@@ -39,6 +42,7 @@ public sealed class SensorEntity : IEntity
 
     public static (SensorEntity? sensor, List<string> errors) Create(
         Guid controllerId,
+        Guid userId,
         string name,
         ConnectionProtocolEnum connectionProtocol,
         string connectionAddress,
@@ -50,6 +54,11 @@ public sealed class SensorEntity : IEntity
         if (controllerId == Guid.Empty)
         {
             errors.Add("controllerId must not be empty.");
+        }
+
+        if (userId == Guid.Empty)
+        {
+            errors.Add("userId must not be empty.");
         }
 
         if (string.IsNullOrWhiteSpace(unit))
@@ -74,6 +83,7 @@ public sealed class SensorEntity : IEntity
 
         var sensor = new SensorEntity(
             Guid.NewGuid(),
+            userId,
             controllerId,
             name.Trim(),
             connectionProtocol,

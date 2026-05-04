@@ -8,6 +8,7 @@ public sealed class RelayEntity : IEntity
     private RelayEntity(
         Guid id,
         Guid controllerId,
+        Guid userId,
         Guid? powerSensorId, 
         string name,
         ConnectionProtocolEnum connectionProtocol,
@@ -21,6 +22,7 @@ public sealed class RelayEntity : IEntity
         Id = id;
         ControllerId = controllerId;
         PowerSensorId = powerSensorId;
+        UserId = userId;
         Name = name;
         ConnectionProtocol = connectionProtocol;
         ConnectionAddress = connectionAddress;
@@ -33,6 +35,7 @@ public sealed class RelayEntity : IEntity
     
     public Guid Id { get; private set; }
     public Guid ControllerId { get; private set; }
+    public Guid UserId { get; private set; }
     public Guid? PowerSensorId { get; private set; }
     public string Name { get; private set; }
     public ConnectionProtocolEnum ConnectionProtocol { get; private set; }
@@ -45,6 +48,7 @@ public sealed class RelayEntity : IEntity
 
     public static (RelayEntity? relay, List<string>? errors) Create (
         Guid controllerId,
+        Guid userId,
         Guid? powerSensorId,
         string name,
         ConnectionProtocolEnum connectionProtocol,
@@ -59,6 +63,11 @@ public sealed class RelayEntity : IEntity
         if (controllerId == Guid.Empty)
         {
             errors.Add("controllerId must not be empty.");
+        }
+
+        if (userId == Guid.Empty)
+        {
+            errors.Add("userId must not be empty.");
         }
 
         if (string.IsNullOrWhiteSpace(name))
@@ -79,6 +88,7 @@ public sealed class RelayEntity : IEntity
         var relay = new RelayEntity(
             Guid.NewGuid(),
             controllerId,
+            userId,
             powerSensorId,
             name.Trim(),
             connectionProtocol,

@@ -59,6 +59,7 @@ public sealed class RelayService(
 
         var (relay, errors) = RelayEntity.Create(
             request.ControllerId,
+            userContext.UserId,
             request.PowerSensorId,
             request.Name,
             request.ConnectionProtocol,
@@ -137,6 +138,7 @@ public sealed class RelayService(
         var specification = new RelayFilterSpecification(
             new RelayFilterParams
             {
+                UserId = userContext.UserId,
                 ControllerId = filter.ControllerId,
                 Purpose = filter.Purpose,
                 IsActive = filter.IsActive,

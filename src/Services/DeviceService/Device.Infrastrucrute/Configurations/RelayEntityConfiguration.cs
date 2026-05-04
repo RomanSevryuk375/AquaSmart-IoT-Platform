@@ -15,6 +15,7 @@ public sealed class RelayEntityConfiguration
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.ControllerId).IsRequired();
+        builder.Property(x => x.UserId).IsRequired();
         builder.Property(x => x.PowerSensorId).IsRequired(false);
 
         builder.Property(x => x.Name)
@@ -46,6 +47,7 @@ public sealed class RelayEntityConfiguration
             x.ConnectionAddress
         }).IsUnique();
 
+        builder.HasIndex(x => x.UserId);
         builder.HasIndex(x => x.PowerSensorId)
             .IsUnique();
 

@@ -15,6 +15,7 @@ public sealed class SensorConfiguration
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.ControllerId).IsRequired();
+        builder.Property(x => x.UserId).IsRequired();
         builder.Property(x => x.Name)
             .HasMaxLength(SensorConstants.NameLength)
             .IsRequired();
@@ -41,6 +42,7 @@ public sealed class SensorConfiguration
 
         builder.Property(x => x.CreatedAt).IsRequired();
 
+        builder.HasIndex(x => x.UserId);
         builder.HasIndex(x => new
         {
             x.ControllerId,

@@ -58,6 +58,7 @@ public sealed class SensorService(
 
         var (sensor, errors) = SensorEntity.Create(
             request.ControllerId,
+            userContext.UserId,
             request.Name,
             request.ConnectionProtocol,
             request.ConnectionAddress,
@@ -133,6 +134,7 @@ public sealed class SensorService(
         var specification = new SensorFilterSpecification(
             new SensorFilterParams
             {
+                UserId = userContext.UserId,
                 ControllerId = filter.ControllerId,
                 Type = filter.Type,
                 State = filter.State,
