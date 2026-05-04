@@ -1,5 +1,5 @@
 ﻿using Contracts.Authorization;
-using Contracts.Events.RelayEvents;
+using Contracts.Results;
 using Device.Application.DTOs.RelayCommands;
 using Device.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +9,7 @@ namespace Device.API.Controllers;
 
 [ApiController]
 [Route("api/device/v1/commands")]
-public class RelayCommandsController(
+public sealed class RelayCommandsController(
     IRelayCommandQueueService commandService) : ControllerBase
 {
     [HttpGet("pending/{controllerId:guid}")]
@@ -21,7 +21,8 @@ public class RelayCommandsController(
     {
         var result = await commandService
             .GetPendingCommands(controllerId, deviceToken, cancellationToken);
-        return Ok(result);
+
+        return this.ToActionResult(result);
     }
 
     [HttpPost("{commandId:guid}/complete")]
@@ -31,9 +32,10 @@ public class RelayCommandsController(
         [FromHeader(Name = "X-Device-Token")] string deviceToken,
         CancellationToken cancellationToken)
     {
-        await commandService
+        var result = await commandService
             .MarkAsCompletedByIdAsync(commandId, deviceToken, cancellationToken);
-        return NoContent();
+
+        return this.ToActionResult(result);
     }
 
     [HttpPost("{commandId:guid}/fail")]
@@ -44,9 +46,10 @@ public class RelayCommandsController(
         [FromHeader(Name = "X-Device-Token")] string deviceToken,
         CancellationToken cancellationToken)
     {
-        await commandService
+        var result = await commandService
             .MarkAsFailedByIdAsync(commandId, deviceToken, errorMessage, cancellationToken);
-        return NoContent();
+
+        return this.ToActionResult(result);
     }
 
     [HttpPost("toggle-state/{relayId:guid}")]
@@ -55,9 +58,10 @@ public class RelayCommandsController(
         Guid relayId,
         CancellationToken cancellationToken)
     {
-        var newState = await commandService
+        var result = await commandService
             .ToggleRelayStateAsync(relayId, cancellationToken);
-        return Ok(newState);
+
+        return this.ToActionResult(result);
     }
 
     [HttpPost("toggle-mode/{relayId:guid}")]
@@ -66,22 +70,9 @@ public class RelayCommandsController(
         Guid relayId,
         CancellationToken cancellationToken)
     {
-        var isManual = await commandService
-            .ToggleRelayModeAsync(relayId, cancellationToken);
-        return Ok(isManual);
-    }
-
-    [HttpPost("set-state")]
-    [Authorize(Policy = SubPermissions.DeviceControl)]
-    public async Task<IActionResult> SetRelayState(
-        [FromBody] ChangeRelayStateCommand command,
-        CancellationToken cancellationToken)
-    {
         var result = await commandService
-            .SetRelayStateAsync(command, cancellationToken);
+            .ToggleRelayModeAsync(relayId, cancellationToken);
 
-        return result.IsSuccess
-            ? NoContent()
-            : BadRequest(result.Error);
+        return this.ToActionResult(result);
     }
 }

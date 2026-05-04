@@ -1,33 +1,34 @@
-﻿using Device.Application.DTOs.Relay;
+﻿using Contracts.Results;
+using Device.Application.DTOs.Relay;
 
 namespace Device.Application.Interfaces
 {
     public interface IRelayService
     {
-        Task<Guid> AddRelayAsync(
+        Task<Result<Guid>> AddRelayAsync(
             RelayRequestDto request, 
             CancellationToken cancellationToken);
 
-        Task DeleteRelayAsync(
+        Task<Result> DeleteRelayAsync(
             Guid relayId, 
             CancellationToken cancellationToken);
 
-        Task<IReadOnlyList<RelayResponseDto>> GetAllRelaysAsync(
+        Task<Result<IReadOnlyList<RelayResponseDto>>> GetAllRelaysAsync(
             RelayFilterDto filter, 
             int? skip, 
             int? take, 
             CancellationToken cancellationToken);
 
-        Task<RelayResponseDto> GetRelayByIdAsync(
+        Task<Result<RelayResponseDto>> GetRelayByIdAsync(
             Guid relayId, 
             CancellationToken cancellationToken);
 
-        Task SetRelayPowerSensorAsync(
+        Task<Result> SetRelayPowerSensorAsync(
             Guid relayId, 
             Guid powerSensorId, 
             CancellationToken cancellationToken);
 
-        Task UpdateRelayAsync(
+        Task<Result> UpdateRelayAsync(
             Guid relayId, 
             RelayUpdateRequestDto updateRequestDto, 
             CancellationToken cancellationToken);

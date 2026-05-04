@@ -6,17 +6,17 @@ namespace Device.Application.Interfaces;
 
 public interface IRelayCommandQueueService
 {
-    Task<IReadOnlyList<RelayCommandResponseDto>> GetPendingCommands(
+    Task<Result<IReadOnlyList<RelayCommandResponseDto>>> GetPendingCommands(
         Guid controllerId,
         string deviceToken,
         CancellationToken cancellationToken);
 
-    Task MarkAsCompletedByIdAsync(
+    Task<Result> MarkAsCompletedByIdAsync(
         Guid commandId,
         string deviceToken,
         CancellationToken cancellationToken);
 
-    Task MarkAsFailedByIdAsync(
+    Task<Result> MarkAsFailedByIdAsync(
         Guid commandId,
         string deviceToken,
         string errorMessage, 
@@ -26,14 +26,14 @@ public interface IRelayCommandQueueService
         ChangeRelayStateCommand command, 
         CancellationToken cancellationToken);
 
-    Task<bool> ToggleRelayModeAsync(
+    Task<Result<bool>> ToggleRelayModeAsync(
         Guid relayId, 
         CancellationToken cancellationToken);
 
-    Task<bool> ToggleRelayStateAsync(
+    Task<Result<bool>> ToggleRelayStateAsync(
         Guid relayId, 
         CancellationToken cancellationToken);
 
-    Task DeleteCompletedCommandsAsync(
+    Task<Result> DeleteCompletedCommandsAsync(
         CancellationToken cancellationToken);
 }

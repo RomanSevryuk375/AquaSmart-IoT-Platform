@@ -9,6 +9,11 @@ public class CheckOfflineControllersJob(
 {
     public async Task Execute(IJobExecutionContext context)
     {
-        await service.CheckAndDisableController(context.CancellationToken);
+        var result = await service.CheckAndDisableController(context.CancellationToken);
+
+        if (result.IsFailure)
+        {
+            throw new ArgumentException(result.Error.Message);
+        }
     }
 }

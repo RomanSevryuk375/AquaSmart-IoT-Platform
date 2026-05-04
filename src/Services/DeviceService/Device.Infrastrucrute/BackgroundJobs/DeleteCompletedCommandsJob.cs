@@ -8,6 +8,11 @@ public class DeleteCompletedCommandsJob(
 {
     public async Task Execute(IJobExecutionContext context)
     {
-        await service.DeleteCompletedCommandsAsync(context.CancellationToken);
+        var result = await service.DeleteCompletedCommandsAsync(context.CancellationToken);
+
+        if (result.IsFailure)
+        {
+            throw new ArgumentException(result.Error.Message);
+        }
     }
 }
