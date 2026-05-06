@@ -1,9 +1,11 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
+using Device.Domain.DomainEvents.RelayEvents;
+using Device.Domain.Factories;
 
 namespace Device.Domain.Entities;
 
-public sealed class RelayEntity : IEntity
+public sealed class RelayEntity : AggregateRoot, IEntity
 {
     private RelayEntity(
         Guid id,
@@ -13,7 +15,7 @@ public sealed class RelayEntity : IEntity
         string name,
         ConnectionProtocolEnum connectionProtocol,
         string connectionAddress,
-        bool isNormalyOpen,
+        bool isNormallyOpen,
         RelayPurposeEnum purpose,
         bool isActive,
         bool isManual,
@@ -26,7 +28,7 @@ public sealed class RelayEntity : IEntity
         Name = name;
         ConnectionProtocol = connectionProtocol;
         ConnectionAddress = connectionAddress;
-        IsNormalyOpen = isNormalyOpen;
+        IsNormallyOpen = isNormallyOpen;
         Purpose = purpose;
         IsActive = isActive;
         IsManual = isManual;
@@ -40,7 +42,7 @@ public sealed class RelayEntity : IEntity
     public string Name { get; private set; }
     public ConnectionProtocolEnum ConnectionProtocol { get; private set; }
     public string ConnectionAddress { get; private set; }
-    public bool IsNormalyOpen { get; private set; }
+    public bool IsNormallyOpen { get; private set; }
     public RelayPurposeEnum Purpose { get; private set; }
     public bool IsActive { get; private set; }
     public bool IsManual { get; private set; }
@@ -99,6 +101,18 @@ public sealed class RelayEntity : IEntity
             isManual,
             DateTime.UtcNow);
 
+        relay.RaiseEvent(new RelayCreatedDomainEvent
+        {
+            RelayId = relay.Id,
+            ControllerId = relay.ControllerId,
+            PowerSensorId = relay.PowerSensorId,
+            Name = relay.Name,
+            Purpose = relay.Purpose,
+            IsManual = relay.IsManual,
+            IsActive = relay.IsActive,
+            CreatedAt = relay.CreatedAt
+        });
+
         return (relay, errors);
     }
 
@@ -129,15 +143,22 @@ public sealed class RelayEntity : IEntity
         ControllerId = controllerId;
         ConnectionProtocol = connectionProtocol;
         ConnectionAddress = connectionAddress.Trim();
-        IsNormalyOpen = isNormalyOpen;
+        IsNormallyOpen = isNormalyOpen;
         Purpose = purpose;
 
-        return null;
-    }
+        RaiseEvent(new RelayUpdatedDomainEvent
+        {
+            RelayId = Id,
+            ControllerId = ControllerId,
+            PowerSensorId = PowerSensorId,
+            Name = Name,
+            Purpose = Purpose,
+            IsManual = IsManual,
+            IsActive = IsActive,
+            CreatedAt = CreatedAt
+        });
 
-    public void ToggleState()
-    {
-        IsActive = !IsActive;
+        return null;
     }
 
     public List<string>? SetName(string name)
@@ -175,6 +196,12 @@ public sealed class RelayEntity : IEntity
 
         PowerSensorId = powerSensorId;
 
+        RaiseEvent(new SetRelayPowerSensorDomainEvent
+        {
+            RelayId = Id,
+            PowerSensorId = powerSensorId,
+        });
+
         return null;
     }
 
@@ -186,10 +213,13 @@ public sealed class RelayEntity : IEntity
         }
 
         IsActive = state;
-    }
 
-    public void ToggleMode()
-    {
-        IsManual = !IsManual;
+        RaiseEvent(new RelayStateChangedDomainEvent
+        {
+            ControllerId = ControllerId,
+            RelayId = Id,
+            Action = StateEvaluatorFactory.EvaluateBool(IsActive),
+            ExpireAt = DateTime.UtcNow.AddMinutes(5)
+        });
     }
 }

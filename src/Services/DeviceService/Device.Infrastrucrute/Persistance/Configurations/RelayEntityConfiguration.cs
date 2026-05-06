@@ -3,7 +3,7 @@ using Device.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Device.Infrastructure.Configurations;
+namespace Device.Infrastructure.Persistance.Configurations;
 
 public sealed class RelayEntityConfiguration 
     : IEntityTypeConfiguration<RelayEntity>
@@ -30,7 +30,7 @@ public sealed class RelayEntityConfiguration
            .HasMaxLength(RelayConstants.ConnectionAddressLength)
            .IsRequired();
 
-        builder.Property(x => x.IsNormalyOpen).IsRequired();
+        builder.Property(x => x.IsNormallyOpen).IsRequired();
 
         builder.Property(x => x.Purpose)
             .HasConversion<int>()

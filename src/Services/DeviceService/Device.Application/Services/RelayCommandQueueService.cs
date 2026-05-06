@@ -166,7 +166,7 @@ public sealed class RelayCommandQueueService(
     }
 
     public async Task<ConsumerResult> SetRelayStateAsync(
-        ChangeRelayStateCommand command,
+        ChangeRelayStateEvent command,
         CancellationToken cancellationToken)
     {
         var existingRelay = await relayRepository
@@ -253,7 +253,7 @@ public sealed class RelayCommandQueueService(
                     "You are not the owner of this controller"));
         }
 
-        existingRelay.ToggleMode();
+        //existingRelay.Set(existingRelay.IsManual);
 
         await relayRepository.UpdateAsync(existingRelay, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -301,7 +301,7 @@ public sealed class RelayCommandQueueService(
                     "You are not the owner of this controller"));
         }
 
-        existingRelay.ToggleState();
+        existingRelay.SetState(!existingRelay.IsActive);
 
         await relayRepository.UpdateAsync(existingRelay, cancellationToken);
 
@@ -334,7 +334,7 @@ public sealed class RelayCommandQueueService(
     }
 
     private static bool UnavalibleCommand(
-        ChangeRelayStateCommand command, 
+        ChangeRelayStateEvent command, 
         RelayEntity existingRelay)
     {
         return existingRelay.IsManual ||

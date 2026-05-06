@@ -3,12 +3,12 @@ using Quartz;
 
 namespace Device.Infrastructure.BackgroundJobs;
 
-public sealed class DeleteCompletedCommandsJob(
-    IRelayCommandQueueService service) : IJob
+public sealed class OutboxMessageProcessorJob(
+    IOutboxMessageProcessorService service) : IJob
 {
     public async Task Execute(IJobExecutionContext context)
     {
-        var result = await service.DeleteCompletedCommandsAsync(context.CancellationToken);
+        var result = await service.ProcessAsync(context.CancellationToken);
 
         if (result.IsFailure)
         {

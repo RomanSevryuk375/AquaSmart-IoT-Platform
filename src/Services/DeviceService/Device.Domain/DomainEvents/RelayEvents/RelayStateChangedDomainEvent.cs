@@ -1,10 +1,10 @@
-﻿using Contracts.Enums;
+﻿using Contracts.Abstractions;
+using Contracts.Enums;
 
-namespace Contracts.Events.RelayEvents;
+namespace Device.Domain.DomainEvents.RelayEvents;
 
-public record ChangeRelayStateCommand
+public sealed record RelayStateChangedDomainEvent : IDomainEvent
 {
-    public Guid EventId { get; init; } = Guid.NewGuid();
     public DateTime OccurredOn { get; init; } = DateTime.UtcNow;
     public Guid ControllerId { get; init; }
     public Guid RelayId { get; init; }

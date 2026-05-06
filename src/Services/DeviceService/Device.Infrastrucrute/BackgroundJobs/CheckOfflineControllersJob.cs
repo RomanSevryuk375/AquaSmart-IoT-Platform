@@ -13,7 +13,7 @@ public sealed class CheckOfflineControllersJob(
 
         if (result.IsFailure)
         {
-            throw new ArgumentException(result.Error.Message);
+            throw new JobExecutionException(result.Error.Message);
         }
     }
 }

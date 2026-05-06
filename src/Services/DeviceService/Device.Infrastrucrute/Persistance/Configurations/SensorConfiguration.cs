@@ -3,7 +3,7 @@ using Device.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Device.Infrastructure.Configurations;
+namespace Device.Infrastructure.Persistance.Configurations;
 
 public sealed class SensorConfiguration 
     : IEntityTypeConfiguration<SensorEntity>

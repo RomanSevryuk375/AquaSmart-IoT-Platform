@@ -1,8 +1,9 @@
 ﻿using Contracts.Abstractions;
+using Device.Domain.DomainEvents.ControllerEvents;
 
 namespace Device.Domain.Entities;
 
-public sealed class ControllerEntity : IEntity
+public sealed class ControllerEntity : AggregateRoot, IEntity
 {
     private ControllerEntity(
         Guid id,
@@ -120,5 +121,12 @@ public sealed class ControllerEntity : IEntity
     public void SetOffline()
     {
         IsOnline = false;
+
+        RaiseEvent(new ControllerNotOnlineDomainEvent
+        {
+            UserId = UserId,
+            ControllerId = Id,
+            LastSeenAt = LastSeenAt,
+        });
     }
 }

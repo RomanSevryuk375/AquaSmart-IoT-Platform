@@ -226,7 +226,7 @@ public sealed class SensorService(
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         await publishEndpoint.Publish(
-            mapper.Map<SensorStateChangedCommand>(existingSensor), 
+            mapper.Map<SensorStateChangedEvent>(existingSensor), 
             cancellationToken);
 
         return Result.Success();

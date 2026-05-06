@@ -2,25 +2,25 @@
 using Device.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Device.Infrastructure.Repositories;
+namespace Device.Infrastructure.Persistance.Repositories;
 
-public sealed class RelayRepository(DeviceDbContext dbContext)
-    : BaseRepository<RelayEntity>(dbContext), IRelayRepository
+public sealed class SensorRepository(DeviceDbContext dbContext)
+    : BaseRepository<SensorEntity>(dbContext), ISensorRepository
 {
     public async Task<bool> ExistsAsync(
-        Guid relayId, 
+        Guid sensorId, 
         CancellationToken cancellationToken)
     {
-        return await Context.Relays
+        return await Context.Sensors
             .AsNoTracking()
-            .AnyAsync(x => x.Id == relayId, cancellationToken);
+            .AnyAsync(x => x.Id == sensorId, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<RelayEntity>> GetAllByControllerId(
+    public async Task<IReadOnlyList<SensorEntity>> GetAllSensorsAsync(
         Guid controllerId,
         CancellationToken cancellationToken)
     {
-        return await Context.Relays
+        return await Context.Sensors
             .AsNoTracking()
             .Where(x => x.ControllerId == controllerId)
             .ToListAsync(cancellationToken);

@@ -2,7 +2,9 @@
 using Device.Domain.Interfaces;
 using Device.Infrastructure.BackgroundJobs;
 using Device.Infrastructure.Messaging;
-using Device.Infrastructure.Repositories;
+using Device.Infrastructure.Persistance;
+using Device.Infrastructure.Persistance.Interceptors;
+using Device.Infrastructure.Persistance.Repositories;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,16 +17,23 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddRepositories (this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddSingleton<ConvertDomainEventsToOutboxMessagesInterceptor>();
+
         services.AddScoped<IControllerRepository, ControllerRepository>();
+        services.AddScoped<IOutboxRepository, OutboxRepository>();
         services.AddScoped<IRelayRepository, RelayRepository>();
-        services.AddScoped<ISensorRepository, SensorRepository>();
         services.AddScoped<IRelayCommandsQueueRepository, RelayCommandsQueueRepository>();
+        services.AddScoped<ISensorRepository, SensorRepository>();
 
         var connectionString = configuration.GetConnectionString(nameof(DeviceDbContext));
 
-        services.AddDbContext<DeviceDbContext>(options =>
+        services.AddDbContext<DeviceDbContext>((sp, options) =>
         {
-            options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
+            var interceptor = sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
+
+            options.UseNpgsql(connectionString)
+                   .UseSnakeCaseNamingConvention()
+                   .AddInterceptors(interceptor); 
         });
         services.AddHealthChecks().AddNpgSql(connectionString!);
 
@@ -40,24 +49,30 @@ public static class DependencyInjection
     {
         services.AddQuartz(options =>
         {
-            var offlineControllerJobKey = new JobKey(nameof(CheckOfflineControllersJob));
+            
             var deleteCompletedTaskAsync = new JobKey(nameof(DeleteCompletedCommandsJob));
-
-            options.AddJob<CheckOfflineControllersJob>(jobOptions =>
-                jobOptions.WithIdentity(offlineControllerJobKey));
-
             options.AddJob<DeleteCompletedCommandsJob>(jobOptions =>
                 jobOptions.WithIdentity(deleteCompletedTaskAsync));
+            options.AddTrigger(triggerOptions => triggerOptions
+                .ForJob(deleteCompletedTaskAsync)
+                .WithIdentity($"{deleteCompletedTaskAsync}-trigger")
+                .WithSimpleSchedule(x => x.WithIntervalInHours(3).RepeatForever()));
 
+            var offlineControllerJobKey = new JobKey(nameof(CheckOfflineControllersJob));
+            options.AddJob<CheckOfflineControllersJob>(jobOptions =>
+                jobOptions.WithIdentity(offlineControllerJobKey));
             options.AddTrigger(triggerOptions => triggerOptions
                 .ForJob(offlineControllerJobKey)
                 .WithIdentity($"{offlineControllerJobKey}-trigger")
                 .WithSimpleSchedule(x => x.WithIntervalInSeconds(60).RepeatForever()));
 
+            var outboxKey = new JobKey(nameof(OutboxMessageProcessorJob));
+            options.AddJob<OutboxMessageProcessorJob>(jobOptions =>
+                jobOptions.WithIdentity(outboxKey));
             options.AddTrigger(triggerOptions => triggerOptions
-                .ForJob(deleteCompletedTaskAsync)
-                .WithIdentity($"{deleteCompletedTaskAsync}-trigger")
-                .WithSimpleSchedule(x => x.WithIntervalInHours(3).RepeatForever()));
+                .ForJob(outboxKey)
+                .WithIdentity($"{outboxKey}-trigger")
+                .WithSimpleSchedule(x => x.WithIntervalInSeconds(60).RepeatForever()));
         });
 
         services.AddQuartzHostedService(hostOptions     

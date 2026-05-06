@@ -2,6 +2,7 @@
 using Device.Application.Services;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace Device.Application.Extesions;
 
@@ -12,6 +13,7 @@ public static class DependencyInjection
         services.AddScoped<IControllerOfflineCheckerService, ControllerOfflineCheckerService>();
         services.AddScoped<IControllerService, ControllerService>();
         services.AddScoped<IDeviceConfigurationService, DeviceConfigurationService>();
+        services.AddScoped<IOutboxMessageProcessorService, OutboxMessageProcessorService>();
         services.AddScoped<IRelayCommandQueueService, RelayCommandQueueService>();
         services.AddScoped<IRelayService, RelayService>();
         services.AddScoped<ISensorService, SensorService>();
@@ -23,6 +25,9 @@ public static class DependencyInjection
 
         services.AddAutoMapper(config => 
             config.AddMaps(typeof(DependencyInjection).Assembly));
+
+        services.AddMediatR(config => 
+            config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
         return services;
     }

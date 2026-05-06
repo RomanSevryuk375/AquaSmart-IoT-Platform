@@ -23,7 +23,7 @@ public interface IRelayCommandQueueService
         CancellationToken cancellationToken);
 
     Task<ConsumerResult> SetRelayStateAsync(
-        ChangeRelayStateCommand command, 
+        ChangeRelayStateEvent command, 
         CancellationToken cancellationToken);
 
     Task<Result<bool>> ToggleRelayModeAsync(

@@ -3,7 +3,7 @@ using Device.Domain.Entities;
 using Device.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Device.Infrastructure.Repositories;
+namespace Device.Infrastructure.Persistance.Repositories;
 
 public sealed class RelayCommandsQueueRepository(DeviceDbContext dbContext)
     : BaseRepository<RelayCommandsQueueEntity>(dbContext), IRelayCommandsQueueRepository

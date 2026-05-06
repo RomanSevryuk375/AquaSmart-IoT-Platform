@@ -2,7 +2,7 @@
 using Device.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Device.Infrastructure.Repositories;
+namespace Device.Infrastructure.Persistance.Repositories;
 
 public sealed class ControllerRepository(DeviceDbContext dbContext) 
     : BaseRepository<ControllerEntity>(dbContext), IControllerRepository

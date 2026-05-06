@@ -1,9 +1,10 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
+using Device.Domain.DomainEvents.SensorEvents;
 
 namespace Device.Domain.Entities;
 
-public sealed class SensorEntity : IEntity
+public sealed class SensorEntity : AggregateRoot, IEntity
 {
     private SensorEntity(
         Guid id,
@@ -83,8 +84,8 @@ public sealed class SensorEntity : IEntity
 
         var sensor = new SensorEntity(
             Guid.NewGuid(),
-            userId,
             controllerId,
+            userId,
             name.Trim(),
             connectionProtocol,
             connectionAddress.Trim(),
@@ -92,6 +93,17 @@ public sealed class SensorEntity : IEntity
             SensorStateEnum.NoData,
             unit.Trim(),
             DateTime.UtcNow);
+
+        sensor.RaiseEvent(new SensorCreatedDomainEvent
+        {
+            SensorId = sensor.Id,
+            ControllerId = sensor.ControllerId,
+            Name = sensor.Name,
+            Type = sensor.Type,
+            State = sensor.State,
+            Unit = sensor.Unit,
+            CreatedAt = sensor.CreatedAt,
+        });
 
         return (sensor, errors);
     }
@@ -131,6 +143,17 @@ public sealed class SensorEntity : IEntity
         Type = type;
         Unit = unit.Trim();
 
+        RaiseEvent(new SensorUpdatedDomainEvent
+        {
+            SensorId = Id,
+            ControllerId = ControllerId,
+            Name = Name,
+            Type = Type,
+            State = State,
+            Unit = Unit,
+            CreatedAt = CreatedAt
+        });
+
         return null;
     }
 
@@ -142,5 +165,11 @@ public sealed class SensorEntity : IEntity
         }
 
         State = state;
+
+        RaiseEvent(new SensorStateChangedDomainEvent
+        {
+            SensorId = Id,
+            State = State
+        });
     }
 }
