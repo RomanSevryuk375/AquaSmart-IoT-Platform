@@ -25,9 +25,9 @@ public static class DependencyInjection
         services.AddScoped<ISensorRepository, SensorRepository>();
         services.AddScoped<IVacationModeRepository, VacationModeRepository>();
 
-        var connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
+        var connectionString = configuration.GetConnectionString(nameof(ControlDbContext));
 
-        services.AddDbContext<SystemDbContext>(options =>
+        services.AddDbContext<ControlDbContext>(options =>
         {
             options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
         });

@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Control.Infrastructure.Migrations
 {
-    [DbContext(typeof(SystemDbContext))]
+    [DbContext(typeof(ControlDbContext))]
     [Migration("20260422211658_UpdateUserAndAquariumOwnership")]
     partial class UpdateUserAndAquariumOwnership
     {

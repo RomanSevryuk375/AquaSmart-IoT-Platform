@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Notification.Infrastructure.Migrations
 {
-    [DbContext(typeof(SystemDbContext))]
+    [DbContext(typeof(NotificationDbContext))]
     partial class SystemDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

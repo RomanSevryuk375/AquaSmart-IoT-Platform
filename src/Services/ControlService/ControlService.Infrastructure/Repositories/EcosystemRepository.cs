@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Control.Infrastructure.Repositories;
 
-public sealed class EcosystemRepository(SystemDbContext dbContext)
+public sealed class EcosystemRepository(ControlDbContext dbContext)
     : BaseRepository<EcosystemEntity>(dbContext), IEcosystemRepository
 {
     public async Task<bool> ExistsAsync(

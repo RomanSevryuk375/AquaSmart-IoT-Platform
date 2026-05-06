@@ -4,7 +4,7 @@ using Notification.Domain.Interfaces;
 
 namespace Notification.Infrastructure.Repositories;
 
-public sealed class EcosystemRepository(SystemDbContext dbContext)
+public sealed class EcosystemRepository(NotificationDbContext dbContext)
     : BaseRepository<EcosystemEntity>(dbContext), IEcosystemRepository
 {
     public async Task<bool> ExistsAsync

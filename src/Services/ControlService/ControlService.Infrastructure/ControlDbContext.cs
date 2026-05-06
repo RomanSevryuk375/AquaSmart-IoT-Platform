@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Control.Infrastructure;
 
-public class SystemDbContext(DbContextOptions<SystemDbContext> options) : DbContext(options)
+public class ControlDbContext(DbContextOptions<ControlDbContext> options) : DbContext(options)
 {
     public DbSet<AutomationRuleEntity> Rules { get; set; }
     public DbSet<EcosystemEntity> Aquariums { get; set; }
@@ -15,6 +15,6 @@ public class SystemDbContext(DbContextOptions<SystemDbContext> options) : DbCont
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(SystemDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ControlDbContext).Assembly);
     }
 }

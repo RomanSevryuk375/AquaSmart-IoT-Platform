@@ -1,6 +1,6 @@
 ﻿namespace Telemetry.Domain.Entities;
 
-public record TelemetrySummary
+public sealed record TelemetrySummary
 {
     public Guid SensorId { get; init; }
     public double MaxValue { get; init; }

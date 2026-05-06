@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Notification.Infrastructure.Migrations
 {
-    [DbContext(typeof(SystemDbContext))]
+    [DbContext(typeof(NotificationDbContext))]
     [Migration("20260501202445_RealInitialCreate")]
     partial class RealInitialCreate
     {

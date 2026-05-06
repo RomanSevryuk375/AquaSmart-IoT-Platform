@@ -2,7 +2,7 @@
 
 namespace Control.Infrastructure.Extensions;
 
-public class UnitOfWork(SystemDbContext dbContext) : IUnitOfWork
+public class UnitOfWork(ControlDbContext dbContext) : IUnitOfWork
 {
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {

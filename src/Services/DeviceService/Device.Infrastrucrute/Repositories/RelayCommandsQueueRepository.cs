@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Device.Infrastructure.Repositories;
 
-public sealed class RelayCommandsQueueRepository(SystemDbContext dbContext)
+public sealed class RelayCommandsQueueRepository(DeviceDbContext dbContext)
     : BaseRepository<RelayCommandsQueueEntity>(dbContext), IRelayCommandsQueueRepository
 {
     private const int maxAttemptCount = 3;

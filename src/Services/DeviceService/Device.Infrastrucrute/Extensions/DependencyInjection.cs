@@ -20,9 +20,9 @@ public static class DependencyInjection
         services.AddScoped<ISensorRepository, SensorRepository>();
         services.AddScoped<IRelayCommandsQueueRepository, RelayCommandsQueueRepository>();
 
-        var connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
+        var connectionString = configuration.GetConnectionString(nameof(DeviceDbContext));
 
-        services.AddDbContext<SystemDbContext>(options =>
+        services.AddDbContext<DeviceDbContext>(options =>
         {
             options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
         });

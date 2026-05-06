@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Control.Infrastructure.Repositories;
 
-public sealed class SensorRepository(SystemDbContext dbContext)
+public sealed class SensorRepository(ControlDbContext dbContext)
     : BaseRepository<SensorEntity>(dbContext), ISensorRepository
 {
     public async Task<bool> ExistsAsync(

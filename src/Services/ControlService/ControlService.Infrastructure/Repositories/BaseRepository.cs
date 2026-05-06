@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Control.Infrastructure.Repositories;
 
-public abstract class BaseRepository<T>(SystemDbContext dbContext) : IRepository<T> where T : class, IEntity
+public abstract class BaseRepository<T>(ControlDbContext dbContext) : IRepository<T> where T : class, IEntity
 {
     private readonly DbSet<T> _set = dbContext.Set<T>();
-    protected SystemDbContext Context => dbContext;
+    protected ControlDbContext Context => dbContext;
 
     public async Task<Guid> AddAsync(T entity, CancellationToken cancellationToken = default)
     {

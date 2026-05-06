@@ -3,7 +3,7 @@ using Telemetry.Domain.Entities;
 
 namespace Telemetry.Infrastructure;
 
-public class SystemDbContext(DbContextOptions<SystemDbContext> options) : DbContext(options)
+public class TelemetryDbContext(DbContextOptions<TelemetryDbContext> options) : DbContext(options)
 {
     public DbSet<EcosystemEntity> Ecosystems { get; set; }
     public DbSet<SensorEntity> Sensors { get; set; }
@@ -11,6 +11,6 @@ public class SystemDbContext(DbContextOptions<SystemDbContext> options) : DbCont
     public DbSet<TelemetryRawEntity> TelemetryRawData { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(SystemDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(TelemetryDbContext).Assembly);
     }
 }

@@ -24,8 +24,8 @@ public static class DependencyInjection
         services.AddScoped<ITelemetryRawDataRepository, TelemetryRawDataRepository>();
         services.AddScoped<ITelemetryAggregateDataRepository, TelemetryAggregateDataRepository>();
 
-        var connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
-        services.AddDbContext<SystemDbContext>(options =>
+        var connectionString = configuration.GetConnectionString(nameof(TelemetryDbContext));
+        services.AddDbContext<TelemetryDbContext>(options =>
         {
             options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
         });
