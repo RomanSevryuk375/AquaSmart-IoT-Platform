@@ -1,5 +1,5 @@
 ﻿using Device.Domain.Interfaces;
-using Device.Infrastructure.Persistance;
+using Device.Infrastructure.Persistence;
 
 namespace Device.Infrastructure.Extensions;
 

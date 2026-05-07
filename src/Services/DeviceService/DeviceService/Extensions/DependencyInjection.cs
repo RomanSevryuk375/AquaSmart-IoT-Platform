@@ -42,7 +42,7 @@ public static class DependencyInjection
         services.AddCommonAuthentication(configuration);
         services.AddControllers();
 
-        services.AddServices();
+        services.AddServices(configuration);
         services.AddRepositories(configuration);
         services.AddQuartzJobs();
         services.AddRabbitMq(configuration);

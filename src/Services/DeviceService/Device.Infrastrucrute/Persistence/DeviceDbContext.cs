@@ -1,7 +1,7 @@
 ﻿using Device.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Device.Infrastructure.Persistance;
+namespace Device.Infrastructure.Persistence;
 
 public sealed class DeviceDbContext(DbContextOptions<DeviceDbContext> options) 
     : DbContext(options)

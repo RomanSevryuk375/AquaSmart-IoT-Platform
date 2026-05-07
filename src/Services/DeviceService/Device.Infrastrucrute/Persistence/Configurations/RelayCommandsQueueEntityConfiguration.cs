@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Device.Infrastructure.Persistance.Configurations;
+namespace Device.Infrastructure.Persistence.Configurations;
 
 public sealed class RelayCommandsQueueEntityConfiguration
     : IEntityTypeConfiguration<RelayCommandsQueueEntity>

@@ -2,9 +2,9 @@
 using Device.Domain.Interfaces;
 using Device.Infrastructure.BackgroundJobs;
 using Device.Infrastructure.Messaging;
-using Device.Infrastructure.Persistance;
-using Device.Infrastructure.Persistance.Interceptors;
-using Device.Infrastructure.Persistance.Repositories;
+using Device.Infrastructure.Persistence;
+using Device.Infrastructure.Persistence.Interceptors;
+using Device.Infrastructure.Persistence.Repositories;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

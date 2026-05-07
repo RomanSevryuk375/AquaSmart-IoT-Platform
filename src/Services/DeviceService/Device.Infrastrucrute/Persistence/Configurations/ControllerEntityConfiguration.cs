@@ -3,7 +3,7 @@ using Device.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Device.Infrastructure.Persistance.Configurations;
+namespace Device.Infrastructure.Persistence.Configurations;
 
 public sealed class ControllerEntityConfiguration 
     : IEntityTypeConfiguration<ControllerEntity>

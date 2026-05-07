@@ -3,10 +3,12 @@ using Contracts.Enums;
 using Contracts.Events.RelayEvents;
 using Contracts.Results;
 using Device.Application.DTOs.RelayCommands;
+using Device.Application.Extesions;
 using Device.Application.Interfaces;
 using Device.Domain.Entities;
 using Device.Domain.Factories;
 using Device.Domain.Interfaces;
+using Microsoft.Extensions.Options;
 
 namespace Device.Application.Services;
 
@@ -16,7 +18,8 @@ public sealed class RelayCommandQueueService(
     IRelayCommandsQueueRepository queueRepository,
     IMapper mapper,
     IUnitOfWork unitOfWork,
-    IDeviceSecurityService securityService) : IRelayCommandQueueService
+    IDeviceSecurityService securityService,
+    IOptions<DeviceSettings> deviceOptions) : IRelayCommandQueueService
 {
     public async Task<Result<IReadOnlyList<RelayCommandResponseDto>>> GetPendingCommands(
         Guid controllerId,
@@ -248,7 +251,7 @@ public sealed class RelayCommandQueueService(
             existingRelay.ControllerId,
             existingRelay.Id,
             StateEvaluatorFactory.EvaluateBool(existingRelay.IsActive),
-            DateTime.UtcNow.AddMinutes(15));
+            DateTime.UtcNow.AddMinutes(deviceOptions.Value.CommandTtlMinutes));
 
         if (newCommand.IsFailure)
         {

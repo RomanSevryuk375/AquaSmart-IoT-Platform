@@ -3,7 +3,7 @@ using Device.Domain.Entities;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Newtonsoft.Json;
 
-namespace Device.Infrastructure.Persistance.Interceptors;
+namespace Device.Infrastructure.Persistence.Interceptors;
 
 public sealed class ConvertDomainEventsToOutboxMessagesInterceptor : SaveChangesInterceptor
 {

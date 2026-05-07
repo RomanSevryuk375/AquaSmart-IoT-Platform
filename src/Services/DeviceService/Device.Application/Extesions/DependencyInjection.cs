@@ -1,6 +1,7 @@
 ﻿using Device.Application.Interfaces;
 using Device.Application.Services;
 using FluentValidation;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -8,7 +9,7 @@ namespace Device.Application.Extesions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddServices (this IServiceCollection services)
+    public static IServiceCollection AddServices (this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IControllerOfflineCheckerService, ControllerOfflineCheckerService>();
         services.AddScoped<IControllerService, ControllerService>();
@@ -29,6 +30,9 @@ public static class DependencyInjection
 
         services.AddMediatR(config => 
             config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
+        services.Configure<DeviceSettings>(
+            configuration.GetSection(DeviceSettings.SectionName));
 
         return services;
     }

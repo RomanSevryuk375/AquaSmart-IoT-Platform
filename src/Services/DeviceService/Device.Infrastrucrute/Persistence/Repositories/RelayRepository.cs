@@ -2,7 +2,7 @@
 using Device.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Device.Infrastructure.Persistance.Repositories;
+namespace Device.Infrastructure.Persistence.Repositories;
 
 public sealed class RelayRepository(DeviceDbContext dbContext)
     : BaseRepository<RelayEntity>(dbContext), IRelayRepository

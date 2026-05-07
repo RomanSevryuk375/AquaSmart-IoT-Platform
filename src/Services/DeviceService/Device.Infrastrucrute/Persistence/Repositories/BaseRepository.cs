@@ -1,7 +1,7 @@
 ﻿using Contracts.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Device.Infrastructure.Persistance.Repositories;
+namespace Device.Infrastructure.Persistence.Repositories;
 
 public abstract class BaseRepository<T>(DeviceDbContext dbContext) : IRepository<T> where T : class, IEntity
 {

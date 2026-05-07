@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Device.Infrastructure.Persistance.Outbox;
+namespace Device.Infrastructure.Persistence.Outbox;
 
 public sealed class OutboxMessageConfiguration 
     : IEntityTypeConfiguration<OutboxMessage>
