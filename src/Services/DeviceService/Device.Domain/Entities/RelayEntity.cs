@@ -222,4 +222,28 @@ public sealed class RelayEntity : AggregateRoot, IEntity
             ExpireAt = DateTime.UtcNow.AddMinutes(5)
         });
     }
+
+    public void SetMode(bool mode)
+    {
+        if (IsManual == mode)
+        {
+            return;
+        }
+
+        IsManual = mode;
+
+        RaiseEvent(new RelayModeChangedDomainEvent
+        {
+            RelayId = Id,
+            IsManual = IsManual
+        });
+    }
+
+    public void MarkAsDeleted()
+    {
+        RaiseEvent(new RelayDeletedDomainEvent
+        {
+            RelayId = Id,
+        });
+    }
 }

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Contracts.Enums;
-using Contracts.Events.SensorEvents;
 using Contracts.Results;
 using Device.Application.DTOs.Sensor;
 using Device.Application.Interfaces;
@@ -9,7 +8,6 @@ using Device.Domain.Interfaces;
 using Device.Domain.SpecificationParams;
 using Device.Domain.Specifications;
 using FluentValidation;
-using MassTransit;
 
 namespace Device.Application.Services;
 
@@ -17,7 +15,6 @@ public sealed class SensorService(
     ISensorRepository sensorRepository,
     IControllerRepository controllerRepository,
     IUnitOfWork unitOfWork,
-    IPublishEndpoint publishEndpoint,
     IMapper mapper,
     IValidator<SensorRequestDto> createValidator,
     IValidator<SensorUpdateRequestDto> updateValidator,
@@ -76,10 +73,6 @@ public sealed class SensorService(
         var result = await sensorRepository.AddAsync(sensor, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        await publishEndpoint.Publish(
-            mapper.Map<SensorCreatedEvent>(sensor), 
-            cancellationToken);
-
         return Result<Guid>.Success(result);
     }
 
@@ -114,13 +107,10 @@ public sealed class SensorService(
                     "You are not the owner of this controller"));
         }
 
+        existingSensor.MarkAsDeleted();
+
         await sensorRepository.DeleteAsync(sensorId, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await publishEndpoint.Publish(new SensorDeletedEvent
-        {
-            SensorId = sensorId,
-        }, cancellationToken);
 
         return Result.Success();
     }
@@ -225,10 +215,6 @@ public sealed class SensorService(
         await sensorRepository.UpdateAsync(existingSensor, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        await publishEndpoint.Publish(
-            mapper.Map<SensorStateChangedEvent>(existingSensor), 
-            cancellationToken);
-
         return Result.Success();
     }
 
@@ -290,10 +276,6 @@ public sealed class SensorService(
 
         await sensorRepository.UpdateAsync(existingSensor, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await publishEndpoint.Publish(
-            mapper.Map<SensorUpdatedEvent>(existingSensor), 
-            cancellationToken);
 
         return Result.Success();
     }

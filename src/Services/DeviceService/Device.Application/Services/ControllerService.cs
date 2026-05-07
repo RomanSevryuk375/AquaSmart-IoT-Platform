@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Contracts.Events.ControllerEvents;
 using Contracts.Results;
 using Device.Application.DTOs.Controller;
 using Device.Application.Interfaces;
@@ -8,13 +7,11 @@ using Device.Domain.Interfaces;
 using Device.Domain.SpecificationParams;
 using Device.Domain.Specifications;
 using FluentValidation;
-using MassTransit;
 
 namespace Device.Application.Services;
 
 public sealed class ControllerService(
     IControllerRepository controllerRepository,
-    IPublishEndpoint publishEndpoint,
     IUserContext userContext,
     IUnitOfWork unitOfWork,
     IMyHasher myHasher,
@@ -180,16 +177,6 @@ public sealed class ControllerService(
 
         await controllerRepository.UpdateAsync(controller, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        if (!controller.IsOnline)
-        {
-            await publishEndpoint.Publish(new ControllerNotOnlineEvent 
-            { 
-                UserId = controller.UserId,
-                ControllerId = controller.Id,
-                LastSeenAt = controller.LastSeenAt,
-            }, cancellationToken);
-        }
 
         return Result<bool>.Success(controller.IsOnline);
     }

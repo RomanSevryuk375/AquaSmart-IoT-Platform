@@ -172,4 +172,12 @@ public sealed class SensorEntity : AggregateRoot, IEntity
             State = State
         });
     }
+
+    public void MarkAsDeleted()
+    {
+        RaiseEvent(new SensorDeletedDomainEvent
+        {
+            SensorId = Id,
+        });
+    }
 }

@@ -7,7 +7,6 @@ using Device.Application.Interfaces;
 using Device.Domain.Entities;
 using Device.Domain.Factories;
 using Device.Domain.Interfaces;
-using MassTransit;
 
 namespace Device.Application.Services;
 
@@ -18,7 +17,6 @@ public sealed class RelayCommandQueueService(
     IMapper mapper,
     IUnitOfWork unitOfWork,
     IMyHasher myHasher,
-    IPublishEndpoint publisherEndpoint,
     IUserContext userContext) : IRelayCommandQueueService
 {
     public async Task<Result<IReadOnlyList<RelayCommandResponseDto>>> GetPendingCommands(
@@ -253,16 +251,10 @@ public sealed class RelayCommandQueueService(
                     "You are not the owner of this controller"));
         }
 
-        //existingRelay.Set(existingRelay.IsManual);
+        existingRelay.SetMode(!existingRelay.IsManual);
 
         await relayRepository.UpdateAsync(existingRelay, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await publisherEndpoint.Publish(new ChangeRelayModeCommand
-        {
-            RelayId = existingRelay.Id,
-            IsManual = existingRelay.IsManual,
-        }, cancellationToken);
 
         return Result<bool>.Success(existingRelay.IsManual);
     }

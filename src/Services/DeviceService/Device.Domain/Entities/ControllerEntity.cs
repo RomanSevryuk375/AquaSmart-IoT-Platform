@@ -116,6 +116,16 @@ public sealed class ControllerEntity : AggregateRoot, IEntity
     public void ToggleState()
     {
         IsOnline = !IsOnline;
+
+        if (IsOnline is false)
+        {
+            RaiseEvent(new ControllerNotOnlineDomainEvent
+            {
+                UserId = UserId,
+                ControllerId = Id,
+                LastSeenAt = LastSeenAt,
+            });
+        }
     }
 
     public void SetOffline()

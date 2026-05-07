@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Contracts.Events.RelayEvents;
 using Contracts.Results;
 using Device.Application.DTOs.Relay;
 using Device.Application.Interfaces;
@@ -8,8 +7,6 @@ using Device.Domain.Interfaces;
 using Device.Domain.SpecificationParams;
 using Device.Domain.Specifications;
 using FluentValidation;
-using MassTransit;
-using Error = Contracts.Results.Error;
 
 namespace Device.Application.Services;
 
@@ -19,7 +16,6 @@ public sealed class RelayService(
     ISensorRepository sensorRepository,
     IUnitOfWork unitOfWork,
     IMapper mapper,
-    IPublishEndpoint publisherEndpoint,
     IValidator<RelayUpdateRequestDto> updateValidator,
     IValidator<RelayRequestDto> createValidator,
     IUserContext userContext) : IRelayService
@@ -80,10 +76,6 @@ public sealed class RelayService(
         var result = await relayRepository.AddAsync(relay, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        await publisherEndpoint.Publish(
-            mapper.Map<RelayCreatedEvent>(relay),
-            cancellationToken);
-
         return Result<Guid>.Success(result);
     }
 
@@ -118,13 +110,10 @@ public sealed class RelayService(
                     "You are not the owner of this controller"));
         }
 
+        existingRelay.MarkAsDeleted();
+
         await relayRepository.DeleteAsync(relayId, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await publisherEndpoint.Publish(new RelayDeletedEvent
-            {
-                RelayId = relayId,
-            }, cancellationToken);
 
         return Result.Success();
     }
@@ -245,10 +234,6 @@ public sealed class RelayService(
         await relayRepository.UpdateAsync(existingRelay, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        await publisherEndpoint.Publish(
-            mapper.Map<RelayUpdatedEvent>(existingRelay),
-            cancellationToken);
-
         return Result.Success();
     }
 
@@ -307,12 +292,6 @@ public sealed class RelayService(
 
         await relayRepository.UpdateAsync(existingRelay, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await publisherEndpoint.Publish(new SetRelayPowerSensorEvent
-        {
-            RelayId = relayId,
-            PowerSensorId = powerSensorId,
-        }, cancellationToken);
 
         return Result.Success();
     }
