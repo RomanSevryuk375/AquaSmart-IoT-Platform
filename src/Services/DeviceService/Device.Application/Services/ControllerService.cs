@@ -7,6 +7,7 @@ using Device.Domain.Interfaces;
 using Device.Domain.SpecificationParams;
 using Device.Domain.Specifications;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Device.Application.Services;
 
@@ -17,7 +18,8 @@ public sealed class ControllerService(
     IMyHasher myHasher,
     IMapper mapper,
     IValidator<ControllerRequestDto> createValidator,
-    IValidator<ControllerUpdateRequestDto> updateValidator) : IControllerService
+    IValidator<ControllerUpdateRequestDto> updateValidator,
+    IDeviceSecurityService securityService) : IControllerService
 {
     public async Task<Result<ControllerRegistredResponseDto>> AddControllerAsync(
         ControllerRequestDto request, 
@@ -35,22 +37,19 @@ public sealed class ControllerService(
 
         var deviceToken = Guid.NewGuid().ToString();
 
-        var (controller, errors) = ControllerEntity.Create(
+        var controller = ControllerEntity.Create(
             userContext.UserId,
             request.MacAddress,
             myHasher.Generate(deviceToken),
             request.Name,
             request.IsOnline);
 
-        if (controller is null)
+        if (controller.IsFailure)
         {
-            return Result<ControllerRegistredResponseDto>
-                .Failure(Error.Validation(
-                    "ConstrollerRequest.Invalid",
-                    $"Failed to create {nameof(ControllerEntity)}: {string.Join(", ", errors!)}"));
+            return Result<ControllerRegistredResponseDto>.Failure(controller.Error);
         }
 
-        var result = await controllerRepository.AddAsync(controller, cancellationToken);
+        var result = await controllerRepository.AddAsync(controller.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<ControllerRegistredResponseDto>.Success(
@@ -65,6 +64,15 @@ public sealed class ControllerService(
         Guid controllerId, 
         CancellationToken cancellationToken)
     {
+        var ownership = await securityService.EnsureUserOwnsControllerAsync(
+            controllerId, cancellationToken);
+
+        if (ownership.IsFailure)
+        {
+            return Result<ControllerResponseDto>
+                .Failure(ownership.Error);
+        }
+
         await controllerRepository.DeleteAsync(controllerId, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -103,20 +111,13 @@ public sealed class ControllerService(
         var controller = await controllerRepository
             .GetByIdAsync(controllerId, cancellationToken);
 
-        if (controller is null)
-        {
-            return Result<ControllerResponseDto>
-                .Failure(Error.NotFound(
-                    "Controller.NotFound", 
-                    $"{nameof(ControllerEntity)} {controllerId} not found"));
-        }
+        var ownership = await securityService.EnsureUserOwnsControllerAsync(
+            controllerId, cancellationToken);
 
-        if (controller.UserId != userContext.UserId)
+        if (ownership.IsFailure || controller is null)
         {
             return Result<ControllerResponseDto>
-                .Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this controller"));
+                .Failure(ownership.Error);
         }
 
         return Result<ControllerResponseDto>.Success(
@@ -131,23 +132,13 @@ public sealed class ControllerService(
         var controller = await controllerRepository
             .GetByIdAsync(controllerId, cancellationToken);
 
-        if (controller is null)
+        var ownership = await securityService.EnsureDeviceAccessAsync(
+            controllerId, deviceToken, cancellationToken);
+
+        if (ownership.IsFailure || controller is null)
         {
             return Result<ControllerPingResponseDto>
-                .Failure(Error.NotFound(
-                    "Controller.NotFound",
-                    $"{nameof(ControllerEntity)} {controllerId} not found"));
-        }
-
-        var verify = myHasher
-            .Verify(deviceToken, controller.DeviceTokenHash);
-
-        if (!verify)
-        {
-            return Result<ControllerPingResponseDto>
-                .Failure(Error.Conflict(
-                    "Controller.Forbidden",
-                    $"invalid device token"));
+                .Failure(ownership.Error);
         }
 
         controller.RecordPing();
@@ -165,12 +156,13 @@ public sealed class ControllerService(
         var controller = await controllerRepository
             .GetByIdAsync(controllerId, cancellationToken);
 
-        if (controller is null)
+        var ownership = await securityService.EnsureUserOwnsControllerAsync(
+            controllerId, cancellationToken);
+
+        if (ownership.IsFailure || controller is null)
         {
             return Result<bool>
-                .Failure(Error.NotFound(
-                    "Controller.NotFound",
-                    $"{nameof(ControllerEntity)}  {controllerId} not found"));
+                .Failure(ownership.Error);
         }
 
         controller.ToggleState();
@@ -198,19 +190,13 @@ public sealed class ControllerService(
         var controller = await controllerRepository
             .GetByIdAsync(controllerId, cancellationToken);
 
-        if (controller is null)
-        {
-            return Result.Failure(Error.NotFound(
-                    "Controller.NotFound",
-                    $"{nameof(ControllerEntity)} {controllerId} not found"));
-        }
+        var ownership = await securityService.EnsureUserOwnsControllerAsync(
+            controllerId, cancellationToken);
 
-        if (controller.UserId != userContext.UserId)
+        if (ownership.IsFailure || controller is null)
         {
             return Result<ControllerResponseDto>
-                .Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this controller"));
+                .Failure(ownership.Error);
         }
 
         var errors = controller.Update(

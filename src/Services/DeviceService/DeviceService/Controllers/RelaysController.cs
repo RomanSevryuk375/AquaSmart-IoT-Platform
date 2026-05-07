@@ -53,12 +53,10 @@ public class RelaysController(
             return this.ToActionResult(result);
         }
 
-        var createdData = await relayService.GetRelayByIdAsync(result.Value, cancellationToken);
-
         return CreatedAtRoute(
             NameGetById,
-            new { id = result.Value },
-            createdData.Value);
+            new { id = result.Value.Id },
+            result.Value);
     }
 
     [HttpPut("{id:guid}")]

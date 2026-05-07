@@ -72,7 +72,7 @@ public static class DependencyInjection
             options.AddTrigger(triggerOptions => triggerOptions
                 .ForJob(outboxKey)
                 .WithIdentity($"{outboxKey}-trigger")
-                .WithSimpleSchedule(x => x.WithIntervalInSeconds(60).RepeatForever()));
+                .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever()));
         });
 
         services.AddQuartzHostedService(hostOptions     

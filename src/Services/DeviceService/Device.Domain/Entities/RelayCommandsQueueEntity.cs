@@ -1,5 +1,6 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
+using Contracts.Results;
 
 namespace Device.Domain.Entities;
 
@@ -40,7 +41,7 @@ public sealed class RelayCommandsQueueEntity : IEntity
     public string? ErrorMessage { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public static (RelayCommandsQueueEntity? comand, List<string>? errors) Create(
+    public static Result<RelayCommandsQueueEntity> Create(
         Guid controllerId,
         Guid relayId,
         RuleActionEnum action,
@@ -60,7 +61,10 @@ public sealed class RelayCommandsQueueEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return (null, errors);
+            return Result<RelayCommandsQueueEntity>.Failure(
+                Error.Validation(
+                    "Command.Invalid",
+                    string.Join("; ", errors)));
         }
 
         var command = new RelayCommandsQueueEntity(
@@ -75,7 +79,7 @@ public sealed class RelayCommandsQueueEntity : IEntity
             null,
             DateTime.UtcNow);
 
-        return (command, errors);
+        return Result<RelayCommandsQueueEntity>.Success(command);
     }
 
     public void MarkAsSent()

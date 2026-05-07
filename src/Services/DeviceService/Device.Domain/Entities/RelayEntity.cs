@@ -1,5 +1,6 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
+using Contracts.Results;
 using Device.Domain.DomainEvents.RelayEvents;
 using Device.Domain.Factories;
 
@@ -48,7 +49,7 @@ public sealed class RelayEntity : AggregateRoot, IEntity
     public bool IsManual { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public static (RelayEntity? relay, List<string>? errors) Create (
+    public static Result<RelayEntity> Create (
         Guid controllerId,
         Guid userId,
         Guid? powerSensorId,
@@ -84,7 +85,10 @@ public sealed class RelayEntity : AggregateRoot, IEntity
 
         if (errors.Count > 0)
         {
-            return (null, errors);
+            return Result<RelayEntity>.Failure(
+                Error.Validation(
+                    "Relay.Invalid",
+                    string.Join("; ", errors)));
         }
 
         var relay = new RelayEntity(
@@ -113,10 +117,10 @@ public sealed class RelayEntity : AggregateRoot, IEntity
             CreatedAt = relay.CreatedAt
         });
 
-        return (relay, errors);
+        return Result<RelayEntity>.Success(relay);
     }
 
-    public List<string>? Update(
+    public Result Update(
         Guid controllerId,
         ConnectionProtocolEnum connectionProtocol,
         string connectionAddress,
@@ -137,7 +141,10 @@ public sealed class RelayEntity : AggregateRoot, IEntity
 
         if (errors.Count > 0)
         {
-            return errors;
+            return Result.Failure(
+                Error.Validation(
+                    "Relay.Invalid",
+                    string.Join("; ", errors)));
         }
 
         ControllerId = controllerId;
@@ -158,40 +165,32 @@ public sealed class RelayEntity : AggregateRoot, IEntity
             CreatedAt = CreatedAt
         });
 
-        return null;
+        return Result.Success();
     }
 
-    public List<string>? SetName(string name)
+    public Result SetName(string name)
     {
-        var errors = new List<string>();
-
         if (string.IsNullOrWhiteSpace(name))
         {
-            errors.Add("name must not be empty.");
-        }
-
-        if (errors.Count > 0)
-        {
-            return errors;
+            return Result.Failure(
+                Error.Validation(
+                    "Command.Invalid",
+                    "name must not be empty."));
         }
 
         Name = name;
 
-        return null;
+        return Result.Success();
     }
 
-    public List<string>? SetPowerSensor(Guid powerSensorId)
+    public Result SetPowerSensor(Guid powerSensorId)
     {
-        var errors = new List<string>();
-
         if (powerSensorId == Guid.Empty)
         {
-            errors.Add("powerSensorId must not be empty.");
-        }
-
-        if (errors.Count > 0)
-        {
-            return errors;
+            return Result.Failure(
+                Error.Validation(
+                    "Command.Invalid",
+                    "powerSensorId must not be empty."));
         }
 
         PowerSensorId = powerSensorId;
@@ -202,7 +201,7 @@ public sealed class RelayEntity : AggregateRoot, IEntity
             PowerSensorId = powerSensorId,
         });
 
-        return null;
+        return Result.Success();
     }
 
     public void SetState(bool state)

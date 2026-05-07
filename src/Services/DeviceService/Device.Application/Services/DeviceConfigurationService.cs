@@ -10,8 +10,8 @@ public sealed class DeviceConfigurationService(
     IControllerRepository controllerRepository,
     ISensorRepository sensorRepository,
     IRelayRepository relayRepository,
-    IMyHasher myHasher,
-    IMapper mapper) : IDeviceConfigurationService
+    IMapper mapper,
+    IDeviceSecurityService securityService) : IDeviceConfigurationService
 {
     public async Task<Result<ConfigResponseDto>> GetControllerConfigAsync(
         string macAddress,
@@ -23,16 +23,19 @@ public sealed class DeviceConfigurationService(
 
         if (controller is null)
         {
-            return Result<ConfigResponseDto>.Failure(
-                Error.NotFound("Controller.NotFound",
-                              $"Controller {macAddress} not found."));
+            return Result<ConfigResponseDto>
+                .Failure(Error.NotFound(
+                    "Controller.NotFound",
+                    "Controller not found"));
         }
 
-        if (!myHasher.Verify(deviceToken, controller.DeviceTokenHash))
+        var ownership = await securityService.EnsureDeviceAccessAsync(
+            controller.Id, deviceToken, cancellationToken);
+
+        if (ownership.IsFailure)
         {
-            return Result<ConfigResponseDto>.Failure(
-                Error.Conflict("Controller.Conflict",
-                              $"Controller have incorrect device token {deviceToken}."));
+            return Result<ConfigResponseDto>
+                .Failure(ownership.Error);
         }
 
         var relays = await relayRepository

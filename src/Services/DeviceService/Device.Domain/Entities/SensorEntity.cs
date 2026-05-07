@@ -1,5 +1,6 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
+using Contracts.Results;
 using Device.Domain.DomainEvents.SensorEvents;
 
 namespace Device.Domain.Entities;
@@ -41,7 +42,7 @@ public sealed class SensorEntity : AggregateRoot, IEntity
     public string Unit { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public static (SensorEntity? sensor, List<string> errors) Create(
+    public static Result<SensorEntity> Create(
         Guid controllerId,
         Guid userId,
         string name,
@@ -79,7 +80,10 @@ public sealed class SensorEntity : AggregateRoot, IEntity
 
         if (errors.Count > 0)
         {
-            return (null, errors);
+            return Result<SensorEntity>.Failure(
+                Error.Validation(
+                    "Command.Invalid",
+                    string.Join("; ", errors)));
         }
 
         var sensor = new SensorEntity(
@@ -105,10 +109,10 @@ public sealed class SensorEntity : AggregateRoot, IEntity
             CreatedAt = sensor.CreatedAt,
         });
 
-        return (sensor, errors);
+        return Result<SensorEntity>.Success(sensor);
     }
 
-    public List<string>? Update(
+    public Result Update(
         ConnectionProtocolEnum connectionProtocol,
         string connectionAddress,
         Guid controllerId,
@@ -134,7 +138,9 @@ public sealed class SensorEntity : AggregateRoot, IEntity
 
         if (errors.Count > 0)
         {
-            return errors;
+            return Result.Failure(Error.Validation(
+                    "Command.Invalid",
+                    string.Join("; ", errors)));
         }
 
         ConnectionProtocol = connectionProtocol;
@@ -154,7 +160,7 @@ public sealed class SensorEntity : AggregateRoot, IEntity
             CreatedAt = CreatedAt
         });
 
-        return null;
+        return Result.Success();
     }
 
     public void SetState(SensorStateEnum state)

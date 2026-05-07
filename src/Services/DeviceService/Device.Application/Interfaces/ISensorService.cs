@@ -16,7 +16,7 @@ public interface ISensorService
         Guid sensorId, 
         CancellationToken cancellationToken);
 
-    Task<Result<Guid>> AddSensorAsync(
+    Task<Result<SensorResponseDto>> AddSensorAsync(
         SensorRequestDto request, 
         CancellationToken cancellationToken);
 

@@ -16,36 +16,24 @@ public sealed class RelayCommandQueueService(
     IRelayCommandsQueueRepository queueRepository,
     IMapper mapper,
     IUnitOfWork unitOfWork,
-    IMyHasher myHasher,
-    IUserContext userContext) : IRelayCommandQueueService
+    IDeviceSecurityService securityService) : IRelayCommandQueueService
 {
     public async Task<Result<IReadOnlyList<RelayCommandResponseDto>>> GetPendingCommands(
         Guid controllerId,
         string deviceToken,
         CancellationToken cancellationToken)
-    {
+    {     
+        var ownership = await securityService.EnsureDeviceAccessAsync(
+            controllerId, deviceToken, cancellationToken);
 
-        var controller = await controllerRepository
-            .GetByIdAsync(controllerId, cancellationToken);
-
-        if (controller is null)
+        if (ownership.IsFailure)
         {
             return Result<IReadOnlyList<RelayCommandResponseDto>>
-                .Failure(Error.NotFound(
-                    "Controller.NotFound",
-                    $"{nameof(ControllerEntity)} {controllerId} not found"));
+                .Failure(ownership.Error);
         }
 
         var commands = await queueRepository
-            .GetPendingByControllerIdAsync(controller.Id, cancellationToken);
-
-        if (!myHasher.Verify(deviceToken, controller.DeviceTokenHash))
-        {
-            return Result<IReadOnlyList<RelayCommandResponseDto>>
-                .Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this controller"));
-        }
+            .GetPendingByControllerIdAsync(controllerId, cancellationToken);
 
         foreach (var command in commands)
         {
@@ -84,24 +72,16 @@ public sealed class RelayCommandQueueService(
                     $"{nameof(RelayEntity)} {command.RelayId} not found"));
         }
 
-        var controller = await controllerRepository
-            .GetByIdAsync(command.ControllerId, cancellationToken);
+        var ownership = await securityService.EnsureDeviceAccessAsync(
+            command.ControllerId, deviceToken, cancellationToken);
 
-        if (controller is null)
+        if (ownership.IsFailure)
         {
-            return Result.Failure(Error.NotFound(
-                    "Controller.NotFound",
-                    $"{nameof(ControllerEntity)} {command.ControllerId} not found"));
-        }
-
-        if (!myHasher.Verify(deviceToken, controller.DeviceTokenHash))
-        {
-            return Result.Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this controller"));
+            return Result.Failure(ownership.Error);
         }
 
         existingRelay.SetState(StateEvaluatorFactory.EvaluateEnum(command.Action));
+
         await relayRepository.UpdateAsync(existingRelay, cancellationToken);
 
         if (command.Status == CommandStatusEnum.Completed)
@@ -133,21 +113,12 @@ public sealed class RelayCommandQueueService(
                     $"{nameof(RelayCommandsQueueEntity)} {commandId} not found"));
         }
 
-        var controller = await controllerRepository
-            .GetByIdAsync(command.ControllerId, cancellationToken);
+        var ownership = await securityService.EnsureDeviceAccessAsync(
+            command.ControllerId, deviceToken, cancellationToken);
 
-        if (controller is null)
+        if (ownership.IsFailure)
         {
-            return Result.Failure(Error.NotFound(
-                    "Controller.NotFound",
-                    $"{nameof(ControllerEntity)} {command.ControllerId} not found"));
-        }
-
-        if (!myHasher.Verify(deviceToken, controller.DeviceTokenHash))
-        {
-            return Result.Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this controller"));
+            return Result<IReadOnlyList<RelayCommandResponseDto>>.Failure(ownership.Error);
         }
 
         if (command.Status == CommandStatusEnum.Failed)
@@ -191,22 +162,20 @@ public sealed class RelayCommandQueueService(
                 .FatalError($"Command is unavalible or was expired.");
         }
 
-        var (newCommand, errors) = RelayCommandsQueueEntity.Create(
+        var newCommand = RelayCommandsQueueEntity.Create(
             existingController.Id,
             existingRelay.Id,
             command.Action,
             command.ExpireAt);
 
-        if (newCommand is null)
+        if (newCommand.IsFailure)
         {
-            return ConsumerResult
-                .FatalError($"Failed to create {nameof(RelayCommandsQueueEntity)}: " +
-                $"{string.Join(", ", errors!)}");
+            return ConsumerResult.FatalError($"{newCommand.Error}");
         }
 
         try
         {
-            await queueRepository.AddAsync(newCommand, cancellationToken);
+            await queueRepository.AddAsync(newCommand.Value, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
             return ConsumerResult.Success();
@@ -232,23 +201,12 @@ public sealed class RelayCommandQueueService(
                     $"{nameof(RelayEntity)} {relayId} not found"));
         }
 
-        var controller = await controllerRepository
-            .GetByIdAsync(existingRelay.ControllerId, cancellationToken);
+        var ownership = await securityService.EnsureUserOwnsControllerAsync(
+            existingRelay.ControllerId, cancellationToken);
 
-        if (controller is null)
+        if (ownership.IsFailure)
         {
-            return Result<bool>
-                .Failure(Error.NotFound(
-                    "Controller.NotFound",
-                    $"{nameof(ControllerEntity)} {existingRelay.ControllerId} not found"));
-        }
-
-        if (controller.UserId != userContext.UserId)
-        {
-            return Result<bool>
-                .Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this controller"));
+            return Result<bool>.Failure(ownership.Error);
         }
 
         existingRelay.SetMode(!existingRelay.IsManual);
@@ -274,44 +232,30 @@ public sealed class RelayCommandQueueService(
                     $"{nameof(RelayEntity)} {relayId} not found"));
         }
 
-        var controller = await controllerRepository
-            .GetByIdAsync(existingRelay.ControllerId, cancellationToken);
+        var ownership = await securityService.EnsureUserOwnsControllerAsync(
+            existingRelay.ControllerId, cancellationToken);
 
-        if (controller is null)
+        if (ownership.IsFailure)
         {
-            return Result<bool>
-                .Failure(Error.NotFound(
-                    "Controller.NotFound",
-                    $"{nameof(ControllerEntity)} {existingRelay.ControllerId} not found"));
-        }
-
-        if (controller.UserId != userContext.UserId)
-        {
-            return Result<bool>
-                .Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this controller"));
+            return Result<bool>.Failure(ownership.Error);
         }
 
         existingRelay.SetState(!existingRelay.IsActive);
 
         await relayRepository.UpdateAsync(existingRelay, cancellationToken);
 
-        var (newCommand, errors) = RelayCommandsQueueEntity.Create(
+        var newCommand = RelayCommandsQueueEntity.Create(
             existingRelay.ControllerId,
             existingRelay.Id,
             StateEvaluatorFactory.EvaluateBool(existingRelay.IsActive),
             DateTime.UtcNow.AddMinutes(15));
 
-        if (newCommand is null)
+        if (newCommand.IsFailure)
         {
-            return Result<bool>
-                .Failure(Error.Validation(
-                    "Command.Invalid",
-                    $"Failed to create {nameof(RelayCommandsQueueEntity)}: {string.Join(", ", errors!)}"));
+            return Result<bool>.Failure(newCommand.Error);
         }
 
-        await queueRepository.AddAsync(newCommand, cancellationToken);
+        await queueRepository.AddAsync(newCommand.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<bool>.Success(existingRelay.IsActive);

@@ -2,7 +2,6 @@
 using Device.Domain.DomainEvents.RelayEvents;
 using MassTransit;
 using MediatR;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Device.Application.Handlers;
 

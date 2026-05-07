@@ -5,7 +5,7 @@ namespace Device.Application.Interfaces
 {
     public interface IRelayService
     {
-        Task<Result<Guid>> AddRelayAsync(
+        Task<Result<RelayResponseDto>> AddRelayAsync(
             RelayRequestDto request, 
             CancellationToken cancellationToken);
 

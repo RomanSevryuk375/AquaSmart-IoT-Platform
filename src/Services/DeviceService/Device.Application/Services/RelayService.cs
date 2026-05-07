@@ -11,16 +11,16 @@ using FluentValidation;
 namespace Device.Application.Services;
 
 public sealed class RelayService(
-    IControllerRepository controllerRepository,
     IRelayRepository relayRepository,
     ISensorRepository sensorRepository,
     IUnitOfWork unitOfWork,
     IMapper mapper,
     IValidator<RelayUpdateRequestDto> updateValidator,
     IValidator<RelayRequestDto> createValidator,
-    IUserContext userContext) : IRelayService
+    IUserContext userContext,
+    IDeviceSecurityService securityService) : IRelayService
 {
-    public async Task<Result<Guid>> AddRelayAsync(
+    public async Task<Result<RelayResponseDto>> AddRelayAsync(
         RelayRequestDto request,
         CancellationToken cancellationToken)
     {
@@ -28,32 +28,21 @@ public sealed class RelayService(
 
         if (!validationResult.IsValid)
         {
-            return Result<Guid>
+            return Result<RelayResponseDto>
                 .Failure(Error.Validation(
                     "CreateRequest.Invalid",
                     string.Join(", ", validationResult.Errors)));
         }
 
-        var existingController = await controllerRepository
-            .GetByIdAsync(request.ControllerId, cancellationToken);
+        var ownership = await securityService.EnsureUserOwnsControllerAsync(
+            request.ControllerId, cancellationToken);
 
-        if (existingController is null)
+        if (ownership.IsFailure)
         {
-            return Result<Guid>
-                .Failure(Error.NotFound(
-                    "Controller.NotFound",
-                    $"{nameof(ControllerEntity)} {request.ControllerId} not found"));
+            return Result<RelayResponseDto>.Failure(ownership.Error);
         }
 
-        if (existingController.UserId != userContext.UserId)
-        {
-            return Result<Guid>
-                .Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this controller"));
-        }
-
-        var (relay, errors) = RelayEntity.Create(
+        var relay = RelayEntity.Create(
             request.ControllerId,
             userContext.UserId,
             request.PowerSensorId,
@@ -65,18 +54,16 @@ public sealed class RelayService(
             request.IsActive,
             request.IsManual);
 
-        if (relay is null)
+        if (relay.IsFailure)
         {
-            return Result<Guid>
-                .Failure(Error.Validation(
-                    "Relay.Invalid",
-                    $"Failed to create {nameof(RelayEntity)}: {string.Join(", ", errors!)}"));
+            return Result<RelayResponseDto>.Failure(relay.Error);
         }
 
-        var result = await relayRepository.AddAsync(relay, cancellationToken);
+        await relayRepository.AddAsync(relay.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result<Guid>.Success(result);
+        return Result<RelayResponseDto>.Success(
+            mapper.Map<RelayResponseDto>(relay.Value));
     }
 
     public async Task<Result> DeleteRelayAsync(
@@ -93,21 +80,12 @@ public sealed class RelayService(
                     $"{nameof(RelayEntity)} {relayId} not found"));
         }
 
-        var controller = await controllerRepository
-            .GetByIdAsync(existingRelay.ControllerId, cancellationToken);
+        var ownership = await securityService.EnsureUserOwnsControllerAsync(
+            existingRelay.ControllerId, cancellationToken);
 
-        if (controller is null)
+        if (ownership.IsFailure)
         {
-            return Result.Failure(Error.NotFound(
-                    "Controller.NotFound",
-                    $"{nameof(ControllerEntity)} {existingRelay.ControllerId} not found"));
-        }
-
-        if (controller.UserId != userContext.UserId)
-        {
-            return Result.Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this controller"));
+            return Result.Failure(ownership.Error);
         }
 
         existingRelay.MarkAsDeleted();
@@ -159,16 +137,12 @@ public sealed class RelayService(
                     $"{nameof(RelayEntity)} {relayId} not found"));
         }
 
-        var controller = await controllerRepository
-            .GetByIdAsync(existingRelay.ControllerId, cancellationToken);
+        var ownership = await securityService.EnsureUserOwnsControllerAsync(
+            existingRelay.ControllerId, cancellationToken);
 
-        if (controller == null || 
-            controller.UserId != userContext.UserId)
+        if (ownership.IsFailure)
         {
-            return Result<RelayResponseDto>
-                .Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this controller"));
+            return Result<RelayResponseDto>.Failure(ownership.Error);
         }
 
         return Result<RelayResponseDto>.Success(
@@ -184,7 +158,7 @@ public sealed class RelayService(
 
         if (!validationResult.IsValid)
         {
-            return Result<Guid>
+            return Result
                 .Failure(Error.Validation(
                     "UpdateRequest.Invalid",
                     string.Join(", ", validationResult.Errors)));
@@ -200,35 +174,35 @@ public sealed class RelayService(
                     $"{nameof(RelayEntity)} {relayId} not found"));
         }
 
-        var controller = await controllerRepository
-            .GetByIdAsync(updateRequestDto.ControllerId, cancellationToken);
+        var ownership = await securityService.EnsureUserOwnsControllerAsync(
+            existingRelay.ControllerId, cancellationToken);
 
-        if (controller is null)
+        if (ownership.IsFailure)
         {
-            return Result.Failure(Error.NotFound(
-                    "Controller.NotFound",
-                    $"{nameof(ControllerEntity)} {updateRequestDto.ControllerId} not found"));
+            return Result.Failure(ownership.Error);
         }
 
-        if (controller.UserId != userContext.UserId)
+        if (updateRequestDto.ControllerId != existingRelay.ControllerId)
         {
-            return Result.Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this controller"));
+            var newControllerOwnership = await securityService.EnsureUserOwnsControllerAsync(
+                updateRequestDto.ControllerId, cancellationToken);
+
+            if (newControllerOwnership.IsFailure)
+            {
+                return newControllerOwnership;
+            }
         }
 
-        var errors = existingRelay.Update(
+        var result = existingRelay.Update(
             updateRequestDto.ControllerId,
             updateRequestDto.ConnectionProtocol,
             updateRequestDto.ConnectionAddress,
             updateRequestDto.Purpose,
             updateRequestDto.IsNormalyOpen);
 
-        if (errors is not null)
+        if (result.IsFailure)
         {
-            return Result.Failure(Error.Validation(
-                    "Relay.Invalid",
-                    $"Failed to update {nameof(RelayEntity)}: {string.Join(", ", errors!)}"));
+            return Result.Failure(result.Error);
         }
 
         await relayRepository.UpdateAsync(existingRelay, cancellationToken);
@@ -262,23 +236,12 @@ public sealed class RelayService(
                     $"{nameof(SensorEntity)} {powerSensorId} not found"));
         }
 
-        var controller = await controllerRepository
-            .GetByIdAsync(existingRelay.ControllerId, cancellationToken);
+        var ownership = await securityService.EnsureUserOwnsControllerAsync(
+            existingRelay.ControllerId, cancellationToken);
 
-        if (controller is null)
+        if (ownership.IsFailure)
         {
-            return Result<bool>
-                .Failure(Error.NotFound(
-                    "Controller.NotFound",
-                    $"{nameof(ControllerEntity)} {existingRelay.ControllerId} not found"));
-        }
-
-        if (controller.UserId != userContext.UserId)
-        {
-            return Result<bool>
-                .Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this controller"));
+            return Result.Failure(ownership.Error);
         }
 
         if (existingRelay.ControllerId != existingSensor.ControllerId)

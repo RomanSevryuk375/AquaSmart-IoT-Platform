@@ -13,47 +13,37 @@ namespace Device.Application.Services;
 
 public sealed class SensorService(
     ISensorRepository sensorRepository,
-    IControllerRepository controllerRepository,
     IUnitOfWork unitOfWork,
     IMapper mapper,
     IValidator<SensorRequestDto> createValidator,
     IValidator<SensorUpdateRequestDto> updateValidator,
-    IUserContext userContext) : ISensorService
+    IUserContext userContext,
+    IDeviceSecurityService securityService) : ISensorService
 {
-    public async Task<Result<Guid>> AddSensorAsync(
+    public async Task<Result<SensorResponseDto>> AddSensorAsync(
         SensorRequestDto request,
         CancellationToken cancellationToken)
     {
-        var validationResult = createValidator.Validate(request);
+        var validationResult = await createValidator
+            .ValidateAsync(request, cancellationToken);
 
         if (!validationResult.IsValid)
         {
-            return Result<Guid>
+            return Result<SensorResponseDto>
                 .Failure(Error.Validation(
                     "CreateRequest.Invalid",
                     string.Join(", ", validationResult.Errors)));
         }
 
-        var controller = await controllerRepository
-            .GetByIdAsync(request.ControllerId, cancellationToken);
+        var ownership = await securityService.EnsureUserOwnsControllerAsync(
+            request.ControllerId, cancellationToken);
 
-        if (controller is null)
+        if (ownership.IsFailure)
         {
-            return Result<Guid>
-                .Failure(Error.NotFound(
-                    "Controller.NotFound",
-                    $"{nameof(ControllerEntity)} {request.ControllerId} not found"));
+            return Result<SensorResponseDto>.Failure(ownership.Error);
         }
 
-        if (controller.UserId != userContext.UserId)
-        {
-            return Result<Guid>
-                .Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this controller"));
-        }
-
-        var (sensor, errors) = SensorEntity.Create(
+        var sensor = SensorEntity.Create(
             request.ControllerId,
             userContext.UserId,
             request.Name,
@@ -62,18 +52,16 @@ public sealed class SensorService(
             request.Type,
             request.Unit);
 
-        if (sensor is null)
+        if (sensor.IsFailure)
         {
-            return Result<Guid>
-                .Failure(Error.Validation(
-                    "Sensor.Invalid",
-                    $"Failed to create {nameof(SensorEntity)}: {string.Join(", ", errors!)}"));
+            return Result<SensorResponseDto>.Failure(sensor.Error);
         }
 
-        var result = await sensorRepository.AddAsync(sensor, cancellationToken);
+        await sensorRepository.AddAsync(sensor.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result<Guid>.Success(result);
+        return Result<SensorResponseDto>.Success(
+            mapper.Map<SensorResponseDto>(sensor.Value));
     }
 
     public async Task<Result> DeleteSensorAsync(
@@ -90,21 +78,12 @@ public sealed class SensorService(
                     $"{nameof(SensorEntity)} {sensorId} not found"));
         }
 
-        var controller = await controllerRepository
-            .GetByIdAsync(existingSensor.ControllerId, cancellationToken);
+        var ownership = await securityService.EnsureUserOwnsControllerAsync(
+            existingSensor.ControllerId, cancellationToken);
 
-        if (controller is null)
+        if (ownership.IsFailure)
         {
-            return Result.Failure(Error.NotFound(
-                    "Controller.NotFound",
-                    $"{nameof(ControllerEntity)} {existingSensor.ControllerId} not found"));
-        }
-
-        if (controller.UserId != userContext.UserId)
-        {
-            return Result.Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this controller"));
+            return Result.Failure(ownership.Error);
         }
 
         existingSensor.MarkAsDeleted();
@@ -155,23 +134,12 @@ public sealed class SensorService(
                     $"{nameof(SensorEntity)} {sensorId} not found"));
         }
 
-        var controller = await controllerRepository
-            .GetByIdAsync(existingSensor.ControllerId, cancellationToken);
+        var ownership = await securityService.EnsureUserOwnsControllerAsync(
+            existingSensor.ControllerId, cancellationToken);
 
-        if (controller is null)
+        if (ownership.IsFailure)
         {
-            return Result<SensorResponseDto>
-                .Failure(Error.NotFound(
-                    "Controller.NotFound",
-                    $"{nameof(ControllerEntity)} {existingSensor.ControllerId} not found"));
-        }
-
-        if (controller.UserId != userContext.UserId)
-        {
-            return Result<SensorResponseDto>
-                .Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this controller"));
+            return Result<SensorResponseDto>.Failure(ownership.Error);
         }
 
         return Result<SensorResponseDto>.Success(
@@ -193,21 +161,12 @@ public sealed class SensorService(
                     $"{nameof(SensorEntity)} {sensorId} not found"));
         }
 
-        var controller = await controllerRepository
-            .GetByIdAsync(existingSensor.ControllerId, cancellationToken);
+        var ownership = await securityService.EnsureUserOwnsControllerAsync(
+            existingSensor.ControllerId, cancellationToken);
 
-        if (controller is null)
+        if (ownership.IsFailure)
         {
-            return Result.Failure(Error.NotFound(
-                    "Controller.NotFound",
-                    $"{nameof(ControllerEntity)} {existingSensor.ControllerId} not found"));
-        }
-
-        if (controller.UserId != userContext.UserId)
-        {
-            return Result.Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this controller"));
+            return Result.Failure(ownership.Error);
         }
 
         existingSensor.SetState(state);
@@ -243,35 +202,35 @@ public sealed class SensorService(
                     $"{nameof(SensorEntity)} {sensorId} not found"));
         }
 
-        var controller = await controllerRepository
-            .GetByIdAsync(existingSensor.ControllerId, cancellationToken);
+        var ownership = await securityService.EnsureUserOwnsControllerAsync(
+            existingSensor.ControllerId, cancellationToken);
 
-        if (controller is null)
+        if (ownership.IsFailure)
         {
-            return Result.Failure(Error.NotFound(
-                    "Controller.NotFound",
-                    $"{nameof(ControllerEntity)} {existingSensor.ControllerId} not found"));
+            return Result<SensorResponseDto>.Failure(ownership.Error);
         }
 
-        if (controller.UserId != userContext.UserId)
+        if (updateRequestDto.ControllerId != existingSensor.ControllerId)
         {
-            return Result.Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this controller"));
+            var newControllerOwnership = await securityService.EnsureUserOwnsControllerAsync(
+                updateRequestDto.ControllerId, cancellationToken);
+
+            if (newControllerOwnership.IsFailure)
+            {
+                return newControllerOwnership;
+            }
         }
 
-        var errors = existingSensor.Update(
+        var result = existingSensor.Update(
             updateRequestDto.ConnectionProtocol,
             updateRequestDto.ConnectionAddress,
             updateRequestDto.ControllerId,
             updateRequestDto.Type,
             updateRequestDto.Unit);
 
-        if (errors is not null)
+        if (result.IsFailure)
         {
-            return Result.Failure(Error.Validation(
-                    "Sensor.Invalid",
-                    $"Failed to update {nameof(SensorEntity)}: {string.Join(", ", errors!)}"));
+            return Result.Failure(result.Error);
         }
 
         await sensorRepository.UpdateAsync(existingSensor, cancellationToken);
