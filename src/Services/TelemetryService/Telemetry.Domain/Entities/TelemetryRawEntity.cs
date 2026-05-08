@@ -1,4 +1,5 @@
 using Contracts.Abstractions;
+using Contracts.Results;
 
 namespace Telemetry.Domain.Entities;
 
@@ -30,7 +31,7 @@ public sealed class TelemetryRawEntity : IEntity
     public DateTime CreatedAt { get; private set; } 
     public bool IsAggregated { get; private set; } 
 
-    public static (TelemetryRawEntity? telemetryData, List<string> errors) Create(
+    public static Result<TelemetryRawEntity> Create(
         Guid sensorId,
         double value,
         string externalMessageId,
@@ -55,7 +56,10 @@ public sealed class TelemetryRawEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return (null, errors);
+            return Result<TelemetryRawEntity>.Failure(
+                Error.Validation(
+                    "TelemetryRaw.Invalid",
+                    string.Join("; ", errors)));
         }
 
         var telemetryData = new TelemetryRawEntity(
@@ -67,7 +71,7 @@ public sealed class TelemetryRawEntity : IEntity
             DateTime.UtcNow,
             false);
 
-        return (telemetryData, errors);
+        return Result<TelemetryRawEntity>.Success(telemetryData);
     }
 
     public void MarkAsAggregated()

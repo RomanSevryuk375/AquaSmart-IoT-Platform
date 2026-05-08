@@ -1,6 +1,4 @@
-﻿using Contracts.Enums;
-
-namespace Telemetry.Application.DTOs;
+﻿namespace Telemetry.Application.DTOs;
 
 public record TelemetryChartPointDto
 {

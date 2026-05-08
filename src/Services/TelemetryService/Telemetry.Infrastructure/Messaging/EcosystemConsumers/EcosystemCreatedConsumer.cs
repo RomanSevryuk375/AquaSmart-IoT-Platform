@@ -1,5 +1,4 @@
-﻿using Contracts.Events.EcosystemEvents;
-using MassTransit;
+﻿using MassTransit;
 using Telemetry.Application.Interfaces;
 
 namespace Telemetry.Infrastructure.Messaging.EcosystemConsumers;

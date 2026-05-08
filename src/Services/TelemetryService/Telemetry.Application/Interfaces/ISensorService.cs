@@ -18,7 +18,7 @@ public interface ISensorService
         CancellationToken cancellationToken);
 
     Task<ConsumerResult> SetSensorStateAsync(
-        SensorStateChangedCommand sensorStateChanged,
+        SensorStateChangedEvent sensorStateChanged,
         CancellationToken cancellationToken);
 
     Task<ConsumerResult> SetSensorNameAsync(

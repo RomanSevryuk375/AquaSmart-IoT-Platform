@@ -1,5 +1,4 @@
-﻿using Contracts.Enums;
-using Contracts.Events.SensorEvents;
+﻿using Contracts.Events.SensorEvents;
 using Contracts.Results;
 using Telemetry.Application.Interfaces;
 using Telemetry.Domain.Entities;
@@ -33,7 +32,7 @@ public class SensorService(
                 .RetryableError($"Ecosystem for controller {sensor.ControllerId} not found.");
         }
 
-        var (newSensor, errors) = SensorEntity.Create(
+        var result = SensorEntity.Create(
             sensor.SensorId,
             sensor.ControllerId,
             ecosystem.Id,
@@ -45,14 +44,13 @@ public class SensorService(
             DateTime.UtcNow,
             sensor.CreatedAt);
 
-        if (newSensor is null)
+        if (result.IsFailure)
         {
             return ConsumerResult
-                .FatalError($"Failed to create {nameof(SensorEntity)}: " +
-                $"{string.Join(", ", errors!)}"); ;
+                .FatalError($"{result.Error}"); ;
         }
 
-        await sensorRepository.AddAsync(newSensor, cancellationToken);
+        await sensorRepository.AddAsync(result.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ConsumerResult.Success();
@@ -94,7 +92,7 @@ public class SensorService(
                     .RetryableError($"Ecosystem for controller {sensor.ControllerId} not found.");
             }
 
-            var (newSensor, validationErrors) = SensorEntity.Create(
+            var result = SensorEntity.Create(
                 sensor.SensorId,
                 sensor.ControllerId,
                 ecosystem.Id,
@@ -106,29 +104,27 @@ public class SensorService(
                 DateTime.UtcNow,
                 sensor.CreatedAt);
 
-            if (newSensor is null)
+            if (result.IsFailure)
             {
                 return ConsumerResult
-                    .FatalError($"Failed to create {nameof(SensorEntity)}: " +
-                    $"{string.Join(", ", validationErrors!)}");
+                    .FatalError($"{result.Error}"); ;
             }
 
-            await sensorRepository.AddAsync(newSensor, cancellationToken);
+            await sensorRepository.AddAsync(result.Value, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
             return ConsumerResult.Success();
         }
 
-        var errors = existingSensor!.Update(
+        var updateResult = existingSensor!.Update(
             sensor.ControllerId,
             sensor.Type,
             sensor.Unit);
 
-        if (errors is not null && errors.Count > 0)
+        if (updateResult.IsFailure)
         {
             return ConsumerResult
-                    .FatalError($"Failed to create {nameof(EcosystemEntity)}: " +
-                    $"{string.Join(", ", errors!)}");
+                .FatalError($"{updateResult.Error}"); ;
         }
 
         await sensorRepository.UpdateAsync(existingSensor, cancellationToken);
@@ -138,7 +134,7 @@ public class SensorService(
     }
 
     public async Task<ConsumerResult> SetSensorStateAsync(
-        SensorStateChangedCommand sensor,
+        SensorStateChangedEvent sensor,
         CancellationToken cancellationToken)
     {
         var existingSensor = await sensorRepository

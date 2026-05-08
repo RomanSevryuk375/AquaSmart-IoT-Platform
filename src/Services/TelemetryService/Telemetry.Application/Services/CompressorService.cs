@@ -34,7 +34,7 @@ public sealed class CompressorService(
 
         foreach (var item in data)
         {
-            var (aggregate, _) = TelemetryAggregateEntity.Create(
+            var result = TelemetryAggregateEntity.Create(
                 item.SensorId,
                 from,
                 PeriodTypeEnum.Minute,
@@ -43,12 +43,12 @@ public sealed class CompressorService(
                 item.AvgValue,
                 item.Count);
 
-            if (aggregate is null)
+            if (result.IsFailure)
             {
-                continue;
+                return;
             }
 
-            await telemetryAggregate.AddAsync(aggregate, cancellationToken);
+            await telemetryAggregate.AddAsync(result.Value, cancellationToken);
         }
 
         var sensorIds = data.Select(x => x.SensorId).ToList();
@@ -82,7 +82,7 @@ public sealed class CompressorService(
 
         foreach (var item in data)
         {
-            var (aggregate, _) = TelemetryAggregateEntity.Create(
+            var result = TelemetryAggregateEntity.Create(
                 item.SensorId,
                 from,
                 PeriodTypeEnum.Hourly,
@@ -91,12 +91,12 @@ public sealed class CompressorService(
                 item.AvgValue,
                 item.Count);
 
-            if (aggregate is null)
+            if (result.IsFailure)
             {
                 continue;
             }
 
-            await telemetryAggregate.AddAsync(aggregate, cancellationToken);
+            await telemetryAggregate.AddAsync(result.Value, cancellationToken);
 
             sensorIds.Add(item.SensorId);
         }
@@ -130,7 +130,7 @@ public sealed class CompressorService(
 
         foreach (var item in data)
         {
-            var (aggregate, _) = TelemetryAggregateEntity.Create(
+            var result = TelemetryAggregateEntity.Create(
                 item.SensorId,
                 from,
                 PeriodTypeEnum.Daily,
@@ -139,12 +139,12 @@ public sealed class CompressorService(
                 item.AvgValue,
                 item.Count);
 
-            if (aggregate is null)
+            if (result.IsFailure)
             {
                 continue;
             }
 
-            await telemetryAggregate.AddAsync(aggregate, cancellationToken);
+            await telemetryAggregate.AddAsync(result.Value, cancellationToken);
 
             sensorIds.Add(item.SensorId);
         }

@@ -1,5 +1,6 @@
 using Contracts.Abstractions;
 using Contracts.Enums;
+using Contracts.Results;
 
 namespace Telemetry.Domain.Entities;
 
@@ -43,7 +44,7 @@ public sealed class SensorEntity : IEntity
     public DateTime CreatedAt { get; private set; }
     public bool IsDataDelayed { get; private set; }
 
-    public static (SensorEntity? sensor, List<string> errors) Create(
+    public static Result<SensorEntity> Create(
         Guid id,
         Guid controllerId,
         Guid ecosystemId,
@@ -84,7 +85,10 @@ public sealed class SensorEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return (null, errors);
+            return Result<SensorEntity>.Failure(
+                  Error.Validation(
+                      "Sensor.Invalid",
+                      string.Join("; ", errors)));
         }
 
         var sensor = new SensorEntity(
@@ -100,10 +104,10 @@ public sealed class SensorEntity : IEntity
             createdAt,
             false);
 
-        return (sensor, errors);
+        return Result<SensorEntity>.Success(sensor);
     }
 
-    public List<string>? Update(
+    public Result Update(
         Guid controllerId,
         SensorTypeEnum type,
         string unit)
@@ -122,33 +126,30 @@ public sealed class SensorEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return errors;
+            return Result.Failure(Error.Validation(
+                    "Sensor.Invalid",
+                    string.Join("; ", errors)));
         }
 
         ControllerId = controllerId;
         Type = type;
         Unit = unit.Trim();
 
-        return null;
+        return Result.Success();
     }
 
-    public List<string>? Rename(string name)
+    public Result Rename(string name)
     {
-        var errors = new List<string>();
-
         if (string.IsNullOrWhiteSpace(name))
         {
-            errors.Add("Name must not be empty.");
-        }
-
-        if (errors.Count > 0)
-        {
-            return errors;
+            return Result.Failure(Error.Validation(
+                    "Ecosystem.Invalid",
+                    "Name must not be empty."));
         }
 
         Name = name;
 
-        return null;
+        return Result.Success();
     }
 
     public void UpdateLastValue(double newValue)
@@ -173,8 +174,9 @@ public sealed class SensorEntity : IEntity
         State = newStatus;
     }
 
-    public void SetDataDelayed(bool status)
+    public void MarkAsNoData()
     {
-        IsDataDelayed = status;
+        IsDataDelayed = true;
+        State = SensorStateEnum.NoData;
     }
 }

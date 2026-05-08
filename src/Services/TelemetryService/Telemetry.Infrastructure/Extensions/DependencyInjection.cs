@@ -1,5 +1,4 @@
-﻿using Contracts.Events.EcosystemEvents;
-using Contracts.Options;
+﻿using Contracts.Options;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

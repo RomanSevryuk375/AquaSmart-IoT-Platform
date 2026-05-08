@@ -1,5 +1,4 @@
 ﻿using Contracts.Events.TelemetryEvents;
-using Contracts.Exceptions;
 using Contracts.Results;
 using MassTransit;
 using Telemetry.Application.DTOs;
@@ -112,20 +111,20 @@ public class TelemetryDataService(
                 continue;
             }
 
-            var (telemetryData, errors) = TelemetryRawEntity.Create(
+            var result = TelemetryRawEntity.Create(
                 item.SensorId,
                 item.Value,
                 item.ExternalMessageId,
                 item.RecordedAt);
 
-            if (telemetryData is null)
+            if (result.IsFailure)
             {
                 continue;
             }
 
             sensor.UpdateLastValue(item.Value);
 
-            await telemetryRepository.AddAsync(telemetryData!, cancellationToken);
+            await telemetryRepository.AddAsync(result.Value, cancellationToken);
             await sensorRepository.UpdateAsync(sensor, cancellationToken);
 
             eventsToPublish.Add(new TelemetryReceivedEvent
