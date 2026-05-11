@@ -1,10 +1,11 @@
 using Contracts.Abstractions;
 using Contracts.Enums;
 using Contracts.Results;
+using Telemetry.Domain.Events;
 
 namespace Telemetry.Domain.Entities;
 
-public sealed class SensorEntity : IEntity
+public sealed class SensorEntity : AggregateRoot, IEntity
 {
     private SensorEntity(
         Guid id,
@@ -143,7 +144,7 @@ public sealed class SensorEntity : IEntity
         if (string.IsNullOrWhiteSpace(name))
         {
             return Result.Failure(Error.Validation(
-                    "Ecosystem.Invalid",
+                    "Sensor.Invalid",
                     "Name must not be empty."));
         }
 
@@ -178,5 +179,12 @@ public sealed class SensorEntity : IEntity
     {
         IsDataDelayed = true;
         State = SensorStateEnum.NoData;
+
+        RaiseEvent(new SensorNoDataDomainEvent
+        {
+            SensorId = Id,
+            State = State,
+            LastSeenAt = UpdatedAt,
+        });
     }
 }

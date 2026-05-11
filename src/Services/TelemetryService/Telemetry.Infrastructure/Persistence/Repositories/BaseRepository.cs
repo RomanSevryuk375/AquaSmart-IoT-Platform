@@ -1,7 +1,7 @@
 using Contracts.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Telemetry.Infrastructure.Repositories;
+namespace Telemetry.Infrastructure.Persistence.Repositories;
 
 public abstract class BaseRepository<T>(TelemetryDbContext dbContext) : IRepository<T> where T : class, IEntity
 {

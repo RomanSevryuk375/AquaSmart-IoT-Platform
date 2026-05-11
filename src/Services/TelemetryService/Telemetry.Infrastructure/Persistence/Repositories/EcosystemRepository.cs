@@ -2,7 +2,7 @@
 using Telemetry.Domain.Entities;
 using Telemetry.Domain.Interfaces;
 
-namespace Telemetry.Infrastructure.Repositories;
+namespace Telemetry.Infrastructure.Persistence.Repositories;
 
 public sealed class EcosystemRepository(TelemetryDbContext dbContext) 
     : BaseRepository<EcosystemEntity>(dbContext), IEcosystemRepository

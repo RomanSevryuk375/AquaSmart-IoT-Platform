@@ -10,6 +10,7 @@ public static class DependencyInjection
     {
         services.AddScoped<ICompressorService, CompressorService>();
         services.AddScoped<IEcosystemService, EcosystemService>();
+        services.AddScoped<IOutboxMessageProcessorService, OutboxMessageProcessorService>();
         services.AddScoped<ISensorService, SensorService>();
         services.AddScoped<ISensorStateCheckerService, SensorStateCheckerService>();
         services.AddScoped<ITelemetryDataService, TelemetryDataService>();

@@ -29,8 +29,7 @@ public sealed class EcosystemService(
 
         if (result.IsFailure)
         {
-            return ConsumerResult
-                .FatalError($"{result.Error}");
+            return ConsumerResult.FatalError($"{result.Error}");
         }
 
         await ecosystemRepository.AddAsync(result.Value, cancellationToken);

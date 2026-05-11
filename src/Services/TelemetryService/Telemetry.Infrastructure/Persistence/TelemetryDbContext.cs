@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Telemetry.Domain.Entities;
 
-namespace Telemetry.Infrastructure;
+namespace Telemetry.Infrastructure.Persistence;
 
 public class TelemetryDbContext(DbContextOptions<TelemetryDbContext> options) : DbContext(options)
 {
@@ -9,6 +9,7 @@ public class TelemetryDbContext(DbContextOptions<TelemetryDbContext> options) : 
     public DbSet<SensorEntity> Sensors { get; set; }
     public DbSet<TelemetryAggregateEntity> TelemetryAggregateData { get; set; }
     public DbSet<TelemetryRawEntity> TelemetryRawData { get; set; }
+    public DbSet<OutboxMessage> OutboxMessages { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(TelemetryDbContext).Assembly);

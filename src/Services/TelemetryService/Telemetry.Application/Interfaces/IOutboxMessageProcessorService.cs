@@ -2,8 +2,8 @@
 
 namespace Telemetry.Application.Interfaces;
 
-public interface ISensorStateCheckerService
+public interface IOutboxMessageProcessorService
 {
-    Task<Result> CheckStateAndNotify(
+    Task<Result> ProcessAsync(
         CancellationToken cancellationToken);
 }

@@ -52,12 +52,12 @@ public sealed class EcosystemEntity : IEntity
                     string.Join("; ", errors)));
         }
 
-        var ecosustem = new EcosystemEntity(
+        var ecosystem = new EcosystemEntity(
             ecosystemId,
             controllerId,
             userId,
             DateTime.UtcNow);
 
-        return Result<EcosystemEntity>.Success(ecosustem);
+        return Result<EcosystemEntity>.Success(ecosystem);
     }
 }

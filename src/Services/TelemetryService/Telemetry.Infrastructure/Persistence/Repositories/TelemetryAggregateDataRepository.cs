@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Telemetry.Domain.Entities;
 using Telemetry.Domain.Interfaces;
 
-namespace Telemetry.Infrastructure.Repositories;
+namespace Telemetry.Infrastructure.Persistence.Repositories;
 
 public sealed class TelemetryAggregateDataRepository(TelemetryDbContext dbContext) 
     : BaseRepository<TelemetryAggregateEntity>(dbContext), ITelemetryAggregateDataRepository

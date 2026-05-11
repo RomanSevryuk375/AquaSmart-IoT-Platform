@@ -2,7 +2,7 @@
 using Telemetry.Domain.Entities;
 using Telemetry.Domain.Interfaces;
 
-namespace Telemetry.Infrastructure.Repositories;
+namespace Telemetry.Infrastructure.Persistence.Repositories;
 
 public sealed class TelemetryRawDataRepository(TelemetryDbContext dbContext)
     : BaseRepository<TelemetryRawEntity>(dbContext), ITelemetryRawDataRepository

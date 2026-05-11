@@ -44,7 +44,7 @@ public sealed class TelemetryRawEntity : IEntity
             errors.Add("sensorId must not be empty.");
         }
 
-        if (recordedAt > DateTime.UtcNow.AddMinutes(1))
+        if (recordedAt > DateTime.UtcNow.AddMinutes(5))
         {
             errors.Add("recordedAt cannot be in the future.");
         }

@@ -1,4 +1,5 @@
 ﻿using Contracts.Events.SensorEvents;
+using Contracts.Results;
 using MassTransit;
 using Telemetry.Application.Interfaces;
 using Telemetry.Domain.Entities;
@@ -9,11 +10,10 @@ namespace Telemetry.Application.Services;
 
 public class SensorStateCheckerService(
     ISensorRepository sensorRepository,
-    IPublishEndpoint publishEndpoint,
     IUnitOfWork unitOfWork)
     : ISensorStateCheckerService
 {
-    public async Task CheckStateAndNotify(CancellationToken cancellationToken)
+    public async Task<Result> CheckStateAndNotify(CancellationToken cancellationToken)
     {
         var offlineThreshold = DateTime.UtcNow.AddMinutes(-5);
         var specification =
@@ -27,32 +27,18 @@ public class SensorStateCheckerService(
 
         if (!sensors.Any())
         {
-            return;
+            return Result.Success();
         }
-
-        var affectedSensors = new List<SensorEntity>();
 
         foreach (var sensor in sensors)
         {
             sensor.MarkAsNoData();
 
             await sensorRepository.UpdateAsync(sensor, cancellationToken);
-            affectedSensors.Add(sensor);
         }
 
-        if (affectedSensors.Count != 0)
-        {
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            foreach (var sensor in affectedSensors)
-            {
-                await publishEndpoint.Publish(new SensorNoDataEvent
-                {
-                    SensorId = sensor.Id,
-                    State = sensor.State,
-                    LastSeenAt = sensor.UpdatedAt,
-                }, cancellationToken);
-            }
-        }
+        return Result.Success();
     }
 }

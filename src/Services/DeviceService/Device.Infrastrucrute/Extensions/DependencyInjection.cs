@@ -4,6 +4,7 @@ using Device.Infrastructure.BackgroundJobs;
 using Device.Infrastructure.Messaging;
 using Device.Infrastructure.Persistence;
 using Device.Infrastructure.Persistence.Interceptors;
+using Device.Infrastructure.Persistence.Outbox;
 using Device.Infrastructure.Persistence.Repositories;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;

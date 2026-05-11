@@ -1,4 +1,5 @@
 ﻿using Contracts.Enums;
+using Contracts.Results;
 using MassTransit.Initializers;
 using Telemetry.Application.Interfaces;
 using Telemetry.Domain.Entities;
@@ -11,7 +12,7 @@ public sealed class CompressorService(
     ITelemetryRawDataRepository telemetryRaw,
     IUnitOfWork unitOfWork) : ICompressorService
 {
-    public async Task CompressToMinutesAsync(
+    public async Task<Result> CompressToMinutesAsync(
         CancellationToken cancellationToken)
     {
         var to = new DateTime(
@@ -29,7 +30,7 @@ public sealed class CompressorService(
 
         if (data is null)
         {
-            return;
+            return Result.Success();
         }
 
         foreach (var item in data)
@@ -45,7 +46,7 @@ public sealed class CompressorService(
 
             if (result.IsFailure)
             {
-                return;
+                continue;
             }
 
             await telemetryAggregate.AddAsync(result.Value, cancellationToken);
@@ -55,9 +56,11 @@ public sealed class CompressorService(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await telemetryRaw.MarkAsAggregatedAsync(sensorIds, from, to, cancellationToken);
+
+        return Result.Success();
     }
 
-    public async Task CompressToHoursAsync(
+    public async Task<Result> CompressToHoursAsync(
         CancellationToken cancellationToken)
     {
         var to = new DateTime(
@@ -75,7 +78,7 @@ public sealed class CompressorService(
 
         if (data is null)
         {
-            return;
+            return Result.Success();
         }
 
         var sensorIds = new List<Guid>();
@@ -103,9 +106,11 @@ public sealed class CompressorService(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await telemetryAggregate.MarkAsAggregatedAsync(sensorIds, from, to, cancellationToken);
+
+        return Result.Success();
     }
 
-    public async Task CompressToDaysAsync(
+    public async Task<Result> CompressToDaysAsync(
         CancellationToken cancellationToken)
     {
         var to = new DateTime(
@@ -123,7 +128,7 @@ public sealed class CompressorService(
 
         if (data is null)
         {
-            return;
+            return Result.Success();
         }
 
         var sensorIds = new List<Guid>();
@@ -151,5 +156,7 @@ public sealed class CompressorService(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await telemetryAggregate.MarkAsAggregatedAsync(sensorIds, from, to, cancellationToken);
+
+        return Result.Success();
     }
 }
