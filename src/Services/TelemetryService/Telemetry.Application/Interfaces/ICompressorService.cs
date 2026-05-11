@@ -1,13 +1,15 @@
-﻿namespace Telemetry.Application.Interfaces;
+﻿using Contracts.Results;
+
+namespace Telemetry.Application.Interfaces;
 
 public interface ICompressorService
 {
-    Task CompressToDaysAsync(
+    Task<Result> CompressToDaysAsync(
         CancellationToken cancellationToken);
 
-    Task CompressToHoursAsync(
+    Task<Result> CompressToHoursAsync(
         CancellationToken cancellationToken);
 
-    Task CompressToMinutesAsync(
+    Task<Result> CompressToMinutesAsync(
         CancellationToken cancellationToken);
 }

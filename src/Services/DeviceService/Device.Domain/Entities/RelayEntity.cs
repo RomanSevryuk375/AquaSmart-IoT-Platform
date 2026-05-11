@@ -1,18 +1,22 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
+using Contracts.Results;
+using Device.Domain.DomainEvents.RelayEvents;
+using Device.Domain.Factories;
 
 namespace Device.Domain.Entities;
 
-public sealed class RelayEntity : IEntity
+public sealed class RelayEntity : AggregateRoot, IEntity
 {
     private RelayEntity(
         Guid id,
         Guid controllerId,
+        Guid userId,
         Guid? powerSensorId, 
         string name,
         ConnectionProtocolEnum connectionProtocol,
         string connectionAddress,
-        bool isNormalyOpen,
+        bool isNormallyOpen,
         RelayPurposeEnum purpose,
         bool isActive,
         bool isManual,
@@ -21,10 +25,11 @@ public sealed class RelayEntity : IEntity
         Id = id;
         ControllerId = controllerId;
         PowerSensorId = powerSensorId;
+        UserId = userId;
         Name = name;
         ConnectionProtocol = connectionProtocol;
         ConnectionAddress = connectionAddress;
-        IsNormalyOpen = isNormalyOpen;
+        IsNormallyOpen = isNormallyOpen;
         Purpose = purpose;
         IsActive = isActive;
         IsManual = isManual;
@@ -33,18 +38,20 @@ public sealed class RelayEntity : IEntity
     
     public Guid Id { get; private set; }
     public Guid ControllerId { get; private set; }
+    public Guid UserId { get; private set; }
     public Guid? PowerSensorId { get; private set; }
     public string Name { get; private set; }
     public ConnectionProtocolEnum ConnectionProtocol { get; private set; }
     public string ConnectionAddress { get; private set; }
-    public bool IsNormalyOpen { get; private set; }
+    public bool IsNormallyOpen { get; private set; }
     public RelayPurposeEnum Purpose { get; private set; }
     public bool IsActive { get; private set; }
     public bool IsManual { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public static (RelayEntity? relay, List<string>? errors) Create (
+    public static Result<RelayEntity> Create (
         Guid controllerId,
+        Guid userId,
         Guid? powerSensorId,
         string name,
         ConnectionProtocolEnum connectionProtocol,
@@ -61,6 +68,11 @@ public sealed class RelayEntity : IEntity
             errors.Add("controllerId must not be empty.");
         }
 
+        if (userId == Guid.Empty)
+        {
+            errors.Add("userId must not be empty.");
+        }
+
         if (string.IsNullOrWhiteSpace(name))
         {
             errors.Add("name must not be empty.");
@@ -73,12 +85,16 @@ public sealed class RelayEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return (null, errors);
+            return Result<RelayEntity>.Failure(
+                Error.Validation(
+                    "Relay.Invalid",
+                    string.Join("; ", errors)));
         }
 
         var relay = new RelayEntity(
             Guid.NewGuid(),
             controllerId,
+            userId,
             powerSensorId,
             name.Trim(),
             connectionProtocol,
@@ -89,10 +105,22 @@ public sealed class RelayEntity : IEntity
             isManual,
             DateTime.UtcNow);
 
-        return (relay, errors);
+        relay.RaiseEvent(new RelayCreatedDomainEvent
+        {
+            RelayId = relay.Id,
+            ControllerId = relay.ControllerId,
+            PowerSensorId = relay.PowerSensorId,
+            Name = relay.Name,
+            Purpose = relay.Purpose,
+            IsManual = relay.IsManual,
+            IsActive = relay.IsActive,
+            CreatedAt = relay.CreatedAt
+        });
+
+        return Result<RelayEntity>.Success(relay);
     }
 
-    public List<string>? Update(
+    public Result Update(
         Guid controllerId,
         ConnectionProtocolEnum connectionProtocol,
         string connectionAddress,
@@ -113,59 +141,67 @@ public sealed class RelayEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return errors;
+            return Result.Failure(
+                Error.Validation(
+                    "Relay.Invalid",
+                    string.Join("; ", errors)));
         }
 
         ControllerId = controllerId;
         ConnectionProtocol = connectionProtocol;
         ConnectionAddress = connectionAddress.Trim();
-        IsNormalyOpen = isNormalyOpen;
+        IsNormallyOpen = isNormalyOpen;
         Purpose = purpose;
 
-        return null;
+        RaiseEvent(new RelayUpdatedDomainEvent
+        {
+            RelayId = Id,
+            ControllerId = ControllerId,
+            PowerSensorId = PowerSensorId,
+            Name = Name,
+            Purpose = Purpose,
+            IsManual = IsManual,
+            IsActive = IsActive,
+            CreatedAt = CreatedAt
+        });
+
+        return Result.Success();
     }
 
-    public void ToggleState()
+    public Result SetName(string name)
     {
-        IsActive = !IsActive;
-    }
-
-    public List<string>? SetName(string name)
-    {
-        var errors = new List<string>();
-
         if (string.IsNullOrWhiteSpace(name))
         {
-            errors.Add("name must not be empty.");
-        }
-
-        if (errors.Count > 0)
-        {
-            return errors;
+            return Result.Failure(
+                Error.Validation(
+                    "Command.Invalid",
+                    "name must not be empty."));
         }
 
         Name = name;
 
-        return null;
+        return Result.Success();
     }
 
-    public List<string>? SetPowerSensor(Guid powerSensorId)
+    public Result SetPowerSensor(Guid powerSensorId)
     {
-        var errors = new List<string>();
-
         if (powerSensorId == Guid.Empty)
         {
-            errors.Add("powerSensorId must not be empty.");
-        }
-
-        if (errors.Count > 0)
-        {
-            return errors;
+            return Result.Failure(
+                Error.Validation(
+                    "Command.Invalid",
+                    "powerSensorId must not be empty."));
         }
 
         PowerSensorId = powerSensorId;
 
-        return null;
+        RaiseEvent(new SetRelayPowerSensorDomainEvent
+        {
+            RelayId = Id,
+            PowerSensorId = powerSensorId,
+        });
+
+        return Result.Success();
     }
 
     public void SetState(bool state)
@@ -176,10 +212,37 @@ public sealed class RelayEntity : IEntity
         }
 
         IsActive = state;
+
+        RaiseEvent(new RelayStateChangedDomainEvent
+        {
+            ControllerId = ControllerId,
+            RelayId = Id,
+            Action = StateEvaluatorFactory.EvaluateBool(IsActive),
+            ExpireAt = DateTime.UtcNow.AddMinutes(5)
+        });
     }
 
-    public void ToggleMode()
+    public void SetMode(bool mode)
     {
-        IsManual = !IsManual;
+        if (IsManual == mode)
+        {
+            return;
+        }
+
+        IsManual = mode;
+
+        RaiseEvent(new RelayModeChangedDomainEvent
+        {
+            RelayId = Id,
+            IsManual = IsManual
+        });
+    }
+
+    public void MarkAsDeleted()
+    {
+        RaiseEvent(new RelayDeletedDomainEvent
+        {
+            RelayId = Id,
+        });
     }
 }

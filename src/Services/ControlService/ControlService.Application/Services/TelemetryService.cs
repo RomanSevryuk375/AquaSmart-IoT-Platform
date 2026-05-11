@@ -89,7 +89,7 @@ public sealed class TelemetryService(
             relay.SetState(targetState.Value);
             await relayRepository.UpdateAsync(relay, cancellationToken);
 
-            await publishEndpoint.Publish(new ChangeRelayStateCommand
+            await publishEndpoint.Publish(new ChangeRelayStateEvent
             {
                 ControllerId = relay.ControllerId,
                 RelayId = relay.Id,

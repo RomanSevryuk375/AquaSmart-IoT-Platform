@@ -1,4 +1,5 @@
 ﻿using Contracts.Authorization;
+using Contracts.Results;
 using Device.Application.DTOs.Relay;
 using Device.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -27,7 +28,7 @@ public class RelaysController(
             take, 
             cancellationToken);
 
-        return Ok(result);
+        return this.ToActionResult(result);
     }
 
     [HttpGet("{id:guid}", Name = NameGetById)]
@@ -37,7 +38,7 @@ public class RelaysController(
     {
         var result = await relayService.GetRelayByIdAsync(id, cancellationToken);
 
-        return Ok(result);
+        return this.ToActionResult(result);
     }
 
     [HttpPost]
@@ -45,14 +46,17 @@ public class RelaysController(
         [FromBody] RelayRequestDto request,
         CancellationToken cancellationToken = default)
     {
-        var id = await relayService.AddRelayAsync(request, cancellationToken);
+        var result = await relayService.AddRelayAsync(request, cancellationToken);
 
-        var createdData = await relayService.GetRelayByIdAsync(id, cancellationToken);
+        if (result.IsFailure)
+        {
+            return this.ToActionResult(result);
+        }
 
         return CreatedAtRoute(
-            NameGetById, 
-            new { id },
-            createdData);
+            NameGetById,
+            new { id = result.Value.Id },
+            result.Value);
     }
 
     [HttpPut("{id:guid}")]
@@ -61,9 +65,9 @@ public class RelaysController(
         [FromBody] RelayUpdateRequestDto request,
         CancellationToken cancellationToken = default)
     {
-        await relayService.UpdateRelayAsync(id, request, cancellationToken);
+        var result = await relayService.UpdateRelayAsync(id, request, cancellationToken);
 
-        return NoContent();
+        return this.ToActionResult(result);
     }
 
     [HttpDelete("{id:guid}")]
@@ -71,8 +75,8 @@ public class RelaysController(
         [FromRoute] Guid id, 
         CancellationToken cancellationToken = default)
     {
-        await relayService.DeleteRelayAsync(id, cancellationToken);
+        var result = await relayService.DeleteRelayAsync(id, cancellationToken);
 
-        return NoContent();
+        return this.ToActionResult(result);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Device.Application.DTOs.Sensor;
 
-public record SensorFilterDto
+public sealed record SensorFilterDto
 {
     public Guid? ControllerId { get; init; }
     public SensorTypeEnum? Type { get; init; }

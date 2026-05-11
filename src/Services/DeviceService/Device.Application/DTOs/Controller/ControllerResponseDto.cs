@@ -1,5 +1,5 @@
 ﻿namespace Device.Application.DTOs.Controller;
-public record ControllerResponseDto
+public sealed record ControllerResponseDto
 {
     public Guid Id { get; init; }
     public string MacAddress { get; init; } = string.Empty;

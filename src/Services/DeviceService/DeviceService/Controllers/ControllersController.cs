@@ -9,15 +9,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace Device.API.Controllers;
 
 [ApiController]
-[Authorize(Policy = SubPermissions.DeviceControl)]
 [Route("api/device/v1/controllers")]
-public class ControllersController(
+public sealed class ControllersController(
     IControllerService controllerService,
     IDeviceConfigurationService deviceConfigurationService) : ControllerBase
 {
     private const string NameGetById = "GetControllerById";
 
     [HttpGet]
+    [Authorize(Policy = SubPermissions.DeviceControl)]
     public async Task<ActionResult<IReadOnlyList<ControllerResponseDto>>> GetAllControllersAsync(
         [FromQuery] ControllerFilterDto filter,
         [FromQuery] int skip = 0,
@@ -30,12 +30,13 @@ public class ControllersController(
             take,
             cancellationToken);
 
-        return Ok(result);
+        return this.ToActionResult(result);
     }
 
     [HttpGet("me/config")]
+    [AllowAnonymous]
     public async Task<ActionResult<ConfigResponseDto>> GetAllControllersAsync(
-        [FromBody] string macAddress,
+        [FromHeader(Name = "X-Mac-Address")] string macAddress,
         [FromHeader(Name = "X-Device-Token")] string deviceToken,
         CancellationToken cancellationToken = default)
     {
@@ -48,26 +49,33 @@ public class ControllersController(
     }
 
     [HttpGet("{id:guid}", Name = NameGetById)]
+    [Authorize(Policy = SubPermissions.DeviceControl)]
     public async Task<ActionResult<ControllerResponseDto>> GetControllerByIdAsync(
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
         var result = await controllerService.GetControllerByIdAsync(id, cancellationToken);
-        return Ok(result);
+        return this.ToActionResult(result);
     }
 
     [HttpPost]
+    [Authorize(Policy = SubPermissions.DeviceControl)]
     public async Task<ActionResult> AddControllerAsync(
         [FromBody] ControllerRequestDto request,
         CancellationToken cancellationToken = default)
     {
-        var response = await controllerService
+        var result = await controllerService
             .AddControllerAsync(request, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return this.ToActionResult(result);
+        }
 
         return CreatedAtRoute(
             NameGetById,
-            new { id = response.ControllerId },
-            response);
+            new { id = result.Value.ControllerId },
+            result.Value);
     }
 
     [HttpPost("{id:guid}/ping")]
@@ -80,27 +88,29 @@ public class ControllersController(
         var result = await controllerService
             .PingControllerAsync(id, deviceToken, cancellationToken);
 
-        return Ok(result);
+        return this.ToActionResult(result);
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Policy = SubPermissions.DeviceControl)]
     public async Task<ActionResult> UpdateControllerAsync(
         [FromRoute] Guid id,
         [FromBody] ControllerUpdateRequestDto request,
         CancellationToken cancellationToken = default)
     {
-        await controllerService.UpdateControllerAsync(id, request, cancellationToken);
+        var result = await controllerService.UpdateControllerAsync(id, request, cancellationToken);
 
-        return NoContent();
+        return this.ToActionResult(result);
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Policy = SubPermissions.DeviceControl)]
     public async Task<ActionResult> DeleteControllerAsync(
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        await controllerService.DeleteControllerAsync(id, cancellationToken);
+        var result = await controllerService.DeleteControllerAsync(id, cancellationToken);
 
-        return NoContent();
+        return this.ToActionResult(result);
     }
 }

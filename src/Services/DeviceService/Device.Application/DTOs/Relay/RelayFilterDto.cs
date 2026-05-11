@@ -2,7 +2,7 @@
 
 namespace Device.Application.DTOs.Relay;
 
-public record RelayFilterDto
+public sealed record RelayFilterDto
 {
     public Guid? ControllerId { get; init; }
     public RelayPurposeEnum? Purpose { get; init; }

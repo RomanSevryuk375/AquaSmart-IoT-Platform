@@ -55,7 +55,7 @@ public sealed class EcosystemEntity : IEntity
             errors.Add("controllerId must not be empty.");
         }
 
-        if (volume >= 0)
+        if (volume <= 0)
         {
             errors.Add("volume must be positive.");
         }

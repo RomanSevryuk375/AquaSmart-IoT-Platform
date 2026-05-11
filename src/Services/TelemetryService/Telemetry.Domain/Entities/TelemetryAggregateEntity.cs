@@ -1,5 +1,6 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
+using Contracts.Results;
 
 namespace Telemetry.Domain.Entities;
 
@@ -41,7 +42,7 @@ public sealed class TelemetryAggregateEntity : IEntity
     public bool IsAggregated { get; private set; }
 
 
-    public static (TelemetryAggregateEntity? aggregateData, List<string>? errors) Create(
+    public static Result<TelemetryAggregateEntity> Create(
         Guid sensorId,
         DateTime periodStart,
         PeriodTypeEnum period,
@@ -74,7 +75,10 @@ public sealed class TelemetryAggregateEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return (null, errors);
+            return Result<TelemetryAggregateEntity>.Failure(
+                Error.Validation(
+                    "AggregatedTelemetry.Invalid",
+                    string.Join("; ", errors)));
         }
 
         var aggregateData = new TelemetryAggregateEntity(
@@ -89,7 +93,7 @@ public sealed class TelemetryAggregateEntity : IEntity
             DateTime.UtcNow,
             false);
 
-        return (aggregateData, errors);
+        return Result<TelemetryAggregateEntity>.Success(aggregateData);
     }
     public void MarkAsAggregated()
     {

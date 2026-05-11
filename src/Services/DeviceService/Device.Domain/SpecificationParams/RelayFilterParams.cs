@@ -2,9 +2,10 @@
 
 namespace Device.Domain.SpecificationParams;
 
-public record RelayFilterParams
+public sealed record RelayFilterParams
 {
     public Guid? ControllerId { get; init; }
+    public Guid? UserId { get; init; }
     public RelayPurposeEnum? Purpose { get; init; }
     public bool? IsActive { get; init; }
     public bool? IsManual { get; init; }

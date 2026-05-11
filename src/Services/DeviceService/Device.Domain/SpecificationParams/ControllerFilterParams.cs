@@ -1,6 +1,6 @@
 ﻿namespace Device.Domain.SpecificationParams;
 
-public record ControllerFilterParams
+public sealed record ControllerFilterParams
 {
     public Guid? UserId { get; init; }
     public string? SearchTerm { get; init; }

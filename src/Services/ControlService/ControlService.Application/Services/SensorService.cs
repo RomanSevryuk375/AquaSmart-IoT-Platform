@@ -17,7 +17,7 @@ public sealed class SensorService(
     IUnitOfWork unitOfWork) : ISensorService
 {
     public async Task<ConsumerResult> ChangedStateAsync(
-        SensorStateChangedCommand sensor,
+        SensorStateChangedEvent sensor,
         CancellationToken cancellationToken)
     {
         var existingSensor = await sensorRepository.GetByIdAsync(
@@ -132,7 +132,7 @@ public sealed class SensorService(
 
         foreach (var rule in affectedRules)
         {
-            await publishEndpoint.Publish(new ChangeRelayStateCommand
+            await publishEndpoint.Publish(new ChangeRelayStateEvent
             {
                 ControllerId = existingEcosystem.ControllerId,
                 RelayId = rule.RelayId,

@@ -1,10 +1,12 @@
 ﻿using Contracts.Events.TelemetryEvents;
-using Contracts.Exceptions;
+using Contracts.Results;
 using Device.Application.DTOs.Telemetry;
 using Device.Application.Interfaces;
+using Device.Domain.Entities;
 using Device.Domain.Interfaces;
 using FluentValidation;
 using MassTransit;
+using Error = Contracts.Results.Error;
 
 namespace Device.Application.Services;
 
@@ -15,7 +17,7 @@ public sealed class TelemetryBatchService(
     IMyHasher myHasher,
     IValidator<TelemetryBatchRequest> batchValidator) : ITelemtryBatchService
 {
-    public async Task<TelemetryResponse> ProcessTelemetryBatchAsync(
+    public async Task<Result<TelemetryResponse>> ProcessTelemetryBatchAsync(
         TelemetryBatchRequest request,
         string deviceToken,
         CancellationToken cancellationToken)
@@ -24,22 +26,32 @@ public sealed class TelemetryBatchService(
 
         if (!validationResult.IsValid)
         {
-            return new TelemetryResponse
+            return Result<TelemetryResponse>.Success(new TelemetryResponse
             {
                 AcceptedCount = 0,
                 SkippedCount = request.Items?.Count ?? 0,
                 ValidationErrors = validationResult.Errors
                     .Select(e => $"{e.PropertyName}: {e.ErrorMessage}").ToList()
-            };
+            });
         }
 
         var existingController = await controllerRepository
-            .GetByMacAddressAsync(request.MacAddress, cancellationToken)
-            ?? throw new NotFoundException($"Controller {request.MacAddress} not found");
+            .GetByMacAddressAsync(request.MacAddress, cancellationToken);
+
+        if (existingController is null)
+        {
+            return Result<TelemetryResponse>
+                .Failure(Error.NotFound(
+                    "Controller.NotFound",
+                    $"{nameof(ControllerEntity)} {request.MacAddress} not found"));
+        }
 
         if (!myHasher.Verify(deviceToken, existingController.DeviceTokenHash))
         {
-            throw new InvalidCredentialsException("DeviceToken is not verified.");
+            return Result<TelemetryResponse>
+                .Failure(Error.Conflict(
+                    "Access.Denied",
+                    "You are not the owner of this controller"));
         }
 
         var existingSensors = await sensorRepository
@@ -82,6 +94,6 @@ public sealed class TelemetryBatchService(
             }, cancellationToken);
         }
 
-        return response;
+        return Result<TelemetryResponse>.Success(response);
     }
 }

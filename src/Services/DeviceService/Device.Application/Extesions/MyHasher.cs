@@ -2,7 +2,7 @@
 
 namespace Device.Application.Extesions;
 
-public class MyHasher : IMyHasher
+public sealed class MyHasher : IMyHasher
 {
     public string Generate(string token) =>
         BCrypt.Net.BCrypt.EnhancedHashPassword(token);

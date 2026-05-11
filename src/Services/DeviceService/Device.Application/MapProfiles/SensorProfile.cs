@@ -16,7 +16,7 @@ public sealed class SensorProfile : Profile
             .ForMember(desc => desc.SensorId,
                        opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<SensorEntity, SensorStateChangedCommand>()
+        CreateMap<SensorEntity, SensorStateChangedEvent>()
             .ForMember(desc => desc.SensorId,
                        opt => opt.MapFrom(src => src.Id));
 

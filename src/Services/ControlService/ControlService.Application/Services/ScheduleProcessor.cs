@@ -60,7 +60,7 @@ public class ScheduleProcessor(
 
                     await relayRepository.UpdateAsync(relay, cancellationToken);
 
-                    await publishEndpoint.Publish(new ChangeRelayStateCommand
+                    await publishEndpoint.Publish(new ChangeRelayStateEvent
                     {
                         RelayId = relay.Id,
                         Action = RuleActionEnum.SwitchOn,
@@ -69,7 +69,7 @@ public class ScheduleProcessor(
 
                 await messageScheduler.SchedulePublish(
                     DateTime.UtcNow.AddMinutes(schedule.DurationMin),
-                    new ChangeRelayStateCommand
+                    new ChangeRelayStateEvent
                     {
                         RelayId = relay.Id,
                         Action = RuleActionEnum.SwitchOff,

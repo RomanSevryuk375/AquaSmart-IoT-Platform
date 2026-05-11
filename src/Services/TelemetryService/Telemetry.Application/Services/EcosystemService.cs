@@ -22,19 +22,17 @@ public sealed class EcosystemService(
             return ConsumerResult.Success();
         }
 
-        var (newEcosystem, errors) = EcosystemEntity.Create(
+        var result = EcosystemEntity.Create(
             ecosystem.EcosystemId,
             ecosystem.ControllerId,
             ecosystem.UserId);
 
-        if (newEcosystem is null)
+        if (result.IsFailure)
         {
-            return ConsumerResult
-                .FatalError($"Failed to create {nameof(EcosystemEntity)}: " +
-                $"{string.Join(", ", errors!)}");
+            return ConsumerResult.FatalError($"{result.Error}");
         }
 
-        await ecosystemRepository.AddAsync(newEcosystem, cancellationToken);
+        await ecosystemRepository.AddAsync(result.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ConsumerResult.Success();

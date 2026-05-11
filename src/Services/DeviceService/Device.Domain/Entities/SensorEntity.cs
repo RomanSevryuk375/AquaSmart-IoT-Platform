@@ -1,13 +1,16 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
+using Contracts.Results;
+using Device.Domain.DomainEvents.SensorEvents;
 
 namespace Device.Domain.Entities;
 
-public sealed class SensorEntity : IEntity
+public sealed class SensorEntity : AggregateRoot, IEntity
 {
     private SensorEntity(
         Guid id,
         Guid controllerId,
+        Guid userId,
         string name,
         ConnectionProtocolEnum connectionProtocol,
         string connectionAddress,
@@ -18,6 +21,7 @@ public sealed class SensorEntity : IEntity
     {
         Id = id;
         ControllerId = controllerId;
+        UserId = userId;
         Name = name;
         ConnectionProtocol = connectionProtocol;
         ConnectionAddress = connectionAddress;
@@ -29,6 +33,7 @@ public sealed class SensorEntity : IEntity
 
     public Guid Id { get; private set; }
     public Guid ControllerId { get; private set; }
+    public Guid UserId { get; private set; }
     public string Name { get; private set; }
     public ConnectionProtocolEnum ConnectionProtocol { get; private set; }
     public string ConnectionAddress { get; private set; }
@@ -37,8 +42,9 @@ public sealed class SensorEntity : IEntity
     public string Unit { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public static (SensorEntity? sensor, List<string> errors) Create(
+    public static Result<SensorEntity> Create(
         Guid controllerId,
+        Guid userId,
         string name,
         ConnectionProtocolEnum connectionProtocol,
         string connectionAddress,
@@ -50,6 +56,11 @@ public sealed class SensorEntity : IEntity
         if (controllerId == Guid.Empty)
         {
             errors.Add("controllerId must not be empty.");
+        }
+
+        if (userId == Guid.Empty)
+        {
+            errors.Add("userId must not be empty.");
         }
 
         if (string.IsNullOrWhiteSpace(unit))
@@ -69,12 +80,16 @@ public sealed class SensorEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return (null, errors);
+            return Result<SensorEntity>.Failure(
+                Error.Validation(
+                    "Command.Invalid",
+                    string.Join("; ", errors)));
         }
 
         var sensor = new SensorEntity(
             Guid.NewGuid(),
             controllerId,
+            userId,
             name.Trim(),
             connectionProtocol,
             connectionAddress.Trim(),
@@ -83,10 +98,21 @@ public sealed class SensorEntity : IEntity
             unit.Trim(),
             DateTime.UtcNow);
 
-        return (sensor, errors);
+        sensor.RaiseEvent(new SensorCreatedDomainEvent
+        {
+            SensorId = sensor.Id,
+            ControllerId = sensor.ControllerId,
+            Name = sensor.Name,
+            Type = sensor.Type,
+            State = sensor.State,
+            Unit = sensor.Unit,
+            CreatedAt = sensor.CreatedAt,
+        });
+
+        return Result<SensorEntity>.Success(sensor);
     }
 
-    public List<string>? Update(
+    public Result Update(
         ConnectionProtocolEnum connectionProtocol,
         string connectionAddress,
         Guid controllerId,
@@ -112,7 +138,9 @@ public sealed class SensorEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return errors;
+            return Result.Failure(Error.Validation(
+                    "Command.Invalid",
+                    string.Join("; ", errors)));
         }
 
         ConnectionProtocol = connectionProtocol;
@@ -121,7 +149,18 @@ public sealed class SensorEntity : IEntity
         Type = type;
         Unit = unit.Trim();
 
-        return null;
+        RaiseEvent(new SensorUpdatedDomainEvent
+        {
+            SensorId = Id,
+            ControllerId = ControllerId,
+            Name = Name,
+            Type = Type,
+            State = State,
+            Unit = Unit,
+            CreatedAt = CreatedAt
+        });
+
+        return Result.Success();
     }
 
     public void SetState(SensorStateEnum state)
@@ -132,5 +171,19 @@ public sealed class SensorEntity : IEntity
         }
 
         State = state;
+
+        RaiseEvent(new SensorStateChangedDomainEvent
+        {
+            SensorId = Id,
+            State = State
+        });
+    }
+
+    public void MarkAsDeleted()
+    {
+        RaiseEvent(new SensorDeletedDomainEvent
+        {
+            SensorId = Id,
+        });
     }
 }

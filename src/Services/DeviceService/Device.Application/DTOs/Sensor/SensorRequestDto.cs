@@ -2,7 +2,7 @@
 
 namespace Device.Application.DTOs.Sensor;
 
-public record SensorRequestDto
+public sealed record SensorRequestDto
 {
     public Guid ControllerId { get; init; }
     public string Name { get; init; } = string.Empty;

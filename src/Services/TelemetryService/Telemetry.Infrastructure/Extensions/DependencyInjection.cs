@@ -1,5 +1,4 @@
-﻿using Contracts.Events.EcosystemEvents;
-using Contracts.Options;
+﻿using Contracts.Options;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,7 +9,10 @@ using Telemetry.Infrastructure.BackgroundJobs;
 using Telemetry.Infrastructure.Messaging;
 using Telemetry.Infrastructure.Messaging.EcosystemConsumers;
 using Telemetry.Infrastructure.Messaging.SensorConsumers;
-using Telemetry.Infrastructure.Repositories;
+using Telemetry.Infrastructure.Persistence;
+using Telemetry.Infrastructure.Persistence.Interceptors;
+using Telemetry.Infrastructure.Persistence.Outbox;
+using Telemetry.Infrastructure.Persistence.Repositories;
 using EcosystemCreatedConsumer = Telemetry.Infrastructure.Messaging.EcosystemConsumers.EcosystemCreatedConsumer;
 
 namespace Telemetry.Infrastructure.Extensions;
@@ -23,11 +25,20 @@ public static class DependencyInjection
         services.AddScoped<ISensorRepository, SensorRepository>();
         services.AddScoped<ITelemetryRawDataRepository, TelemetryRawDataRepository>();
         services.AddScoped<ITelemetryAggregateDataRepository, TelemetryAggregateDataRepository>();
+        services.AddScoped<IOutboxRepository, OutboxRepository>();
 
         var connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
-        services.AddDbContext<SystemDbContext>(options =>
+        services.AddDbContext<SystemDbContext>((sp, options) =>
         {
-            options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
+            var interceptor = sp.GetService<ConvertDomainEventsToOutboxMessagesInterceptor>();
+
+            options.UseNpgsql(connectionString)
+                   .UseSnakeCaseNamingConvention();
+
+            if (interceptor != null)
+            {
+                options.AddInterceptors(interceptor);
+            }
         });
 
         services.AddHealthChecks().AddNpgSql(connectionString!);
@@ -75,6 +86,13 @@ public static class DependencyInjection
                 .ForJob(cleanupKey)
                 .WithIdentity("Cleanup-trigger")
                 .WithCronSchedule("0 0 3 * * ?"));
+
+            var outboxKey = new JobKey(nameof(OutboxMessageProcessorJob));
+            options.AddJob<OutboxMessageProcessorJob>(opts => opts.WithIdentity(outboxKey));
+            options.AddTrigger(triggerOptions => triggerOptions
+                .ForJob(outboxKey)
+                .WithIdentity($"{outboxKey}-trigger")
+                .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever()));
         });
 
         services.AddQuartzHostedService(hostOptions 

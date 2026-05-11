@@ -1,8 +1,10 @@
 ﻿using Contracts.Abstractions;
+using Contracts.Results;
+using Device.Domain.DomainEvents.ControllerEvents;
 
 namespace Device.Domain.Entities;
 
-public sealed class ControllerEntity : IEntity
+public sealed class ControllerEntity : AggregateRoot, IEntity
 {
     private ControllerEntity(
         Guid id,
@@ -33,7 +35,7 @@ public sealed class ControllerEntity : IEntity
     public DateTime LastSeenAt { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public static (ControllerEntity? controller, List<string>? errors) Create(
+    public static Result<ControllerEntity> Create(
         Guid userId,
         string macAddress,
         string deviceTokenHash,
@@ -64,7 +66,10 @@ public sealed class ControllerEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return (null, errors);
+            return Result<ControllerEntity>.Failure(
+                Error.Validation(
+                    "Controller.Invalid", 
+                    string.Join("; ", errors)));
         }
 
         var controller = new ControllerEntity(
@@ -77,10 +82,10 @@ public sealed class ControllerEntity : IEntity
             DateTime.UtcNow,
             DateTime.UtcNow);
 
-        return (controller, errors);
+        return Result<ControllerEntity>.Success(controller);
     }
 
-    public List<string>? Update(
+    public Result Update(
         string macAddress,
         string name)
     {
@@ -98,13 +103,16 @@ public sealed class ControllerEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return errors;
+            return Result<ControllerEntity>.Failure(
+                 Error.Validation(
+                     "Controller.Invalid",
+                     string.Join("; ", errors)));
         }
 
         MacAddress = macAddress.Trim();
         Name = name.Trim();
         
-        return null;
+        return Result.Success();
     }
 
     public void RecordPing()
@@ -115,10 +123,27 @@ public sealed class ControllerEntity : IEntity
     public void ToggleState()
     {
         IsOnline = !IsOnline;
+
+        if (IsOnline is false)
+        {
+            RaiseEvent(new ControllerNotOnlineDomainEvent
+            {
+                UserId = UserId,
+                ControllerId = Id,
+                LastSeenAt = LastSeenAt,
+            });
+        }
     }
 
     public void SetOffline()
     {
         IsOnline = false;
+
+        RaiseEvent(new ControllerNotOnlineDomainEvent
+        {
+            UserId = UserId,
+            ControllerId = Id,
+            LastSeenAt = LastSeenAt,
+        });
     }
 }

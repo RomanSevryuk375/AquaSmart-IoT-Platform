@@ -1,7 +1,7 @@
 using Contracts.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using Telemetry.API.Extensions;
-using Telemetry.Infrastructure;
+using Telemetry.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 

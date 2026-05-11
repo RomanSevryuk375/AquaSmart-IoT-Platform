@@ -4,7 +4,8 @@ using Device.Domain.SpecificationParams;
 
 namespace Device.Domain.Specifications;
 
-public class ControllerFilterSpecification : BaseSpecification<ControllerEntity>
+public sealed class ControllerFilterSpecification 
+    : BaseSpecification<ControllerEntity>
 {
     public ControllerFilterSpecification(ControllerFilterParams @params) 
         : base(data => 

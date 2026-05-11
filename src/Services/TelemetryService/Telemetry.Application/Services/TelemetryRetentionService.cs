@@ -10,15 +10,15 @@ public sealed class TelemetryRetentionService(
 {
     public async Task CleanUpOldDataAsync(CancellationToken cancellationToken)
     {
-        var rawThreshold = DateTime.UtcNow.AddHours(-24);
+        var rawThreshold = DateTime.UtcNow.AddHours(-24); //TODO remove to options
         await rawRepo
             .DeleteOldRawDataAsync(rawThreshold, cancellationToken);
 
-        var minuteThreshold = DateTime.UtcNow.AddDays(-7);
+        var minuteThreshold = DateTime.UtcNow.AddDays(-7); //TODO remove to options
         await aggregateRepo
             .DeleteOldRawDataAsync(PeriodTypeEnum.Minute, minuteThreshold, cancellationToken);
 
-        var hourlyThreshold = DateTime.UtcNow.AddDays(-90);
+        var hourlyThreshold = DateTime.UtcNow.AddDays(-90); //TODO remove to options
         await aggregateRepo
             .DeleteOldRawDataAsync(PeriodTypeEnum.Hourly, hourlyThreshold, cancellationToken);
     }

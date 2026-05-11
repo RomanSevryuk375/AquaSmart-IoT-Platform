@@ -1,7 +1,9 @@
-﻿namespace Telemetry.Application.Interfaces;
+﻿using Contracts.Results;
+
+namespace Telemetry.Application.Interfaces;
 
 public interface ISensorStateCheckerService
 {
-    Task CheckStateAndNotify(
+    Task<Result> CheckStateAndNotify(
         CancellationToken cancellationToken);
 }

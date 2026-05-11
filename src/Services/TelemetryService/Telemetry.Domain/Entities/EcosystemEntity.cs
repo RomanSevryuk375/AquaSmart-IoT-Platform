@@ -1,4 +1,5 @@
 ﻿using Contracts.Abstractions;
+using Contracts.Results;
 
 namespace Telemetry.Domain.Entities;
 
@@ -21,7 +22,7 @@ public sealed class EcosystemEntity : IEntity
     public Guid UserId { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public static (EcosystemEntity? ecosystem, List<string>? errors) Create(
+    public static Result<EcosystemEntity> Create(
         Guid ecosystemId,
         Guid controllerId,
         Guid userId)
@@ -45,15 +46,18 @@ public sealed class EcosystemEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return (null, errors);
+            return Result<EcosystemEntity>.Failure(
+                Error.Validation(
+                    "Ecosystem.Invalid", 
+                    string.Join("; ", errors)));
         }
 
-        var ecosustem = new EcosystemEntity(
+        var ecosystem = new EcosystemEntity(
             ecosystemId,
             controllerId,
             userId,
             DateTime.UtcNow);
 
-        return (ecosustem, errors);
+        return Result<EcosystemEntity>.Success(ecosystem);
     }
 }

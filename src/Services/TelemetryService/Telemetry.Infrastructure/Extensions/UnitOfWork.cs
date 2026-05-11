@@ -1,4 +1,5 @@
 using Telemetry.Domain.Interfaces;
+using Telemetry.Infrastructure.Persistence;
 
 namespace Telemetry.Infrastructure.Extensions;
 

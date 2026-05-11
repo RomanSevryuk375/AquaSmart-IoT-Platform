@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Contracts.Results;
 using Device.Application.DTOs.Configurations;
+using Device.Application.Extesions;
 using Device.Application.Interfaces;
 using Device.Domain.Interfaces;
+using Microsoft.Extensions.Options;
 
 namespace Device.Application.Services;
 
@@ -10,8 +12,9 @@ public sealed class DeviceConfigurationService(
     IControllerRepository controllerRepository,
     ISensorRepository sensorRepository,
     IRelayRepository relayRepository,
-    IMyHasher myHasher,
-    IMapper mapper) : IDeviceConfigurationService
+    IMapper mapper,
+    IDeviceSecurityService securityService,
+     IOptions<DeviceSettings> deviceOptions) : IDeviceConfigurationService
 {
     public async Task<Result<ConfigResponseDto>> GetControllerConfigAsync(
         string macAddress,
@@ -23,16 +26,19 @@ public sealed class DeviceConfigurationService(
 
         if (controller is null)
         {
-            return Result<ConfigResponseDto>.Failure(
-                Error.NotFound("Controller.NotFound",
-                              $"Controller {macAddress} not found."));
+            return Result<ConfigResponseDto>
+                .Failure(Error.NotFound(
+                    "Controller.NotFound",
+                    "Controller not found"));
         }
 
-        if (!myHasher.Verify(deviceToken, controller.DeviceTokenHash))
+        var ownership = await securityService.EnsureDeviceAccessAsync(
+            controller.Id, deviceToken, cancellationToken);
+
+        if (ownership.IsFailure)
         {
-            return Result<ConfigResponseDto>.Failure(
-                Error.Conflict("Controller.Conflict",
-                              $"Controller have incorrect device token {deviceToken}."));
+            return Result<ConfigResponseDto>
+                .Failure(ownership.Error);
         }
 
         var relays = await relayRepository
@@ -44,8 +50,8 @@ public sealed class DeviceConfigurationService(
         return Result<ConfigResponseDto>.Success(
             new ConfigResponseDto
             {
-                SendIntervalMs = 5000,
-                MaxBatchSize = 50,
+                SendIntervalMs = deviceOptions.Value.DefaultSendIntervalMs,
+                MaxBatchSize = deviceOptions.Value.MaxConfigBatchSize,
                 Relays = mapper.Map<IReadOnlyList<RelayConfigDto>>(relays),
                 Sensors = mapper.Map<IReadOnlyList<SensorConfigDto>>(sensors),
             });

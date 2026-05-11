@@ -1,4 +1,5 @@
 ﻿using Contracts.Enums;
+using Contracts.Results;
 using MassTransit.Initializers;
 using Telemetry.Application.Interfaces;
 using Telemetry.Domain.Entities;
@@ -11,7 +12,7 @@ public sealed class CompressorService(
     ITelemetryRawDataRepository telemetryRaw,
     IUnitOfWork unitOfWork) : ICompressorService
 {
-    public async Task CompressToMinutesAsync(
+    public async Task<Result> CompressToMinutesAsync(
         CancellationToken cancellationToken)
     {
         var to = new DateTime(
@@ -29,12 +30,12 @@ public sealed class CompressorService(
 
         if (data is null)
         {
-            return;
+            return Result.Success();
         }
 
         foreach (var item in data)
         {
-            var (aggregate, _) = TelemetryAggregateEntity.Create(
+            var result = TelemetryAggregateEntity.Create(
                 item.SensorId,
                 from,
                 PeriodTypeEnum.Minute,
@@ -43,21 +44,23 @@ public sealed class CompressorService(
                 item.AvgValue,
                 item.Count);
 
-            if (aggregate is null)
+            if (result.IsFailure)
             {
                 continue;
             }
 
-            await telemetryAggregate.AddAsync(aggregate, cancellationToken);
+            await telemetryAggregate.AddAsync(result.Value, cancellationToken);
         }
 
         var sensorIds = data.Select(x => x.SensorId).ToList();
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await telemetryRaw.MarkAsAggregatedAsync(sensorIds, from, to, cancellationToken);
+
+        return Result.Success();
     }
 
-    public async Task CompressToHoursAsync(
+    public async Task<Result> CompressToHoursAsync(
         CancellationToken cancellationToken)
     {
         var to = new DateTime(
@@ -75,14 +78,14 @@ public sealed class CompressorService(
 
         if (data is null)
         {
-            return;
+            return Result.Success();
         }
 
         var sensorIds = new List<Guid>();
 
         foreach (var item in data)
         {
-            var (aggregate, _) = TelemetryAggregateEntity.Create(
+            var result = TelemetryAggregateEntity.Create(
                 item.SensorId,
                 from,
                 PeriodTypeEnum.Hourly,
@@ -91,21 +94,23 @@ public sealed class CompressorService(
                 item.AvgValue,
                 item.Count);
 
-            if (aggregate is null)
+            if (result.IsFailure)
             {
                 continue;
             }
 
-            await telemetryAggregate.AddAsync(aggregate, cancellationToken);
+            await telemetryAggregate.AddAsync(result.Value, cancellationToken);
 
             sensorIds.Add(item.SensorId);
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await telemetryAggregate.MarkAsAggregatedAsync(sensorIds, from, to, cancellationToken);
+
+        return Result.Success();
     }
 
-    public async Task CompressToDaysAsync(
+    public async Task<Result> CompressToDaysAsync(
         CancellationToken cancellationToken)
     {
         var to = new DateTime(
@@ -123,14 +128,14 @@ public sealed class CompressorService(
 
         if (data is null)
         {
-            return;
+            return Result.Success();
         }
 
         var sensorIds = new List<Guid>();
 
         foreach (var item in data)
         {
-            var (aggregate, _) = TelemetryAggregateEntity.Create(
+            var result = TelemetryAggregateEntity.Create(
                 item.SensorId,
                 from,
                 PeriodTypeEnum.Daily,
@@ -139,17 +144,19 @@ public sealed class CompressorService(
                 item.AvgValue,
                 item.Count);
 
-            if (aggregate is null)
+            if (result.IsFailure)
             {
                 continue;
             }
 
-            await telemetryAggregate.AddAsync(aggregate, cancellationToken);
+            await telemetryAggregate.AddAsync(result.Value, cancellationToken);
 
             sensorIds.Add(item.SensorId);
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await telemetryAggregate.MarkAsAggregatedAsync(sensorIds, from, to, cancellationToken);
+
+        return Result.Success();
     }
 }
