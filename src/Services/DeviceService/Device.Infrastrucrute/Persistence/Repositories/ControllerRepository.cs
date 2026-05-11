@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Device.Infrastructure.Persistence.Repositories;
 
-public sealed class ControllerRepository(DeviceDbContext dbContext) 
+public sealed class ControllerRepository(SystemDbContext dbContext) 
     : BaseRepository<ControllerEntity>(dbContext), IControllerRepository
 {
     public async Task<ControllerEntity?> GetByMacAddressAsync(

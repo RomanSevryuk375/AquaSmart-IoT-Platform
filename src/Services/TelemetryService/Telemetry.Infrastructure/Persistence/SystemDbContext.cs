@@ -3,7 +3,7 @@ using Telemetry.Domain.Entities;
 
 namespace Telemetry.Infrastructure.Persistence;
 
-public class TelemetryDbContext(DbContextOptions<TelemetryDbContext> options) : DbContext(options)
+public class SystemDbContext(DbContextOptions<SystemDbContext> options) : DbContext(options)
 {
     public DbSet<EcosystemEntity> Ecosystems { get; set; }
     public DbSet<SensorEntity> Sensors { get; set; }
@@ -12,6 +12,6 @@ public class TelemetryDbContext(DbContextOptions<TelemetryDbContext> options) : 
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(TelemetryDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(SystemDbContext).Assembly);
     }
 }

@@ -10,6 +10,7 @@ using Telemetry.Infrastructure.Messaging;
 using Telemetry.Infrastructure.Messaging.EcosystemConsumers;
 using Telemetry.Infrastructure.Messaging.SensorConsumers;
 using Telemetry.Infrastructure.Persistence;
+using Telemetry.Infrastructure.Persistence.Interceptors;
 using Telemetry.Infrastructure.Persistence.Outbox;
 using Telemetry.Infrastructure.Persistence.Repositories;
 using EcosystemCreatedConsumer = Telemetry.Infrastructure.Messaging.EcosystemConsumers.EcosystemCreatedConsumer;
@@ -26,10 +27,18 @@ public static class DependencyInjection
         services.AddScoped<ITelemetryAggregateDataRepository, TelemetryAggregateDataRepository>();
         services.AddScoped<IOutboxRepository, OutboxRepository>();
 
-        var connectionString = configuration.GetConnectionString(nameof(TelemetryDbContext));
-        services.AddDbContext<TelemetryDbContext>(options =>
+        var connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
+        services.AddDbContext<SystemDbContext>((sp, options) =>
         {
-            options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
+            var interceptor = sp.GetService<ConvertDomainEventsToOutboxMessagesInterceptor>();
+
+            options.UseNpgsql(connectionString)
+                   .UseSnakeCaseNamingConvention();
+
+            if (interceptor != null)
+            {
+                options.AddInterceptors(interceptor);
+            }
         });
 
         services.AddHealthChecks().AddNpgSql(connectionString!);

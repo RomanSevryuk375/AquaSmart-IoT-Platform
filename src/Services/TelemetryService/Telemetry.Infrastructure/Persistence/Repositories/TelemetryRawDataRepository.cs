@@ -4,7 +4,7 @@ using Telemetry.Domain.Interfaces;
 
 namespace Telemetry.Infrastructure.Persistence.Repositories;
 
-public sealed class TelemetryRawDataRepository(TelemetryDbContext dbContext)
+public sealed class TelemetryRawDataRepository(SystemDbContext dbContext)
     : BaseRepository<TelemetryRawEntity>(dbContext), ITelemetryRawDataRepository
 {
     public async Task<TelemetryRawEntity?> GetByExternalMessageIdAsync(

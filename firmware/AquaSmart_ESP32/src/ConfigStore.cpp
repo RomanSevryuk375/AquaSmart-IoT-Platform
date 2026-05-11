@@ -16,11 +16,11 @@ bool ConfigStore::begin() {
 }
 
 void ConfigStore::load(DeviceConfig& config) {
-    copyString(config.wifiSsid, sizeof(config.wifiSsid), preferences.getString("ssid", "Your_WiFi"));
-    copyString(config.wifiPass, sizeof(config.wifiPass), preferences.getString("pass", "Your_Pass"));
-    copyString(config.apiBaseUrl, sizeof(config.apiBaseUrl), preferences.getString("url", "http://192.168.1.100:5237"));
-    copyString(config.deviceToken, sizeof(config.deviceToken), preferences.getString("token", ""));
-    copyString(config.controllerId, sizeof(config.controllerId), preferences.getString("cid", ""));
+    copyString(config.wifiSsid, sizeof(config.wifiSsid), preferences.getString("ssid", "iPhone 15 Pro"));
+    copyString(config.wifiPass, sizeof(config.wifiPass), preferences.getString("pass", "12345678"));
+    copyString(config.apiBaseUrl, sizeof(config.apiBaseUrl), preferences.getString("url", "http://172.20.10.2:5237"));
+    copyString(config.deviceToken, sizeof(config.deviceToken), preferences.getString("token", "39392510-96dc-4aa4-bc8e-b01310aa9b50"));
+    copyString(config.controllerId, sizeof(config.controllerId), preferences.getString("cid", "3afee932-b839-439c-b31b-45d83bb5569b"));
     copyString(config.telemetryPath, sizeof(config.telemetryPath), preferences.getString("telemetryPath", DEFAULT_TELEMETRY_PATH));
     copyString(config.ds18WaterAddress, sizeof(config.ds18WaterAddress), preferences.getString("ds18water", ""));
     copyString(config.ds18SurfaceAddress, sizeof(config.ds18SurfaceAddress), preferences.getString("ds18surface", ""));

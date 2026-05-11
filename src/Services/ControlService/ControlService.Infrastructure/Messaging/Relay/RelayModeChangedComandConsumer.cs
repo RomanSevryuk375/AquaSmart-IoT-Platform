@@ -5,9 +5,9 @@ using MassTransit;
 namespace Control.Infrastructure.Messaging.Relay;
 
 public class RelayModeChangedComandConsumer(IRelayService service) 
-    : IConsumer<ChangeRelayModeCommand>
+    : IConsumer<RelayModeChangedEvent>
 {
-    public async Task Consume(ConsumeContext<ChangeRelayModeCommand> context)
+    public async Task Consume(ConsumeContext<RelayModeChangedEvent> context)
     {
         await service.ChangedModeAsync(
             context.Message, context.CancellationToken);

@@ -6,7 +6,7 @@ namespace Control.Application.Interfaces;
 public interface ISensorService
 {
     Task<ConsumerResult> ChangedStateAsync(
-        SensorStateChangedCommand sensor, 
+        SensorStateChangedEvent sensor, 
         CancellationToken cancellationToken);
 
     Task<ConsumerResult> CreateSensorAsync(

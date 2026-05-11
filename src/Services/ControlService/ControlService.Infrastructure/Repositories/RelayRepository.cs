@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Control.Infrastructure.Repositories;
 
-public sealed class RelayRepository(ControlDbContext dbContext)
+public sealed class RelayRepository(SystemDbContext dbContext)
     : BaseRepository<RelayEntity>(dbContext), IRelayRepository
 {
     public async Task<bool> ExistsAsync(

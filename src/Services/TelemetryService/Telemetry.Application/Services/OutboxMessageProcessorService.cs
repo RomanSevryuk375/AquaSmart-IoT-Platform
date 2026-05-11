@@ -25,9 +25,13 @@ namespace Telemetry.Application.Services
 
             foreach (var message in messages)
             {
-                var domainEvent = JsonConvert.DeserializeObject<IDomainEvent>(
-                    message.Content,
-                    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+                var type = Type.GetType(message.Type);
+                if (type == null)
+                {
+                    continue;
+                }
+
+                var domainEvent = JsonConvert.DeserializeObject(message.Content, type) as IDomainEvent;
 
                 if (domainEvent is null)
                 {

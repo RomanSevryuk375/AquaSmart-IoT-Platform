@@ -4,7 +4,7 @@ using Notification.Domain.Interfaces;
 
 namespace Notification.Infrastructure.Repositories;
 
-public sealed class NotificationRepository(NotificationDbContext dbContext)
+public sealed class NotificationRepository(SystemDbContext dbContext)
     : BaseRepository<NotificationEntity>(dbContext), INotificationRepository
 {
     public async Task<IReadOnlyList<NotificationEntity>> GetUnpublishedNotificationsAsync(

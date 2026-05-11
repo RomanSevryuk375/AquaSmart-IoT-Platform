@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Device.Infrastructure.Migrations
 {
     [DbContext(typeof(SystemDbContext))]
-    [Migration("20260427141002_AddRelayCommandsQueue")]
-    partial class AddRelayCommandsQueue
+    [Migration("20260511152412_AddOutbox")]
+    partial class AddOutbox
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -80,6 +80,48 @@ namespace Device.Infrastructure.Migrations
                         .HasDatabaseName("ix_controllers_user_id");
 
                     b.ToTable("controllers", (string)null);
+                });
+
+            modelBuilder.Entity("Device.Domain.Entities.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("content");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("text")
+                        .HasColumnName("error");
+
+                    b.Property<DateTime>("OccurredOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_on_utc");
+
+                    b.Property<DateTime?>("ProcessedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("processed_on_utc");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_outbox_messages");
+
+                    b.HasIndex("OccurredOnUtc")
+                        .HasDatabaseName("ix_outbox_messages_occurred_on_utc");
+
+                    b.ToTable("outbox_messages", (string)null);
                 });
 
             modelBuilder.Entity("Device.Domain.Entities.RelayCommandsQueueEntity", b =>
@@ -170,9 +212,9 @@ namespace Device.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_manual");
 
-                    b.Property<bool>("IsNormalyOpen")
+                    b.Property<bool>("IsNormallyOpen")
                         .HasColumnType("boolean")
-                        .HasColumnName("is_normaly_open");
+                        .HasColumnName("is_normally_open");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -188,12 +230,19 @@ namespace Device.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("purpose");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
                     b.HasKey("Id")
                         .HasName("pk_relays");
 
                     b.HasIndex("PowerSensorId")
                         .IsUnique()
                         .HasDatabaseName("ix_relays_power_sensor_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_relays_user_id");
 
                     b.HasIndex("ControllerId", "PowerSensorId", "ConnectionAddress")
                         .IsUnique()
@@ -247,8 +296,15 @@ namespace Device.Infrastructure.Migrations
                         .HasColumnType("character varying(32)")
                         .HasColumnName("unit");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
                     b.HasKey("Id")
                         .HasName("pk_sensors");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_sensors_user_id");
 
                     b.HasIndex("ControllerId", "ConnectionAddress")
                         .IsUnique()

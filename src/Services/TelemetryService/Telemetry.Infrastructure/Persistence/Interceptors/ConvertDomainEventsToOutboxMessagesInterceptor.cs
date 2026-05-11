@@ -32,7 +32,7 @@ public sealed class ConvertDomainEventsToOutboxMessagesInterceptor : SaveChanges
             {
                 Id = Guid.NewGuid(),
                 OccurredOnUtc = DateTime.UtcNow,
-                Type = domainEvent.GetType().Name,
+                Type = domainEvent.GetType().AssemblyQualifiedName!,
                 Content = JsonConvert.SerializeObject(
                     domainEvent,
                     new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All })

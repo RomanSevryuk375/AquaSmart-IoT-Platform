@@ -6,11 +6,11 @@ namespace Control.Application.Interfaces;
 public interface IRelayService
 {
     Task<ConsumerResult> ChangedModeAsync(
-        ChangeRelayModeCommand relay, 
+        RelayModeChangedEvent relay, 
         CancellationToken cancellationToken);
 
     Task<ConsumerResult> ChangedStateAsync(
-        ChangeRelayStateCommand relay, 
+        ChangeRelayStateEvent relay, 
         CancellationToken cancellationToken);
 
     Task<ConsumerResult> CreateRelayAsync(

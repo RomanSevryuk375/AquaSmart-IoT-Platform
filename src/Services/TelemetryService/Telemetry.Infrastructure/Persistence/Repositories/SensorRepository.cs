@@ -4,7 +4,7 @@ using Telemetry.Domain.Interfaces;
 
 namespace Telemetry.Infrastructure.Persistence.Repositories;
 
-public sealed class SensorRepository(TelemetryDbContext dbContext) 
+public sealed class SensorRepository(SystemDbContext dbContext) 
     : BaseRepository<SensorEntity>(dbContext), ISensorRepository
 {
     public async Task<bool> ExistsAsync(

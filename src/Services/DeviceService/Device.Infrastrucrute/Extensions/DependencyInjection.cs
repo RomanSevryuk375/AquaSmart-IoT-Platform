@@ -26,9 +26,9 @@ public static class DependencyInjection
         services.AddScoped<IRelayCommandsQueueRepository, RelayCommandsQueueRepository>();
         services.AddScoped<ISensorRepository, SensorRepository>();
 
-        var connectionString = configuration.GetConnectionString(nameof(DeviceDbContext));
+        var connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
 
-        services.AddDbContext<DeviceDbContext>((sp, options) =>
+        services.AddDbContext<SystemDbContext>((sp, options) =>
         {
             var interceptor = sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
 

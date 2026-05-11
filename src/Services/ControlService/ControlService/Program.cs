@@ -13,7 +13,7 @@ app.UseGlobalExceptionHandler();
 
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<ControlDbContext>();
+    var context = scope.ServiceProvider.GetRequiredService<SystemDbContext>();
     context.Database.Migrate();
 }
 

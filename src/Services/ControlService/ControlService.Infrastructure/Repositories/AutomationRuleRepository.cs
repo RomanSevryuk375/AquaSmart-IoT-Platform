@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Control.Infrastructure.Repositories;
 
-public sealed class AutomationRuleRepository(ControlDbContext dbContext)
+public sealed class AutomationRuleRepository(SystemDbContext dbContext)
         : BaseRepository<AutomationRuleEntity>(dbContext), IAutomationRuleRepository
 {
     public async Task<AutomationRuleEntity?> GetByIdWithConditionsAsync(

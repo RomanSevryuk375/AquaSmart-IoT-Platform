@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Device.Infrastructure.Migrations
 {
-    [DbContext(typeof(DeviceDbContext))]
+    [DbContext(typeof(SystemDbContext))]
     partial class SystemDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -77,6 +77,48 @@ namespace Device.Infrastructure.Migrations
                         .HasDatabaseName("ix_controllers_user_id");
 
                     b.ToTable("controllers", (string)null);
+                });
+
+            modelBuilder.Entity("Device.Domain.Entities.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("content");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("text")
+                        .HasColumnName("error");
+
+                    b.Property<DateTime>("OccurredOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_on_utc");
+
+                    b.Property<DateTime?>("ProcessedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("processed_on_utc");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_outbox_messages");
+
+                    b.HasIndex("OccurredOnUtc")
+                        .HasDatabaseName("ix_outbox_messages_occurred_on_utc");
+
+                    b.ToTable("outbox_messages", (string)null);
                 });
 
             modelBuilder.Entity("Device.Domain.Entities.RelayCommandsQueueEntity", b =>
@@ -167,9 +209,9 @@ namespace Device.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_manual");
 
-                    b.Property<bool>("IsNormalyOpen")
+                    b.Property<bool>("IsNormallyOpen")
                         .HasColumnType("boolean")
-                        .HasColumnName("is_normaly_open");
+                        .HasColumnName("is_normally_open");
 
                     b.Property<string>("Name")
                         .IsRequired()

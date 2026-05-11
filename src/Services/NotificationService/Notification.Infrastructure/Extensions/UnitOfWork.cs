@@ -2,7 +2,7 @@
 
 namespace Notification.Infrastructure.Extensions;
 
-public class UnitOfWork(NotificationDbContext dbContext) : IUnitOfWork
+public class UnitOfWork(SystemDbContext dbContext) : IUnitOfWork
 {
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {

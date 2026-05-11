@@ -5,7 +5,7 @@ using Telemetry.Domain.Interfaces;
 
 namespace Telemetry.Infrastructure.Persistence.Repositories;
 
-public sealed class TelemetryAggregateDataRepository(TelemetryDbContext dbContext) 
+public sealed class TelemetryAggregateDataRepository(SystemDbContext dbContext) 
     : BaseRepository<TelemetryAggregateEntity>(dbContext), ITelemetryAggregateDataRepository
 {
     public async Task<IReadOnlyList<TelemetrySummary>> GetSummaryForPeriodAsync(

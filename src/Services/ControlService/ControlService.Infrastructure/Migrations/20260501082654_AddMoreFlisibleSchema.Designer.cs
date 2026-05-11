@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Control.Infrastructure.Migrations
 {
-    [DbContext(typeof(ControlDbContext))]
+    [DbContext(typeof(SystemDbContext))]
     [Migration("20260501082654_AddMoreFlisibleSchema")]
     partial class AddMoreFlisibleSchema
     {

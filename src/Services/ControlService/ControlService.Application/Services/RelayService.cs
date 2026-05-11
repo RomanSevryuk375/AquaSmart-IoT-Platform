@@ -13,7 +13,7 @@ public sealed class RelayService(
     IUnitOfWork unitOfWork) : IRelayService
 {
     public async Task<ConsumerResult> ChangedModeAsync(
-        ChangeRelayModeCommand relay,
+        RelayModeChangedEvent relay,
         CancellationToken cancellationToken)
     {
         var existingRelay = await relayRepository
@@ -34,7 +34,7 @@ public sealed class RelayService(
     }
 
     public async Task<ConsumerResult> ChangedStateAsync(
-        ChangeRelayStateCommand relay,
+        ChangeRelayStateEvent relay,
         CancellationToken cancellationToken)
     {
         var existingRelay = await relayRepository

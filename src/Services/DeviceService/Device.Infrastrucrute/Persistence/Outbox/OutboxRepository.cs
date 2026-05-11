@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Device.Infrastructure.Persistence.Outbox;
 
-public sealed class OutboxRepository(DeviceDbContext dbContext)
+public sealed class OutboxRepository(SystemDbContext dbContext)
     : BaseRepository<OutboxMessage>(dbContext), IOutboxRepository
 {
     public async Task<IReadOnlyList<OutboxMessage>> GetPendingMessagesAsync(

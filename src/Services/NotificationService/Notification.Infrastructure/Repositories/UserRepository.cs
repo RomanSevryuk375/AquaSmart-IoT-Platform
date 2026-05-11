@@ -4,7 +4,7 @@ using Notification.Domain.Interfaces;
 
 namespace Notification.Infrastructure.Repositories;
 
-public sealed class UserRepository(NotificationDbContext dbContext)
+public sealed class UserRepository(SystemDbContext dbContext)
     : BaseRepository<UserEntity>(dbContext), IUserRepository
 {
     public async Task<bool> ExistsAsync(

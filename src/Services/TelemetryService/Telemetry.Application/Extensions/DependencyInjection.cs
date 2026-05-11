@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 using Telemetry.Application.Interfaces;
 using Telemetry.Application.Services;
 
@@ -16,6 +17,8 @@ public static class DependencyInjection
         services.AddScoped<ITelemetryDataService, TelemetryDataService>();
         services.AddScoped<ITelemetryRetentionService, TelemetryRetentionService>();
         services.AddScoped<IDataAggregateService, DataAggregateService>();
+
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
         return services;
     }

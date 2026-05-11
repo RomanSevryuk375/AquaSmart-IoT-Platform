@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Device.Infrastructure.Persistence.Repositories;
 
-public sealed class RelayRepository(DeviceDbContext dbContext)
+public sealed class RelayRepository(SystemDbContext dbContext)
     : BaseRepository<RelayEntity>(dbContext), IRelayRepository
 {
     public async Task<bool> ExistsAsync(

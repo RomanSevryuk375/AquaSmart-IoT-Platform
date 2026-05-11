@@ -328,15 +328,20 @@ void initializeRuntimeIdentity() {
 
 void setup() {
     Serial.begin(115200);
+    ConfigStore::begin();
+    ConfigStore::reset(); 
     delay(200);
     Serial.println("[BOOT] AquaSmart firmware");
 
     changeState(SystemState::LOAD_CONFIG);
 
+    WiFi.mode(WIFI_STA);
+    WiFi.disconnect();
     Wire.begin(PIN_I2C_SDA, PIN_I2C_SCL);
     ConfigStore::begin();
     ConfigStore::load(deviceConfig);
     ConfigStore::save(deviceConfig);
+    
 
     changeState(SystemState::INIT_HARDWARE);
 

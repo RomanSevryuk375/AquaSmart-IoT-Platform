@@ -19,8 +19,8 @@ public static class DependencyInjection
         services.Configure<TelegramOptions>(configuration.GetSection(TelegramOptions.SectionName));
         services.Configure<EmailOptions>(configuration.GetSection(EmailOptions.SectionName));
 
-        var connectionSting = configuration.GetConnectionString(nameof(NotificationDbContext));
-        services.AddDbContext<NotificationDbContext>(options =>
+        var connectionSting = configuration.GetConnectionString(nameof(SystemDbContext));
+        services.AddDbContext<SystemDbContext>(options =>
         {
             options.UseNpgsql(connectionSting).UseSnakeCaseNamingConvention();
         });
