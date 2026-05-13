@@ -2,7 +2,7 @@
 
 namespace Control.Domain.SpecificationParams;
 
-public record SensorFilterParams
+public sealed record SensorFilterParams
 {
     public Guid? EcosystemId { get; init; }
     public Guid? ControllerId { get; init; }

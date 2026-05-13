@@ -2,7 +2,7 @@
 
 namespace Control.Domain.SpecificationParams;
 
-public record RelayFilterParams
+public sealed record RelayFilterParams
 {
     public Guid? EcosystemId { get; init; }
     public Guid? ControllerId { get; init; }

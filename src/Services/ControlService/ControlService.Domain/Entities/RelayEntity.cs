@@ -1,9 +1,12 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
+using Contracts.Results;
+using Control.Domain.Events;
+using Control.Domain.Factories;
 
 namespace Control.Domain.Entities;
 
-public class RelayEntity : IEntity
+public sealed class RelayEntity : AggregateRoot, IEntity
 {
     private RelayEntity(
         Guid id,
@@ -36,7 +39,7 @@ public class RelayEntity : IEntity
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public static (RelayEntity? relay, List<string> errors) Create(
+    public static Result<RelayEntity> Create(
         Guid id,
         Guid ecosystemId,
         Guid controllerId,
@@ -76,7 +79,10 @@ public class RelayEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return (null, errors);
+            return Result<RelayEntity>.Failure(
+                Error.Validation(
+                    "Relay.Invalid",
+                    string.Join("; ", errors)));
         }
 
         var relay = new RelayEntity(
@@ -90,7 +96,7 @@ public class RelayEntity : IEntity
             isActive,
             createdAt);
 
-        return (relay, errors);
+        return Result<RelayEntity>.Success(relay);
     }
 
     public void SetPurpose(RelayPurposeEnum purpose)
@@ -106,11 +112,25 @@ public class RelayEntity : IEntity
     public void SetMode(bool mode)
     {
         IsManual = mode;
+
+        RaiseEvent(new RelayModeChangedDomainEvent
+        {
+            RelayId = Id,
+            IsManual = IsManual,
+        });
     }
 
-    public void SetState(bool state)
+    public void SetState(bool state, DateTime expireAt)
     {
         IsActive = state;
+
+        RaiseEvent(new RelayStateChangedDomainEvent
+        {
+            ControllerId = ControllerId,
+            RelayId = Id,
+            Action = StateEvaluatorFactory.EvaluateBool(state),
+            ExpireAt = expireAt,
+        });
     }
 
     public void SetPowerSensorId(Guid powerSensorId)
@@ -118,7 +138,7 @@ public class RelayEntity : IEntity
         PowerSensorId = powerSensorId;
     }
 
-    public List<string>? SetName(string name)
+    public Result SetName(string name)
     {
         var errors = new List<string>();
 
@@ -129,11 +149,13 @@ public class RelayEntity : IEntity
 
         if (errors.Count != 0)
         {
-            return errors;
+            return Result.Failure(Error.Validation(
+                "Relay.Invalid",
+                string.Join("; ", errors)));
         }
 
         Name = name;
 
-        return null;
+        return Result.Success();
     }
 }

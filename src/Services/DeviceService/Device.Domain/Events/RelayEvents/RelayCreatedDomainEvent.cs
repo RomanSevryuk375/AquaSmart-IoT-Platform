@@ -1,7 +1,7 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
 
-namespace Device.Domain.DomainEvents.RelayEvents;
+namespace Device.Domain.Events.RelayEvents;
 
 public sealed record RelayCreatedDomainEvent : IDomainEvent
 {

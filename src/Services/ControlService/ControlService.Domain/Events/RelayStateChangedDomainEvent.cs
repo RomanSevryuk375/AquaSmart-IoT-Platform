@@ -1,7 +1,7 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
 
-namespace Device.Domain.Events.RelayEvents;
+namespace Control.Domain.Events;
 
 public sealed record RelayStateChangedDomainEvent : IDomainEvent
 {

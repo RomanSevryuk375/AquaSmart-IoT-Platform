@@ -1,9 +1,10 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
+using Contracts.Results;
 
 namespace Control.Domain.Entities;
 
-public class SensorEntity : IEntity
+public sealed class SensorEntity : IEntity
 {
     private SensorEntity(
         Guid id, 
@@ -34,7 +35,7 @@ public class SensorEntity : IEntity
     public double LastValue { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public static (SensorEntity? sensor, List<string> errors) Create(
+    public static Result<SensorEntity> Create(
         Guid id,
         Guid controllerId,
         Guid ecosystemId,
@@ -67,7 +68,10 @@ public class SensorEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return (null, errors);
+            return Result<SensorEntity>.Failure(
+                Error.Validation(
+                    "Sensor.Invalid",
+                    string.Join("; ", errors)));
         }
 
         var sensor = new SensorEntity(
@@ -80,7 +84,7 @@ public class SensorEntity : IEntity
             0.0,
             createdAt);
 
-        return (sensor, errors);
+        return Result<SensorEntity>.Success(sensor);
     }
 
     public void SetState(SensorStateEnum state)
@@ -108,7 +112,7 @@ public class SensorEntity : IEntity
         Type = type;
     }
 
-    public List<string>? SetName(string name)
+    public Result SetName(string name)
     {
         var errors = new List<string>();
 
@@ -119,11 +123,13 @@ public class SensorEntity : IEntity
 
         if (errors.Count != 0)
         {
-            return errors;
+            return Result.Failure(Error.Validation(
+                "Sensor.Invalid",
+                string.Join("; ", errors)));
         }
 
         Name = name;
 
-        return null;
+        return Result.Success();
     }
 }

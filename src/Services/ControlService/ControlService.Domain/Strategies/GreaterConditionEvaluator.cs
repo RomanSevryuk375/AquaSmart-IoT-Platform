@@ -2,7 +2,7 @@
 
 namespace Control.Domain.Strategies;
 
-public class GreaterConditionEvaluator : IRuleEvaluator
+public sealed class GreaterConditionEvaluator : IRuleEvaluator
 {
     public bool? Evaluate(double currentValue, double threshold, double hysteresis)
     {
