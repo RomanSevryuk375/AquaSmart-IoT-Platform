@@ -1,8 +1,9 @@
 ﻿using Contracts.Abstractions;
+using Contracts.Results;
 
 namespace Control.Domain.Entities;
 
-public class VacationModeEntity : IEntity
+public sealed class VacationModeEntity : IEntity
 {
     private VacationModeEntity(
         Guid id, 
@@ -30,7 +31,7 @@ public class VacationModeEntity : IEntity
     public double CalculatedFeed { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public static (VacationModeEntity? vacation, List<string> errors) Create(
+    public static Result<VacationModeEntity> Create(
        Guid aquariumId,
        DateTime startDate,
        DateTime endDate,
@@ -56,7 +57,10 @@ public class VacationModeEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return (null, errors);
+            return Result<VacationModeEntity>.Failure(
+                Error.Validation(
+                    "VacationMode.Invalid",
+                    string.Join("; ", errors)));
         }
 
         var vacation = new VacationModeEntity(
@@ -68,10 +72,10 @@ public class VacationModeEntity : IEntity
             calculatedFeed,
             DateTime.UtcNow);
 
-        return (vacation, errors);
+        return Result<VacationModeEntity>.Success(vacation);
     }
 
-    public List<string>? Update(
+    public Result Update(
         DateTime startDate,
         DateTime endDate,
         bool isActive,
@@ -91,7 +95,9 @@ public class VacationModeEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return errors;
+            return Result.Failure(Error.Validation(
+                "VacationMode.Invalid",
+                string.Join("; ", errors)));
         }
 
         StartDate = startDate;
@@ -99,7 +105,7 @@ public class VacationModeEntity : IEntity
         IsActive = isActive;
         CalculatedFeed = calculatedFeed;
 
-        return null;
+        return Result.Success();
     }
 
     public void SetActive(bool status)
@@ -107,28 +113,32 @@ public class VacationModeEntity : IEntity
         IsActive = status;
     }
 
-    public string? SetTiming(DateTime startDate, DateTime endDate)
+    public Result SetTiming(DateTime startDate, DateTime endDate)
     {
         if (endDate <= startDate)
         {
-            return("EndDate must be later than StartDate.");
+            return Result.Failure(Error.Validation(
+                "VacationMode.Invalid",
+                "EndDate must be later than StartDate."));
         }
 
         StartDate = startDate;
         EndDate = endDate;
 
-        return null;
+        return Result.Success();
     }
 
-    public string? SetFeedSize(double calculatedFeed)
+    public Result SetFeedSize(double calculatedFeed)
     {
         if (calculatedFeed < 0)
         {
-            return("CalculatedFeed cannot be negative.");
+            return Result.Failure(Error.Validation(
+                "VacationMode.Invalid",
+                "CalculatedFeed cannot be negative."));
         }
 
         CalculatedFeed = calculatedFeed;
 
-        return null;
+        return Result.Success();
     }
 }

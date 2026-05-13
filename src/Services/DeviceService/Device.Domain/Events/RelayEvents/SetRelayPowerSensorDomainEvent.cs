@@ -1,6 +1,6 @@
 ﻿using Contracts.Abstractions;
 
-namespace Device.Domain.DomainEvents.RelayEvents;
+namespace Device.Domain.Events.RelayEvents;
 
 public sealed record SetRelayPowerSensorDomainEvent : IDomainEvent
 {

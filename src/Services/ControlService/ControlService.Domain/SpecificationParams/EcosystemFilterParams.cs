@@ -2,7 +2,7 @@
 
 namespace Control.Domain.SpecificationParams;
 
-public record EcosystemFilterParams
+public sealed record EcosystemFilterParams
 {
     public Guid? UserId { get; init; }
     public string? Name { get; init; } = string.Empty;

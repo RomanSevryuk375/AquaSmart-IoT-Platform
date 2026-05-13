@@ -2,7 +2,7 @@
 
 namespace Control.Domain.Strategies;
 
-public class EqualConditionEvaluator : IRuleEvaluator
+public sealed class EqualConditionEvaluator : IRuleEvaluator
 {
     public bool? Evaluate(double currentValue, double threshold, double hysteresis)
     {

@@ -1,5 +1,6 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
+using Contracts.Results;
 
 namespace Control.Domain.Entities;
 
@@ -36,7 +37,7 @@ public class AutomationRuleEntity : IEntity
 
     public virtual ICollection<RuleConditionEntity> Conditions { get; private set; } = [];
 
-    public static (AutomationRuleEntity? rule, List<string> errors) Create(
+    public static Result<AutomationRuleEntity> Create(
         Guid ecosystemId,
         string name,
         Guid relayId,
@@ -63,7 +64,10 @@ public class AutomationRuleEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return (null, errors);
+            return Result<AutomationRuleEntity>.Failure(
+                Error.Validation(
+                    "Rule.Invalid",
+                    string.Join("; ", errors)));
         }
 
         var rule = new AutomationRuleEntity(
@@ -76,10 +80,10 @@ public class AutomationRuleEntity : IEntity
             isActive,
             DateTime.UtcNow);
 
-        return (rule, errors);
+        return Result<AutomationRuleEntity>.Success(rule);
     }
 
-    public List<string>? Update (
+    public Result Update (
         string name,
         Guid relayId,
         OperatorEnum @operator,
@@ -99,7 +103,9 @@ public class AutomationRuleEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return errors;
+            return Result.Failure(Error.Validation(
+                     "Rule.Invalid",
+                     string.Join("; ", errors)));
         }
 
         Name = name;
@@ -107,7 +113,7 @@ public class AutomationRuleEntity : IEntity
         Operator = @operator;
         Action = action;
 
-        return null;
+        return Result.Success();
     }
 
     public void SetAction(RuleActionEnum action)

@@ -1,8 +1,9 @@
 ﻿using Contracts.Abstractions;
+using Contracts.Results;
 
 namespace Control.Domain.Entities;
 
-public class ScheduleEntity : IEntity
+public sealed class ScheduleEntity : IEntity
 {
     private ScheduleEntity(
         Guid id, 
@@ -33,7 +34,7 @@ public class ScheduleEntity : IEntity
     public bool IsEnable { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public static (ScheduleEntity? schedule, List<string> errors) Create(
+    public static Result<ScheduleEntity> Create(
         Guid ecosystemId,
         Guid relayId,
         string cronExpression,
@@ -70,7 +71,10 @@ public class ScheduleEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return (null, errors);
+            return Result<ScheduleEntity>.Failure(
+                Error.Validation(
+                    "Schedule.Invalid",
+                    string.Join("; ", errors)));
         }
 
         var schedule = new ScheduleEntity(
@@ -83,10 +87,10 @@ public class ScheduleEntity : IEntity
             isEnable,
             DateTime.UtcNow);
 
-        return (schedule, errors);
+        return Result<ScheduleEntity>.Success(schedule);
     }
 
-    public List<string>? Update(
+    public Result Update(
         string cronExpression,
         double durationMin,
         bool isFadeMode,
@@ -111,7 +115,9 @@ public class ScheduleEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return errors;
+            return Result.Failure(Error.Validation(
+                "Schedule.Invalid",
+                string.Join("; ", errors)));
         }
 
         CronExpression = cronExpression;
@@ -119,6 +125,6 @@ public class ScheduleEntity : IEntity
         IsFadeMode = isFadeMode;
         IsEnable = isEnable;
 
-        return null;
+        return Result.Success();
     }
 }

@@ -1,9 +1,11 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
+using Contracts.Results;
+using Control.Domain.Events;
 
 namespace Control.Domain.Entities;
 
-public sealed class EcosystemEntity : IEntity
+public sealed class EcosystemEntity : AggregateRoot, IEntity
 {
     private EcosystemEntity(
         Guid id, 
@@ -31,7 +33,7 @@ public sealed class EcosystemEntity : IEntity
     public Guid ControllerId { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public static (EcosystemEntity? aquarium, List<string> errors) Create(
+    public static Result<EcosystemEntity> Create(
         Guid userId,
         EcosystemTypeEnum type,
         string name,
@@ -62,10 +64,13 @@ public sealed class EcosystemEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return (null, errors);
+            return Result<EcosystemEntity>.Failure(
+                Error.Validation(
+                    "Ecosystem.Invalid",
+                    string.Join("; ", errors)));
         }
 
-        var aquarium = new EcosystemEntity(
+        var ecosystem = new EcosystemEntity(
             Guid.NewGuid(),
             userId,
             type,
@@ -74,10 +79,18 @@ public sealed class EcosystemEntity : IEntity
             controllerId,
             DateTime.UtcNow);
 
-        return (aquarium, errors);
+        ecosystem.RaiseEvent(new EcosystemCreatedDomainEvent
+        {
+            EcosystemId = ecosystem.Id,
+            Name = ecosystem.Name,
+            UserId = ecosystem.UserId,
+            ControllerId = ecosystem.ControllerId,
+        });
+
+        return Result<EcosystemEntity>.Success(ecosystem);
     }
 
-    public List<string>? SetName(string name)
+    public Result SetName(string name)
     {
         var errors = new List<string>();
 
@@ -88,15 +101,26 @@ public sealed class EcosystemEntity : IEntity
 
         if (errors.Count != 0)
         {
-            return errors;
+            return Result.Failure(Error.Validation(
+                "Ecosystem.Invalid",
+                string.Join("; ", errors)));
         }
 
         Name = name;
 
-        return null;
+        RaiseEvent(new EcosystemUdatedDominEvent
+        {
+            EcosystemId = Id,
+            UserId = UserId,
+            Name = Name,
+            ControllerId = ControllerId,
+            CreatedAt = CreatedAt,
+        });
+
+        return Result.Success();
     }
 
-    public List<string>? SetVolume(double? volume)
+    public Result SetVolume(double? volume)
     {
         var errors = new List<string>();
 
@@ -107,11 +131,13 @@ public sealed class EcosystemEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return errors;
+            return Result.Failure(Error.Validation(
+                "Ecosystem.Invalid",
+                string.Join("; ", errors)));
         }
 
         Volume = volume;
 
-        return null;
+        return Result.Success();
     }
 }

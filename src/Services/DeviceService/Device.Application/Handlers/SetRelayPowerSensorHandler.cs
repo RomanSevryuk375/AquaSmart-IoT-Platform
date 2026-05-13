@@ -1,5 +1,5 @@
 ﻿using Contracts.Events.RelayEvents;
-using Device.Domain.DomainEvents.RelayEvents;
+using Device.Domain.Events.RelayEvents;
 using MassTransit;
 using MediatR;
 

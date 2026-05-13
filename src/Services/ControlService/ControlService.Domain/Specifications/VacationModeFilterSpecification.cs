@@ -4,7 +4,8 @@ using Control.Domain.SpecificationParams;
 
 namespace Control.Domain.Specifications;
 
-public class VacationModeFilterSpecification : BaseSpecification<VacationModeEntity>
+public sealed class VacationModeFilterSpecification 
+    : BaseSpecification<VacationModeEntity>
 {
     public VacationModeFilterSpecification(VacationModeFilterParams @params) 
         : base(data => 

@@ -1,10 +1,9 @@
 ﻿using Contracts.Abstractions;
 
-namespace Contracts.Events.EcosystemEvents;
+namespace Control.Domain.Events;
 
-public sealed record EcosystemCreatedEvent
+public sealed record EcosystemCreatedDomainEvent : IDomainEvent
 {
-    public Guid EventId { get; init; } = Guid.NewGuid();
     public DateTime OccurredOn { get; init; } = DateTime.UtcNow;
     public Guid EcosystemId { get; init; }
     public string Name { get; init; } = string.Empty;
