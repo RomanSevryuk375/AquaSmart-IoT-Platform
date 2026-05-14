@@ -1,5 +1,4 @@
 ﻿using Contracts.Enums;
-using Control.Domain.Entities;
 
 namespace Control.Application.DTOs.AutomationRule;
 

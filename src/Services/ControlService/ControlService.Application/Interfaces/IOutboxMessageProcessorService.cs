@@ -2,7 +2,7 @@
 
 namespace Control.Application.Interfaces;
 
-public interface IScheduleProcessor
+public interface IOutboxMessageProcessorService
 {
     Task<Result> ProcessAsync(CancellationToken cancellationToken);
 }

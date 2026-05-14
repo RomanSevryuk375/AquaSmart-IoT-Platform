@@ -13,11 +13,10 @@ namespace Control.Application.Services;
 public sealed class AutomationRuleService(
     IAutomationRuleRepository ruleRepository,
     IRelayRepository relayRepository,
-    IEcosystemRepository ecosystemRepository,
+    ISecureService secureService,
     IUnitOfWork unitOfWork,
     IMapper mapper,
-    IValidator<AutomationRuleRequestDto> validator,
-    IUserContext userContext) : IAutomationRuleService
+    IValidator<AutomationRuleRequestDto> validator) : IAutomationRuleService
 {
     public async Task<Result<IReadOnlyList<AutomationRuleResponseDto>>> GetAllRulesAsync(
         AutomationRuleFilterDto filter,
@@ -36,16 +35,13 @@ public sealed class AutomationRuleService(
 
         if (filter.EcosystemId.HasValue)
         {
-            var ecosystem = await ecosystemRepository
-                .GetByIdAsync(filter.EcosystemId.Value, cancellationToken);
+            var ownership = await secureService
+                .EnsureUserOwnsEcosystemAsync(filter.EcosystemId.Value, cancellationToken);
 
-            if (ecosystem == null || 
-                ecosystem.UserId != userContext.UserId)
+            if (ownership.IsFailure)
             {
                 return Result<IReadOnlyList<AutomationRuleResponseDto>>
-                    .Failure(Error.Conflict(
-                        "Access.Denied", 
-                        "Forbidden or ecosystem not found"));
+                    .Failure(ownership.Error);
             }
         }
         else
@@ -81,23 +77,13 @@ public sealed class AutomationRuleService(
                     $"Rule {ruleId} not found"));
         }
 
-        var ecosystem = await ecosystemRepository
-        .GetByIdAsync(rule.EcosystemId, cancellationToken);
+        var ownership = await secureService
+                .EnsureUserOwnsEcosystemAsync(rule.EcosystemId, cancellationToken);
 
-        if (ecosystem is null)
+        if (ownership.IsFailure)
         {
             return Result<AutomationRuleResponseDto>
-                .Failure(Error.NotFound(
-                    "Ecosystem.NotFound",
-                    $"Ecosystem {rule.EcosystemId} not found. "));
-        }
-
-        if (ecosystem.UserId != userContext.UserId)
-        {
-            return Result<AutomationRuleResponseDto>
-                .Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this ecosystem"));
+                .Failure(ownership.Error);
         }
 
         return Result<AutomationRuleResponseDto>
@@ -108,25 +94,24 @@ public sealed class AutomationRuleService(
         AutomationRuleRequestDto request,
         CancellationToken cancellationToken)
     {
-        validator.ValidateAndThrow(request);
+        var validationResult = await validator
+            .ValidateAsync(request, cancellationToken);
 
-        var existingEcosystem = await ecosystemRepository
-            .GetByIdAsync(request.EcosystemId, cancellationToken);
-
-        if (existingEcosystem is null)
+        if (!validationResult.IsValid)
         {
             return Result<Guid>
                 .Failure(Error.NotFound(
-                    "Ecosystem.NotFound",
-                    $"Ecosystem {request.EcosystemId} not found"));
+                    "Rule.Invalid",
+                    string.Join(", ", validationResult.Errors)));
         }
 
-        if (existingEcosystem.UserId != userContext.UserId)
+        var ownership = await secureService
+                .EnsureUserOwnsEcosystemAsync(request.EcosystemId, cancellationToken);
+
+        if (ownership.IsFailure)
         {
             return Result<Guid>
-                .Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this ecosystem"));
+                .Failure(ownership.Error);
         }
 
         var existingRelay = await relayRepository
@@ -148,7 +133,7 @@ public sealed class AutomationRuleService(
                     "Target relay must belong to the same ecosystem as the rule."));
         }
 
-        var (rule, errors) = AutomationRuleEntity.Create(
+        var createResult = AutomationRuleEntity.Create(
             request.EcosystemId,
             request.Name,
             request.RelayId,
@@ -156,15 +141,12 @@ public sealed class AutomationRuleService(
             request.Action,
             request.IsActive);
 
-        if (rule is null)
+        if (createResult.IsFailure)
         {
-            return Result<Guid>
-                .Failure(Error.Validation(
-                    "Rule.Invalid",
-                    $"Failed to create {nameof(AutomationRuleEntity)}: {string.Join(", ", errors)}"));
+            return Result<Guid>.Failure(createResult.Error);
         }
 
-        var result = await ruleRepository.AddAsync(rule!, cancellationToken);
+        var result = await ruleRepository.AddAsync(createResult.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<Guid>.Success(result);
@@ -180,41 +162,30 @@ public sealed class AutomationRuleService(
 
         if (rule is null)
         {
-            return Result<Guid>
-                .Failure(Error.NotFound(
+            return Result.Failure(Error.NotFound(
                     "Rule.NotFound",
                     $"Rule {ruleId} not found"));
         }
 
-        var ecosystem = await ecosystemRepository
-        .GetByIdAsync(rule.EcosystemId, cancellationToken);
+        var ownership = await secureService
+                .EnsureUserOwnsEcosystemAsync(rule.EcosystemId, cancellationToken);
 
-        if (ecosystem is null)
+        if (ownership.IsFailure)
         {
-            return Result.Failure(Error.NotFound(
-                    "Ecosystem.NotFound",
-                    $"Ecosystem {rule.EcosystemId} not found. "));
+            return Result.Failure(ownership.Error);
         }
 
-        if (ecosystem.UserId != userContext.UserId)
-        {
-            return Result.Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this ecosystem"));
-        }
-
-        var errors = rule.Update(
+        var validationResult = rule.Update(
             request.Name,
             request.RelayId,
             request.Operator,
             request.Action);
 
-        if (errors is not null)
+        if (validationResult.IsFailure)
         {
-            return Result<Guid>
-                .Failure(Error.Validation(
+            return Result.Failure(Error.Validation(
                     "Rule.Invalid",
-                    $"Failed to update {nameof(AutomationRuleEntity)}: {string.Join(", ", errors)}"));
+                    string.Join(", ", validationResult.Error)));
         }
 
         await ruleRepository.UpdateAsync(rule, cancellationToken);
@@ -232,27 +203,17 @@ public sealed class AutomationRuleService(
 
         if (rule is null)
         {
-            return Result<Guid>
-                .Failure(Error.NotFound(
+            return Result.Failure(Error.NotFound(
                     "Rule.NotFound",
                     $"Rule {ruleId} not found"));
         }
 
-        var ecosystem = await ecosystemRepository
-        .GetByIdAsync(rule.EcosystemId, cancellationToken);
+        var ownership = await secureService
+                .EnsureUserOwnsEcosystemAsync(rule.EcosystemId, cancellationToken);
 
-        if (ecosystem is null)
+        if (ownership.IsFailure)
         {
-            return Result.Failure(Error.NotFound(
-                    "Ecosystem.NotFound",
-                    $"Ecosystem {rule.EcosystemId} not found. "));
-        }
-
-        if (ecosystem.UserId != userContext.UserId)
-        {
-            return Result.Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this ecosystem"));
+            return Result.Failure(ownership.Error);
         }
 
         await ruleRepository.DeleteAsync(ruleId, cancellationToken);

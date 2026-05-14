@@ -7,12 +7,11 @@ using FluentValidation;
 
 namespace Control.Application.Services;
 
-public class RuleConditionService(
+public sealed class RuleConditionService(
     IAutomationRuleRepository ruleRepository,
     IRuleConditionRepository ruleConditionRepository,
-    IEcosystemRepository ecosystemRepository,
     ISensorRepository sensorRepository,
-    IUserContext userContext,
+    ISecureService secureService,
     IValidator<RuleConditionRequestDto> validator,
     IUnitOfWork unitOfWork) : IRuleConditionService
 {
@@ -21,7 +20,16 @@ public class RuleConditionService(
         RuleConditionRequestDto request,
         CancellationToken cancellationToken)
     {
-        validator.ValidateAndThrow(request);
+        var validationResult = await validator
+            .ValidateAsync(request, cancellationToken);
+
+        if (!validationResult.IsValid)
+        {
+            return Result<Guid>
+                .Failure(Error.NotFound(
+                    "Ecosystem.Invalid",
+                    string.Join(", ", validationResult.Errors)));
+        }
 
         var rule = await ruleRepository
             .GetByIdWithConditionsAsync(ruleId, cancellationToken);
@@ -34,57 +42,40 @@ public class RuleConditionService(
                     $"Rule {ruleId} not found"));
         }
 
-        var ecosystem = await ecosystemRepository
-            .GetByIdAsync(rule.EcosystemId, cancellationToken);
-        
-        if (ecosystem is null || 
-            ecosystem.UserId != userContext.UserId)
+        var ownership = await secureService
+            .EnsureUserOwnsEcosystemAsync(rule.EcosystemId, cancellationToken);
+
+        if (ownership.IsFailure)
         {
-            return Result<Guid>.Failure(
-                Error.Conflict(
-                    "Access.Denied", 
-                    "You do not own this ecosystem"));
+            return Result<Guid>
+                .Failure(ownership.Error);
         }
 
-        var sensor = await sensorRepository
-            .GetByIdAsync(request.SensorId, cancellationToken);
+        var sensorOwrenship = await EnsureConditionOwnsSensorAsync(
+            rule, request.SensorId, cancellationToken);
 
-        if (sensor is null)
+        if (sensorOwrenship.IsFailure)
         {
-            return Result<Guid>.Failure(
-                Error.NotFound(
-                    "Sensor.NotFound", 
-                    "Sensor not found"));
+            return Result<Guid>
+                .Failure(sensorOwrenship.Error);
         }
 
-        if (sensor.EcosystemId != rule.EcosystemId)
-        {
-            return Result<Guid>.Failure(
-                Error.Validation(
-                    "Condition.InvalidSensor", 
-                    "Sensor must belong to the same ecosystem as the rule"));
-        }
-
-        var (condition, errors) = RuleConditionEntity.Create(
+        var result = RuleConditionEntity.Create(
             rule.Id,
             request.SensorId,
             request.Condition,
             request.Threshold,
             request.Hysteresis);
 
-        if (condition is null)
+        if (result.IsFailure)
         {
-            return Result<Guid>.Failure(
-                Error.Validation(
-                    "Condition.Invalid", 
-                    string.Join(", ", errors!)));
+            return Result<Guid>.Failure(result.Error);
         }
 
-        await ruleConditionRepository.AddAsync(condition, cancellationToken);
-
+        await ruleConditionRepository.AddAsync(result.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result<Guid>.Success(condition.Id);
+        return Result<Guid>.Success(result.Value.Id);
     }
 
     public async Task<Result> UpdateConditionAsync(
@@ -100,57 +91,38 @@ public class RuleConditionService(
 
         if (rule is null)
         {
-            return Result
-                .Failure(Error.NotFound(
+            return Result.Failure(Error.NotFound(
                     "Rule.NotFound",
                     "Rule not found"));
         }
 
-        var condition = await ruleConditionRepository
-            .GetByIdAsync(conditionId, cancellationToken);
+        var conditionOwnership = await EnsureRuleOwnsConditionAsync(
+            rule, conditionId, cancellationToken);
 
-        if (condition is null)
+        if (conditionOwnership.IsFailure)
         {
-            return Result
-                .Failure(Error.NotFound(
-                    "Condition.NotFound",
-                    "Condition not found"));
+            return Result.Failure(conditionOwnership.Error);
         }
 
-        if (rule.Conditions.Any(x => x.Id == condition.AutomationRuleId))
+        var ownership = await secureService
+            .EnsureUserOwnsEcosystemAsync(rule.EcosystemId, cancellationToken);
+
+        if (ownership.IsFailure)
         {
-            return Result
-                .Failure(Error.Conflict(
-                    "Condition.Forbidden",
-                    "Rule do not contains this condition"));
+            return Result.Failure(ownership.Error);
         }
 
-        var ecosystem = await ecosystemRepository
-            .GetByIdAsync(rule.EcosystemId, cancellationToken);
-
-        if (ecosystem is null ||
-            ecosystem.UserId != userContext.UserId)
-        {
-            return Result
-                .Failure(Error.Conflict(
-                    "Access.Denied",
-                    "Access denied"));
-        }
-
-        var updateErrors = condition.Update(
+        var updateResult = conditionOwnership.Value.Update(
             request.Condition,
             request.Threshold,
             request.Hysteresis);
 
-        if (updateErrors is not null)
+        if (updateResult.IsFailure)
         {
-            return Result
-                .Failure(Error.Validation(
-                    "Condition.UpdateFailed",
-                    string.Join(", ", updateErrors)));
+            return Result.Failure(updateResult.Error);
         }
 
-        await ruleConditionRepository.UpdateAsync(condition, cancellationToken);
+        await ruleConditionRepository.UpdateAsync(conditionOwnership.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
@@ -166,18 +138,44 @@ public class RuleConditionService(
 
         if (rule is null)
         {
-            return Result
-                .Failure(Error.NotFound(
+            return Result.Failure(Error.NotFound(
                     "Rule.NotFound",
                     "Rule not found"));
         }
 
+        var conditionOwnership = await EnsureRuleOwnsConditionAsync(
+            rule, conditionId, cancellationToken);
+
+        if (conditionOwnership.IsFailure)
+        {
+            return Result.Failure(conditionOwnership.Error);
+        }
+
+        var ownership = await secureService
+            .EnsureUserOwnsEcosystemAsync(rule.EcosystemId, cancellationToken);
+
+        if (ownership.IsFailure)
+        {
+            return Result.Failure(ownership.Error);
+        }
+
+        await ruleConditionRepository.DeleteAsync(ruleId, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
+    }
+
+    private async Task<Result<RuleConditionEntity>> EnsureRuleOwnsConditionAsync(
+        AutomationRuleEntity rule,
+        Guid conditionId, 
+        CancellationToken cancellationToken)
+    {
         var condition = await ruleConditionRepository
             .GetByIdAsync(conditionId, cancellationToken);
 
         if (condition is null)
         {
-            return Result
+            return Result<RuleConditionEntity>
                 .Failure(Error.NotFound(
                     "Condition.NotFound",
                     "Condition not found"));
@@ -185,26 +183,35 @@ public class RuleConditionService(
 
         if (rule.Conditions.Any(x => x.Id == condition.AutomationRuleId))
         {
-            return Result
+            return Result<RuleConditionEntity>
                 .Failure(Error.Conflict(
                     "Condition.Forbidden",
                     "Rule do not contains this condition"));
         }
 
-        var ecosystem = await ecosystemRepository
-            .GetByIdAsync(rule.EcosystemId, cancellationToken);
+        return Result<RuleConditionEntity>.Success(condition);
+    }
 
-        if (ecosystem is null ||
-            ecosystem.UserId != userContext.UserId)
+    private async Task<Result> EnsureConditionOwnsSensorAsync(
+        AutomationRuleEntity rule,
+        Guid sensorId, 
+        CancellationToken cancellationToken)
+    {
+        var sensor = await sensorRepository.GetByIdAsync(sensorId, cancellationToken);
+
+        if (sensor is null)
         {
-            return Result
-                .Failure(Error.Conflict(
-                    "Access.Denied",
-                    "Access denied"));
+            return Result.Failure(Error.NotFound(
+                    "Sensor.NotFound",
+                    "Sensor not found"));
         }
 
-        await ruleConditionRepository.DeleteAsync(ruleId, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        if (sensor.EcosystemId != rule.EcosystemId)
+        {
+            return Result.Failure(Error.Validation(
+                    "Condition.InvalidSensor",
+                    "Sensor must belong to the same ecosystem as the rule"));
+        }
 
         return Result.Success();
     }

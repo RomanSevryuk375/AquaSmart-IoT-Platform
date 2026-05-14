@@ -2,9 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Control.Infrastructure.Configurations;
+namespace Control.Infrastructure.Persistence.Configurations;
 
-public class VacationModeEntityConfiguration : IEntityTypeConfiguration<VacationModeEntity>
+public sealed class VacationModeEntityConfiguration 
+    : IEntityTypeConfiguration<VacationModeEntity>
 {
     public void Configure(EntityTypeBuilder<VacationModeEntity> builder)
     {

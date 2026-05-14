@@ -15,6 +15,7 @@ namespace Control.Application.Services;
 
 public sealed class EcosystemService(
     IEcosystemRepository ecosystemRepository,
+    ISecureService secureService,
     IPublishEndpoint publishEndpoint,
     IUserContext userContext,
     IMapper mapper,
@@ -49,64 +50,48 @@ public sealed class EcosystemService(
         Guid ecosystemId,
         CancellationToken cancellationToken)
     {
-        var ecosystem = await ecosystemRepository
-            .GetByIdAsync(ecosystemId, cancellationToken);
+        var ownership = await secureService
+                .EnsureUserOwnsEcosystemAsync(ecosystemId, cancellationToken);
 
-        if (ecosystem is null)
+        if (ownership.IsFailure)
         {
             return Result<EcosystemResponseDto>
-                .Failure(Error.NotFound(
-                    "Ecosystem.NotFound",
-                    $"{nameof(EcosystemEntity)} not found"));
-        }
-
-        if (ecosystem.UserId != userContext.UserId)
-        {
-            return Result<EcosystemResponseDto>
-                .Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this ecosystem"));
+                .Failure(ownership.Error);
         }
 
         return Result<EcosystemResponseDto>
-            .Success(mapper.Map<EcosystemResponseDto>(ecosystem));
+            .Success(mapper.Map<EcosystemResponseDto>(ownership.Value));
     }
 
     public async Task<Result<Guid>> CreateEcosystemAsync(
         EcosystemRequestDto request,
         CancellationToken cancellationToken)
     {
-        var validationResult = validator.Validate(request);
+        var validationResult = await validator
+            .ValidateAsync(request, cancellationToken);
 
         if(!validationResult.IsValid)
         {
             return Result<Guid>
                 .Failure(Error.NotFound(
                     "Ecosystem.Invalid",
-                    $"Failed to validate {nameof(EcosystemEntity)}: {string.Join(", ", validationResult.Errors)}"));
+                    string.Join(", ", validationResult.Errors)));
         }
 
-        var (ecosystem, errors) = EcosystemEntity.Create(
+        var createResult = EcosystemEntity.Create(
             userContext.UserId,
             request.Type,
             request.Name,
             request.Volume,
             request.ControllerId);
 
-        if (ecosystem is null)
+        if (createResult.IsFailure)
         {
-            return Result<Guid>
-                .Failure(Error.NotFound(
-                    "Ecosystem.Invalid",
-                    $"Failed to create {nameof(EcosystemEntity)}: {string.Join(", ", errors)}"));
+            return Result<Guid>.Failure(createResult.Error);
         }
 
-        var result = await ecosystemRepository.AddAsync(ecosystem, cancellationToken);
+        var result = await ecosystemRepository.AddAsync(createResult.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await publishEndpoint.Publish(
-            mapper.Map<EcosystemCreatedEvent>(ecosystem),
-            cancellationToken);
 
         return Result<Guid>.Success(result);
     }
@@ -116,45 +101,33 @@ public sealed class EcosystemService(
         EcosystemUpdateRequestDto request,
         CancellationToken cancellationToken)
     {
-        var ecosystem = await ecosystemRepository
-            .GetByIdAsync(ecosystemId, cancellationToken);
+        var ownership = await secureService
+            .EnsureUserOwnsEcosystemAsync(ecosystemId, cancellationToken);
 
-        if (ecosystem is null)
+        if (ownership.IsFailure)
         {
-            return Result.Failure(Error.NotFound(
-                "Ecosystem.NotFound",
-                $"{nameof(EcosystemEntity)} not found"));
+            return Result<AutomationRuleResponseDto>
+                .Failure(ownership.Error);
         }
 
-        if (ecosystem.UserId != userContext.UserId)
+        var ecosystem = ownership.Value;
+
+        var nameResult = ecosystem.SetName(request.Name);
+
+        if (nameResult.IsFailure)
         {
-            return Result.Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this ecosystem"));
+            return Result.Failure(nameResult.Error);
         }
 
-        var nameErrors = ecosystem.SetName(request.Name);
+        var volumeResult = ecosystem.SetVolume(request.Volume);
 
-        if (nameErrors is not null)
+        if (volumeResult.IsFailure)
         {
-            return Result
-                .Failure(Error.Validation("Ecosystem.InvalidName", nameErrors[0]));
-        }
-
-        var volumeErrors = ecosystem.SetVolume(request.Volume);
-
-        if (volumeErrors is not null)
-        {
-            return Result
-                .Failure(Error.Validation("Ecosystem.InvalidVolume", volumeErrors[0]));
+            return Result.Failure(volumeResult.Error);
         }
 
         await ecosystemRepository.UpdateAsync(ecosystem, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await publishEndpoint.Publish(
-            mapper.Map<EcosystemUdatedEvent>(ecosystem),
-            cancellationToken);
 
         return Result.Success();
     }
@@ -163,21 +136,12 @@ public sealed class EcosystemService(
         Guid ecosystemId,
         CancellationToken cancellationToken)
     {
-        var ecosystem = await ecosystemRepository
-            .GetByIdAsync(ecosystemId, cancellationToken);
+        var ownership = await secureService
+                .EnsureUserOwnsEcosystemAsync(ecosystemId, cancellationToken);
 
-        if (ecosystem is null)
+        if (ownership.IsFailure)
         {
-            return Result.Failure(Error.NotFound(
-                    "Ecosystem.NotFound",
-                    $"{nameof(EcosystemEntity)} not found"));
-        }
-
-        if (ecosystem.UserId != userContext.UserId)
-        {
-            return Result.Failure(Error.Conflict(
-                    "Access.Denied",
-                    "You are not the owner of this ecosystem"));
+            return Result.Failure(ownership.Error);
         }
 
         await ecosystemRepository.DeleteAsync(ecosystemId, cancellationToken);

@@ -4,12 +4,17 @@ using MassTransit;
 
 namespace Control.Infrastructure.Messaging.Sensor;
 
-public class SensorStateChangedComandConsumer(
+internal sealed class SensorStateChangedComandConsumer(
     ISensorService service) : IConsumer<SensorStateChangedEvent>
 {
     public async Task Consume(ConsumeContext<SensorStateChangedEvent> context)
     {
-        await service.ChangedStateAsync(
+        var result = await service.ChangedStateAsync(
             context.Message, context.CancellationToken);
+
+        if (!result.IsSuccess && result.IsRetryable)
+        {
+            throw new Exception(result.Error);
+        }
     }
 }

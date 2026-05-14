@@ -1,6 +1,4 @@
-﻿using Contracts.Abstractions;
-
-namespace Contracts.Events.EcosystemEvents;
+﻿namespace Contracts.Events.EcosystemEvents;
 
 public sealed record EcosystemCreatedEvent
 {

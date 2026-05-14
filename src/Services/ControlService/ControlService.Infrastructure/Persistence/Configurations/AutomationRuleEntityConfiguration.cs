@@ -3,7 +3,7 @@ using Control.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Control.Infrastructure.Configurations;
+namespace Control.Infrastructure.Persistence.Configurations;
 
 public sealed class AutomationRuleEntityConfiguration
     : IEntityTypeConfiguration<AutomationRuleEntity>

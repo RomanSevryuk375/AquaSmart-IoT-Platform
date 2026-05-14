@@ -1,5 +1,6 @@
 ﻿using Contracts.Enums;
 using Contracts.Events.RelayEvents;
+using Contracts.Results;
 using Control.Application.Interfaces;
 using Control.Domain.Interfaces;
 using Control.Domain.Specifications;
@@ -8,17 +9,16 @@ using MassTransit;
 
 namespace Control.Application.Services;
 
-public class ScheduleProcessor(
+public sealed class ScheduleProcessor(
     IScheduleRepository scheduleRepository,
     IRelayRepository relayRepository,
-    IPublishEndpoint publishEndpoint,
     IMessageScheduler messageScheduler,
     IUnitOfWork unitOfWork) : IScheduleProcessor
 {
-    public async Task ProcessAsync(CancellationToken cancellationToken)
+    public async Task<Result> ProcessAsync(CancellationToken cancellationToken)
     {
         var specifiction = new ActiveScheduleSpecification();
-
+        var actionExpireAt = DateTime.UtcNow.AddMinutes(5);
         var schedules = await scheduleRepository.GetAllAsync(
             specifiction,
             null,
@@ -27,7 +27,7 @@ public class ScheduleProcessor(
 
         if (schedules is null)
         {
-            return;
+            return Result.Success();
         }
 
         var roundedTime = new DateTime(
@@ -56,15 +56,9 @@ public class ScheduleProcessor(
 
                 if (relay.IsActive is not true)
                 {
-                    relay.SetState(true);
+                    relay.SetState(true, actionExpireAt);
 
                     await relayRepository.UpdateAsync(relay, cancellationToken);
-
-                    await publishEndpoint.Publish(new ChangeRelayStateEvent
-                    {
-                        RelayId = relay.Id,
-                        Action = RuleActionEnum.SwitchOn,
-                    }, cancellationToken);
                 }
 
                 await messageScheduler.SchedulePublish(
@@ -78,5 +72,7 @@ public class ScheduleProcessor(
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
     }
 }

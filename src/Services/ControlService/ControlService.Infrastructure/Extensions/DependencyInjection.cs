@@ -4,7 +4,10 @@ using Control.Infrastructure.BackgroundJobs;
 using Control.Infrastructure.Messaging.Relay;
 using Control.Infrastructure.Messaging.Sensor;
 using Control.Infrastructure.Messaging.Telemetry;
-using Control.Infrastructure.Repositories;
+using Control.Infrastructure.Persistence;
+using Control.Infrastructure.Persistence.Interceptors;
+using Control.Infrastructure.Persistence.Outbox;
+using Control.Infrastructure.Persistence.Repositories;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +22,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IAutomationRuleRepository, AutomationRuleRepository>();
         services.AddScoped<IEcosystemRepository, EcosystemRepository>();
+        services.AddScoped<IOutboxRepository, OutboxRepository>();
         services.AddScoped<IRelayRepository, RelayRepository>();
         services.AddScoped<IRuleConditionRepository, RuleConditionRepository>();
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
@@ -27,9 +31,13 @@ public static class DependencyInjection
 
         var connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
 
-        services.AddDbContext<SystemDbContext>(options =>
+        services.AddDbContext<SystemDbContext>((sp, options) =>
         {
-            options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
+            var interceptor = sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
+
+            options.UseNpgsql(connectionString)
+                   .UseSnakeCaseNamingConvention()
+                   .AddInterceptors(interceptor);
         });
 
         services.AddHealthChecks().AddNpgSql(connectionString!);
@@ -90,16 +98,20 @@ public static class DependencyInjection
 
     public static IServiceCollection AddQuartzJobs(this IServiceCollection services)
     {
-        services.AddQuartz(options =>
+        services.AddQuartz(opts =>
         {
             var jobKey = new JobKey(nameof(ScheduleProcessJob));
-
-            options.AddJob<ScheduleProcessJob>(jobOptions =>
-                jobOptions.WithIdentity(jobKey));
-
-            options.AddTrigger(triggerOptions => triggerOptions
+            opts.AddJob<ScheduleProcessJob>(jobOpts => jobOpts.WithIdentity(jobKey));
+            opts.AddTrigger(triggerOpts => triggerOpts
                 .ForJob(jobKey)
                 .WithIdentity($"{jobKey}-trigger")
+                .WithSimpleSchedule(x => x.WithIntervalInSeconds(60).RepeatForever()));
+
+            var outboxJobKey = new JobKey(nameof(OutboxMessageProcessorJob));
+            opts.AddJob<OutboxMessageProcessorJob>(jobOpts => jobOpts.WithIdentity(outboxJobKey));
+            opts.AddTrigger(triggerOpts => triggerOpts
+                .ForJob(outboxJobKey)
+                .WithIdentity($"{outboxJobKey}-trigger")
                 .WithSimpleSchedule(x => x.WithIntervalInSeconds(60).RepeatForever()));
         });
 

@@ -37,6 +37,8 @@ public sealed class RelayService(
         ChangeRelayStateEvent relay,
         CancellationToken cancellationToken)
     {
+        var expireAt = DateTime.UtcNow.AddMinutes(5);
+
         var existingRelay = await relayRepository
             .GetByIdAsync(relay.RelayId, cancellationToken);
 
@@ -46,7 +48,7 @@ public sealed class RelayService(
                 .RetryableError($"Relay {relay.RelayId} not found. ");
         }
 
-        existingRelay.SetState(StateEvaluatorFactory.EvaluateEnum(relay.Action));
+        existingRelay.SetState(StateEvaluatorFactory.EvaluateEnum(relay.Action), expireAt);
 
         await relayRepository.UpdateAsync(existingRelay, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -72,7 +74,7 @@ public sealed class RelayService(
                 .RetryableError($"Ecosystem with controller {newRelay.ControllerId} not found. ");
         }
 
-        var (relay, errors) = RelayEntity.Create(
+        var result = RelayEntity.Create(
             newRelay.RelayId,
             ecosystem.Id,
             newRelay.ControllerId,
@@ -83,13 +85,13 @@ public sealed class RelayService(
             newRelay.IsActive,
             newRelay.CreatedAt);
 
-        if (errors.Count > 0)
+        if (result.IsFailure)
         {
             return ConsumerResult
-                .FatalError($"Failed to create {nameof(RelayEntity)}: {string.Join(", ", errors)}");
+                .FatalError($"{result.Error}");
         }
 
-        await relayRepository.AddAsync(relay!, cancellationToken);
+        await relayRepository.AddAsync(result.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ConsumerResult.Success();
@@ -131,7 +133,7 @@ public sealed class RelayService(
                     .RetryableError($"Ecosystem with controller {relayUpdated.ControllerId} not found. ");
             }
 
-            var (relay, errors) = RelayEntity.Create(
+            var result = RelayEntity.Create(
                 relayUpdated.RelayId,
                 ecosystem.Id,
                 relayUpdated.ControllerId,
@@ -142,21 +144,23 @@ public sealed class RelayService(
                 relayUpdated.IsActive,
                 relayUpdated.CreatedAt);
 
-            if (errors.Count > 0)
+            if (result.IsFailure)
             {
                 return ConsumerResult
-                    .FatalError($"Failed to create {nameof(RelayEntity)}: {string.Join(", ", errors)}");
+                    .FatalError($"{result.Error}");
             }
 
-            await relayRepository.AddAsync(relay!, cancellationToken);
+            await relayRepository.AddAsync(result.Value, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
             return ConsumerResult.Success();
         }
 
+        var expireAt = DateTime.UtcNow.AddMinutes(5);
+
         existingRelay.SetPurpose(relayUpdated.Purpose);
         existingRelay.SetMode(relayUpdated.IsManual);
-        existingRelay.SetState(relayUpdated.IsActive);
+        existingRelay.SetState(relayUpdated.IsActive, expireAt);
 
         await relayRepository.UpdateAsync(existingRelay, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);

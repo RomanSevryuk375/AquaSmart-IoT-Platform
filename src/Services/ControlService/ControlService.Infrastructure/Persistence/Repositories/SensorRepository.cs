@@ -2,7 +2,7 @@
 using Control.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Control.Infrastructure.Repositories;
+namespace Control.Infrastructure.Persistence.Repositories;
 
 public sealed class SensorRepository(SystemDbContext dbContext)
     : BaseRepository<SensorEntity>(dbContext), ISensorRepository
