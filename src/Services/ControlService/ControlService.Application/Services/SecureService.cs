@@ -7,6 +7,7 @@ namespace Control.Application.Services;
 
 public sealed class SecureService(
     IEcosystemRepository ecosystemRepository,
+    IRelayRepository relayRepository,
     IUserContext userContext) : ISecureService
 {
     public async Task<Result<EcosystemEntity>> EnsureUserOwnsEcosystemAsync(
@@ -31,5 +32,32 @@ public sealed class SecureService(
         }
 
         return Result<EcosystemEntity>.Success(ecosystem);
+    }
+
+    public async Task<Result> EnsureEcosystemOwnsRelayAsync(
+        Guid ecosystemId,
+        Guid relayId,
+        CancellationToken cancellationToken)
+    {
+        var existingRelay = await relayRepository
+        .GetByIdAsync(relayId, cancellationToken);
+
+        if (existingRelay is null)
+        {
+            return Result<Guid>
+                .Failure(Error.NotFound(
+                    "Relay.NotFound",
+                    $"Relay {relayId} not found"));
+        }
+
+        if (existingRelay.EcosystemId != ecosystemId)
+        {
+            return Result<Guid>
+                .Failure(Error.Validation(
+                    "Rule.InvalidRelay",
+                    "Target relay must belong to the same ecosystem as the rule."));
+        }
+
+        return Result.Success();
     }
 }

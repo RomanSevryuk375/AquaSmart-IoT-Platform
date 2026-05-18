@@ -8,4 +8,9 @@ public interface ISecureService
     Task<Result<EcosystemEntity>> EnsureUserOwnsEcosystemAsync(
         Guid ecosystemId, 
         CancellationToken cancellationToken);
+
+    Task<Result> EnsureEcosystemOwnsRelayAsync(
+        Guid ecosystemId,
+        Guid relayId,
+        CancellationToken cancellationToken);
 }

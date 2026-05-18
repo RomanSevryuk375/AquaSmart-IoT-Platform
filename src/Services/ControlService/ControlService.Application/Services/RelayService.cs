@@ -1,4 +1,5 @@
-﻿using Contracts.Events.RelayEvents;
+﻿using Contracts.Enums;
+using Contracts.Events.RelayEvents;
 using Contracts.Results;
 using Control.Application.Interfaces;
 using Control.Domain.Entities;
@@ -65,34 +66,15 @@ public sealed class RelayService(
             return ConsumerResult.Success();
         }
 
-        var ecosystem = await ecosystemRepository
-            .GetByControllerIdAsync(newRelay.ControllerId, cancellationToken);
+        var relayForm = new RelayForm(newRelay.RelayId, newRelay.ControllerId, 
+            newRelay.PowerSensorId, newRelay.Name,newRelay.Purpose, newRelay.IsManual, 
+            newRelay.IsActive, newRelay.CreatedAt);
 
-        if (ecosystem is null)
+        var creationResult = await CreateValidRealyAsync(relayForm, cancellationToken);
+        if (!creationResult.IsSuccess)
         {
-            return ConsumerResult
-                .RetryableError($"Ecosystem with controller {newRelay.ControllerId} not found. ");
+            return creationResult;
         }
-
-        var result = RelayEntity.Create(
-            newRelay.RelayId,
-            ecosystem.Id,
-            newRelay.ControllerId,
-            newRelay.PowerSensorId,
-            newRelay.Name,
-            newRelay.Purpose,
-            newRelay.IsManual,
-            newRelay.IsActive,
-            newRelay.CreatedAt);
-
-        if (result.IsFailure)
-        {
-            return ConsumerResult
-                .FatalError($"{result.Error}");
-        }
-
-        await relayRepository.AddAsync(result.Value, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ConsumerResult.Success();
     }
@@ -124,47 +106,80 @@ public sealed class RelayService(
 
         if (existingRelay is null)
         {
-            var ecosystem = await ecosystemRepository
-            .GetByControllerIdAsync(relayUpdated.ControllerId, cancellationToken);
+            var relayForm = new RelayForm(
+            relayUpdated.RelayId,
+            relayUpdated.ControllerId,
+            relayUpdated.PowerSensorId,
+            relayUpdated.Name,
+            relayUpdated.Purpose,
+            relayUpdated.IsManual,
+            relayUpdated.IsActive,
+            relayUpdated.CreatedAt);
 
-            if (ecosystem is null)
+            var creationResult = await CreateValidRealyAsync(relayForm, cancellationToken);
+            if (!creationResult.IsSuccess)
             {
-                return ConsumerResult
-                    .RetryableError($"Ecosystem with controller {relayUpdated.ControllerId} not found. ");
+                return creationResult;
             }
-
-            var result = RelayEntity.Create(
-                relayUpdated.RelayId,
-                ecosystem.Id,
-                relayUpdated.ControllerId,
-                relayUpdated.PowerSensorId,
-                relayUpdated.Name,
-                relayUpdated.Purpose,
-                relayUpdated.IsManual,
-                relayUpdated.IsActive,
-                relayUpdated.CreatedAt);
-
-            if (result.IsFailure)
-            {
-                return ConsumerResult
-                    .FatalError($"{result.Error}");
-            }
-
-            await relayRepository.AddAsync(result.Value, cancellationToken);
-            await unitOfWork.SaveChangesAsync(cancellationToken);
 
             return ConsumerResult.Success();
         }
 
         var expireAt = DateTime.UtcNow.AddMinutes(5);
 
-        existingRelay.SetPurpose(relayUpdated.Purpose);
+        existingRelay!.SetPurpose(relayUpdated.Purpose);
         existingRelay.SetMode(relayUpdated.IsManual);
         existingRelay.SetState(relayUpdated.IsActive, expireAt);
+        existingRelay.SetName(relayUpdated.Name);
 
         await relayRepository.UpdateAsync(existingRelay, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ConsumerResult.Success();
     }
+
+    private async Task<ConsumerResult> CreateValidRealyAsync(
+        RelayForm relayForm, 
+        CancellationToken cancellationToken)
+    {
+        var ecosystem = await ecosystemRepository
+            .GetByControllerIdAsync(relayForm.ControllerId, cancellationToken);
+
+        if (ecosystem is null)
+        {
+            return ConsumerResult
+                .RetryableError($"Ecosystem with controller {relayForm.ControllerId} not found. ");
+        }
+
+        var result = RelayEntity.Create(
+            relayForm.RelayId,
+            ecosystem.Id,
+            relayForm.ControllerId,
+            relayForm.PowerSensorId,
+            relayForm.Name,
+            relayForm.Purpose,
+            relayForm.IsManual,
+            relayForm.IsActive,
+            relayForm.CreatedAt);
+
+        if (result.IsFailure)
+        {
+            return ConsumerResult
+                .FatalError($"{result.Error}");
+        }
+
+        await relayRepository.AddAsync(result.Value, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return ConsumerResult.Success();
+    }
+
+    private record RelayForm(Guid RelayId,
+                Guid ControllerId,
+                Guid? PowerSensorId,
+                string Name,
+                RelayPurposeEnum Purpose,
+                bool IsManual,
+                bool IsActive,
+                DateTime CreatedAt);
 }

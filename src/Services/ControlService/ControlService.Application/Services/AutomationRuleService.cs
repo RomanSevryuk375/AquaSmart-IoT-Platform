@@ -12,7 +12,6 @@ namespace Control.Application.Services;
 
 public sealed class AutomationRuleService(
     IAutomationRuleRepository ruleRepository,
-    IRelayRepository relayRepository,
     ISecureService secureService,
     IUnitOfWork unitOfWork,
     IMapper mapper,
@@ -24,6 +23,22 @@ public sealed class AutomationRuleService(
         int? take,
         CancellationToken cancellationToken)
     {
+        if (!filter.EcosystemId.HasValue)
+        {
+            return Result<IReadOnlyList<AutomationRuleResponseDto>>
+                .Failure(Error.Validation(
+                    "Rule.FilterRequired", 
+                    "EcosystemId filter is required for security reasons."));
+        }
+
+        var ownership = await secureService.EnsureUserOwnsEcosystemAsync(
+            filter.EcosystemId.Value, cancellationToken);
+        if (ownership.IsFailure)
+        {
+            return Result<IReadOnlyList<AutomationRuleResponseDto>>
+                .Failure(ownership.Error);
+        }
+
         var specification = new AutomationRuleFilterSpecification(
             new AutomationRuleFilterParams
             {
@@ -33,58 +48,24 @@ public sealed class AutomationRuleService(
                 Operator = filter.Operator,
             });
 
-        if (filter.EcosystemId.HasValue)
-        {
-            var ownership = await secureService
-                .EnsureUserOwnsEcosystemAsync(filter.EcosystemId.Value, cancellationToken);
-
-            if (ownership.IsFailure)
-            {
-                return Result<IReadOnlyList<AutomationRuleResponseDto>>
-                    .Failure(ownership.Error);
-            }
-        }
-        else
-        {
-            return Result<IReadOnlyList<AutomationRuleResponseDto>>
-                .Failure(Error.Validation(
-                    "Rule.FilterRequired", 
-                    "EcosystemId filter is required for security reasons."));
-        }
-
         var rules = await ruleRepository.GetAllAsync(
-            specification,
-            skip,
-            take,
-            cancellationToken);
+            specification, skip, take, cancellationToken);
 
-        return Result<IReadOnlyList<AutomationRuleResponseDto>>
-            .Success(mapper.Map<IReadOnlyList<AutomationRuleResponseDto>>(rules));
+        return Result<IReadOnlyList<AutomationRuleResponseDto>>.Success(
+            mapper.Map<IReadOnlyList<AutomationRuleResponseDto>>(rules));
     }
 
     public async Task<Result<AutomationRuleResponseDto>> GetRuleByIdAsync(
         Guid ruleId,
         CancellationToken cancellationToken)
     {
-        var rule = await ruleRepository
-            .GetByIdAsync(ruleId, cancellationToken);
-
-        if (rule is null)
+        var ruleResult = await GetValidRuleAsync(ruleId, cancellationToken);
+        if (ruleResult.IsFailure)
         {
-            return Result<AutomationRuleResponseDto>
-                .Failure(Error.NotFound(
-                    "Rule.NotFound",
-                    $"Rule {ruleId} not found"));
+            return Result<AutomationRuleResponseDto>.Failure(ruleResult.Error);
         }
 
-        var ownership = await secureService
-                .EnsureUserOwnsEcosystemAsync(rule.EcosystemId, cancellationToken);
-
-        if (ownership.IsFailure)
-        {
-            return Result<AutomationRuleResponseDto>
-                .Failure(ownership.Error);
-        }
+        var rule = ruleResult.Value;
 
         return Result<AutomationRuleResponseDto>
             .Success(mapper.Map<AutomationRuleResponseDto>(rule));
@@ -94,43 +75,30 @@ public sealed class AutomationRuleService(
         AutomationRuleRequestDto request,
         CancellationToken cancellationToken)
     {
-        var validationResult = await validator
-            .ValidateAsync(request, cancellationToken);
-
+        var validationResult = await validator.ValidateAsync(
+            request, cancellationToken);
         if (!validationResult.IsValid)
         {
             return Result<Guid>
-                .Failure(Error.NotFound(
+                .Failure(Error.Validation(
                     "Rule.Invalid",
                     string.Join(", ", validationResult.Errors)));
         }
 
-        var ownership = await secureService
-                .EnsureUserOwnsEcosystemAsync(request.EcosystemId, cancellationToken);
-
+        var ownership = await secureService.EnsureUserOwnsEcosystemAsync(
+            request.EcosystemId, cancellationToken);
         if (ownership.IsFailure)
         {
             return Result<Guid>
                 .Failure(ownership.Error);
         }
 
-        var existingRelay = await relayRepository
-            .GetByIdAsync(request.RelayId, cancellationToken);
-
-        if (existingRelay is null)
+        var relayOwnership = await secureService.EnsureEcosystemOwnsRelayAsync(
+            request.EcosystemId, request.RelayId, cancellationToken);
+        if (relayOwnership.IsFailure)
         {
             return Result<Guid>
-                .Failure(Error.NotFound(
-                    "Relay.NotFound",
-                    $"Relay {request.RelayId} not found"));
-        }
-
-        if (existingRelay.EcosystemId != request.EcosystemId)
-        {
-            return Result<Guid>
-                .Failure(Error.Validation(
-                    "Rule.InvalidRelay",
-                    "Target relay must belong to the same ecosystem as the rule."));
+                .Failure(relayOwnership.Error);
         }
 
         var createResult = AutomationRuleEntity.Create(
@@ -157,25 +125,20 @@ public sealed class AutomationRuleService(
         AutomationRuleUpdateRequestDto request,
         CancellationToken cancellationToken)
     {
-        var rule = await ruleRepository
-            .GetByIdAsync(ruleId, cancellationToken);
-
-        if (rule is null)
+        var ruleResult = await GetValidRuleAsync(ruleId, cancellationToken);
+        if (ruleResult.IsFailure)
         {
-            return Result.Failure(Error.NotFound(
-                    "Rule.NotFound",
-                    $"Rule {ruleId} not found"));
+            return Result.Failure(ruleResult.Error);
         }
 
-        var ownership = await secureService
-                .EnsureUserOwnsEcosystemAsync(rule.EcosystemId, cancellationToken);
-
-        if (ownership.IsFailure)
+        var relayOwnership = await secureService.EnsureEcosystemOwnsRelayAsync(
+            ruleResult.Value.EcosystemId, request.RelayId, cancellationToken);
+        if (relayOwnership.IsFailure)
         {
-            return Result.Failure(ownership.Error);
+            return Result.Failure(relayOwnership.Error);
         }
 
-        var validationResult = rule.Update(
+        var validationResult = ruleResult.Value.Update(
             request.Name,
             request.RelayId,
             request.Operator,
@@ -183,10 +146,10 @@ public sealed class AutomationRuleService(
 
         if (validationResult.IsFailure)
         {
-            return Result.Failure(Error.Validation(
-                    "Rule.Invalid",
-                    string.Join(", ", validationResult.Error)));
+            return Result.Failure(validationResult.Error);
         }
+
+        var rule = ruleResult.Value;
 
         await ruleRepository.UpdateAsync(rule, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -198,27 +161,41 @@ public sealed class AutomationRuleService(
         Guid ruleId,
         CancellationToken cancellationToken)
     {
+        var ruleResult = await GetValidRuleAsync(ruleId, cancellationToken);
+        if (ruleResult.IsFailure)
+        {
+            return Result.Failure(ruleResult.Error);
+        }
+
+        var rule = ruleResult.Value;
+
+        await ruleRepository.DeleteAsync(rule.Id, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
+    }
+
+    private async Task<Result<AutomationRuleEntity>> GetValidRuleAsync(
+        Guid ruleId, 
+        CancellationToken cancellationToken)
+    {
         var rule = await ruleRepository
             .GetByIdAsync(ruleId, cancellationToken);
-
         if (rule is null)
         {
-            return Result.Failure(Error.NotFound(
+            return Result<AutomationRuleEntity>
+                .Failure(Error.NotFound(
                     "Rule.NotFound",
                     $"Rule {ruleId} not found"));
         }
 
         var ownership = await secureService
-                .EnsureUserOwnsEcosystemAsync(rule.EcosystemId, cancellationToken);
-
+            .EnsureUserOwnsEcosystemAsync(rule.EcosystemId, cancellationToken);
         if (ownership.IsFailure)
         {
-            return Result.Failure(ownership.Error);
+            return Result<AutomationRuleEntity>.Failure(ownership.Error);
         }
 
-        await ruleRepository.DeleteAsync(ruleId, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return Result.Success();
+        return Result<AutomationRuleEntity>.Success(rule);
     }
 }

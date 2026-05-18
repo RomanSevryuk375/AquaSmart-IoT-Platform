@@ -2,6 +2,7 @@
 using Contracts.Events.RelayEvents;
 using Contracts.Results;
 using Control.Application.Interfaces;
+using Control.Domain.Entities;
 using Control.Domain.Interfaces;
 using Control.Domain.Specifications;
 using Cronos;
@@ -17,58 +18,61 @@ public sealed class ScheduleProcessor(
 {
     public async Task<Result> ProcessAsync(CancellationToken cancellationToken)
     {
-        var specifiction = new ActiveScheduleSpecification();
-        var actionExpireAt = DateTime.UtcNow.AddMinutes(5);
+        var specification = new ActiveScheduleSpecification();
         var schedules = await scheduleRepository.GetAllAsync(
-            specifiction,
-            null,
-            null,
-            cancellationToken);
+            specification, null, null, cancellationToken);
 
-        if (schedules is null)
+        if (schedules == null || !schedules.Any())
         {
             return Result.Success();
         }
 
         var roundedTime = new DateTime(
-                DateTime.UtcNow.Year,
-                DateTime.UtcNow.Month,
-                DateTime.UtcNow.Day,
-                DateTime.UtcNow.Hour,
-                DateTime.UtcNow.Minute,
-                0, DateTimeKind.Utc);
+            DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day,
+            DateTime.UtcNow.Hour, DateTime.UtcNow.Minute, 0, DateTimeKind.Utc);
 
-        foreach (var schedule in schedules)
+        var triggeredSchedules = schedules.Where(s =>
         {
-            var cron = CronExpression
-                .Parse(schedule.CronExpression, CronFormat.Standard)
-                .GetNextOccurrence(roundedTime.AddTicks(-1));
+            var cron = CronExpression.Parse(s.CronExpression, CronFormat.Standard);
+            var nextOccurrence = cron.GetNextOccurrence(roundedTime.AddTicks(-1));
+            return nextOccurrence == roundedTime;
+        }).ToList();
 
-            if (roundedTime == cron)
+        if (triggeredSchedules.Count == 0)
+        {
+            return Result.Success();
+        }
+
+        var relayIds = triggeredSchedules.Select(s => s.RelayId).Distinct().ToList();
+        var relaysCache = (await relayRepository.GetManyByIds(relayIds, cancellationToken))
+            .ToDictionary(r => r.Id);
+
+        var actionExpireAt = DateTime.UtcNow.AddMinutes(5);
+
+        foreach (var schedule in triggeredSchedules)
+        {
+            if (!relaysCache.TryGetValue(schedule.RelayId, out var relay) || relay.IsManual)
             {
-                var relay = await relayRepository.GetByIdAsync(
-                    schedule.RelayId, cancellationToken);
-
-                if (relay is null || relay.IsManual)
-                {
-                    continue;
-                }
-
-                if (relay.IsActive is not true)
-                {
-                    relay.SetState(true, actionExpireAt);
-
-                    await relayRepository.UpdateAsync(relay, cancellationToken);
-                }
-
-                await messageScheduler.SchedulePublish(
-                    DateTime.UtcNow.AddMinutes(schedule.DurationMin),
-                    new ChangeRelayStateEvent
-                    {
-                        RelayId = relay.Id,
-                        Action = RuleActionEnum.SwitchOff,
-                    }, cancellationToken);
+                continue;
             }
+
+            if (!relay.IsActive)
+            {
+                relay.SetState(true, actionExpireAt);
+                await relayRepository.UpdateAsync(relay, cancellationToken);
+            }
+
+            var turnOffTime = DateTime.UtcNow.AddMinutes(schedule.DurationMin);
+
+            await messageScheduler.SchedulePublish(
+                turnOffTime,
+                new ChangeRelayStateEvent
+                {
+                    ControllerId = relay.ControllerId,
+                    RelayId = relay.Id,
+                    Action = RuleActionEnum.SwitchOff,
+                    ExpireAt = turnOffTime.AddMinutes(5) 
+                }, cancellationToken);
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);

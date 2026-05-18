@@ -24,4 +24,13 @@ public sealed class RelayRepository(SystemDbContext dbContext)
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.PowerSensorId == powerSensorId, cancellationToken);
     }
+
+    public async Task<IReadOnlyList<RelayEntity>> GetManyByIds(
+        List<Guid> relayIds, 
+        CancellationToken cancellationToken)
+    {
+        return await Context.Relays.AsNoTracking()
+            .Where(x => relayIds.Contains(x.Id))
+            .ToListAsync(cancellationToken);
+    }
 }

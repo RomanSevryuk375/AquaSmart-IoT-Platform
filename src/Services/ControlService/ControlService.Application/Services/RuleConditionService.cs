@@ -20,40 +20,27 @@ public sealed class RuleConditionService(
         RuleConditionRequestDto request,
         CancellationToken cancellationToken)
     {
-        var validationResult = await validator
-            .ValidateAsync(request, cancellationToken);
+        var validationResult = await validator.ValidateAsync(
+            request, cancellationToken);
 
         if (!validationResult.IsValid)
         {
             return Result<Guid>
-                .Failure(Error.NotFound(
+                .Failure(Error.Validation(
                     "Ecosystem.Invalid",
                     string.Join(", ", validationResult.Errors)));
         }
 
-        var rule = await ruleRepository
-            .GetByIdWithConditionsAsync(ruleId, cancellationToken);
-
-        if (rule is null)
+        var ruleResult = await GetValidRuleAsync(ruleId, cancellationToken);
+        if (ruleResult.IsFailure)
         {
-            return Result<Guid>.Failure(
-                Error.NotFound(
-                    "Rule.NotFound", 
-                    $"Rule {ruleId} not found"));
+            return Result<Guid>.Failure(ruleResult.Error);
         }
 
-        var ownership = await secureService
-            .EnsureUserOwnsEcosystemAsync(rule.EcosystemId, cancellationToken);
-
-        if (ownership.IsFailure)
-        {
-            return Result<Guid>
-                .Failure(ownership.Error);
-        }
+        var rule = ruleResult.Value;
 
         var sensorOwrenship = await EnsureConditionOwnsSensorAsync(
             rule, request.SensorId, cancellationToken);
-
         if (sensorOwrenship.IsFailure)
         {
             return Result<Guid>
@@ -84,32 +71,28 @@ public sealed class RuleConditionService(
         RuleConditionRequestDto request,
         CancellationToken cancellationToken)
     {
-        validator.ValidateAndThrow(request);
-
-        var rule = await ruleRepository
-            .GetByIdWithConditionsAsync(ruleId, cancellationToken);
-
-        if (rule is null)
+        var validationResult = await validator.ValidateAsync(
+            request, cancellationToken);
+        if (!validationResult.IsValid)
         {
-            return Result.Failure(Error.NotFound(
-                    "Rule.NotFound",
-                    "Rule not found"));
+            return Result.Failure(Error.Validation(
+                    "Ecosystem.Invalid",
+                    string.Join(", ", validationResult.Errors)));
         }
+
+        var ruleResult = await GetValidRuleAsync(ruleId, cancellationToken);
+        if (ruleResult.IsFailure)
+        {
+            return Result.Failure(ruleResult.Error);
+        }
+
+        var rule = ruleResult.Value;
 
         var conditionOwnership = await EnsureRuleOwnsConditionAsync(
             rule, conditionId, cancellationToken);
-
         if (conditionOwnership.IsFailure)
         {
             return Result.Failure(conditionOwnership.Error);
-        }
-
-        var ownership = await secureService
-            .EnsureUserOwnsEcosystemAsync(rule.EcosystemId, cancellationToken);
-
-        if (ownership.IsFailure)
-        {
-            return Result.Failure(ownership.Error);
         }
 
         var updateResult = conditionOwnership.Value.Update(
@@ -133,33 +116,22 @@ public sealed class RuleConditionService(
         Guid conditionId,
         CancellationToken cancellationToken)
     {
-        var rule = await ruleRepository
-            .GetByIdWithConditionsAsync(ruleId, cancellationToken);
-
-        if (rule is null)
+        var ruleResult = await GetValidRuleAsync(ruleId, cancellationToken);
+        if (ruleResult.IsFailure)
         {
-            return Result.Failure(Error.NotFound(
-                    "Rule.NotFound",
-                    "Rule not found"));
+            return Result.Failure(ruleResult.Error);
         }
+
+        var rule = ruleResult.Value;
 
         var conditionOwnership = await EnsureRuleOwnsConditionAsync(
             rule, conditionId, cancellationToken);
-
         if (conditionOwnership.IsFailure)
         {
             return Result.Failure(conditionOwnership.Error);
         }
 
-        var ownership = await secureService
-            .EnsureUserOwnsEcosystemAsync(rule.EcosystemId, cancellationToken);
-
-        if (ownership.IsFailure)
-        {
-            return Result.Failure(ownership.Error);
-        }
-
-        await ruleConditionRepository.DeleteAsync(ruleId, cancellationToken);
+        await ruleConditionRepository.DeleteAsync(conditionId, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
@@ -181,7 +153,7 @@ public sealed class RuleConditionService(
                     "Condition not found"));
         }
 
-        if (rule.Conditions.Any(x => x.Id == condition.AutomationRuleId))
+        if (condition.AutomationRuleId != rule.Id)
         {
             return Result<RuleConditionEntity>
                 .Failure(Error.Conflict(
@@ -198,7 +170,6 @@ public sealed class RuleConditionService(
         CancellationToken cancellationToken)
     {
         var sensor = await sensorRepository.GetByIdAsync(sensorId, cancellationToken);
-
         if (sensor is null)
         {
             return Result.Failure(Error.NotFound(
@@ -214,5 +185,29 @@ public sealed class RuleConditionService(
         }
 
         return Result.Success();
+    }
+
+    private async Task<Result<AutomationRuleEntity>> GetValidRuleAsync(
+        Guid ruleId, 
+        CancellationToken cancellationToken)
+    {
+        var rule = await ruleRepository.GetByIdWithConditionsAsync(
+            ruleId, cancellationToken);
+        if (rule is null)
+        {
+            return Result<AutomationRuleEntity>
+                .Failure(Error.NotFound(
+                    "Rule.NotFound",
+                    $"Rule {ruleId} not found"));
+        }
+
+        var ownership = await secureService.EnsureUserOwnsEcosystemAsync(
+            rule.EcosystemId, cancellationToken);
+        if (ownership.IsFailure)
+        {
+            return Result<AutomationRuleEntity>.Failure(ownership.Error);
+        }
+
+        return Result<AutomationRuleEntity>.Success(rule);
     }
 }

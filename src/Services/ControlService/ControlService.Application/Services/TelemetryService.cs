@@ -4,8 +4,6 @@ using Control.Application.Interfaces;
 using Control.Domain.Entities;
 using Control.Domain.Factories;
 using Control.Domain.Interfaces;
-using MassTransit;
-using System.Data;
 
 namespace Control.Application.Services;
 
@@ -16,15 +14,15 @@ public sealed class TelemetryService(
     IUnitOfWork unitOfWork) : ITelemetryService
 {
     public async Task<ConsumerResult> ProcessTelemetryAsync(
-        TelemetryReceivedEvent telemetry,
+        TelemetryReceivedEvent telemetry, 
         CancellationToken cancellationToken)
     {
         var triggerSensor = await sensorRepository.GetByIdAsync(
             telemetry.SensorId, cancellationToken);
         if (triggerSensor is null)
         {
-            return ConsumerResult.FatalError($"Trigger sensor {telemetry.SensorId} " +
-                $"not found in ControlService.");
+            return ConsumerResult.FatalError(
+                $"Trigger sensor {telemetry.SensorId} not found in ControlService.");
         }
 
         triggerSensor.SetLastValue(telemetry.Value);
@@ -38,9 +36,17 @@ public sealed class TelemetryService(
         }
 
         var sensorsCache = await LoadRequiredSensorsAsync(rules, cancellationToken);
+
         foreach (var rule in rules)
         {
-            await ApplyRulesAsync(rule, sensorsCache, telemetry, cancellationToken);
+            var matchConditions = EvaluateConditions(rule.Conditions, sensorsCache, telemetry);
+
+            var targetState = RuleOperatorFactory.CalculateTargetState(matchConditions, rule.Operator, rule.Action);
+
+            if (targetState.HasValue)
+            {
+                await ApplyRelayStateAsync(rule.RelayId, targetState.Value, cancellationToken);
+            }
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -58,8 +64,7 @@ public sealed class TelemetryService(
             .Distinct()
             .ToList();
 
-        var sensors = await sensorRepository.GetManyByIdsAsync(
-            neededSensorIds, cancellationToken);
+        var sensors = await sensorRepository.GetManyByIdsAsync(neededSensorIds, cancellationToken);
         return sensors.ToDictionary(s => s.Id);
     }
 
@@ -77,58 +82,35 @@ public sealed class TelemetryService(
                 continue;
             }
 
-            var valueToEvaluate = (condition.SensorId == telemetry.SensorId)
+            var valueToEvaluate = condition.SensorId == telemetry.SensorId
                 ? telemetry.Value
                 : sensor.LastValue;
 
             var evaluator = RuleEvaluatorFactory.Create(condition.Condition);
-            var isMet = evaluator.Evaluate(
-                valueToEvaluate, condition.Threshold, condition.Hysteresis);
+            var isMet = evaluator.Evaluate(valueToEvaluate, condition.Threshold, condition.Hysteresis);
+
             matchConditions.Add(isMet);
         }
 
-        return matchConditions;
+        return matchConditions; 
     }
 
     private async Task ApplyRelayStateAsync(
-        Guid relayId, 
-        bool targetState, 
+        Guid relayId,
+        bool targetState,
         CancellationToken cancellationToken)
     {
-        var actionExpireAt = DateTime.UtcNow.AddMinutes(5);
+        var relay = await relayRepository.GetByIdAsync(relayId, cancellationToken);
 
-        var relay = await relayRepository
-                .GetByIdAsync(relayId, cancellationToken);
-
-        bool unableToChangeState = relay is null ||
-            relay.IsManual ||
-            relay.IsActive == targetState;
-
-        if (unableToChangeState)
+        if (relay is null || relay.IsManual || relay.IsActive == targetState)
         {
-            return;
+            return; 
         }
 
-        relay!.SetState(targetState, actionExpireAt);
+        var actionExpireAt = DateTime.UtcNow.AddMinutes(5); 
+
+        relay.SetState(targetState, actionExpireAt);
+
         await relayRepository.UpdateAsync(relay, cancellationToken);
-    }
-
-    private async Task ApplyRulesAsync(
-        AutomationRuleEntity rule,
-        Dictionary<Guid, SensorEntity> sensorsCache,
-        TelemetryReceivedEvent telemetry,
-        CancellationToken cancellationToken)
-    {
-        var matchConditions = EvaluateConditions(rule.Conditions, sensorsCache, telemetry);
-
-        var targetState = RuleOperatorFactory
-            .CalculateTargetState(matchConditions, rule.Operator, rule.Action);
-
-        if (targetState.HasValue)
-        {
-            await ApplyRelayStateAsync(rule.RelayId, targetState.Value, cancellationToken);
-        }
-
-        return;
     }
 }
