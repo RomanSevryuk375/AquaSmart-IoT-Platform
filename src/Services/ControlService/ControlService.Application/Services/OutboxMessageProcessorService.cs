@@ -18,9 +18,7 @@ public sealed class OutboxMessageProcessorService(
         var batchSize = 50;
 
         var messages = await outboxRepository.GetPendingMessagesAsync(batchSize, cancellationToken);
-
         bool anyMessagesForPublish = messages is null || !messages.Any();
-
         if (anyMessagesForPublish)
         {
             return Result.Success();

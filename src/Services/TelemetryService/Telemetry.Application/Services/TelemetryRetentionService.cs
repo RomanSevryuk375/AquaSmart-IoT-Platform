@@ -1,4 +1,6 @@
 ﻿using Contracts.Enums;
+using Microsoft.Extensions.Options;
+using Telemetry.Application.Extensions;
 using Telemetry.Application.Interfaces;
 using Telemetry.Domain.Interfaces;
 
@@ -6,19 +8,23 @@ namespace Telemetry.Application.Services;
 
 public sealed class TelemetryRetentionService(
     ITelemetryRawDataRepository rawRepo,
-    ITelemetryAggregateDataRepository aggregateRepo) : ITelemetryRetentionService
+    ITelemetryAggregateDataRepository aggregateRepo,
+    IOptions<TelemetrySettings> telemetrySettings) : ITelemetryRetentionService
 {
     public async Task CleanUpOldDataAsync(CancellationToken cancellationToken)
     {
-        var rawThreshold = DateTime.UtcNow.AddHours(-24); //TODO remove to options
+        var rawThreshold = DateTime.UtcNow
+            .AddHours(telemetrySettings.Value.MaxLiveTimeForRawDataInHours); 
         await rawRepo
             .DeleteOldRawDataAsync(rawThreshold, cancellationToken);
 
-        var minuteThreshold = DateTime.UtcNow.AddDays(-7); //TODO remove to options
+        var minuteThreshold = DateTime.UtcNow
+            .AddDays(telemetrySettings.Value.MaxLiveTimeForMinutesDataInDayes); 
         await aggregateRepo
             .DeleteOldRawDataAsync(PeriodTypeEnum.Minute, minuteThreshold, cancellationToken);
 
-        var hourlyThreshold = DateTime.UtcNow.AddDays(-90); //TODO remove to options
+        var hourlyThreshold = DateTime.UtcNow
+            .AddDays(telemetrySettings.Value.MaxLiveTimeForHourseDataInDayes); 
         await aggregateRepo
             .DeleteOldRawDataAsync(PeriodTypeEnum.Hourly, hourlyThreshold, cancellationToken);
     }

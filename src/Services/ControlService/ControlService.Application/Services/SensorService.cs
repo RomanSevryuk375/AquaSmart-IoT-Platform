@@ -152,7 +152,30 @@ public sealed class SensorService(
         return ConsumerResult.Success();
     }
 
-    private async Task<ConsumerResult> CreateValidSensorAsync(SensorForm form, CancellationToken cancellationToken)
+    public async Task<ConsumerResult> SetSensorNameAsync(
+        SensorRenamedEvent @event,
+        CancellationToken cancellationToken)
+    {
+        var existingSensor = await sensorRepository
+            .GetByIdAsync(@event.SensorId, cancellationToken);
+
+        if (existingSensor is null)
+        {
+            return ConsumerResult
+                .RetryableError($"Sensor {@event.SensorId} not found.");
+        }
+
+        existingSensor.SetName(@event.Name);
+
+        await sensorRepository.UpdateAsync(existingSensor, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return ConsumerResult.Success();
+    }
+
+    private async Task<ConsumerResult> CreateValidSensorAsync(
+        SensorForm form, 
+        CancellationToken cancellationToken)
     {
         var ecosystem = await ecosystemRepository.GetByControllerIdAsync(
             form.ControllerId, cancellationToken);

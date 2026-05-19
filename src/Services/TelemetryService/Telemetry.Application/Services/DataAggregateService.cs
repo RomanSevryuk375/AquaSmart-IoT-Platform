@@ -1,6 +1,6 @@
-﻿using Contracts.Enums;
+﻿using AutoMapper;
+using Contracts.Enums;
 using Contracts.Results;
-using MassTransit.Initializers;
 using Telemetry.Application.DTOs;
 using Telemetry.Application.Interfaces;
 using Telemetry.Domain.Interfaces;
@@ -11,8 +11,12 @@ namespace Telemetry.Application.Services;
 
 public sealed class DataAggregateService(
     ITelemetryAggregateDataRepository dataRepository,
-    ISensorRepository sensorRepository) : IDataAggregateService
+    ISensorRepository sensorRepository,
+    IMapper mapper) : IDataAggregateService
 {
+    private const int MaxHoursForMinuteInterval = 6;
+    private const int MaxDaysForHourlyInterval = 7;
+
     public async Task<Result<TelemetryChartResponseDto>> GetChartDataAsync(
         TelemetryAggregateFilterDto filter,
         int? skip,
@@ -22,19 +26,14 @@ public sealed class DataAggregateService(
         var to = filter.To ?? DateTime.UtcNow;
         var from = filter.From ?? to.AddDays(-1);
 
-        var sensor = await sensorRepository
-            .GetByIdAsync(filter.SensorId, cancellationToken);
-
+        var sensor = await sensorRepository.GetByIdAsync(filter.SensorId, cancellationToken);
         if (sensor is null)
         {
             return Result<TelemetryChartResponseDto>
                 .Failure(Error.NotFound("Sensor.NotFound", "Sensor not found"));
         }
 
-        var period = filter.Period
-            ?? DetermineBestPeriod(from, to);
-
-        IEnumerable<TelemetryChartPointDto> points;
+        var period = filter.Period ?? DetermineBestPeriod(from, to);
 
         var specification = new TelemetryAggregateFilterSpecification(
             new TelemetryAggregateFilterParams
@@ -45,20 +44,9 @@ public sealed class DataAggregateService(
                 To = to,
             });
 
-        var data = await dataRepository.GetAllAsync(
-            specification,
-            skip,
-            take,
-            cancellationToken);
+        var data = await dataRepository.GetAllAsync(specification, skip, take, cancellationToken);
 
-        points = data.Select(x => new TelemetryChartPointDto
-        {
-            AvgValue = x.AvgValue,
-            MinValue = x.MinValue,
-            MaxValue = x.MaxValue,
-            Time = x.PeriodStart,
-        });
-
+        var points = mapper.Map<IReadOnlyList<TelemetryChartPointDto>>(data);
 
         return Result<TelemetryChartResponseDto>
             .Success(new TelemetryChartResponseDto
@@ -74,12 +62,12 @@ public sealed class DataAggregateService(
     {
         var duration = to - from;
 
-        if (duration.TotalHours <= 6)
+        if (duration.TotalHours <= MaxHoursForMinuteInterval)
         {
             return PeriodTypeEnum.Minute;
         }
 
-        if (duration.TotalDays <= 7)
+        if (duration.TotalDays <= MaxDaysForHourlyInterval)
         {
             return PeriodTypeEnum.Hourly;
         }

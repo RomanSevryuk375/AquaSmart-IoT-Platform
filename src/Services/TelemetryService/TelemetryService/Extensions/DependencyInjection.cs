@@ -41,7 +41,7 @@ public static class DependencyInjection
         services.AddControllers();
 
         services.AddCommonAuthentication(configuration);
-        services.AddServices();
+        services.AddServices(configuration);
 
         services.AddRepositories(configuration);
         services.AddQuartzJob();

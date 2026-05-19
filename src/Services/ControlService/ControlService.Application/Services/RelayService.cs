@@ -66,8 +66,8 @@ public sealed class RelayService(
             return ConsumerResult.Success();
         }
 
-        var relayForm = new RelayForm(newRelay.RelayId, newRelay.ControllerId, 
-            newRelay.PowerSensorId, newRelay.Name,newRelay.Purpose, newRelay.IsManual, 
+        var relayForm = new RelayForm(newRelay.RelayId, newRelay.ControllerId,
+            newRelay.PowerSensorId, newRelay.Name, newRelay.Purpose, newRelay.IsManual,
             newRelay.IsActive, newRelay.CreatedAt);
 
         var creationResult = await CreateValidRealyAsync(relayForm, cancellationToken);
@@ -80,7 +80,7 @@ public sealed class RelayService(
     }
 
     public async Task<ConsumerResult> DeletedRelayAsync(
-        RelayDeletedEvent relayDeleted, 
+        RelayDeletedEvent relayDeleted,
         CancellationToken cancellationToken)
     {
         var existingRelay = await relayRepository
@@ -139,7 +139,7 @@ public sealed class RelayService(
     }
 
     private async Task<ConsumerResult> CreateValidRealyAsync(
-        RelayForm relayForm, 
+        RelayForm relayForm,
         CancellationToken cancellationToken)
     {
         var ecosystem = await ecosystemRepository
