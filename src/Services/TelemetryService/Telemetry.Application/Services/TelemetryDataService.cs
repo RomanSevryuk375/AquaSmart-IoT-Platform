@@ -17,7 +17,8 @@ public class TelemetryDataService(
     IEcosystemRepository ecosystemRepository,
     IPublishEndpoint publishEndpoint,
     IUnitOfWork unitOfWork,
-    IMapper mapper) : ITelemetryDataService
+    IMapper mapper,
+    ITelemetryNotifier realtimeNotifier) : ITelemetryDataService
 {
     private const int DefaultPeriodDays = -1;
 
@@ -79,6 +80,8 @@ public class TelemetryDataService(
                 $"No sensors found for ecosystem {ecosystem.Id}.");
         }
 
+        var points = new List<TelemetryRawChartPointDto>();
+
         foreach (var item in batch.Items)
         {
             var existingTelemetry = await telemetryRepository.GetByExternalMessageIdAsync(
@@ -109,7 +112,10 @@ public class TelemetryDataService(
             await telemetryRepository.AddAsync(result.Value, cancellationToken);
             await sensorRepository.UpdateAsync(sensor, cancellationToken);
 
-            await publishEndpoint.Publish(mapper.Map<TelemetryReceivedEvent>(item), cancellationToken);
+            await publishEndpoint.Publish(
+                mapper.Map<TelemetryReceivedEvent>(item), cancellationToken);
+
+            points.Add(mapper.Map<TelemetryRawChartPointDto>(item));
         }
 
         try
@@ -119,6 +125,11 @@ public class TelemetryDataService(
         catch (Exception ex)
         {
             return ConsumerResult.RetryableError($"Database error: {ex.Message}");
+        }
+
+        foreach (var point in points)
+        {
+            await realtimeNotifier.TelemetryRawReceived(ecosystem.Id.ToString(), point);
         }
 
         return ConsumerResult.Success();

@@ -2,6 +2,7 @@
 
 public record TelemetryChartPointDto
 {
+    public Guid SensorId { get; set; }
     public double MinValue { get; init; }
     public double MaxValue { get; init; }
     public double AvgValue { get; init; }

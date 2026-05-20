@@ -9,7 +9,7 @@ public class SensorDeletedConsumer(
 {
     public async Task Consume(ConsumeContext<SensorDeletedEvent> context)
     {
-        var result = await sensorService.DeleteSensorAsync(
+        var result = await sensorService.DeletedSensorAsync(
             context.Message, context.CancellationToken);
 
         if (!result.IsSuccess && result.IsRetryable)

@@ -46,6 +46,7 @@ public static class DependencyInjection
         services.AddRepositories(configuration);
         services.AddQuartzJob();
         services.AddRabbitMq(configuration);
+        services.AddMySignalR();
 
         services.AddAquaAuthorizationPolicies();
 

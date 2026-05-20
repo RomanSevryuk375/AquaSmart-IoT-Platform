@@ -12,5 +12,7 @@ public sealed class TelemetryRawProfile : Profile
         CreateMap<TelemetryRawEntity, TelemetryRawChartPointDto>();
 
         CreateMap<TelemetryBatchEventItem, TelemetryReceivedEvent>();
+
+        CreateMap<TelemetryBatchEventItem, TelemetryRawChartPointDto>();
     }
 }

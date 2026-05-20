@@ -1,5 +1,4 @@
-﻿using Contracts.Options;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Telemetry.Application.Interfaces;
@@ -9,7 +8,7 @@ namespace Telemetry.Application.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration cfg)
     {
         services.AddScoped<ICompressorService, CompressorService>();
         services.AddScoped<IEcosystemService, EcosystemService>();
@@ -20,13 +19,14 @@ public static class DependencyInjection
         services.AddScoped<ITelemetryRetentionService, TelemetryRetentionService>();
         services.AddScoped<IDataAggregateService, DataAggregateService>();
 
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+        services.AddMediatR(cfg => 
+            cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
-        services.AddAutoMapper(config =>
-            config.AddMaps(typeof(DependencyInjection).Assembly));
+        services.AddAutoMapper(cfg =>
+            cfg.AddMaps(typeof(DependencyInjection).Assembly));
 
         services.Configure<TelemetrySettings>(
-            configuration.GetSection(TelemetrySettings.SectionName));
+            cfg.GetSection(TelemetrySettings.SectionName));
 
         return services;
     }

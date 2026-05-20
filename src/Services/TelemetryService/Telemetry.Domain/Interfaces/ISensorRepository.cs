@@ -12,4 +12,8 @@ public interface ISensorRepository : IRepository<SensorEntity>
     Task<IReadOnlyList<SensorEntity>> GetAllByEcosystemId(
         Guid ecosystemId,
         CancellationToken cancellationToken);
+
+    Task<IReadOnlyList<SensorEntity>> GetManyByIdsAsync(
+        List<Guid> sensorIds,
+        CancellationToken cancellationToken);
 }
