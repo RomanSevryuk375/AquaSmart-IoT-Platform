@@ -1,6 +1,6 @@
 ﻿namespace Contracts.Events.UserEvents;
 
-public record SubscriptionDowngradedEvent
+public sealed record SubscriptionDowngradedEvent
 {
     public Guid EventId { get; init; } = Guid.NewGuid();
     public DateTime OccurredOn { get; init; } = DateTime.UtcNow;

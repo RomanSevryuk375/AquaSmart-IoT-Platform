@@ -1,6 +1,6 @@
 ﻿namespace Contracts.Events.SensorEvents;
 
-public record SensorNoDataAlertEvent
+public sealed record SensorNoDataAlertEvent
 {
     public Guid EventId { get; init; } = Guid.NewGuid();
     public DateTime OccurredOn { get; init; } = DateTime.UtcNow;

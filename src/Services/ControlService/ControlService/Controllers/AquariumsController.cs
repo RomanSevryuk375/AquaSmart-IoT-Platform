@@ -22,8 +22,8 @@ public class EcosystemsController(
         [FromQuery] int take = 10,
         CancellationToken cancellationToken = default)
     {
-        var result = await ecosystemService
-            .GetAllEcosystemsAsync(filter, skip, take, cancellationToken);
+        var result = await ecosystemService.GetAllEcosystemsAsync(
+            filter, skip, take, cancellationToken);
 
         return Ok(result);
     }
@@ -34,8 +34,8 @@ public class EcosystemsController(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var result = await ecosystemService
-            .GetEcosystemByIdAsync(id, cancellationToken);
+        var result = await ecosystemService.GetEcosystemByIdAsync(
+            id, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -46,9 +46,8 @@ public class EcosystemsController(
         [FromBody] EcosystemRequestDto request,
         CancellationToken cancellationToken)
     {
-        var result = await ecosystemService
-            .CreateEcosystemAsync(request, cancellationToken);
-
+        var result = await ecosystemService.CreateEcosystemAsync(
+            request, cancellationToken);
         if (result.IsFailure)
         {
             return this.ToActionResult(result);
@@ -67,8 +66,8 @@ public class EcosystemsController(
         [FromBody] EcosystemUpdateRequestDto request,
         CancellationToken cancellationToken)
     {
-        var result = await ecosystemService
-            .UpdateEcosystemAsync(id, request, cancellationToken);
+        var result = await ecosystemService.UpdateEcosystemAsync(
+            id, request, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -79,8 +78,8 @@ public class EcosystemsController(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var result = await ecosystemService
-            .DeleteEcosystemAsync(id, cancellationToken);
+        var result = await ecosystemService.DeleteEcosystemAsync(
+            id, cancellationToken);
 
         return this.ToActionResult(result);
     }

@@ -19,8 +19,8 @@ public class RuleConditionsController(
         [FromBody] RuleConditionRequestDto request,
         CancellationToken cancellationToken)
     {
-        var result = await conditionService
-            .AddConditionAsync(ruleId, request, cancellationToken);
+        var result = await conditionService.AddConditionAsync(
+            ruleId, request, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -35,10 +35,7 @@ public class RuleConditionsController(
         CancellationToken cancellationToken)
     {
         var result = await conditionService.UpdateConditionAsync(
-            ruleId,
-            conditionId,
-            request,
-            cancellationToken);
+            ruleId, conditionId, request, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -51,9 +48,7 @@ public class RuleConditionsController(
         CancellationToken cancellationToken)
     {
         var result = await conditionService.DeleteConditionAsync(
-            ruleId,
-            conditionId,
-            cancellationToken);
+            ruleId, conditionId, cancellationToken);
 
         return this.ToActionResult(result);
     }

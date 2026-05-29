@@ -17,9 +17,8 @@ public sealed class RelayService(
         RelayModeChangedEvent relay,
         CancellationToken cancellationToken)
     {
-        var existingRelay = await relayRepository
-            .GetByIdAsync(relay.RelayId, cancellationToken);
-
+        var existingRelay = await relayRepository.GetByIdAsync(
+            relay.RelayId, cancellationToken);
         if (existingRelay is null)
         {
             return ConsumerResult
@@ -40,9 +39,8 @@ public sealed class RelayService(
     {
         var expireAt = DateTime.UtcNow.AddMinutes(5);
 
-        var existingRelay = await relayRepository
-            .GetByIdAsync(relay.RelayId, cancellationToken);
-
+        var existingRelay = await relayRepository.GetByIdAsync(
+            relay.RelayId, cancellationToken);
         if (existingRelay is null)
         {
             return ConsumerResult
@@ -142,13 +140,12 @@ public sealed class RelayService(
         RelayForm relayForm,
         CancellationToken cancellationToken)
     {
-        var ecosystem = await ecosystemRepository
-            .GetByControllerIdAsync(relayForm.ControllerId, cancellationToken);
-
+        var ecosystem = await ecosystemRepository.GetByControllerIdAsync(
+            relayForm.ControllerId, cancellationToken);
         if (ecosystem is null)
         {
-            return ConsumerResult
-                .RetryableError($"Ecosystem with controller {relayForm.ControllerId} not found. ");
+            return ConsumerResult.RetryableError(
+                $"Ecosystem with controller {relayForm.ControllerId} not found. ");
         }
 
         var result = RelayEntity.Create(
@@ -164,8 +161,7 @@ public sealed class RelayService(
 
         if (result.IsFailure)
         {
-            return ConsumerResult
-                .FatalError($"{result.Error}");
+            return ConsumerResult.FatalError($"{result.Error}");
         }
 
         await relayRepository.AddAsync(result.Value, cancellationToken);

@@ -39,9 +39,11 @@ public sealed class TelemetryService(
 
         foreach (var rule in rules)
         {
-            var matchConditions = EvaluateConditions(rule.Conditions, sensorsCache, telemetry);
+            var matchConditions = EvaluateConditions(
+                rule.Conditions, sensorsCache, telemetry);
 
-            var targetState = RuleOperatorFactory.CalculateTargetState(matchConditions, rule.Operator, rule.Action);
+            var targetState = RuleOperatorFactory.CalculateTargetState(
+                matchConditions, rule.Operator, rule.Action);
 
             if (targetState.HasValue)
             {

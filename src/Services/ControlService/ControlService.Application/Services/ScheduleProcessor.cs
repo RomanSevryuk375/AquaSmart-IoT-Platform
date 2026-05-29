@@ -2,7 +2,6 @@
 using Contracts.Events.RelayEvents;
 using Contracts.Results;
 using Control.Application.Interfaces;
-using Control.Domain.Entities;
 using Control.Domain.Interfaces;
 using Control.Domain.Specifications;
 using Cronos;
@@ -44,9 +43,7 @@ public sealed class ScheduleProcessor(
         }
 
         var relayIds = triggeredSchedules.Select(s => s.RelayId).Distinct().ToList();
-        var relaysCache = (await relayRepository.GetManyByIds(relayIds, cancellationToken))
-            .ToDictionary(r => r.Id);
-
+        var relaysCache = (await relayRepository.GetManyByIds(relayIds, cancellationToken)).ToDictionary(r => r.Id);
         var actionExpireAt = DateTime.UtcNow.AddMinutes(5);
 
         foreach (var schedule in triggeredSchedules)

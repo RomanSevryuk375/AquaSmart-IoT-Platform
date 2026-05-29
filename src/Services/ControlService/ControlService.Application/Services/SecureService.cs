@@ -14,9 +14,8 @@ public sealed class SecureService(
         Guid ecosystemId,
         CancellationToken cancellationToken)
     {
-        var ecosystem = await ecosystemRepository
-        .GetByIdAsync(ecosystemId, cancellationToken);
-
+        var ecosystem = await ecosystemRepository.GetByIdAsync(
+            ecosystemId, cancellationToken);
         if (ecosystem is null)
         {
             return Result<EcosystemEntity>.Failure(Error.NotFound(
@@ -39,9 +38,8 @@ public sealed class SecureService(
         Guid relayId,
         CancellationToken cancellationToken)
     {
-        var existingRelay = await relayRepository
-        .GetByIdAsync(relayId, cancellationToken);
-
+        var existingRelay = await relayRepository.GetByIdAsync(
+            relayId, cancellationToken);
         if (existingRelay is null)
         {
             return Result<Guid>

@@ -1,6 +1,6 @@
 ﻿namespace Contracts.Events.UserEvents;
 
-public record UserUpdatedEvent
+public sealed record UserUpdatedEvent
 {
     public Guid EventId { get; init; } = Guid.NewGuid();
     public DateTime OccurredOn { get; init; } = DateTime.UtcNow;

@@ -23,8 +23,8 @@ public class AutomationRulesController(
         [FromQuery] int take = 10,
         CancellationToken cancellationToken = default)
     {
-        var result = await ruleService
-            .GetAllRulesAsync(filter, skip, take, cancellationToken);
+        var result = await ruleService.GetAllRulesAsync(
+            filter, skip, take, cancellationToken);
 
         return Ok(result);
     }
@@ -36,8 +36,8 @@ public class AutomationRulesController(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var result = await ruleService
-            .GetRuleByIdAsync(id, cancellationToken);
+        var result = await ruleService.GetRuleByIdAsync(
+            id, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -48,9 +48,8 @@ public class AutomationRulesController(
         [FromBody] AutomationRuleRequestDto request,
         CancellationToken cancellationToken)
     {
-        var result = await ruleService
-            .CreateRuleAsync(request, cancellationToken);
-
+        var result = await ruleService.CreateRuleAsync(
+            request, cancellationToken);
         if (result.IsFailure)
         {
             return this.ToActionResult(result);
@@ -69,8 +68,8 @@ public class AutomationRulesController(
         [FromBody] AutomationRuleUpdateRequestDto request,
         CancellationToken cancellationToken)
     {
-        var result = await ruleService
-            .UpdateRuleAsync(id, request, cancellationToken);
+        var result = await ruleService.UpdateRuleAsync(
+            id, request, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -81,8 +80,8 @@ public class AutomationRulesController(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var result = await ruleService
-            .DeleteRuleAsync(id, cancellationToken);
+        var result = await ruleService.DeleteRuleAsync(
+            id, cancellationToken);
 
         return this.ToActionResult(result);
     }

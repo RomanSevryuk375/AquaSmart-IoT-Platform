@@ -10,6 +10,6 @@ public interface ISensorRepository : IRepository<SensorEntity>
         CancellationToken cancellationToken);
 
     Task<IReadOnlyList<SensorEntity>> GetManyByIdsAsync(
-        List<Guid> sensorIds,
+        IEnumerable<Guid> sensorIds,
         CancellationToken cancellationToken);
 }

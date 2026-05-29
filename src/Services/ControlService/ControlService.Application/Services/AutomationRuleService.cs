@@ -143,14 +143,12 @@ public sealed class AutomationRuleService(
             request.RelayId,
             request.Operator,
             request.Action);
-
         if (validationResult.IsFailure)
         {
             return Result.Failure(validationResult.Error);
         }
 
         var rule = ruleResult.Value;
-
         await ruleRepository.UpdateAsync(rule, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

@@ -1,6 +1,6 @@
 ﻿namespace Contracts.Options;
 
-public class JwtOptions
+public sealed record JwtOptions
 {
     public const string SectionName = "JwtOptions";
     public string SecretKey { get; set; } = string.Empty;

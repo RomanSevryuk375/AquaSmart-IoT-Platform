@@ -1,6 +1,6 @@
 ﻿namespace Contracts.Events.RelayEvents;
 
-public record RelayModeChangedEvent
+public sealed record RelayModeChangedEvent
 {
     public Guid EventId { get; init; } = Guid.NewGuid();
     public DateTime OccurredOn { get; init; } = DateTime.UtcNow;

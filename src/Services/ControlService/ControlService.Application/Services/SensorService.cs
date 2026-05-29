@@ -20,11 +20,12 @@ public sealed class SensorService(
         SensorStateChangedEvent @event,
         CancellationToken cancellationToken)
     {
-        var sensor = await sensorRepository.GetByIdAsync(@event.SensorId, cancellationToken);
-
+        var sensor = await sensorRepository.GetByIdAsync(
+            @event.SensorId, cancellationToken);
         if (sensor is null)
         {
-            return ConsumerResult.RetryableError($"Sensor {@event.SensorId} not found.");
+            return ConsumerResult.RetryableError(
+                $"Sensor {@event.SensorId} not found.");
         }
 
         sensor.SetState(@event.State);
@@ -59,8 +60,8 @@ public sealed class SensorService(
         SensorDeletedEvent @event,
         CancellationToken cancellationToken)
     {
-        var sensor = await sensorRepository.GetByIdAsync(@event.SensorId, cancellationToken);
-
+        var sensor = await sensorRepository.GetByIdAsync(
+            @event.SensorId, cancellationToken);
         if (sensor is null)
         {
             return ConsumerResult.Success();
@@ -76,16 +77,20 @@ public sealed class SensorService(
         SensorNoDataEvent @event,
         CancellationToken cancellationToken)
     {
-        var sensor = await sensorRepository.GetByIdAsync(@event.SensorId, cancellationToken);
+        var sensor = await sensorRepository.GetByIdAsync(
+            @event.SensorId, cancellationToken);
         if (sensor is null)
         {
-            return ConsumerResult.RetryableError($"Sensor {@event.SensorId} not found.");
+            return ConsumerResult.RetryableError(
+                $"Sensor {@event.SensorId} not found.");
         }
 
-        var ecosystem = await ecosystemRepository.GetByIdAsync(sensor.EcosystemId, cancellationToken);
+        var ecosystem = await ecosystemRepository.GetByIdAsync(
+            sensor.EcosystemId, cancellationToken);
         if (ecosystem is null)
         {
-            return ConsumerResult.RetryableError($"Ecosystem {sensor.EcosystemId} not found.");
+            return ConsumerResult.RetryableError(
+                $"Ecosystem {sensor.EcosystemId} not found.");
         }
 
         sensor.SetState(SensorStateEnum.Faulty);
@@ -93,7 +98,8 @@ public sealed class SensorService(
         await sensorRepository.UpdateAsync(sensor, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var affectedRules = await ruleRepository.GetBySensorIdWithConditionsAsync(sensor.Id, cancellationToken);
+        var affectedRules = await ruleRepository.GetBySensorIdWithConditionsAsync(
+            sensor.Id, cancellationToken);
         if (affectedRules is null || !affectedRules.Any())
         {
             return ConsumerResult.Success();
@@ -156,13 +162,12 @@ public sealed class SensorService(
         SensorRenamedEvent @event,
         CancellationToken cancellationToken)
     {
-        var existingSensor = await sensorRepository
-            .GetByIdAsync(@event.SensorId, cancellationToken);
-
+        var existingSensor = await sensorRepository.GetByIdAsync(
+            @event.SensorId, cancellationToken);
         if (existingSensor is null)
         {
-            return ConsumerResult
-                .RetryableError($"Sensor {@event.SensorId} not found.");
+            return ConsumerResult.RetryableError(
+                $"Sensor {@event.SensorId} not found.");
         }
 
         existingSensor.SetName(@event.Name);
@@ -179,7 +184,6 @@ public sealed class SensorService(
     {
         var ecosystem = await ecosystemRepository.GetByControllerIdAsync(
             form.ControllerId, cancellationToken);
-
         if (ecosystem is null)
         {
             return ConsumerResult.RetryableError(

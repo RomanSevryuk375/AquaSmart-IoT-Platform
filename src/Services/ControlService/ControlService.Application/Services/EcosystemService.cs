@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Contracts.Events.EcosystemEvents;
 using Contracts.Results;
-using Control.Application.DTOs.AutomationRule;
 using Control.Application.DTOs.Ecosystem;
 using Control.Application.Interfaces;
 using Control.Domain.Entities;
@@ -50,26 +49,23 @@ public sealed class EcosystemService(
         Guid ecosystemId,
         CancellationToken cancellationToken)
     {
-        var ownership = await secureService
-                .EnsureUserOwnsEcosystemAsync(ecosystemId, cancellationToken);
-
+        var ownership = await secureService.EnsureUserOwnsEcosystemAsync(
+            ecosystemId, cancellationToken);
         if (ownership.IsFailure)
         {
             return Result<EcosystemResponseDto>
                 .Failure(ownership.Error);
         }
 
-        return Result<EcosystemResponseDto>
-            .Success(mapper.Map<EcosystemResponseDto>(ownership.Value));
+        return Result<EcosystemResponseDto>.Success(
+            mapper.Map<EcosystemResponseDto>(ownership.Value));
     }
 
     public async Task<Result<Guid>> CreateEcosystemAsync(
         EcosystemRequestDto request,
         CancellationToken cancellationToken)
     {
-        var validationResult = await validator
-            .ValidateAsync(request, cancellationToken);
-
+        var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if(!validationResult.IsValid)
         {
             return Result<Guid>
@@ -84,7 +80,6 @@ public sealed class EcosystemService(
             request.Name,
             request.Volume,
             request.ControllerId);
-
         if (createResult.IsFailure)
         {
             return Result<Guid>.Failure(createResult.Error);
@@ -101,26 +96,21 @@ public sealed class EcosystemService(
         EcosystemUpdateRequestDto request,
         CancellationToken cancellationToken)
     {
-        var ownership = await secureService
-            .EnsureUserOwnsEcosystemAsync(ecosystemId, cancellationToken);
-
+        var ownership = await secureService.EnsureUserOwnsEcosystemAsync(
+            ecosystemId, cancellationToken);
         if (ownership.IsFailure)
         {
-            return Result<AutomationRuleResponseDto>
-                .Failure(ownership.Error);
+            return Result.Failure(ownership.Error);
         }
 
         var ecosystem = ownership.Value;
-
         var nameResult = ecosystem.SetName(request.Name);
-
         if (nameResult.IsFailure)
         {
             return Result.Failure(nameResult.Error);
         }
 
         var volumeResult = ecosystem.SetVolume(request.Volume);
-
         if (volumeResult.IsFailure)
         {
             return Result.Failure(volumeResult.Error);
@@ -136,9 +126,8 @@ public sealed class EcosystemService(
         Guid ecosystemId,
         CancellationToken cancellationToken)
     {
-        var ownership = await secureService
-                .EnsureUserOwnsEcosystemAsync(ecosystemId, cancellationToken);
-
+        var ownership = await secureService.EnsureUserOwnsEcosystemAsync(
+            ecosystemId, cancellationToken);
         if (ownership.IsFailure)
         {
             return Result.Failure(ownership.Error);

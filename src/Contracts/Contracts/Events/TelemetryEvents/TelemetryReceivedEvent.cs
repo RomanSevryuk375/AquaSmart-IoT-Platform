@@ -1,6 +1,6 @@
 ﻿namespace Contracts.Events.TelemetryEvents;
 
-public record TelemetryReceivedEvent
+public sealed record TelemetryReceivedEvent
 {
     public Guid EventId { get; init; } = Guid.NewGuid();
     public DateTime OccurredOn { get; init; } = DateTime.UtcNow;

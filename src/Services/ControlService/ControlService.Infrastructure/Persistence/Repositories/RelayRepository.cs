@@ -26,7 +26,7 @@ public sealed class RelayRepository(SystemDbContext dbContext)
     }
 
     public async Task<IReadOnlyList<RelayEntity>> GetManyByIds(
-        List<Guid> relayIds, 
+        IEnumerable<Guid> relayIds, 
         CancellationToken cancellationToken)
     {
         return await Context.Relays.AsNoTracking()

@@ -14,6 +14,6 @@ public interface IRelayRepository : IRepository<RelayEntity>
         CancellationToken cancellationToken);
 
     Task<IReadOnlyList<RelayEntity>> GetManyByIds(
-        List<Guid> relayIds,
+        IEnumerable<Guid> relayIds,
         CancellationToken cancellationToken);
 }

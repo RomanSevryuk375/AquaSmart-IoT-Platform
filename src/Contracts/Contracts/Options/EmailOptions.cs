@@ -1,6 +1,6 @@
 ﻿namespace Contracts.Options;
 
-public record EmailOptions
+public sealed record EmailOptions
 {
     public const string SectionName = "EmailOptions";
     public string Host { get; init; } = string.Empty;

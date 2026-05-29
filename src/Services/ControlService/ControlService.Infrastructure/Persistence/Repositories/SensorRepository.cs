@@ -17,7 +17,7 @@ public sealed class SensorRepository(SystemDbContext dbContext)
     }
 
     public async Task<IReadOnlyList<SensorEntity>> GetManyByIdsAsync(
-        List<Guid> sensorIds,
+        IEnumerable<Guid> sensorIds,
         CancellationToken cancellationToken)
     {
         return await Context.Sensors

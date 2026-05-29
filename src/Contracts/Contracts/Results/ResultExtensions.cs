@@ -40,6 +40,7 @@ public static class ResultExtensions
             ErrorType.NotFound => controller.NotFound(response),
             ErrorType.Validation => controller.BadRequest(response),
             ErrorType.Conflict => controller.Conflict(response),
+
             _ => controller.StatusCode(500, new { error = "InternalError", message = error.Message })
         };
     }

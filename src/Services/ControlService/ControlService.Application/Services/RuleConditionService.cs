@@ -22,7 +22,6 @@ public sealed class RuleConditionService(
     {
         var validationResult = await validator.ValidateAsync(
             request, cancellationToken);
-
         if (!validationResult.IsValid)
         {
             return Result<Guid>
@@ -38,7 +37,6 @@ public sealed class RuleConditionService(
         }
 
         var rule = ruleResult.Value;
-
         var sensorOwrenship = await EnsureConditionOwnsSensorAsync(
             rule, request.SensorId, cancellationToken);
         if (sensorOwrenship.IsFailure)
@@ -87,7 +85,6 @@ public sealed class RuleConditionService(
         }
 
         var rule = ruleResult.Value;
-
         var conditionOwnership = await EnsureRuleOwnsConditionAsync(
             rule, conditionId, cancellationToken);
         if (conditionOwnership.IsFailure)
@@ -99,7 +96,6 @@ public sealed class RuleConditionService(
             request.Condition,
             request.Threshold,
             request.Hysteresis);
-
         if (updateResult.IsFailure)
         {
             return Result.Failure(updateResult.Error);
@@ -123,7 +119,6 @@ public sealed class RuleConditionService(
         }
 
         var rule = ruleResult.Value;
-
         var conditionOwnership = await EnsureRuleOwnsConditionAsync(
             rule, conditionId, cancellationToken);
         if (conditionOwnership.IsFailure)
@@ -142,9 +137,8 @@ public sealed class RuleConditionService(
         Guid conditionId, 
         CancellationToken cancellationToken)
     {
-        var condition = await ruleConditionRepository
-            .GetByIdAsync(conditionId, cancellationToken);
-
+        var condition = await ruleConditionRepository.GetByIdAsync(
+            conditionId, cancellationToken);
         if (condition is null)
         {
             return Result<RuleConditionEntity>
