@@ -1,7 +1,10 @@
 ﻿using Contracts.Authorization;
 using Contracts.Results;
+using Control.Application.CQRS.Ecosystem.Commands.CreateEcosystem;
 using Control.Application.DTOs.Ecosystem;
 using Control.Application.Interfaces;
+using Control.Domain.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,8 +12,10 @@ namespace Control.API.Controllers;
 
 [ApiController]
 [Route("api/control/v1/ecosystems")]
-public class EcosystemsController(
-    IEcosystemService ecosystemService) : ControllerBase
+public class EcosystemController(
+    IEcosystemService ecosystemService,
+    IUserContext userContext,
+    ISender sender) : ControllerBase
 {
     private const string GetByIdRoute = "GetEcosystemById";
 
@@ -46,8 +51,16 @@ public class EcosystemsController(
         [FromBody] EcosystemRequestDto request,
         CancellationToken cancellationToken)
     {
-        var result = await ecosystemService.CreateEcosystemAsync(
-            request, cancellationToken);
+        var command = new CreateEcosystemCommand
+        {
+            Type = request.Type,
+            Name = request.Name,
+            Volume = request.Volume,
+            ControllerId = request.ControllerId,
+            UserId = userContext.UserId
+        };
+
+        var result = await sender.Send(command, cancellationToken);
         if (result.IsFailure)
         {
             return this.ToActionResult(result);

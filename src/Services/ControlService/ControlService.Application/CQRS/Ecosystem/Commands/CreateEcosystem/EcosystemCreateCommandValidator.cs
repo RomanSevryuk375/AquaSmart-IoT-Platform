@@ -1,13 +1,12 @@
 ﻿using Contracts.Constants;
-using Control.Application.DTOs.Ecosystem;
 using FluentValidation;
 
-namespace Control.Application.DTOs.Validators;
+namespace Control.Application.CQRS.Ecosystem.Commands.CreateEcosystem;
 
-public sealed class EcosystemRequestDtoValidator 
-    : AbstractValidator<EcosystemRequestDto>
+public sealed class EcosystemCreateCommandValidator 
+    : AbstractValidator<CreateEcosystemCommand>
 {
-    public EcosystemRequestDtoValidator()
+    public EcosystemCreateCommandValidator() 
     {
         RuleFor(x => x.Type)
             .NotEmpty()
@@ -18,10 +17,13 @@ public sealed class EcosystemRequestDtoValidator
             .MaximumLength(EcosystemConstants.NameLength);
 
         RuleFor(x => x.Volume)
-            .NotEmpty()
+            .NotNull()
             .GreaterThan(0.0);
 
         RuleFor(x => x.ControllerId)
+            .NotEmpty();
+
+        RuleFor(x => x.UserId)
             .NotEmpty();
     }
 }

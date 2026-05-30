@@ -16,4 +16,8 @@
     <ProjectReference Include="..\ControlService.Domain\Control.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CQRS\Ecosystem\Queries\" />
+  </ItemGroup>
+
 </Project>
