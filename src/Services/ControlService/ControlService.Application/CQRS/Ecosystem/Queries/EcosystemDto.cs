@@ -1,8 +1,8 @@
 ﻿using Contracts.Enums;
 
-namespace Control.Application.DTOs.Ecosystem;
+namespace Control.Application.CQRS.Ecosystem.Queries;
 
-public sealed record EcosystemResponseDto
+public sealed record EcosystemDto 
 {
     public Guid Id { get; init; }
     public EcosystemTypeEnum Type { get; init; }

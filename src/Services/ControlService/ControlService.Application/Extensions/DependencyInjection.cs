@@ -9,18 +9,23 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
+        var assembly = typeof(DependencyInjection).Assembly;
         services.AddScoped<IAutomationRuleService, AutomationRuleService>();
-        services.AddScoped<IEcosystemService, EcosystemService>();
         services.AddScoped<IRelayService, RelayService>();
         services.AddScoped<IRuleConditionService, RuleConditionService>();
         services.AddScoped<IScheduleProcessor, ScheduleProcessor>();
         services.AddScoped<ISensorService, SensorService>();
         services.AddScoped<ITelemetryService, TelemetryService>();
 
-        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+        services.AddMediatR(cfg => 
+        { 
+            cfg.RegisterServicesFromAssembly(assembly);  
+        });
 
-        services.AddAutoMapper(config =>
-            config.AddMaps(typeof(DependencyInjection).Assembly));
+        services.AddValidatorsFromAssembly(assembly);
+
+        services.AddAutoMapper(config => 
+        config.AddMaps(assembly));
 
         return services;
     }

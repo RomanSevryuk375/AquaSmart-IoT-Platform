@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Control.Application.CQRS.Ecosystem.Commands.CreateEcosystem;
 
-public class EcosystemCreateHandler(
+public sealed class CreateEcosystemHandler(
     IEcosystemRepository ecosystemRepository, 
     IUnitOfWork unitOfWork) : IRequestHandler<CreateEcosystemCommand, Result<Guid>>
 {

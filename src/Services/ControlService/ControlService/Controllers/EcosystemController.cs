@@ -1,8 +1,12 @@
 ﻿using Contracts.Authorization;
 using Contracts.Results;
 using Control.Application.CQRS.Ecosystem.Commands.CreateEcosystem;
+using Control.Application.CQRS.Ecosystem.Commands.DeleteEcosystem;
+using Control.Application.CQRS.Ecosystem.Commands.UpdateEcosystem;
+using Control.Application.CQRS.Ecosystem.Queries;
+using Control.Application.CQRS.Ecosystem.Queries.GetAllEcosystems;
+using Control.Application.CQRS.Ecosystem.Queries.GetEcosystemById;
 using Control.Application.DTOs.Ecosystem;
-using Control.Application.Interfaces;
 using Control.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -12,8 +16,7 @@ namespace Control.API.Controllers;
 
 [ApiController]
 [Route("api/control/v1/ecosystems")]
-public class EcosystemController(
-    IEcosystemService ecosystemService,
+public sealed class EcosystemController(
     IUserContext userContext,
     ISender sender) : ControllerBase
 {
@@ -21,26 +24,25 @@ public class EcosystemController(
 
     [HttpGet]
     [Authorize(Policy = SubPermissions.TankRead)]
-    public async Task<ActionResult<IReadOnlyList<EcosystemResponseDto>>> GetAllEcosystemsAsync(
-        [FromQuery] EcosystemFilterDto filter,
-        [FromQuery] int skip = 0,
-        [FromQuery] int take = 10,
+    public async Task<ActionResult<IReadOnlyList<EcosystemDto>>> GetAllEcosystemsAsync(
+        [FromQuery] GetAllEcosystemsQuery query,
         CancellationToken cancellationToken = default)
     {
-        var result = await ecosystemService.GetAllEcosystemsAsync(
-            filter, skip, take, cancellationToken);
+        var enrichedQuery = query with { UserId = userContext.UserId };
+
+        var result = await sender.Send(enrichedQuery, cancellationToken);
 
         return Ok(result);
     }
 
     [HttpGet("{id:guid}", Name = GetByIdRoute)]
     [Authorize(Policy = SubPermissions.TankRead)]
-    public async Task<ActionResult<EcosystemResponseDto>> GetEcosystemByIdAsync(
+    public async Task<ActionResult<EcosystemDto>> GetEcosystemByIdAsync(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var result = await ecosystemService.GetEcosystemByIdAsync(
-            id, cancellationToken);
+        var query = new GetEcosystemByIdQuery{ EcosystemId = id };
+        var result = await sender.Send(query, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -79,8 +81,14 @@ public class EcosystemController(
         [FromBody] EcosystemUpdateRequestDto request,
         CancellationToken cancellationToken)
     {
-        var result = await ecosystemService.UpdateEcosystemAsync(
-            id, request, cancellationToken);
+        var command = new UpdateEcosystemCommand
+        {
+            EcosystemId = id,
+            Name = request.Name,
+            Volume = request.Volume
+        };
+
+        var result = await sender.Send(command, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -91,8 +99,8 @@ public class EcosystemController(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var result = await ecosystemService.DeleteEcosystemAsync(
-            id, cancellationToken);
+        var command = new DeleteEcosystemCommand { EcosystemId = id };
+        var result = await sender.Send(command, cancellationToken);
 
         return this.ToActionResult(result);
     }

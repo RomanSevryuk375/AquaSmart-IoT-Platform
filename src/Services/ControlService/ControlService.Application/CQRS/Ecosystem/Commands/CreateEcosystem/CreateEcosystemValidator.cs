@@ -3,10 +3,10 @@ using FluentValidation;
 
 namespace Control.Application.CQRS.Ecosystem.Commands.CreateEcosystem;
 
-public sealed class EcosystemCreateCommandValidator 
+public sealed class CreateEcosystemValidator 
     : AbstractValidator<CreateEcosystemCommand>
 {
-    public EcosystemCreateCommandValidator() 
+    public CreateEcosystemValidator() 
     {
         RuleFor(x => x.Type)
             .NotEmpty()
