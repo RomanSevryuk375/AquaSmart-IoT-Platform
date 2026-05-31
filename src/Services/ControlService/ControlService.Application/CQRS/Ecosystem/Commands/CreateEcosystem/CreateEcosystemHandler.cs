@@ -14,11 +14,8 @@ public sealed class CreateEcosystemHandler(
         CancellationToken cancellationToken)
     {
         var createResult = EcosystemEntity.Create(
-            request.UserId,
-            request.Type,
-            request.Name,
-            request.Volume,
-            request.ControllerId);
+            request.UserId, request.Type, request.Name,
+            request.Volume, request.ControllerId);
         if (createResult.IsFailure)
         {
             return Result<Guid>.Failure(createResult.Error);
