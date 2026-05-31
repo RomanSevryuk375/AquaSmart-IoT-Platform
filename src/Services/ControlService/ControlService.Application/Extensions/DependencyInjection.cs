@@ -1,6 +1,8 @@
-﻿using Control.Application.Interfaces;
+﻿using Control.Application.CQRS.Common;
+using Control.Application.Interfaces;
 using Control.Application.Services;
 using FluentValidation;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Control.Application.Extensions;
@@ -10,6 +12,7 @@ public static class DependencyInjection
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         var assembly = typeof(DependencyInjection).Assembly;
+
         services.AddScoped<IAutomationRuleService, AutomationRuleService>();
         services.AddScoped<IRelayService, RelayService>();
         services.AddScoped<IRuleConditionService, RuleConditionService>();
@@ -19,7 +22,10 @@ public static class DependencyInjection
 
         services.AddMediatR(cfg => 
         { 
-            cfg.RegisterServicesFromAssembly(assembly);  
+            cfg.RegisterServicesFromAssembly(assembly);
+
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(EcosystemSecurityBehavior<,>));
         });
 
         services.AddValidatorsFromAssembly(assembly);
