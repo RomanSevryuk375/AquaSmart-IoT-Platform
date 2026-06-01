@@ -3,7 +3,8 @@ using MediatR;
 
 namespace Control.Application.CQRS.Ecosystem.Queries.GetAllEcosystems;
 
-public sealed record GetAllEcosystemsQuery : IRequest<IReadOnlyList<EcosystemDto>>
+public sealed record GetAllEcosystemsQuery 
+    : IRequest<IReadOnlyList<EcosystemDto>>
 {
     public Guid? UserId { get; init; }
     public string? Name { get; init; } = string.Empty;

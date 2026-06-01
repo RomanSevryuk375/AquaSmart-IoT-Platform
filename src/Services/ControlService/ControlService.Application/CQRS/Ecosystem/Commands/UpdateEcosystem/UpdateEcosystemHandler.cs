@@ -1,5 +1,4 @@
 ﻿using Contracts.Results;
-using Control.Application.Interfaces;
 using Control.Domain.Interfaces;
 using MediatR;
 
@@ -7,21 +6,19 @@ namespace Control.Application.CQRS.Ecosystem.Commands.UpdateEcosystem;
 
 public sealed class UpdateEcosystemHandler(
     IEcosystemRepository ecosystemRepository,
-    ISecureService secureService,
     IUnitOfWork unitOfWork) : IRequestHandler<UpdateEcosystemCommand, Result>
 {
     public async Task<Result> Handle(
         UpdateEcosystemCommand request, 
         CancellationToken cancellationToken)
     {
-        var ownership = await secureService.EnsureUserOwnsEcosystemAsync(
-            request.EcosystemId, cancellationToken);
-        if (ownership.IsFailure)
+        var ecosystem = await ecosystemRepository.GetByIdAsync(request.EcosystemId, cancellationToken);
+        if (ecosystem is null)
         {
-            return Result.Failure(ownership.Error);
+            return Result.Failure(Error.NotFound(
+                "Ecosystem.NotFound", $"Ecosystem {request.EcosystemId} not found"));
         }
 
-        var ecosystem = ownership.Value;
         var nameResult = ecosystem.SetName(request.Name);
         if (nameResult.IsFailure)
         {

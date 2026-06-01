@@ -1,8 +1,9 @@
 ﻿using Contracts.Enums;
+using Control.Application.DTOs.AutomationRule;
 
-namespace Control.Application.DTOs.AutomationRule;
+namespace Control.Application.CQRS.AutomationRule.Queries;
 
-public record AutomationRuleResponseDto
+public sealed record AutomationRuleDto
 {
     public Guid Id { get; private set; }
     public Guid EcosystemId { get; private set; }

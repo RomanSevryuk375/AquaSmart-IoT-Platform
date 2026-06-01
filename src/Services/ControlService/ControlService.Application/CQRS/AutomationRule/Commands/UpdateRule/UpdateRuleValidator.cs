@@ -1,15 +1,14 @@
 ﻿using Contracts.Constants;
-using Control.Application.DTOs.AutomationRule;
 using FluentValidation;
 
-namespace Control.Application.DTOs.Validators;
+namespace Control.Application.CQRS.AutomationRule.Commands.UpdateRule;
 
-public sealed class AutomationRuleRequestDtoValidator
-    : AbstractValidator<AutomationRuleRequestDto>
+public sealed class UpdateRuleValidator 
+    : AbstractValidator<UpdateRuleCommand>
 {
-    public AutomationRuleRequestDtoValidator()
+    public UpdateRuleValidator()
     {
-        RuleFor(x => x.EcosystemId)
+        RuleFor(x => x.RuleId)
             .NotEmpty();
 
         RuleFor(x => x.RelayId)
@@ -26,8 +25,5 @@ public sealed class AutomationRuleRequestDtoValidator
         RuleFor(x => x.Action)
             .NotEmpty()
             .IsInEnum();
-
-        RuleFor(x => x.IsActive)
-            .NotEmpty();
     }
 }

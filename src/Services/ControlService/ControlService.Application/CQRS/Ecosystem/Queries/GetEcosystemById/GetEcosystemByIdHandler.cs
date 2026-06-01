@@ -1,25 +1,25 @@
 ﻿using AutoMapper;
 using Contracts.Results;
-using Control.Application.Interfaces;
+using Control.Domain.Interfaces;
 using MediatR;
 
 namespace Control.Application.CQRS.Ecosystem.Queries.GetEcosystemById;
 
 public sealed class GetEcosystemByIdHandler(
-    ISecureService secureService,
+    IEcosystemRepository ecosystemRepository,
     IMapper mapper) : IRequestHandler<GetEcosystemByIdQuery, Result<EcosystemDto>>
 {
     public async Task<Result<EcosystemDto>> Handle(
         GetEcosystemByIdQuery request, 
         CancellationToken cancellationToken)
     {
-        var ownership = await secureService.EnsureUserOwnsEcosystemAsync(
-            request.EcosystemId, cancellationToken);
-        if (ownership.IsFailure)
+        var ecosystem = await ecosystemRepository.GetByIdAsync(request.EcosystemId, cancellationToken);
+        if (ecosystem is null)
         {
-            return Result<EcosystemDto>.Failure(ownership.Error);
+            return Result<EcosystemDto>.Failure(Error.NotFound(
+                "Ecosystem.NotFound", $"Ecosystem {request.EcosystemId} not found"));
         }
 
-        return Result<EcosystemDto>.Success(mapper.Map<EcosystemDto>(ownership.Value));
+        return Result<EcosystemDto>.Success(mapper.Map<EcosystemDto>(ecosystem));
     }
 }

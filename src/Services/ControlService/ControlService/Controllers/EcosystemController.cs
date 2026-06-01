@@ -29,7 +29,6 @@ public sealed class EcosystemController(
         CancellationToken cancellationToken = default)
     {
         var enrichedQuery = query with { UserId = userContext.UserId };
-
         var result = await sender.Send(enrichedQuery, cancellationToken);
 
         return Ok(result);
@@ -41,7 +40,7 @@ public sealed class EcosystemController(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var query = new GetEcosystemByIdQuery{ EcosystemId = id };
+        var query = new GetEcosystemByIdQuery { EcosystemId = id };
         var result = await sender.Send(query, cancellationToken);
 
         return this.ToActionResult(result);
@@ -70,7 +69,7 @@ public sealed class EcosystemController(
 
         return CreatedAtRoute(
             GetByIdRoute,
-            new { id = result.Value }, 
+            new { id = result.Value },
             result.Value);
     }
 

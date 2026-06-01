@@ -1,4 +1,4 @@
-﻿using Control.Application.CQRS.Common;
+﻿using Control.Application.CQRS.Common.Behaviors;
 using Control.Application.Interfaces;
 using Control.Application.Services;
 using FluentValidation;
@@ -13,7 +13,6 @@ public static class DependencyInjection
     {
         var assembly = typeof(DependencyInjection).Assembly;
 
-        services.AddScoped<IAutomationRuleService, AutomationRuleService>();
         services.AddScoped<IRelayService, RelayService>();
         services.AddScoped<IRuleConditionService, RuleConditionService>();
         services.AddScoped<IScheduleProcessor, ScheduleProcessor>();
@@ -26,6 +25,7 @@ public static class DependencyInjection
 
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(EcosystemSecurityBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(AutomationRuleSecurityBehavior<,>));
         });
 
         services.AddValidatorsFromAssembly(assembly);
