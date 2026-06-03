@@ -14,7 +14,6 @@ public static class DependencyInjection
         var assembly = typeof(DependencyInjection).Assembly;
 
         services.AddScoped<IRelayService, RelayService>();
-        services.AddScoped<IRuleConditionService, RuleConditionService>();
         services.AddScoped<IScheduleProcessor, ScheduleProcessor>();
         services.AddScoped<ISensorService, SensorService>();
         services.AddScoped<ITelemetryService, TelemetryService>();

@@ -1,7 +1,10 @@
 ﻿using Contracts.Authorization;
 using Contracts.Results;
+using Control.Application.CQRS.RuleCondition.Command.AddCondition;
+using Control.Application.CQRS.RuleCondition.Command.DeleteCondition;
+using Control.Application.CQRS.RuleCondition.Command.UpdateCondition;
 using Control.Application.DTOs.AutomationRule;
-using Control.Application.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,7 +13,7 @@ namespace Control.API.Controllers;
 [ApiController]
 [Route("api/control/v1/automation-rules/{ruleId:guid}/conditions")]
 public class RuleConditionsController(
-    IRuleConditionService conditionService) : ControllerBase
+    ISender sender) : ControllerBase
 {
     [HttpPost]
     [Authorize(Policy = SubPermissions.AutoRuleCreate)]
@@ -19,8 +22,15 @@ public class RuleConditionsController(
         [FromBody] RuleConditionRequestDto request,
         CancellationToken cancellationToken)
     {
-        var result = await conditionService.AddConditionAsync(
-            ruleId, request, cancellationToken);
+        var command = new AddConditionCommand
+        {
+            RuleId = ruleId,
+            SensorId = request.SensorId,
+            Condition = request.Condition,
+            Threshold = request.Threshold,
+            Hysteresis = request.Hysteresis,
+        };
+        var result = await sender.Send(command, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -34,8 +44,16 @@ public class RuleConditionsController(
         [FromBody] RuleConditionRequestDto request,
         CancellationToken cancellationToken)
     {
-        var result = await conditionService.UpdateConditionAsync(
-            ruleId, conditionId, request, cancellationToken);
+        var command = new UpdateConditionCommand
+        {
+            RuleId = ruleId,
+            ConditionId = conditionId,
+            SensorId = request.SensorId,
+            Condition = request.Condition,
+            Threshold = request.Threshold,
+            Hysteresis = request.Hysteresis,
+        };
+        var result = await sender.Send(command, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -47,8 +65,12 @@ public class RuleConditionsController(
         [FromRoute] Guid conditionId,
         CancellationToken cancellationToken)
     {
-        var result = await conditionService.DeleteConditionAsync(
-            ruleId, conditionId, cancellationToken);
+        var command = new DeleteConditionCommand
+        {
+            ConditionId = conditionId,
+            RuleId = ruleId,
+        };
+        var result = await sender.Send(command, cancellationToken);
 
         return this.ToActionResult(result);
     }

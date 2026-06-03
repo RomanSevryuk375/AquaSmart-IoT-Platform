@@ -1,13 +1,15 @@
-﻿using Control.Application.DTOs.AutomationRule;
-using FluentValidation;
+﻿using FluentValidation;
 
-namespace Control.Application.DTOs.Validators;
+namespace Control.Application.CQRS.RuleCondition.Command.AddCondition;
 
-public class RuleConditionRequestDtoValidator 
-    : AbstractValidator<RuleConditionRequestDto>
+public sealed class AddConditionValidator 
+    : AbstractValidator<AddConditionCommand>
 {
-    public RuleConditionRequestDtoValidator()
+    public AddConditionValidator()
     {
+        RuleFor(x => x.RuleId)
+            .NotEmpty();
+
         RuleFor(x => x.SensorId)
             .NotEmpty();
 
