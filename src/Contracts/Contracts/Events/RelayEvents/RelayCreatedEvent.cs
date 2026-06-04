@@ -2,7 +2,7 @@
 
 namespace Contracts.Events.RelayEvents;
 
-public record RelayCreatedEvent
+public sealed record RelayCreatedEvent
 {
     public Guid EventId { get; init; } = Guid.NewGuid();
     public DateTime OccurredOn { get; init; } = DateTime.UtcNow;

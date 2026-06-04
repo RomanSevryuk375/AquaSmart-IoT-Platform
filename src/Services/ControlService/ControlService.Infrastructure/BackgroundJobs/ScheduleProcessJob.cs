@@ -3,10 +3,16 @@ using Quartz;
 
 namespace Control.Infrastructure.BackgroundJobs;
 
-public class ScheduleProcessJob(IScheduleProcessor scheduleProcessor) : IJob
+public sealed class ScheduleProcessJob(
+    IScheduleProcessor scheduleProcessor) : IJob
 {
     public async Task Execute(IJobExecutionContext context)
     {
-        await scheduleProcessor.ProcessAsync(context.CancellationToken);
+        var result = await scheduleProcessor.ProcessAsync(context.CancellationToken);
+
+        if (result.IsFailure)
+        {
+            throw new JobExecutionException(result.Error.Message);
+        }
     }
 }

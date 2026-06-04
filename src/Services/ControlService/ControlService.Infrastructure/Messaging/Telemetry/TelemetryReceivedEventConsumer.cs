@@ -4,12 +4,17 @@ using MassTransit;
 
 namespace Control.Infrastructure.Messaging.Telemetry;
 
-public class TelemetryReceivedEventConsumer(ITelemetryService service) 
+internal sealed class TelemetryReceivedEventConsumer(ITelemetryService service) 
     : IConsumer<TelemetryReceivedEvent>
 {
     public async Task Consume(ConsumeContext<TelemetryReceivedEvent> context)
     {
-        await service.ProcessTelemetryAsync(
+        var result = await service.ProcessTelemetryAsync(
             context.Message, context.CancellationToken);
+
+        if (!result.IsSuccess && result.IsRetryable)
+        {
+            throw new Exception(result.Error);
+        }
     }
 }

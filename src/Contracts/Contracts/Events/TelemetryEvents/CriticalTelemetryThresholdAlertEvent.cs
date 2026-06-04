@@ -1,6 +1,6 @@
 ﻿namespace Contracts.Events.TelemetryEvents;
 
-public record CriticalTelemetryThresholdAlertEvent
+public sealed record CriticalTelemetryThresholdAlertEvent
 {
     public Guid EventId { get; init; } = Guid.NewGuid();
     public DateTime OccurredOn { get; init; } = DateTime.UtcNow;

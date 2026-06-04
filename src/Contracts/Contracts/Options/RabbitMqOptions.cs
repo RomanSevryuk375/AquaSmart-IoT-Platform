@@ -1,6 +1,6 @@
 ﻿namespace Contracts.Options;
 
-public record RabbitMqOptions
+public sealed record RabbitMqOptions
 {
     public const string SectionName = "RabbitMqOptions";
     public string Host { get; init; } = string.Empty;

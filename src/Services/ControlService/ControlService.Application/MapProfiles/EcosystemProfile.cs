@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Contracts.Events.EcosystemEvents;
-using Control.Application.DTOs.Ecosystem;
+using Control.Application.CQRS.Ecosystem.Queries;
 using Control.Domain.Entities;
 
 namespace Control.Application.MapProfiles;
@@ -9,7 +9,7 @@ public sealed class EcosystemProfile : Profile
 {
     public EcosystemProfile()
     {
-        CreateMap<EcosystemEntity, EcosystemResponseDto>();
+        CreateMap<EcosystemEntity, EcosystemDto>();
 
         CreateMap<EcosystemEntity, EcosystemCreatedEvent>()
             .ForMember(desc => desc.EcosystemId, 

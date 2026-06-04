@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
+using Telemetry.Application.Interfaces;
 using Telemetry.Domain.Interfaces;
 using Telemetry.Infrastructure.BackgroundJobs;
 using Telemetry.Infrastructure.Messaging;
@@ -13,6 +14,7 @@ using Telemetry.Infrastructure.Persistence;
 using Telemetry.Infrastructure.Persistence.Interceptors;
 using Telemetry.Infrastructure.Persistence.Outbox;
 using Telemetry.Infrastructure.Persistence.Repositories;
+using Telemetry.Infrastructure.SignalR;
 using EcosystemCreatedConsumer = Telemetry.Infrastructure.Messaging.EcosystemConsumers.EcosystemCreatedConsumer;
 
 namespace Telemetry.Infrastructure.Extensions;
@@ -138,6 +140,15 @@ public static class DependencyInjection
 
         services.AddHealthChecks()
             .AddRabbitMQ(new Uri(rabbitOptions.Host));
+
+        return services;
+    }
+
+    public static IServiceCollection AddMySignalR(this IServiceCollection services)
+    {
+        services.AddSignalR();
+
+        services.AddScoped<ITelemetryNotifier, RawTelemetryNotifier>();
 
         return services;
     }

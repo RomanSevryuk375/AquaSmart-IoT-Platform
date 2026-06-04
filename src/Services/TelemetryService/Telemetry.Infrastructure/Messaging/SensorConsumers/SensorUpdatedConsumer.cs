@@ -9,7 +9,7 @@ public class SensorUpdatedConsumer(
 {
     public async Task Consume(ConsumeContext<SensorUpdatedEvent> context)
     {
-        var result = await sensorService.UpdateSensorAsync(
+        var result = await sensorService.UpdatedSensorAsync(
             context.Message, context.CancellationToken);
 
         if (!result.IsSuccess && result.IsRetryable)

@@ -6,19 +6,19 @@ namespace Telemetry.Application.Interfaces;
 public interface ISensorService
 {
     Task<ConsumerResult> CreateSensorAsync(
-        SensorCreatedEvent sensorCreated, 
+        SensorCreatedEvent @event,
         CancellationToken cancellationToken);
 
-    Task<ConsumerResult> DeleteSensorAsync(
-        SensorDeletedEvent sensorDeleted, 
+    Task<ConsumerResult> DeletedSensorAsync(
+        SensorDeletedEvent @event,
         CancellationToken cancellationToken);
 
-    Task<ConsumerResult> UpdateSensorAsync(
-        SensorUpdatedEvent updatedEvent, 
+    Task<ConsumerResult> UpdatedSensorAsync(
+        SensorUpdatedEvent @event,
         CancellationToken cancellationToken);
 
     Task<ConsumerResult> SetSensorStateAsync(
-        SensorStateChangedEvent sensorStateChanged,
+        SensorStateChangedEvent @event,
         CancellationToken cancellationToken);
 
     Task<ConsumerResult> SetSensorNameAsync(

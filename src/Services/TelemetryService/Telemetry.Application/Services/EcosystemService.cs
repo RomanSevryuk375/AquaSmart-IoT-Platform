@@ -14,9 +14,8 @@ public sealed class EcosystemService(
         EcosystemCreatedEvent ecosystem,
         CancellationToken cancellationToken)
     {
-        var existingEcosystem = await ecosystemRepository
-            .GetByIdAsync(ecosystem.EcosystemId, cancellationToken);
-
+        var existingEcosystem = await ecosystemRepository.GetByIdAsync(
+            ecosystem.EcosystemId, cancellationToken);
         if (existingEcosystem is not null)
         {
             return ConsumerResult.Success();
@@ -26,10 +25,9 @@ public sealed class EcosystemService(
             ecosystem.EcosystemId,
             ecosystem.ControllerId,
             ecosystem.UserId);
-
         if (result.IsFailure)
         {
-            return ConsumerResult.FatalError($"{result.Error}");
+            return ConsumerResult.FatalError($"Ecosystem creation failed: {result.Error.Message}");
         }
 
         await ecosystemRepository.AddAsync(result.Value, cancellationToken);
@@ -42,13 +40,11 @@ public sealed class EcosystemService(
         EcosystemDeletedEvent ecosystem,
         CancellationToken cancellationToken)
     {
-        var existingEcosystem = await ecosystemRepository
-            .GetByIdAsync(ecosystem.EcosystemId, cancellationToken);
-
+        var existingEcosystem = await ecosystemRepository.GetByIdAsync(
+            ecosystem.EcosystemId, cancellationToken);
         if (existingEcosystem is null)
         {
-            return ConsumerResult
-                .RetryableError($"Ecosystem {ecosystem.EcosystemId} not found.");
+            return ConsumerResult.Success();
         }
 
         await ecosystemRepository.DeleteAsync(existingEcosystem.Id, cancellationToken);

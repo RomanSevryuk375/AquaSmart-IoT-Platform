@@ -1,6 +1,6 @@
 ﻿namespace Control.Domain.SpecificationParams;
 
-public record VacationModeFilterParams
+public sealed record VacationModeFilterParams
 {
     public Guid? EcosystemId { get; init; }
     public DateTime? StartDate { get; init; }

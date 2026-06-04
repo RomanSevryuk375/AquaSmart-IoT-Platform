@@ -12,10 +12,4 @@ public interface IAutomationRuleRepository : IRepository<AutomationRuleEntity>
     Task<IReadOnlyList<AutomationRuleEntity>> GetBySensorIdWithConditionsAsync(
         Guid sensorId,
         CancellationToken cancellationToken);
-
-    Task<IReadOnlyList<AutomationRuleEntity>> GetAllRulesAsync(
-        BaseSpecification<AutomationRuleEntity>? specification,
-        int? skip,
-        int? take,
-        CancellationToken cancellationToken);
 }

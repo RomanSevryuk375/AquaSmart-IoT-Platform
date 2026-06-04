@@ -1,6 +1,8 @@
-﻿namespace Control.Application.Interfaces;
+﻿using Contracts.Results;
+
+namespace Control.Application.Interfaces;
 
 public interface IScheduleProcessor
 {
-    Task ProcessAsync(CancellationToken cancellationToken);
+    Task<Result> ProcessAsync(CancellationToken cancellationToken);
 }

@@ -1,6 +1,6 @@
 ﻿namespace Contracts.Events.EcosystemEvents;
 
-public class EcosystemUdatedEvent
+public sealed record EcosystemUdatedEvent
 {
     public Guid EventId { get; init; } = Guid.NewGuid();
     public DateTime OccurredOn { get; init; } = DateTime.UtcNow;

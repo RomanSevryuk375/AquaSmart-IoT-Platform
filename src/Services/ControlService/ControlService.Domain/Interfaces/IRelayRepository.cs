@@ -12,4 +12,8 @@ public interface IRelayRepository : IRepository<RelayEntity>
     Task<RelayEntity?> GetByPowerSensorId(
         Guid powerSensorId,
         CancellationToken cancellationToken);
+
+    Task<IReadOnlyList<RelayEntity>> GetManyByIds(
+        IEnumerable<Guid> relayIds,
+        CancellationToken cancellationToken);
 }

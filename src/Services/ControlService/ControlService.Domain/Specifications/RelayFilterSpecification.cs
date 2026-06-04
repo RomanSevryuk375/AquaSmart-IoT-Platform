@@ -4,7 +4,8 @@ using Control.Domain.SpecificationParams;
 
 namespace Control.Domain.Specifications;
 
-public class RelayFilterSpecification : BaseSpecification<RelayEntity>
+public sealed class RelayFilterSpecification 
+    : BaseSpecification<RelayEntity>
 {
     public RelayFilterSpecification(RelayFilterParams @params) 
         : base(data => 

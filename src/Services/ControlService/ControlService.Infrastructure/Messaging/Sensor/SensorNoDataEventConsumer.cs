@@ -4,12 +4,17 @@ using MassTransit;
 
 namespace Control.Infrastructure.Messaging.Sensor;
 
-public class SensorNoDataEventConsumer(ISensorService service)
+internal sealed class SensorNoDataEventConsumer(ISensorService service)
     : IConsumer<SensorNoDataEvent>
 {
     public async Task Consume(ConsumeContext<SensorNoDataEvent> context)
     {
-        await service.HandleSensorNoDataEventAsync(
+        var result = await service.HandleSensorNoDataEventAsync(
             context.Message, context.CancellationToken);
+
+        if (!result.IsSuccess && result.IsRetryable)
+        {
+            throw new Exception(result.Error);
+        }
     }
 }

@@ -3,49 +3,70 @@ using Contracts.Results;
 using MediatR;
 using Newtonsoft.Json;
 using Telemetry.Application.Interfaces;
+using Telemetry.Domain.Entities;
 using Telemetry.Domain.Interfaces;
 
-namespace Telemetry.Application.Services
+namespace Telemetry.Application.Services;
+
+public sealed class OutboxMessageProcessorService(
+    IOutboxRepository outboxRepository,
+    IPublisher publisher,
+    IUnitOfWork unitOfWork) : IOutboxMessageProcessorService
 {
-    public sealed class OutboxMessageProcessorService(
-        IOutboxRepository outboxRepository,
-        IPublisher publisher,
-        IUnitOfWork unitOfWork) : IOutboxMessageProcessorService
+    public async Task<Result> ProcessAsync(CancellationToken cancellationToken)
     {
-        public async Task<Result> ProcessAsync(CancellationToken cancellationToken)
+        var batchSize = 50;
+
+        var messages = await outboxRepository.GetPendingMessagesAsync(batchSize, cancellationToken);
+        bool anyMessagesForPublish = messages is null || !messages.Any();
+        if (anyMessagesForPublish)
         {
-            var batchSize = 50;
-
-            var messages = await outboxRepository.GetPendingMessagesAsync(batchSize, cancellationToken);
-            if (messages is null ||
-                !messages.Any())
-            {
-                return Result.Success();
-            }
-
-            foreach (var message in messages)
-            {
-                var type = Type.GetType(message.Type);
-                if (type == null)
-                {
-                    continue;
-                }
-
-                var domainEvent = JsonConvert.DeserializeObject(message.Content, type) as IDomainEvent;
-
-                if (domainEvent is null)
-                {
-                    continue;
-                }
-
-                await publisher.Publish(domainEvent, cancellationToken);
-
-                message.ProcessedOnUtc = DateTime.UtcNow;
-            }
-
-            await unitOfWork.SaveChangesAsync(cancellationToken);
-
             return Result.Success();
         }
+
+        foreach (var message in messages!)
+        {
+            await PublishDomainEventAsync(message, cancellationToken);
+        }
+
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
+    }
+
+    private async Task PublishDomainEventAsync(
+        OutboxMessage message,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var type = Type.GetType(message.Type);
+            if (type == null)
+            {
+                MarkAsPoisonMessage(message, $"Type '{message.Type}' could not be resolved.");
+                return;
+            }
+
+            var domainEvent = JsonConvert.DeserializeObject(message.Content, type) as IDomainEvent;
+            if (domainEvent is null)
+            {
+                MarkAsPoisonMessage(message, "Deserialization returned null or invalid type.");
+                return;
+            }
+
+            await publisher.Publish(domainEvent, cancellationToken);
+
+            message.ProcessedOnUtc = DateTime.UtcNow;
+        }
+        catch (Exception ex)
+        {
+            MarkAsPoisonMessage(message, ex.Message);
+        }
+    }
+
+    private static void MarkAsPoisonMessage(OutboxMessage message, string error)
+    {
+        message.Error = error;
+        message.ProcessedOnUtc = DateTime.UtcNow;
     }
 }

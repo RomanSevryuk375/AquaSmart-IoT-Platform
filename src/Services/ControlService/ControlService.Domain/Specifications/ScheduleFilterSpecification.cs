@@ -4,7 +4,8 @@ using Control.Domain.SpecificationParams;
 
 namespace Control.Domain.Specifications;
 
-public class ScheduleFilterSpecification : BaseSpecification<ScheduleEntity>
+public sealed class ScheduleFilterSpecification 
+    : BaseSpecification<ScheduleEntity>
 {
     public ScheduleFilterSpecification(ScheduleFilterParams @params) 
         : base(data =>

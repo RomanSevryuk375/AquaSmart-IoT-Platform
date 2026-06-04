@@ -14,7 +14,7 @@ public sealed class DeviceConfigurationService(
     IRelayRepository relayRepository,
     IMapper mapper,
     IDeviceSecurityService securityService,
-     IOptions<DeviceSettings> deviceOptions) : IDeviceConfigurationService
+    IOptions<DeviceSettings> deviceOptions) : IDeviceConfigurationService
 {
     public async Task<Result<ConfigResponseDto>> GetControllerConfigAsync(
         string macAddress,

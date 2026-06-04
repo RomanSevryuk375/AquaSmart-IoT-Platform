@@ -1,6 +1,6 @@
 ﻿namespace Contracts.Events.ControllerEvents;
 
-public record ControllerNotOnlineEvent
+public sealed record ControllerNotOnlineEvent
 {
     public Guid EventId { get; init; } = Guid.NewGuid();
     public DateTime OccurredOn { get; init; } = DateTime.UtcNow;

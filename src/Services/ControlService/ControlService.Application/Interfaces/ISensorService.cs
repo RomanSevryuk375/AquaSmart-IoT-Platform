@@ -24,4 +24,8 @@ public interface ISensorService
     Task<ConsumerResult> UpdatedSensorAsync(
         SensorUpdatedEvent sensorUpdated, 
         CancellationToken cancellationToken);
+
+    Task<ConsumerResult> SetSensorNameAsync(
+        SensorRenamedEvent sensor,
+        CancellationToken cancellationToken);
 }

@@ -4,7 +4,8 @@ using Control.Domain.SpecificationParams;
 
 namespace Control.Domain.Specifications;
 
-public class EcosystemFilterSpecification : BaseSpecification<EcosystemEntity>
+public sealed class EcosystemFilterSpecification 
+    : BaseSpecification<EcosystemEntity>
 {
     public EcosystemFilterSpecification(EcosystemFilterParams @params) 
         : base(data => 

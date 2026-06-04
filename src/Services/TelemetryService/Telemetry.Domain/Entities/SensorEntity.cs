@@ -139,7 +139,7 @@ public sealed class SensorEntity : AggregateRoot, IEntity
         return Result.Success();
     }
 
-    public Result Rename(string name)
+    public Result SetName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -173,6 +173,16 @@ public sealed class SensorEntity : AggregateRoot, IEntity
         }
 
         State = newStatus;
+    }
+
+    public void SetType(SensorTypeEnum type)
+    {
+        if (Type == type)
+        {
+            return;
+        }
+
+        Type = type;
     }
 
     public void MarkAsNoData()

@@ -1,5 +1,6 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
+using Contracts.Results;
 
 namespace Control.Domain.Entities;
 
@@ -31,7 +32,7 @@ public sealed class RuleConditionEntity : IEntity
     public double Hysteresis { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public static (RuleConditionEntity? ruleCondition, List<string> errors) Create(
+    public static Result<RuleConditionEntity> Create(
         Guid automationRuleId,
         Guid sensorId,
         RuleConditionEnum condition,
@@ -52,7 +53,10 @@ public sealed class RuleConditionEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return (null, errors);
+            return Result<RuleConditionEntity>.Failure(
+                Error.Validation(
+                    "RuleCondition.Invalid",
+                    string.Join("; ", errors)));
         }
 
         var ruleCondition = new RuleConditionEntity(
@@ -64,10 +68,10 @@ public sealed class RuleConditionEntity : IEntity
             hysteresis,
             DateTime.UtcNow);
 
-        return (ruleCondition, errors);
+        return Result<RuleConditionEntity>.Success(ruleCondition);
     }
 
-    public List<string>? Update(
+    public Result Update(
         RuleConditionEnum condition,
         double threshold,
         double hysteresis)
@@ -81,14 +85,16 @@ public sealed class RuleConditionEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return errors;
+            return Result.Failure(Error.Validation(
+                "RuleCondition.Invalid",
+                string.Join("; ", errors)));
         }
 
         Condition = condition;
         Threshold = threshold;
         Hysteresis = hysteresis;
 
-        return null;
+        return Result.Success();
     }
 
     public void SetCondition(RuleConditionEnum condition)
@@ -106,15 +112,17 @@ public sealed class RuleConditionEntity : IEntity
         Threshold = threshold;
     }
 
-    public string? SetHysteresis(double hysteresis)
+    public Result SetHysteresis(double hysteresis)
     {
         if (hysteresis < 0)
         {
-            return ("hysteresis must not be less then zero.");
+            return Result.Failure(Error.Validation(
+                "RuleCondition.Invalid",
+                "hysteresis must not be less then zero."));
         }
 
         Hysteresis = hysteresis;
 
-        return null;
+        return Result.Success();
     }
 }

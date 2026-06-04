@@ -2,7 +2,7 @@
 
 namespace Contracts.Events.SensorEvents;
 
-public class SensorUpdatedEvent
+public sealed record SensorUpdatedEvent
 {
     public Guid EventId { get; init; } = Guid.NewGuid();
     public DateTime OccurredOn { get; init; } = DateTime.UtcNow;

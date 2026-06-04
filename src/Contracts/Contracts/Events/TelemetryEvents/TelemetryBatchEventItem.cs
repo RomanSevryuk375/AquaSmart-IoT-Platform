@@ -1,6 +1,6 @@
 ﻿namespace Contracts.Events.TelemetryEvents;
 
-public record TelemetryBatchEventItem
+public sealed record TelemetryBatchEventItem
 {
     public Guid SensorId { get; init; }
     public double Value { get; init; }

@@ -1,6 +1,6 @@
 ﻿namespace Contracts.Events.RelayEvents;
 
-public record SetRelayPowerSensorEvent
+public sealed record SetRelayPowerSensorEvent
 {
     public Guid EventId { get; init; } = Guid.NewGuid();
     public DateTime OccurredOn { get; init; } = DateTime.UtcNow;

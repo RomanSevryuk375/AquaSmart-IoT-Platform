@@ -4,12 +4,17 @@ using MassTransit;
 
 namespace Control.Infrastructure.Messaging.Relay;
 
-public class RelayUpdatedEventConsumer(IRelayService service)
+internal sealed class RelayUpdatedEventConsumer(IRelayService service)
     : IConsumer<RelayUpdatedEvent>
 {
     public async Task Consume(ConsumeContext<RelayUpdatedEvent> context)
     {
-        await service.UpdatedRelayAsync(
+        var result = await service.UpdatedRelayAsync(
             context.Message, context.CancellationToken);
+
+        if (!result.IsSuccess && result.IsRetryable)
+        {
+            throw new Exception(result.Error);
+        }
     }
 }

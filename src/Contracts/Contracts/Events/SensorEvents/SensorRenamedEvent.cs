@@ -1,6 +1,6 @@
 ﻿namespace Contracts.Events.SensorEvents;
 
-public record SensorRenamedEvent
+public sealed record SensorRenamedEvent
 {
     public Guid EventId { get; init; } = Guid.NewGuid();
     public DateTime OccurredOn { get; init; } = DateTime.UtcNow;

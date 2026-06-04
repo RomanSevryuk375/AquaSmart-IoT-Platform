@@ -1,4 +1,5 @@
-﻿using Contracts.Events.TelemetryEvents;
+﻿using AutoMapper;
+using Contracts.Events.TelemetryEvents;
 using Contracts.Results;
 using MassTransit;
 using Telemetry.Application.DTOs;
@@ -15,8 +16,12 @@ public class TelemetryDataService(
     ISensorRepository sensorRepository,
     IEcosystemRepository ecosystemRepository,
     IPublishEndpoint publishEndpoint,
-    IUnitOfWork unitOfWork) : ITelemetryDataService
+    IUnitOfWork unitOfWork,
+    IMapper mapper,
+    ITelemetryNotifier realtimeNotifier) : ITelemetryDataService
 {
+    private const int DefaultPeriodDays = -1;
+
     public async Task<Result<TelemetryRawChartResponseDto>> GetAllDataAsync(
         TelemetryDataFilterDto filter,
         int skip,
@@ -24,11 +29,9 @@ public class TelemetryDataService(
         CancellationToken cancellationToken)
     {
         var to = filter.To ?? DateTime.UtcNow;
-        var from = filter.From ?? to.AddDays(-1);
+        var from = filter.From ?? to.AddDays(DefaultPeriodDays);
 
-        var sensor = await sensorRepository
-            .GetByIdAsync(filter.SensorId, cancellationToken);
-
+        var sensor = await sensorRepository.GetByIdAsync(filter.SensorId, cancellationToken);
         if (sensor is null)
         {
             return Result<TelemetryRawChartResponseDto>
@@ -41,23 +44,13 @@ public class TelemetryDataService(
             new TelemetryFilterParams
             {
                 SensorId = filter.SensorId,
-                From = filter.From,
-                To = filter.To,
+                From = from,
+                To = to,
             });
 
-        var data = await telemetryRepository.GetAllAsync(
-            specification,
-            skip,
-            take,
-            cancellationToken);
+        var data = await telemetryRepository.GetAllAsync(specification, skip, take, cancellationToken);
 
-        IEnumerable<TelemetryRawChartPointDto> points;
-
-        points = data.Select(x => new TelemetryRawChartPointDto
-        {
-            Value = x.Value,
-            RecordedAt = x.RecordedAt,
-        });
+        var points = mapper.Map<IReadOnlyList<TelemetryRawChartPointDto>>(data);
 
         return Result<TelemetryRawChartResponseDto>.Success(
             new TelemetryRawChartResponseDto
@@ -73,50 +66,42 @@ public class TelemetryDataService(
         TelemetryBatchEvent batch,
         CancellationToken cancellationToken)
     {
-        var ecosystem = await ecosystemRepository
-            .GetByControllerIdAsync(batch.ControllerId, cancellationToken);
-
+        var ecosystem = await ecosystemRepository.GetByControllerIdAsync(batch.ControllerId, cancellationToken);
         if (ecosystem is null)
         {
-            return ConsumerResult
-                .RetryableError($"Ecosystem for controller {batch.ControllerId} not found.");
+            return ConsumerResult.RetryableError(
+                $"Ecosystem for controller {batch.ControllerId} not found.");
         }
 
-        var sensors = await sensorRepository
-            .GetAllByEcosystemId(ecosystem.Id, cancellationToken);
-
+        var sensors = await sensorRepository.GetAllByEcosystemId(ecosystem.Id, cancellationToken);
         if (!sensors.Any())
         {
-            return ConsumerResult
-                .FatalError($"Any sensors for ecosystem {ecosystem.Id} not found.");
+            return ConsumerResult.FatalError(
+                $"No sensors found for ecosystem {ecosystem.Id}.");
         }
 
-        var eventsToPublish = new List<TelemetryReceivedEvent>();
+        var points = new List<TelemetryRawChartPointDto>();
 
         foreach (var item in batch.Items)
         {
-            var existingTelemetry = await telemetryRepository
-                .GetByExternalMessageIdAsync(item.ExternalMessageId, cancellationToken);
-
+            var existingTelemetry = await telemetryRepository.GetByExternalMessageIdAsync(
+                item.ExternalMessageId, cancellationToken);
             if (existingTelemetry is not null)
             {
                 continue;
             }
 
-            var sensor = sensors
-                .FirstOrDefault(x => x.Id == item.SensorId);
-
+            var sensor = sensors.FirstOrDefault(x => x.Id == item.SensorId);
             if (sensor is null)
             {
                 continue;
             }
 
             var result = TelemetryRawEntity.Create(
-                item.SensorId,
-                item.Value,
+                item.SensorId, 
+                item.Value, 
                 item.ExternalMessageId,
                 item.RecordedAt);
-
             if (result.IsFailure)
             {
                 continue;
@@ -127,12 +112,10 @@ public class TelemetryDataService(
             await telemetryRepository.AddAsync(result.Value, cancellationToken);
             await sensorRepository.UpdateAsync(sensor, cancellationToken);
 
-            eventsToPublish.Add(new TelemetryReceivedEvent
-            {
-                SensorId = item.SensorId,
-                Value = item.Value,
-                RecordedAt = item.RecordedAt,
-            });
+            await publishEndpoint.Publish(
+                mapper.Map<TelemetryReceivedEvent>(item), cancellationToken);
+
+            points.Add(mapper.Map<TelemetryRawChartPointDto>(item));
         }
 
         try
@@ -144,9 +127,9 @@ public class TelemetryDataService(
             return ConsumerResult.RetryableError($"Database error: {ex.Message}");
         }
 
-        foreach (var item in eventsToPublish)
+        foreach (var point in points)
         {
-            await publishEndpoint.Publish(item, cancellationToken);
+            await realtimeNotifier.TelemetryRawReceived(ecosystem.Id.ToString(), point);
         }
 
         return ConsumerResult.Success();

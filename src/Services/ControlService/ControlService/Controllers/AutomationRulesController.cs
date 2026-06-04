@@ -1,7 +1,14 @@
 ﻿using Contracts.Authorization;
 using Contracts.Results;
+using Control.Application.CQRS.AutomationRule.Commands.CreateRule;
+using Control.Application.CQRS.AutomationRule.Commands.DeleteRule;
+using Control.Application.CQRS.AutomationRule.Commands.UpdateRule;
+using Control.Application.CQRS.AutomationRule.Queries;
+using Control.Application.CQRS.AutomationRule.Queries.GetRuleById;
+using Control.Application.CQRS.Ecosystem.Queries.GetAllEcosystems;
 using Control.Application.DTOs.AutomationRule;
-using Control.Application.Interfaces;
+using Control.Domain.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,21 +17,20 @@ namespace Control.API.Controllers;
 [ApiController]
 [Route("api/control/v1/automation-rules")]
 public class AutomationRulesController(
-    IAutomationRuleService ruleService) : ControllerBase
+    IUserContext userContext,
+    ISender sender) : ControllerBase
 {
     private const string GetRuleByIdRoute = "GetRuleById";
 
     [HttpGet]
     [Authorize]
     [Authorize(Policy = SubPermissions.AutoRuleCreate)]
-    public async Task<ActionResult<IReadOnlyList<AutomationRuleResponseDto>>> GetAllRulesAsync(
-        [FromQuery] AutomationRuleFilterDto filter,
-        [FromQuery] int skip = 0,
-        [FromQuery] int take = 10,
+    public async Task<ActionResult<IReadOnlyList<AutomationRuleDto>>> GetAllRulesAsync(
+        [FromQuery] GetAllEcosystemsQuery query,
         CancellationToken cancellationToken = default)
     {
-        var result = await ruleService
-            .GetAllRulesAsync(filter, skip, take, cancellationToken);
+        var enrichedQuery = query with { UserId = userContext.UserId };
+        var result = await sender.Send(enrichedQuery, cancellationToken);
 
         return Ok(result);
     }
@@ -32,12 +38,12 @@ public class AutomationRulesController(
     [HttpGet("{id:guid}", Name = GetRuleByIdRoute)]
     [Authorize]
     [Authorize(Policy = SubPermissions.AutoRuleCreate)]
-    public async Task<ActionResult<AutomationRuleResponseDto>> GetRuleByIdAsync(
+    public async Task<ActionResult<AutomationRuleDto>> GetRuleByIdAsync(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var result = await ruleService
-            .GetRuleByIdAsync(id, cancellationToken);
+        var query = new GetRuleByIdQuery { RuleId = id };
+        var result = await sender.Send(query, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -45,20 +51,18 @@ public class AutomationRulesController(
     [HttpPost]
     [Authorize(Policy = SubPermissions.AutoRuleCreate)]
     public async Task<ActionResult<Guid>> CreateRuleAsync(
-        [FromBody] AutomationRuleRequestDto request,
+        [FromBody] CreateRuleCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await ruleService
-            .CreateRuleAsync(request, cancellationToken);
-
+        var result = await sender.Send(command, cancellationToken);
         if (result.IsFailure)
         {
             return this.ToActionResult(result);
         }
 
         return CreatedAtRoute(
-            GetRuleByIdRoute, 
-            new { id = result.Value }, 
+            GetRuleByIdRoute,
+            new { id = result.Value },
             result.Value);
     }
 
@@ -69,8 +73,15 @@ public class AutomationRulesController(
         [FromBody] AutomationRuleUpdateRequestDto request,
         CancellationToken cancellationToken)
     {
-        var result = await ruleService
-            .UpdateRuleAsync(id, request, cancellationToken);
+        var command = new UpdateRuleCommand
+        {
+            RuleId = id,
+            Name = request.Name,
+            RelayId = request.RelayId,
+            Operator = request.Operator,
+            Action = request.Action,
+        };
+        var result = await sender.Send(command, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -81,8 +92,8 @@ public class AutomationRulesController(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var result = await ruleService
-            .DeleteRuleAsync(id, cancellationToken);
+        var command = new DeleteRuleCommand { RuleId = id };
+        var result = await sender.Send(command, cancellationToken);
 
         return this.ToActionResult(result);
     }
