@@ -1,3 +1,5 @@
+[English](README.md) | [Русский](README.ru.md)
+
 # AquaSmart IoT Platform
 
 ![.NET 8](https://img.shields.io/badge/.NET_8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
