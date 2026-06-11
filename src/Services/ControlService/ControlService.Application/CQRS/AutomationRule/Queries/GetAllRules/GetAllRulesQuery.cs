@@ -1,12 +1,11 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
 using Contracts.Results;
-using MediatR;
 
 namespace Control.Application.CQRS.AutomationRule.Queries.GetAllRules;
 
 public sealed record GetAllRulesQuery 
-    : IRequest<Result<IReadOnlyList<AutomationRuleDto>>>, IEcosystemBoundRequest
+    : IQuery<Result<IReadOnlyList<AutomationRuleDto>>>, IEcosystemBoundRequest
 {
     public Guid EcosystemId { get; init; }
     public Guid? RelayId { get; init; }

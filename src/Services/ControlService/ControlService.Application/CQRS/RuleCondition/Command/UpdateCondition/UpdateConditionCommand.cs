@@ -1,12 +1,10 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
-using Contracts.Results;
-using MediatR;
 
 namespace Control.Application.CQRS.RuleCondition.Command.UpdateCondition;
 
 public sealed record UpdateConditionCommand 
-    : IRequest<Result>, IRuleBoundRequest
+    : ICommand, IRuleBoundRequest
 {
     public Guid RuleId { get; init; }
     public Guid ConditionId { get; init; }

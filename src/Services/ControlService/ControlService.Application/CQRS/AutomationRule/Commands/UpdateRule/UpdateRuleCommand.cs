@@ -1,12 +1,10 @@
 ﻿using Contracts.Abstractions;
 using Contracts.Enums;
-using Contracts.Results;
-using MediatR;
 
 namespace Control.Application.CQRS.AutomationRule.Commands.UpdateRule;
 
 public sealed record UpdateRuleCommand 
-    : IRequest<Result>, IRuleBoundRequest
+    : ICommand, IRuleBoundRequest
 {
     public Guid RuleId { get; init; }
     public string Name { get; init; } = string.Empty;

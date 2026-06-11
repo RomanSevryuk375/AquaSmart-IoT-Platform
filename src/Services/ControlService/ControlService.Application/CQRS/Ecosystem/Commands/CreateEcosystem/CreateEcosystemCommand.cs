@@ -1,10 +1,10 @@
-﻿using Contracts.Enums;
-using Contracts.Results;
-using MediatR;
+﻿using Contracts.Abstractions;
+using Contracts.Enums;
+
 
 namespace Control.Application.CQRS.Ecosystem.Commands.CreateEcosystem;
 
-public sealed record CreateEcosystemCommand : IRequest<Result<Guid>>
+public sealed record CreateEcosystemCommand : ICommand<Guid>
 {
     public EcosystemTypeEnum Type { get; init; }
     public string Name { get; init; } = string.Empty;
