@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Contracts.Enums;
 using Contracts.Events.RelayEvents;
 using Contracts.Results;
@@ -62,7 +62,7 @@ public sealed class RelayCommandQueueService(
         {
             return Result.Failure(Error.NotFound(
                     "Command.NotFound",
-                    $"{nameof(RelayCommandsQueueEntity)} {commandId} not found"));
+                    $"{nameof(RelayCommand)} {commandId} not found"));
         }
 
         var existingRelay = await relayRepository
@@ -72,7 +72,7 @@ public sealed class RelayCommandQueueService(
         {
             return Result.Failure(Error.NotFound(
                     "Relay.NotFound",
-                    $"{nameof(RelayEntity)} {command.RelayId} not found"));
+                    $"{nameof(Relay)} {command.RelayId} not found"));
         }
 
         var ownership = await securityService.EnsureDeviceAccessAsync(
@@ -113,7 +113,7 @@ public sealed class RelayCommandQueueService(
         {
             return Result.Failure(Error.NotFound(
                     "Command.NotFound",
-                    $"{nameof(RelayCommandsQueueEntity)} {commandId} not found"));
+                    $"{nameof(RelayCommand)} {commandId} not found"));
         }
 
         var ownership = await securityService.EnsureDeviceAccessAsync(
@@ -165,7 +165,7 @@ public sealed class RelayCommandQueueService(
                 .FatalError($"Command is unavalible or was expired.");
         }
 
-        var newCommand = RelayCommandsQueueEntity.Create(
+        var newCommand = RelayCommand.Create(
             existingController.Id,
             existingRelay.Id,
             command.Action,
@@ -201,7 +201,7 @@ public sealed class RelayCommandQueueService(
             return Result<bool>
                 .Failure(Error.NotFound(
                     "Relay.NotFound",
-                    $"{nameof(RelayEntity)} {relayId} not found"));
+                    $"{nameof(Relay)} {relayId} not found"));
         }
 
         var ownership = await securityService.EnsureUserOwnsControllerAsync(
@@ -232,7 +232,7 @@ public sealed class RelayCommandQueueService(
             return Result<bool>
                 .Failure(Error.NotFound(
                     "Relay.NotFound",
-                    $"{nameof(RelayEntity)} {relayId} not found"));
+                    $"{nameof(Relay)} {relayId} not found"));
         }
 
         var ownership = await securityService.EnsureUserOwnsControllerAsync(
@@ -247,7 +247,7 @@ public sealed class RelayCommandQueueService(
 
         await relayRepository.UpdateAsync(existingRelay, cancellationToken);
 
-        var newCommand = RelayCommandsQueueEntity.Create(
+        var newCommand = RelayCommand.Create(
             existingRelay.ControllerId,
             existingRelay.Id,
             StateEvaluatorFactory.EvaluateBool(existingRelay.IsActive),
@@ -274,7 +274,7 @@ public sealed class RelayCommandQueueService(
 
     private static bool UnavalibleCommand(
         ChangeRelayStateEvent command, 
-        RelayEntity existingRelay)
+        Relay existingRelay)
     {
         return existingRelay.IsManual ||
               (command.ExpireAt.HasValue && command.ExpireAt.Value < DateTime.UtcNow) ||

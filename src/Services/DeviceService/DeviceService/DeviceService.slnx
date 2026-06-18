@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
   <Project Path="../../../Contracts/Contracts/Contracts.csproj" />
   <Project Path="../Device.Application/Device.Application.csproj" Id="7fd0c524-265e-4942-8f62-d04b17625ecd" />
   <Project Path="../Device.Domain/Device.Domain.csproj" Id="313e48db-471f-4516-97e6-d958cd872b5d" />

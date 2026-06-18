@@ -1,15 +1,15 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Device.Domain.Entities;
 
 namespace Device.Domain.Interfaces;
 
-public interface IControllerRepository : IRepository<ControllerEntity>
+public interface IControllerRepository : IRepository<Controller>
 {
-    Task<ControllerEntity?> GetByMacAddressAsync(
+    Task<Controller?> GetByMacAddressAsync(
         string macAddress, 
         CancellationToken cancellationToken);
 
-    Task<ControllerEntity?> GetByDeviceTokenAsync(
+    Task<Controller?> GetByDeviceTokenAsync(
         string deviceTokenHash,
         CancellationToken cancellationToken);
 }

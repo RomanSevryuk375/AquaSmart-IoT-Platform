@@ -1,8 +1,9 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Contracts.Results;
 using Device.Application.DTOs.Relay;
 using Device.Application.Interfaces;
 using Device.Domain.Entities;
+using Device.Domain.Entities.Sensors;
 using Device.Domain.Interfaces;
 using Device.Domain.SpecificationParams;
 using Device.Domain.Specifications;
@@ -42,7 +43,7 @@ public sealed class RelayService(
             return Result<RelayResponseDto>.Failure(ownership.Error);
         }
 
-        var relay = RelayEntity.Create(
+        var relay = Relay.Create(
             request.ControllerId,
             userContext.UserId,
             request.PowerSensorId,
@@ -77,7 +78,7 @@ public sealed class RelayService(
         {
             return Result.Failure(Error.NotFound(
                     "Relay.NotFound",
-                    $"{nameof(RelayEntity)} {relayId} not found"));
+                    $"{nameof(Relay)} {relayId} not found"));
         }
 
         var ownership = await securityService.EnsureUserOwnsControllerAsync(
@@ -134,7 +135,7 @@ public sealed class RelayService(
             return Result<RelayResponseDto>
                 .Failure(Error.NotFound(
                     "Relay.NotFound",
-                    $"{nameof(RelayEntity)} {relayId} not found"));
+                    $"{nameof(Relay)} {relayId} not found"));
         }
 
         var ownership = await securityService.EnsureUserOwnsControllerAsync(
@@ -171,7 +172,7 @@ public sealed class RelayService(
         {
             return Result.Failure(Error.NotFound(
                     "Relay.NotFound",
-                    $"{nameof(RelayEntity)} {relayId} not found"));
+                    $"{nameof(Relay)} {relayId} not found"));
         }
 
         var ownership = await securityService.EnsureUserOwnsControllerAsync(
@@ -223,7 +224,7 @@ public sealed class RelayService(
         {
             return Result.Failure(Error.NotFound(
                     "Relay.NotFound",
-                    $"{nameof(RelayEntity)} {relayId} not found"));
+                    $"{nameof(Relay)} {relayId} not found"));
         }
 
         var existingSensor = await sensorRepository
@@ -233,7 +234,7 @@ public sealed class RelayService(
         {
             return Result.Failure(Error.NotFound(
                     "Sensor.NotFound",
-                    $"{nameof(SensorEntity)} {powerSensorId} not found"));
+                    $"{nameof(Sensor)} {powerSensorId} not found"));
         }
 
         var ownership = await securityService.EnsureUserOwnsControllerAsync(

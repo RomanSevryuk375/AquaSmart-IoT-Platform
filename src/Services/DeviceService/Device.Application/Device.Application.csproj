@@ -17,4 +17,9 @@
     <ProjectReference Include="..\Device.Domain\Device.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CQRS\Common\" />
+    <Folder Include="CQRS\Controller\Query\" />
+  </ItemGroup>
+
 </Project>

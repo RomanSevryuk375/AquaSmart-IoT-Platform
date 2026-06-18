@@ -1,11 +1,11 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Device.Domain.Entities;
 using Device.Domain.SpecificationParams;
 
 namespace Device.Domain.Specifications;
 
 public sealed class RelayFilterSpecification 
-    : BaseSpecification<RelayEntity>
+    : BaseSpecification<Relay>
 {
     public RelayFilterSpecification(RelayFilterParams @params) : 
             base(data => 

@@ -6,5 +6,6 @@
 	  <AnalysisLevel>latest</AnalysisLevel>
 	  <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	  <DockerfileContext>.</DockerfileContext>
+      <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
  </Project>

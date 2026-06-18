@@ -1,13 +1,13 @@
-﻿using Device.Domain.Entities;
+using Device.Domain.Entities;
 using Device.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Device.Infrastructure.Persistence.Repositories;
 
 public sealed class ControllerRepository(SystemDbContext dbContext) 
-    : BaseRepository<ControllerEntity>(dbContext), IControllerRepository
+    : BaseRepository<Controller>(dbContext), IControllerRepository
 {
-    public async Task<ControllerEntity?> GetByMacAddressAsync(
+    public async Task<Controller?> GetByMacAddressAsync(
         string macAddress, 
         CancellationToken cancellationToken)
     {
@@ -16,7 +16,7 @@ public sealed class ControllerRepository(SystemDbContext dbContext)
             .FirstOrDefaultAsync(x => x.MacAddress == macAddress, cancellationToken);
     }
 
-    public async Task<ControllerEntity?> GetByDeviceTokenAsync(
+    public async Task<Controller?> GetByDeviceTokenAsync(
         string deviceTokenHash, 
         CancellationToken cancellationToken)
     {

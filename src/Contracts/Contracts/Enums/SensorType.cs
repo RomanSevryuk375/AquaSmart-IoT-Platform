@@ -1,11 +1,9 @@
 namespace Contracts.Enums;
 
-public enum SensorTypeEnum
+public enum SensorType
 {
-    Unknown = 0,
     Temperature = 1,
     Pressure = 2,
     Humidity = 3,
-    FlowRate = 4,
-    Voltage = 5
+    Voltage = 4
 }

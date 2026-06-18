@@ -1,4 +1,4 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Enums;
 
 namespace Device.Domain.Events.RelayEvents;
@@ -9,7 +9,7 @@ public sealed record RelayUpdatedDomainEvent : IDomainEvent
     public Guid RelayId { get; init; }
     public Guid ControllerId { get; init; }
     public Guid? PowerSensorId { get; init; }
-    public string Name { get; init; } = string.Empty;
+    public string DeviceName { get; init; } = null!;
     public RelayPurposeEnum Purpose { get; init; }
     public bool IsManual { get; init; }
     public bool IsActive { get; init; }

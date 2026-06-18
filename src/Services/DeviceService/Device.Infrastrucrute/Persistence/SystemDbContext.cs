@@ -1,4 +1,5 @@
-﻿using Device.Domain.Entities;
+using Device.Domain.Entities;
+using Device.Domain.Entities.Sensors;
 using Microsoft.EntityFrameworkCore;
 
 namespace Device.Infrastructure.Persistence;
@@ -6,10 +7,10 @@ namespace Device.Infrastructure.Persistence;
 public sealed class SystemDbContext(DbContextOptions<SystemDbContext> options) 
     : DbContext(options)
 {
-    public DbSet<ControllerEntity> Controllers { get; set; }
-    public DbSet<RelayCommandsQueueEntity> RelayCommands { get; set; }
-    public DbSet<RelayEntity> Relays { get; set; }
-    public DbSet<SensorEntity> Sensors { get; set; }
+    public DbSet<Controller> Controllers { get; set; }
+    public DbSet<RelayCommand> RelayCommands { get; set; }
+    public DbSet<Relay> Relays { get; set; }
+    public DbSet<Sensor> Sensors { get; set; }
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

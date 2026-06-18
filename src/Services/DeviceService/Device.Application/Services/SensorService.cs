@@ -1,9 +1,9 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Contracts.Enums;
 using Contracts.Results;
 using Device.Application.DTOs.Sensor;
 using Device.Application.Interfaces;
-using Device.Domain.Entities;
+using Device.Domain.Entities.Sensors;
 using Device.Domain.Interfaces;
 using Device.Domain.SpecificationParams;
 using Device.Domain.Specifications;
@@ -43,7 +43,7 @@ public sealed class SensorService(
             return Result<SensorResponseDto>.Failure(ownership.Error);
         }
 
-        var sensor = SensorEntity.Create(
+        var sensor = Sensor.Create(
             request.ControllerId,
             userContext.UserId,
             request.Name,
@@ -75,7 +75,7 @@ public sealed class SensorService(
         {
             return Result.Failure(Error.NotFound(
                     "Sensor.NotFound",
-                    $"{nameof(SensorEntity)} {sensorId} not found"));
+                    $"{nameof(Sensor)} {sensorId} not found"));
         }
 
         var ownership = await securityService.EnsureUserOwnsControllerAsync(
@@ -131,7 +131,7 @@ public sealed class SensorService(
             return Result<SensorResponseDto>
                 .Failure(Error.NotFound(
                     "Sensor.NotFound",
-                    $"{nameof(SensorEntity)} {sensorId} not found"));
+                    $"{nameof(Sensor)} {sensorId} not found"));
         }
 
         var ownership = await securityService.EnsureUserOwnsControllerAsync(
@@ -148,7 +148,7 @@ public sealed class SensorService(
 
     public async Task<Result> SetSensorStateAsync(
         Guid sensorId,
-        SensorStateEnum state,
+        SensorState state,
         CancellationToken cancellationToken)
     {
         var existingSensor = await sensorRepository
@@ -158,7 +158,7 @@ public sealed class SensorService(
         {
             return Result.Failure(Error.NotFound(
                     "Sensor.NotFound",
-                    $"{nameof(SensorEntity)} {sensorId} not found"));
+                    $"{nameof(Sensor)} {sensorId} not found"));
         }
 
         var ownership = await securityService.EnsureUserOwnsControllerAsync(
@@ -199,7 +199,7 @@ public sealed class SensorService(
         {
             return Result.Failure(Error.NotFound(
                     "Sensor.NotFound",
-                    $"{nameof(SensorEntity)} {sensorId} not found"));
+                    $"{nameof(Sensor)} {sensorId} not found"));
         }
 
         var ownership = await securityService.EnsureUserOwnsControllerAsync(

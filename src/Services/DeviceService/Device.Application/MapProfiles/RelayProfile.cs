@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Contracts.Events.RelayEvents;
 using Device.Application.DTOs.Configurations;
 using Device.Application.DTOs.Relay;
@@ -10,20 +10,20 @@ public sealed class RelayProfile : Profile
 {
     public RelayProfile()
     {
-        CreateMap<RelayEntity, RelayResponseDto>()
+        CreateMap<Relay, RelayResponseDto>()
             .ForMember(desc => desc.ConnectionAddress,
                        opt => opt.MapFrom(src => 
                             $"{src.ConnectionProtocol}.{src.ConnectionAddress}"));
 
-        CreateMap<RelayEntity, RelayCreatedEvent>()
+        CreateMap<Relay, RelayCreatedEvent>()
             .ForMember(desc => desc.RelayId,
                        opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<RelayEntity, RelayUpdatedEvent>()
+        CreateMap<Relay, RelayUpdatedEvent>()
             .ForMember(desc => desc.RelayId,
                        opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<RelayEntity, RelayConfigDto>()
+        CreateMap<Relay, RelayConfigDto>()
             .ForMember(desc => desc.RelayId,
                        opt => opt.MapFrom(src => src.Id));
     }

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Contracts.Results;
 using Device.Application.DTOs.Controller;
 using Device.Application.Interfaces;
@@ -7,7 +7,6 @@ using Device.Domain.Interfaces;
 using Device.Domain.SpecificationParams;
 using Device.Domain.Specifications;
 using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Device.Application.Services;
 
@@ -37,7 +36,7 @@ public sealed class ControllerService(
 
         var deviceToken = Guid.NewGuid().ToString();
 
-        var controller = ControllerEntity.Create(
+        var controller = Controller.Create(
             userContext.UserId,
             request.MacAddress,
             myHasher.Generate(deviceToken),
@@ -207,7 +206,7 @@ public sealed class ControllerService(
         {
             return Result.Failure(Error.Validation(
                     "ConstrollerRequest.Invalid",
-                    $"Failed to update {nameof(ControllerEntity)}: {string.Join(", ", errors!)}"));
+                    $"Failed to update {nameof(Controller)}: {string.Join(", ", errors!)}"));
         }
 
         await controllerRepository.UpdateAsync(controller, cancellationToken);

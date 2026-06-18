@@ -1,11 +1,11 @@
-﻿using Device.Domain.Entities;
+using Device.Domain.Entities;
 using Device.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Device.Infrastructure.Persistence.Repositories;
 
 public sealed class RelayRepository(SystemDbContext dbContext)
-    : BaseRepository<RelayEntity>(dbContext), IRelayRepository
+    : BaseRepository<Relay>(dbContext), IRelayRepository
 {
     public async Task<bool> ExistsAsync(
         Guid relayId, 
@@ -16,7 +16,7 @@ public sealed class RelayRepository(SystemDbContext dbContext)
             .AnyAsync(x => x.Id == relayId, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<RelayEntity>> GetAllByControllerId(
+    public async Task<IReadOnlyList<Relay>> GetAllByControllerId(
         Guid controllerId,
         CancellationToken cancellationToken)
     {

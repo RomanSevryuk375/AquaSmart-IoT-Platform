@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Contracts.Results;
 using Device.Application.DTOs.Sensor;
 
@@ -31,6 +31,6 @@ public interface ISensorService
 
     Task<Result> SetSensorStateAsync(
         Guid sensorId,
-        SensorStateEnum state,
+        SensorState state,
         CancellationToken cancellationToken);
 }

@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Device.Domain.Entities;
 using Device.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore;
 namespace Device.Infrastructure.Persistence.Repositories;
 
 public sealed class RelayCommandsQueueRepository(SystemDbContext dbContext)
-    : BaseRepository<RelayCommandsQueueEntity>(dbContext), IRelayCommandsQueueRepository
+    : BaseRepository<RelayCommand>(dbContext), IRelayCommandsQueueRepository
 {
     private const int MaxAttemptCount = 3;
     private const int RetryCooldownMinutes = 1;
 
-    public async Task<IReadOnlyList<RelayCommandsQueueEntity>> GetPendingByControllerIdAsync(
+    public async Task<IReadOnlyList<RelayCommand>> GetPendingByControllerIdAsync(
         Guid controllerId,
         CancellationToken cancellationToken)
     {

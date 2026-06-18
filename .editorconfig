@@ -1,0 +1,169 @@
+# ==============================================================================
+# STRICT .NET EDITORCONFIG (Clean Code & DDD Oriented)
+# ==============================================================================
+
+root = true
+
+# Все файлы: базовое форматирование
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+end_of_line = lf # [Teamlead] Изменено на lf для кроссплатформенности (Linux/Docker/Git)
+
+# ==============================================================================
+# НАСТРОЙКИ СТИЛЯ КОДА .NET (C#)
+# ==============================================================================
+[*.cs]
+
+# Организация using (Сортировка по алфавиту, System на первом месте)
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+dotnet_diagnostic.IDE0005.severity = warning # Удалять неиспользуемые using
+
+# Использование 'this.' (Запрещаем писать this. там, где это не обязательно)
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_property = false:warning
+dotnet_style_qualification_for_method = false:warning
+dotnet_style_qualification_for_event = false:warning
+
+# Модификаторы и их строгий порядок
+csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async:warning
+dotnet_style_require_accessibility_modifiers = always:warning
+
+# File-scoped namespaces (C# 10+) - требуем использовать пространства имен без фигурных скобок
+csharp_style_namespace_declarations = file_scoped:warning
+
+# ==============================================================================
+# DDD & NULLABILITY STRICTNESS (NRT)
+# ==============================================================================
+# [Teamlead] Запрещаем создание сущностей в невалидном состоянии
+# CS8618: Non-nullable property must contain a non-null value when exiting constructor.
+dotnet_diagnostic.CS8618.severity = error
+# CS8603: Possible null reference return.
+dotnet_diagnostic.CS8603.severity = warning
+# CS8600: Converting null literal or possible null value to non-nullable type.
+dotnet_diagnostic.CS8600.severity = warning
+
+# ==============================================================================
+# ПРАВИЛА ИСПОЛЬЗОВАНИЯ ТИПОВ И СИНТАКСИСА (C#)
+# ==============================================================================
+
+# Использование var (Требуем var, когда тип очевиден, иначе - явный тип)
+csharp_style_var_for_built_in_types = false:warning
+csharp_style_var_when_type_is_apparent = true:warning
+csharp_style_var_elsewhere = false:warning
+
+# Использование Expression-bodied members (Лямбды вместо фигурных скобок для простых методов)
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_constructors = false:silent
+csharp_style_expression_bodied_operators = false:silent
+# [Teamlead] Изменено на when_on_single_line, чтобы не делать монстров из многострочных свойств
+csharp_style_expression_bodied_properties = when_on_single_line:warning
+csharp_style_expression_bodied_accessors = when_on_single_line:warning
+
+# Проверки на null (Требуем современные проверки: is null, ?. и т.д.)
+csharp_style_conditional_delegate_call = true:warning
+csharp_style_pattern_matching_over_as_with_null_check = true:warning
+csharp_style_pattern_matching_over_is_with_cast_check = true:warning
+csharp_style_prefer_switch_expression = true:warning
+
+# ==============================================================================
+# ФОРМАТИРОВАНИЕ (Скобки, пробелы)
+# ==============================================================================
+
+# Всегда требовать фигурные скобки (Даже для if из одной строки)
+csharp_prefer_braces = always:warning
+
+# Расположение фигурных скобок (Allman style - скобки на новой строке)
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+
+# ==============================================================================
+# СТРОГИЕ ПРАВИЛА ИМЕНОВАНИЯ (NAMING CONVENTIONS)
+# ==============================================================================
+
+# --- 1. ПРИВЯЗКА ПРАВИЛ К СТИЛЯМ И СИМВОЛАМ ---
+
+dotnet_naming_rule.interface_should_be_begins_with_i.severity = warning
+dotnet_naming_rule.interface_should_be_begins_with_i.symbols = interface
+dotnet_naming_rule.interface_should_be_begins_with_i.style = begins_with_i
+
+dotnet_naming_rule.private_or_internal_field_should_be_begins_with__.severity = warning
+dotnet_naming_rule.private_or_internal_field_should_be_begins_with__.symbols = private_or_internal_field
+dotnet_naming_rule.private_or_internal_field_should_be_begins_with__.style = begins_with__
+
+dotnet_naming_rule.constants_should_be_pascal_case.severity = warning
+dotnet_naming_rule.constants_should_be_pascal_case.symbols = constants
+dotnet_naming_rule.constants_should_be_pascal_case.style = pascal_case
+
+dotnet_naming_rule.types_should_be_pascal_case.severity = warning
+dotnet_naming_rule.types_should_be_pascal_case.symbols = types
+dotnet_naming_rule.types_should_be_pascal_case.style = pascal_case
+
+dotnet_naming_rule.locals_and_parameters_should_be_camel_case.severity = warning
+dotnet_naming_rule.locals_and_parameters_should_be_camel_case.symbols = locals_and_parameters
+dotnet_naming_rule.locals_and_parameters_should_be_camel_case.style = camel_case_style
+
+dotnet_naming_rule.async_methods_must_end_with_async.severity = warning
+dotnet_naming_rule.async_methods_must_end_with_async.symbols = async_methods
+dotnet_naming_rule.async_methods_must_end_with_async.style = end_with_async
+
+# --- 2. ОПИСАНИЕ СИМВОЛОВ (К чему применяем) ---
+
+dotnet_naming_symbols.interface.applicable_kinds = interface
+dotnet_naming_symbols.interface.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
+dotnet_naming_symbols.interface.required_modifiers = 
+
+dotnet_naming_symbols.private_or_internal_field.applicable_kinds = field
+dotnet_naming_symbols.private_or_internal_field.applicable_accessibilities = internal, private, private_protected
+dotnet_naming_symbols.private_or_internal_field.required_modifiers = 
+
+dotnet_naming_symbols.constants.applicable_kinds = field, local
+dotnet_naming_symbols.constants.applicable_accessibilities = *
+dotnet_naming_symbols.constants.required_modifiers = const
+
+dotnet_naming_symbols.types.applicable_kinds = class, struct, interface, enum, property, method, event
+dotnet_naming_symbols.types.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
+dotnet_naming_symbols.types.required_modifiers = 
+
+dotnet_naming_symbols.locals_and_parameters.applicable_kinds = parameter, local
+dotnet_naming_symbols.locals_and_parameters.applicable_accessibilities = local
+dotnet_naming_symbols.locals_and_parameters.required_modifiers = 
+
+dotnet_naming_symbols.async_methods.applicable_kinds = method
+dotnet_naming_symbols.async_methods.applicable_accessibilities = *
+dotnet_naming_symbols.async_methods.required_modifiers = async
+
+# --- 3. ОПИСАНИЕ СТИЛЕЙ (Как должно выглядеть) ---
+
+dotnet_naming_style.begins_with_i.required_prefix = I
+dotnet_naming_style.begins_with_i.required_suffix = 
+dotnet_naming_style.begins_with_i.word_separator = 
+dotnet_naming_style.begins_with_i.capitalization = pascal_case
+
+dotnet_naming_style.begins_with__.required_prefix = _
+dotnet_naming_style.begins_with__.required_suffix = 
+dotnet_naming_style.begins_with__.word_separator = 
+dotnet_naming_style.begins_with__.capitalization = camel_case
+
+dotnet_naming_style.pascal_case.required_prefix = 
+dotnet_naming_style.pascal_case.required_suffix = 
+dotnet_naming_style.pascal_case.word_separator = 
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+dotnet_naming_style.camel_case_style.required_prefix = 
+dotnet_naming_style.camel_case_style.required_suffix = 
+dotnet_naming_style.camel_case_style.word_separator = 
+dotnet_naming_style.camel_case_style.capitalization = camel_case
+
+dotnet_naming_style.end_with_async.required_prefix = 
+dotnet_naming_style.end_with_async.required_suffix = Async
+dotnet_naming_style.end_with_async.word_separator = 
+dotnet_naming_style.end_with_async.capitalization = pascal_case

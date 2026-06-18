@@ -1,4 +1,4 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Enums;
 
 namespace Device.Domain.DomainEvents.SensorEvents;
@@ -9,8 +9,8 @@ public sealed record SensorUpdatedDomainEvent : IDomainEvent
     public Guid SensorId { get; init; }
     public Guid ControllerId { get; init; }
     public string Name { get; init; } = string.Empty;
-    public SensorTypeEnum Type { get; init; }
-    public SensorStateEnum State { get; init; }
+    public SensorType Type { get; init; }
+    public SensorState State { get; init; }
     public string Unit { get; init; } = string.Empty;
     public DateTime CreatedAt { get; init; }
 }

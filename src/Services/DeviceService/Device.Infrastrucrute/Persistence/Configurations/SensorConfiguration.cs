@@ -1,14 +1,14 @@
-﻿using Contracts.Constants;
-using Device.Domain.Entities;
+using Contracts.Constants;
+using Device.Domain.Entities.Sensors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Device.Infrastructure.Persistence.Configurations;
 
 public sealed class SensorConfiguration 
-    : IEntityTypeConfiguration<SensorEntity>
+    : IEntityTypeConfiguration<Sensor>
 {
-    public void Configure(EntityTypeBuilder<SensorEntity> builder)
+    public void Configure(EntityTypeBuilder<Sensor> builder)
     {
         builder.ToTable("sensors");
 

@@ -1,11 +1,11 @@
-﻿using Contracts.Abstractions;
-using Device.Domain.Entities;
+using Contracts.Abstractions;
+using Device.Domain.Entities.Sensors;
 using Device.Domain.SpecificationParams;
 
 namespace Device.Domain.Specifications;
 
 public sealed class SensorFilterSpecification 
-    : BaseSpecification<SensorEntity>
+    : BaseSpecification<Sensor>
 {
     public SensorFilterSpecification(SensorFilterParams @params) 
         : base(data => 

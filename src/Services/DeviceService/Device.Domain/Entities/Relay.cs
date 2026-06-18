@@ -1,21 +1,23 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
+using Contracts.Constants;
 using Contracts.Enums;
 using Contracts.Results;
-using Device.Domain.DomainEvents.RelayEvents;
+using Device.Domain.Entities.Sensors;
+using Device.Domain.Events.RelayEvents;
 using Device.Domain.Factories;
+using Device.Domain.ValueObjects;
 
 namespace Device.Domain.Entities;
 
-public sealed class RelayEntity : AggregateRoot, IEntity
+public sealed class Relay : AggregateRoot, IEntity
 {
-    private RelayEntity(
+    private Relay(
         Guid id,
         Guid controllerId,
         Guid userId,
         Guid? powerSensorId, 
-        string name,
-        ConnectionProtocolEnum connectionProtocol,
-        string connectionAddress,
+        DeviceName deviceName,
+        ConnectionAddress connectionAddress,
         bool isNormallyOpen,
         RelayPurposeEnum purpose,
         bool isActive,
@@ -26,8 +28,7 @@ public sealed class RelayEntity : AggregateRoot, IEntity
         ControllerId = controllerId;
         PowerSensorId = powerSensorId;
         UserId = userId;
-        Name = name;
-        ConnectionProtocol = connectionProtocol;
+        DeviceName = deviceName;
         ConnectionAddress = connectionAddress;
         IsNormallyOpen = isNormallyOpen;
         Purpose = purpose;
@@ -36,69 +37,58 @@ public sealed class RelayEntity : AggregateRoot, IEntity
         CreatedAt = createdAt;
     }
     
-    public Guid Id { get; private set; }
+    public Guid Id { get; init; }
     public Guid ControllerId { get; private set; }
     public Guid UserId { get; private set; }
     public Guid? PowerSensorId { get; private set; }
-    public string Name { get; private set; }
-    public ConnectionProtocolEnum ConnectionProtocol { get; private set; }
-    public string ConnectionAddress { get; private set; }
+    public DeviceName DeviceName { get; private set; }
+    public ConnectionAddress ConnectionAddress { get; private set; }
     public bool IsNormallyOpen { get; private set; }
     public RelayPurposeEnum Purpose { get; private set; }
     public bool IsActive { get; private set; }
     public bool IsManual { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public static Result<RelayEntity> Create (
+    public static Result<Relay> Create (
+        Guid id,
         Guid controllerId,
         Guid userId,
         Guid? powerSensorId,
-        string name,
-        ConnectionProtocolEnum connectionProtocol,
-        string connectionAddress,
+        string rawName,
+        ConnectionProtocol connectionProtocol,
+        string rawConnectionAddress,
         bool isNormalyOpen,
         RelayPurposeEnum purpose,
         bool isActive,
         bool isManual)
     {
         var errors = new List<string>();
-
-        if (controllerId == Guid.Empty)
+        Result<DeviceName> nameResut = DeviceName.Create(rawName);
+        if (nameResut.IsFailure)
         {
-            errors.Add("controllerId must not be empty.");
+            errors.Add(nameResut.Error.Message);
         }
 
-        if (userId == Guid.Empty)
+        Result<ConnectionAddress> addressResult = ConnectionAddress.Create(
+            connectionProtocol, rawConnectionAddress);
+        if (addressResult.IsFailure)
         {
-            errors.Add("userId must not be empty.");
+            errors.Add(addressResult.Error.Message);
         }
 
-        if (string.IsNullOrWhiteSpace(name))
+        if (errors.Count != 0)
         {
-            errors.Add("name must not be empty.");
+            return Result<Relay>.Failure(Error.Validation<Relay>(
+                string.Join(", ", errors)));
         }
 
-        if (string.IsNullOrWhiteSpace(connectionAddress))
-        {
-            errors.Add("connectionAddress must not be empty.");
-        }
-
-        if (errors.Count > 0)
-        {
-            return Result<RelayEntity>.Failure(
-                Error.Validation(
-                    "Relay.Invalid",
-                    string.Join("; ", errors)));
-        }
-
-        var relay = new RelayEntity(
-            Guid.NewGuid(),
+        var relay = new Relay(
+            id,
             controllerId,
             userId,
             powerSensorId,
-            name.Trim(),
-            connectionProtocol,
-            connectionAddress.Trim(),
+            nameResut.Value,
+            addressResult.Value,
             isNormalyOpen,
             purpose,
             isActive,
@@ -110,46 +100,32 @@ public sealed class RelayEntity : AggregateRoot, IEntity
             RelayId = relay.Id,
             ControllerId = relay.ControllerId,
             PowerSensorId = relay.PowerSensorId,
-            Name = relay.Name,
+            DeviceName = relay.DeviceName,
             Purpose = relay.Purpose,
             IsManual = relay.IsManual,
             IsActive = relay.IsActive,
             CreatedAt = relay.CreatedAt
         });
 
-        return Result<RelayEntity>.Success(relay);
+        return Result<Relay>.Success(relay);
     }
 
     public Result Update(
         Guid controllerId,
-        ConnectionProtocolEnum connectionProtocol,
-        string connectionAddress,
+        ConnectionProtocol connectionProtocol,
+        string rawConnectionAddress,
         RelayPurposeEnum purpose,
         bool isNormalyOpen)
     {
-        var errors = new List<string>();
-
-        if (controllerId == Guid.Empty)
+        Result<ConnectionAddress> addressResult = ConnectionAddress.Create(
+            connectionProtocol, rawConnectionAddress);
+        if (addressResult.IsFailure)
         {
-            errors.Add("controllerId must not be empty.");
-        }
-
-        if (string.IsNullOrWhiteSpace(connectionAddress))
-        {
-            errors.Add("connectionAddress must not be empty.");
-        }
-
-        if (errors.Count > 0)
-        {
-            return Result.Failure(
-                Error.Validation(
-                    "Relay.Invalid",
-                    string.Join("; ", errors)));
+            return Result.Failure(addressResult.Error);
         }
 
         ControllerId = controllerId;
-        ConnectionProtocol = connectionProtocol;
-        ConnectionAddress = connectionAddress.Trim();
+        ConnectionAddress = addressResult.Value;
         IsNormallyOpen = isNormalyOpen;
         Purpose = purpose;
 
@@ -158,7 +134,7 @@ public sealed class RelayEntity : AggregateRoot, IEntity
             RelayId = Id,
             ControllerId = ControllerId,
             PowerSensorId = PowerSensorId,
-            Name = Name,
+            DeviceName = DeviceName.Value,
             Purpose = Purpose,
             IsManual = IsManual,
             IsActive = IsActive,
@@ -168,37 +144,33 @@ public sealed class RelayEntity : AggregateRoot, IEntity
         return Result.Success();
     }
 
-    public Result SetName(string name)
+    public Result SetName(string rawName)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        Result<DeviceName> nameResut = DeviceName.Create(rawName);
+        if (nameResut.IsFailure)
         {
-            return Result.Failure(
-                Error.Validation(
-                    "Command.Invalid",
-                    "name must not be empty."));
+            return Result<Relay>.Failure(nameResut.Error);
         }
 
-        Name = name;
+        DeviceName = nameResut.Value;
 
         return Result.Success();
     }
 
-    public Result SetPowerSensor(Guid powerSensorId)
+    public Result SetPowerSensor(Sensor sensor)
     {
-        if (powerSensorId == Guid.Empty)
+        if (sensor is not VoltageSensor)
         {
-            return Result.Failure(
-                Error.Validation(
-                    "Command.Invalid",
-                    "powerSensorId must not be empty."));
+            return Result.Failure(Error.Conflict<Relay>(
+                    RelayErrors.InvalidPowerSensorType));
         }
 
-        PowerSensorId = powerSensorId;
+        PowerSensorId = sensor.Id;
 
         RaiseEvent(new SetRelayPowerSensorDomainEvent
         {
             RelayId = Id,
-            PowerSensorId = powerSensorId,
+            PowerSensorId = sensor.Id,
         });
 
         return Result.Success();

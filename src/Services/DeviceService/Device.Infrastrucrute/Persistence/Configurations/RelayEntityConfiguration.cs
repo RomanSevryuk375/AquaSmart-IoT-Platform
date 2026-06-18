@@ -1,14 +1,15 @@
-﻿using Contracts.Constants;
+using Contracts.Constants;
 using Device.Domain.Entities;
+using Device.Domain.Entities.Sensors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Device.Infrastructure.Persistence.Configurations;
 
 public sealed class RelayEntityConfiguration 
-    : IEntityTypeConfiguration<RelayEntity>
+    : IEntityTypeConfiguration<Relay>
 {
-    public void Configure(EntityTypeBuilder<RelayEntity> builder)
+    public void Configure(EntityTypeBuilder<Relay> builder)
     {
         builder.ToTable("relays");
 
@@ -51,14 +52,14 @@ public sealed class RelayEntityConfiguration
         builder.HasIndex(x => x.PowerSensorId)
             .IsUnique();
 
-        builder.HasMany<RelayCommandsQueueEntity>()
+        builder.HasMany<RelayCommand>()
             .WithOne()
             .HasForeignKey(x => x.RelayId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<SensorEntity>()
+        builder.HasOne<Sensor>()
             .WithOne()
-            .HasForeignKey<RelayEntity>(x => x.PowerSensorId)
+            .HasForeignKey<Relay>(x => x.PowerSensorId)
             .OnDelete(DeleteBehavior.SetNull);
     }
 }

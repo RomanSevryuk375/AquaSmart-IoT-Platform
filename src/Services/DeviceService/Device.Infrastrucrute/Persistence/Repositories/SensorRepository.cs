@@ -1,11 +1,11 @@
-﻿using Device.Domain.Entities;
+using Device.Domain.Entities.Sensors;
 using Device.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Device.Infrastructure.Persistence.Repositories;
 
 public sealed class SensorRepository(SystemDbContext dbContext)
-    : BaseRepository<SensorEntity>(dbContext), ISensorRepository
+    : BaseRepository<Sensor>(dbContext), ISensorRepository
 {
     public async Task<bool> ExistsAsync(
         Guid sensorId, 
@@ -16,7 +16,7 @@ public sealed class SensorRepository(SystemDbContext dbContext)
             .AnyAsync(x => x.Id == sensorId, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<SensorEntity>> GetAllSensorsAsync(
+    public async Task<IReadOnlyList<Sensor>> GetAllSensorsAsync(
         Guid controllerId,
         CancellationToken cancellationToken)
     {

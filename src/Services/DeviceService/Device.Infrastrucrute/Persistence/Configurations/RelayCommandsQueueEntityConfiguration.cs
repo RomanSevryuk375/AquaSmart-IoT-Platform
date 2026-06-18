@@ -1,13 +1,13 @@
-﻿using Device.Domain.Entities;
+using Device.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Device.Infrastructure.Persistence.Configurations;
 
 public sealed class RelayCommandsQueueEntityConfiguration
-    : IEntityTypeConfiguration<RelayCommandsQueueEntity>
+    : IEntityTypeConfiguration<RelayCommand>
 {
-    public void Configure(EntityTypeBuilder<RelayCommandsQueueEntity> builder)
+    public void Configure(EntityTypeBuilder<RelayCommand> builder)
     {
         builder.ToTable("relay_command_queues");
 

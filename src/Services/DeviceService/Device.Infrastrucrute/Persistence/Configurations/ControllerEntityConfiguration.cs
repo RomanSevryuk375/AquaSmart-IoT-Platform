@@ -1,14 +1,15 @@
-﻿using Contracts.Constants;
+using Contracts.Constants;
 using Device.Domain.Entities;
+using Device.Domain.Entities.Sensors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Device.Infrastructure.Persistence.Configurations;
 
 public sealed class ControllerEntityConfiguration 
-    : IEntityTypeConfiguration<ControllerEntity>
+    : IEntityTypeConfiguration<Controller>
 {
-    public void Configure(EntityTypeBuilder<ControllerEntity> builder)
+    public void Configure(EntityTypeBuilder<Controller> builder)
     {
         builder.ToTable("controllers");
 
@@ -30,17 +31,17 @@ public sealed class ControllerEntityConfiguration
         builder.Property(x => x.LastSeenAt).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
 
-        builder.HasMany<SensorEntity>()
+        builder.HasMany<Sensor>()
             .WithOne()
             .HasForeignKey(s => s.ControllerId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany<RelayEntity>()
+        builder.HasMany<Relay>()
             .WithOne()
             .HasForeignKey(r => r.ControllerId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany<RelayCommandsQueueEntity>()
+        builder.HasMany<RelayCommand>()
             .WithOne()
             .HasForeignKey(x => x.ControllerId)
             .OnDelete(DeleteBehavior.Cascade);

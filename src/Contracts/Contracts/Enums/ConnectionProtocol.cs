@@ -1,6 +1,6 @@
-﻿namespace Contracts.Enums;
+namespace Contracts.Enums;
 
-public enum ConnectionProtocolEnum
+public enum ConnectionProtocol
 {
     Digital = 1,
     Analog = 2,

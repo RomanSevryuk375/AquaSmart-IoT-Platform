@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Device.Application.DTOs.Controller;
 using Device.Domain.Entities;
 
@@ -8,6 +8,6 @@ public sealed class ControllerProfile : Profile
 {
     public ControllerProfile()
     {
-        CreateMap<ControllerEntity, ControllerResponseDto>();
+        CreateMap<Controller, ControllerResponseDto>();
     }
 }

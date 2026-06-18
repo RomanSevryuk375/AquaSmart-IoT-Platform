@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Device.Application.DTOs.RelayCommands;
 using Device.Domain.Entities;
 
@@ -8,6 +8,6 @@ public sealed class RelayCommandProfile : Profile
 {
     public RelayCommandProfile()
     {
-        CreateMap<RelayCommandsQueueEntity, RelayCommandResponseDto>();
+        CreateMap<RelayCommand, RelayCommandResponseDto>();
     }
 }

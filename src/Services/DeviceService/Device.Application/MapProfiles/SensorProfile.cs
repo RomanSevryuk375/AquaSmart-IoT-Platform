@@ -1,8 +1,8 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Contracts.Events.SensorEvents;
 using Device.Application.DTOs.Configurations;
 using Device.Application.DTOs.Sensor;
-using Device.Domain.Entities;
+using Device.Domain.Entities.Sensors;
 
 namespace Device.Application.MapProfiles;
 
@@ -10,21 +10,21 @@ public sealed class SensorProfile : Profile
 {
     public SensorProfile()
     {
-        CreateMap<SensorEntity, SensorResponseDto>();
+        CreateMap<Sensor, SensorResponseDto>();
 
-        CreateMap<SensorEntity, SensorUpdatedEvent>()
+        CreateMap<Sensor, SensorUpdatedEvent>()
             .ForMember(desc => desc.SensorId,
                        opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<SensorEntity, SensorStateChangedEvent>()
+        CreateMap<Sensor, SensorStateChangedEvent>()
             .ForMember(desc => desc.SensorId,
                        opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<SensorEntity, SensorCreatedEvent>()
+        CreateMap<Sensor, SensorCreatedEvent>()
             .ForMember(desc => desc.SensorId,
                        opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<SensorEntity, SensorConfigDto>()
+        CreateMap<Sensor, SensorConfigDto>()
             .ForMember(desc => desc.SensorId,
                        opt => opt.MapFrom(src => src.Id));
     }

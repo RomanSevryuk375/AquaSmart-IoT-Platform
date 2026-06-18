@@ -1,12 +1,12 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Enums;
 using Contracts.Results;
 
 namespace Device.Domain.Entities;
 
-public sealed class RelayCommandsQueueEntity : IEntity
+public sealed class RelayCommand : IEntity
 {
-    private RelayCommandsQueueEntity(
+    private RelayCommand(
         Guid id,
         Guid controllerId,
         Guid relayId,
@@ -41,45 +41,26 @@ public sealed class RelayCommandsQueueEntity : IEntity
     public string? ErrorMessage { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public static Result<RelayCommandsQueueEntity> Create(
+    public static Result<RelayCommand> Create(
+        Guid id,
         Guid controllerId,
         Guid relayId,
         RuleActionEnum action,
         DateTime? expireAt)
     {
-        var errors = new List<string>();
-
-        if (controllerId == Guid.Empty)
-        {
-            errors.Add("controllerId must not be empty.");
-        }
-
-        if (relayId == Guid.Empty)
-        {
-            errors.Add("relayId must not be empty.");
-        }
-
-        if (errors.Count > 0)
-        {
-            return Result<RelayCommandsQueueEntity>.Failure(
-                Error.Validation(
-                    "Command.Invalid",
-                    string.Join("; ", errors)));
-        }
-
-        var command = new RelayCommandsQueueEntity(
-            Guid.NewGuid(),
+        var command = new RelayCommand(
+            id,
             controllerId,
             relayId,
             action,
-            CommandStatusEnum.Pending,
+            status: CommandStatusEnum.Pending,
             expireAt ?? DateTime.UtcNow.AddMinutes(5),
-            0,
-            null,
-            null,
-            DateTime.UtcNow);
+            attemptCount: 0,
+            processedAt: null,
+            errorMessage: null,
+            createdAt: DateTime.UtcNow);
 
-        return Result<RelayCommandsQueueEntity>.Success(command);
+        return Result<RelayCommand>.Success(command);
     }
 
     public void MarkAsSent()

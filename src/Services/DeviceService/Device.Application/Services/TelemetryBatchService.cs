@@ -1,4 +1,4 @@
-﻿using Contracts.Events.TelemetryEvents;
+using Contracts.Events.TelemetryEvents;
 using Contracts.Results;
 using Device.Application.DTOs.Telemetry;
 using Device.Application.Interfaces;
@@ -43,7 +43,7 @@ public sealed class TelemetryBatchService(
             return Result<TelemetryResponse>
                 .Failure(Error.NotFound(
                     "Controller.NotFound",
-                    $"{nameof(ControllerEntity)} {request.MacAddress} not found"));
+                    $"{nameof(Controller)} {request.MacAddress} not found"));
         }
 
         if (!myHasher.Verify(deviceToken, existingController.DeviceTokenHash))

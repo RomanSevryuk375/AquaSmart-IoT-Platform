@@ -1,6 +1,6 @@
-﻿namespace Contracts.Enums;
+namespace Contracts.Enums;
 
-public enum SensorStateEnum
+public enum SensorState
 {
     Active = 1,
     Inactive = 2,

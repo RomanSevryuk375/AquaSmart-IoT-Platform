@@ -1,4 +1,4 @@
-﻿namespace Contracts.Abstractions;
+namespace Contracts.Abstractions;
 
 public abstract class AggregateRoot 
 {
