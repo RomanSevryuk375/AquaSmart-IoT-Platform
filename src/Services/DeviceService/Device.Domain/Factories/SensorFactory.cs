@@ -1,8 +1,4 @@
 using Contracts.Constants;
-using Contracts.Enums;
-using Contracts.Results;
-using Device.Domain.Entities.Sensors;
-using Device.Domain.ValueObjects;
 
 namespace Device.Domain.Factories;
 

@@ -1,7 +1,6 @@
-﻿using Contracts.Events.SensorEvents;
-using Device.Domain.DomainEvents.SensorEvents;
+using Contracts.Events.SensorEvents;
+using Device.Domain.Events.SensorEvents;
 using MassTransit;
-using MediatR;
 
 namespace Device.Application.Handlers;
 

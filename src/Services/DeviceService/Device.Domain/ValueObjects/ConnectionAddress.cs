@@ -1,6 +1,4 @@
 using Contracts.Constants;
-using Contracts.Enums;
-using Contracts.Results;
 using System.Text.RegularExpressions;
 
 namespace Device.Domain.ValueObjects;

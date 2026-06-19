@@ -1,5 +1,5 @@
-﻿using Contracts.Extensions;
-using Device.Domain.Interfaces;
+using Contracts.Extensions;
+using Device.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace Device.Infrastructure.Extensions;

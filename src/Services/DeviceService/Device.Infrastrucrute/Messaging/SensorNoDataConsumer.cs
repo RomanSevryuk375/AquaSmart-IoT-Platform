@@ -1,6 +1,5 @@
-﻿using Contracts.Events.SensorEvents;
+using Contracts.Events.SensorEvents;
 using Device.Application.Interfaces;
-using MassTransit;
 
 namespace Device.Infrastructure.Messaging;
 

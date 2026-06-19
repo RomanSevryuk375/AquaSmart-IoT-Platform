@@ -1,6 +1,3 @@
-using Contracts.Abstractions;
-using Contracts.Enums;
-
 namespace Device.Domain.DomainEvents.SensorEvents;
 
 public sealed record SensorCreatedDomainEvent : IDomainEvent

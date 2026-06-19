@@ -1,4 +1,3 @@
-﻿using Contracts.Results;
 using Device.Application.DTOs.Telemetry;
 
 namespace Device.Application.Interfaces;

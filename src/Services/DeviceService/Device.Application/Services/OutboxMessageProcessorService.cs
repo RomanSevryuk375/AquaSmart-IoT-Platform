@@ -1,8 +1,5 @@
-﻿using Contracts.Abstractions;
-using Contracts.Results;
+using Contracts.Abstractions;
 using Device.Application.Interfaces;
-using Device.Domain.Interfaces;
-using MediatR;
 using Newtonsoft.Json;
 
 namespace Device.Application.Services;

@@ -1,8 +1,5 @@
-using AutoMapper;
 using Contracts.Events.SensorEvents;
 using Device.Application.DTOs.Configurations;
-using Device.Application.DTOs.Sensor;
-using Device.Domain.Entities.Sensors;
 
 namespace Device.Application.MapProfiles;
 

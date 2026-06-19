@@ -1,11 +1,5 @@
-using Contracts.Abstractions;
 using Contracts.Constants;
-using Contracts.Enums;
-using Contracts.Results;
-using Device.Domain.Entities.Sensors;
 using Device.Domain.Events.RelayEvents;
-using Device.Domain.Factories;
-using Device.Domain.ValueObjects;
 
 namespace Device.Domain.Entities;
 
@@ -100,7 +94,7 @@ public sealed class Relay : AggregateRoot, IEntity
             RelayId = relay.Id,
             ControllerId = relay.ControllerId,
             PowerSensorId = relay.PowerSensorId,
-            DeviceName = relay.DeviceName,
+            DeviceName = relay.DeviceName.Value,
             Purpose = relay.Purpose,
             IsManual = relay.IsManual,
             IsActive = relay.IsActive,
@@ -189,7 +183,7 @@ public sealed class Relay : AggregateRoot, IEntity
         {
             ControllerId = ControllerId,
             RelayId = Id,
-            Action = StateEvaluatorFactory.EvaluateBool(IsActive),
+            TargetState = IsActive,
             ExpireAt = DateTime.UtcNow.AddMinutes(5)
         });
     }

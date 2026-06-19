@@ -1,6 +1,4 @@
-﻿using Contracts.Constants;
-using Device.Application.DTOs.Relay;
-using FluentValidation;
+using Contracts.Constants;
 
 namespace Device.Application.DTOs.Validators.RelayValidators;
 

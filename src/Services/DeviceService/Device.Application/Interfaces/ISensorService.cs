@@ -1,7 +1,3 @@
-using Contracts.Enums;
-using Contracts.Results;
-using Device.Application.DTOs.Sensor;
-
 namespace Device.Application.Interfaces;
 
 public interface ISensorService

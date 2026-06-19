@@ -1,8 +1,4 @@
 using Contracts.Constants;
-using Device.Domain.Entities;
-using Device.Domain.Entities.Sensors;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Device.Infrastructure.Persistence.Configurations;
 

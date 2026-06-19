@@ -1,13 +1,5 @@
-using AutoMapper;
-using Contracts.Enums;
-using Contracts.Results;
-using Device.Application.DTOs.Sensor;
 using Device.Application.Interfaces;
-using Device.Domain.Entities.Sensors;
-using Device.Domain.Interfaces;
-using Device.Domain.SpecificationParams;
 using Device.Domain.Specifications;
-using FluentValidation;
 
 namespace Device.Application.Services;
 

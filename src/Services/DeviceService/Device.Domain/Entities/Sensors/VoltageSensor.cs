@@ -1,6 +1,3 @@
-using Contracts.Enums;
-using Device.Domain.ValueObjects;
-
 namespace Device.Domain.Entities.Sensors;
 
 public sealed class VoltageSensor : Sensor

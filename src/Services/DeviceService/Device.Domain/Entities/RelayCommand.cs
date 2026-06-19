@@ -1,7 +1,3 @@
-using Contracts.Abstractions;
-using Contracts.Enums;
-using Contracts.Results;
-
 namespace Device.Domain.Entities;
 
 public sealed class RelayCommand : IEntity

@@ -1,6 +1,4 @@
-﻿using Contracts.Enums;
-
-namespace Device.Domain.Factories;
+namespace Device.Application.Factories;
 
 public static class StateEvaluatorFactory
 {

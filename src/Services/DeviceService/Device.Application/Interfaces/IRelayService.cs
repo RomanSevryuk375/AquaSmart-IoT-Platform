@@ -1,6 +1,3 @@
-﻿using Contracts.Results;
-using Device.Application.DTOs.Relay;
-
 namespace Device.Application.Interfaces
 {
     public interface IRelayService

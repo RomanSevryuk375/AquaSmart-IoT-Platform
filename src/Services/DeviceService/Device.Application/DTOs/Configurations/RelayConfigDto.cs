@@ -1,5 +1,3 @@
-using Contracts.Enums;
-
 namespace Device.Application.DTOs.Configurations;
 
 public sealed record RelayConfigDto

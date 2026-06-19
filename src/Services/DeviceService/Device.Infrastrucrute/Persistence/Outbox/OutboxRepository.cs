@@ -1,7 +1,5 @@
-﻿using Device.Domain.Entities;
-using Device.Domain.Interfaces;
+using Device.Application.Models;
 using Device.Infrastructure.Persistence.Repositories;
-using Microsoft.EntityFrameworkCore;
 
 namespace Device.Infrastructure.Persistence.Outbox;
 

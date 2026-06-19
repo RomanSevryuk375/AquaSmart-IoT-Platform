@@ -1,7 +1,3 @@
-using AutoMapper;
-using Device.Application.DTOs.Controller;
-using Device.Domain.Entities;
-
 namespace Device.Application.MapProfiles;
 
 public sealed class ControllerProfile : Profile

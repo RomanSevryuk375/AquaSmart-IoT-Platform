@@ -1,6 +1,3 @@
-using Contracts.Abstractions;
-using Contracts.Enums;
-
 namespace Device.Domain.Events.RelayEvents;
 
 public sealed record RelayUpdatedDomainEvent : IDomainEvent

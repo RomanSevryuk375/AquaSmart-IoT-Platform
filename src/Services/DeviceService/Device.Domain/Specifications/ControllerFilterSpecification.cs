@@ -1,19 +1,11 @@
-using Contracts.Abstractions;
-using Device.Domain.Entities;
-using Device.Domain.SpecificationParams;
-
 namespace Device.Domain.Specifications;
 
-public sealed class ControllerFilterSpecification 
-    : BaseSpecification<Controller>
+public sealed class ControllerFilterSpecification(Guid? userId, string? searchTerm, bool? isOnline)
+        : BaseSpecification<Controller>(data => 
+            (!isOnline.HasValue || data.IsOnline == isOnline.Value) 
+            && (!userId.HasValue || data.UserId == userId.Value)
+            && (string.IsNullOrWhiteSpace(searchTerm)
+                || data.Name.Value.ToLower().Contains(searchTerm.ToLower())
+                || data.MacAddress.Value.ToLower().Contains(searchTerm.ToLower())))
 {
-    public ControllerFilterSpecification(ControllerFilterParams @params) 
-        : base(data => 
-            (!@params.IsOnline.HasValue || data.IsOnline == @params.IsOnline.Value) 
-            && (!@params.UserId.HasValue || data.UserId == @params.UserId.Value)
-            && (string.IsNullOrWhiteSpace(@params.SearchTerm)
-                || data.Name.ToLower().Contains(@params.SearchTerm.ToLower())
-                || data.MacAddress.ToLower().Contains(@params.SearchTerm.ToLower())))
-    {
-    }
 }

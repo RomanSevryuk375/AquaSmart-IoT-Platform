@@ -1,6 +1,4 @@
-﻿using Contracts.Abstractions;
-
-namespace Device.Domain.DomainEvents.ControllerEvents;
+namespace Device.Domain.Events.ControllerEvents;
 
 public sealed record ControllerNotOnlineDomainEvent : IDomainEvent
 {

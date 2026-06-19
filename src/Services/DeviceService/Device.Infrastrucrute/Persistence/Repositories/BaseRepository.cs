@@ -1,5 +1,4 @@
-﻿using Contracts.Abstractions;
-using Microsoft.EntityFrameworkCore;
+using Contracts.Abstractions;
 
 namespace Device.Infrastructure.Persistence.Repositories;
 

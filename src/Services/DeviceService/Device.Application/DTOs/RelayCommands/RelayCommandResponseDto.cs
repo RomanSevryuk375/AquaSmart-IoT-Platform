@@ -1,5 +1,3 @@
-﻿using Contracts.Enums;
-
 namespace Device.Application.DTOs.RelayCommands;
 
 public sealed record RelayCommandResponseDto

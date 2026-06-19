@@ -1,5 +1,3 @@
-using Contracts.Enums;
-
 namespace Device.Application.DTOs.Sensor;
 
 public sealed record SensorUpdateRequestDto

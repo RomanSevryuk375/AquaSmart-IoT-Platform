@@ -1,6 +1,4 @@
-using AutoMapper;
 using Device.Application.DTOs.RelayCommands;
-using Device.Domain.Entities;
 
 namespace Device.Application.MapProfiles;
 

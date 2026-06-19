@@ -1,6 +1,3 @@
-using Contracts.Abstractions;
-using Contracts.Enums;
-using Device.Domain.ValueObjects;
 using Device.Domain.DomainEvents.SensorEvents;
 
 namespace Device.Domain.Entities.Sensors;

@@ -1,6 +1,5 @@
-﻿using Contracts.Constants;
+using Contracts.Constants;
 using Device.Application.DTOs.Telemetry;
-using FluentValidation;
 
 namespace Device.Application.DTOs.Validators.TelemtryValidators;
 

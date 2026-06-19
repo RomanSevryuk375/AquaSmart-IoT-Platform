@@ -1,7 +1,4 @@
-using Contracts.Abstractions;
-using Contracts.Enums;
-
-namespace Device.Domain.DomainEvents.SensorEvents;
+namespace Device.Domain.Events.SensorEvents;
 
 public sealed record SensorStateChangedDomainEvent : IDomainEvent
 {

@@ -1,9 +1,4 @@
-﻿using Contracts.Authorization;
-using Contracts.Results;
 using Device.Application.DTOs.Relay;
-using Device.Application.Interfaces;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Device.API.Controllers;
 

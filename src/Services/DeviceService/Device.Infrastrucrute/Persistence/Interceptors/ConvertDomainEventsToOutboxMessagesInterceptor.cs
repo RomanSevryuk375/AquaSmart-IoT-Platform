@@ -1,5 +1,5 @@
-﻿using Contracts.Abstractions;
-using Device.Domain.Entities;
+using Contracts.Abstractions;
+using Device.Application.Models;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Newtonsoft.Json;
 

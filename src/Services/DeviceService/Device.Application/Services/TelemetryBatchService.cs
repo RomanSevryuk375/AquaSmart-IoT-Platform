@@ -1,10 +1,6 @@
 using Contracts.Events.TelemetryEvents;
-using Contracts.Results;
 using Device.Application.DTOs.Telemetry;
 using Device.Application.Interfaces;
-using Device.Domain.Entities;
-using Device.Domain.Interfaces;
-using FluentValidation;
 using MassTransit;
 using Error = Contracts.Results.Error;
 

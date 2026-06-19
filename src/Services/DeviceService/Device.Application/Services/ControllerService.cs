@@ -1,12 +1,5 @@
-using AutoMapper;
-using Contracts.Results;
-using Device.Application.DTOs.Controller;
 using Device.Application.Interfaces;
-using Device.Domain.Entities;
-using Device.Domain.Interfaces;
-using Device.Domain.SpecificationParams;
 using Device.Domain.Specifications;
-using FluentValidation;
 
 namespace Device.Application.Services;
 

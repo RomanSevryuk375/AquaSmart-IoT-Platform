@@ -1,6 +1,5 @@
-﻿using Contracts.Events.RelayEvents;
+using Contracts.Events.RelayEvents;
 using Device.Application.Interfaces;
-using MassTransit;
 
 namespace Device.Infrastructure.Messaging;
 

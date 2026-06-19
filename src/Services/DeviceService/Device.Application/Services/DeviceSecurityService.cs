@@ -1,6 +1,4 @@
-﻿using Contracts.Results;
 using Device.Application.Interfaces;
-using Device.Domain.Interfaces;
 
 namespace Device.Application.Services;
 

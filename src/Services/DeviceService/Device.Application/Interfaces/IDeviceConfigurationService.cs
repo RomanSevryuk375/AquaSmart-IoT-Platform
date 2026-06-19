@@ -1,4 +1,3 @@
-﻿using Contracts.Results;
 using Device.Application.DTOs.Configurations;
 
 namespace Device.Application.Interfaces;

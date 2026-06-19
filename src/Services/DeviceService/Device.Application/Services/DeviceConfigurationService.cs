@@ -1,9 +1,6 @@
-﻿using AutoMapper;
-using Contracts.Results;
 using Device.Application.DTOs.Configurations;
 using Device.Application.Extesions;
 using Device.Application.Interfaces;
-using Device.Domain.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace Device.Application.Services;

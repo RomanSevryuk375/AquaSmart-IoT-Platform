@@ -1,4 +1,3 @@
-using Contracts.Authorization;
 using Device.Application.Extesions;
 using Device.Infrastructure.Extensions;
 using Microsoft.OpenApi.Models;

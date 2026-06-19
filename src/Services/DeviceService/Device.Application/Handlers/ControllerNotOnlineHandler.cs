@@ -1,7 +1,6 @@
-﻿using Contracts.Events.ControllerEvents;
-using Device.Domain.DomainEvents.ControllerEvents;
+using Contracts.Events.ControllerEvents;
+using Device.Domain.Events.ControllerEvents;
 using MassTransit;
-using MediatR;
 
 namespace Device.Application.Handlers;
 

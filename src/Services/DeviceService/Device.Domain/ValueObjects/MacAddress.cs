@@ -1,5 +1,4 @@
 using Contracts.Constants;
-using Contracts.Results;
 using System.Text.RegularExpressions;
 
 namespace Device.Domain.ValueObjects;

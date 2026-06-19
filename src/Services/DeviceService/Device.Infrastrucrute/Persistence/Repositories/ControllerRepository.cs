@@ -1,7 +1,3 @@
-using Device.Domain.Entities;
-using Device.Domain.Interfaces;
-using Microsoft.EntityFrameworkCore;
-
 namespace Device.Infrastructure.Persistence.Repositories;
 
 public sealed class ControllerRepository(SystemDbContext dbContext) 

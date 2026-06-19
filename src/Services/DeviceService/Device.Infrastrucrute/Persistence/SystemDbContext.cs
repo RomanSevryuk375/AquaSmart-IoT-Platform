@@ -1,6 +1,4 @@
-using Device.Domain.Entities;
-using Device.Domain.Entities.Sensors;
-using Microsoft.EntityFrameworkCore;
+using Device.Application.Models;
 
 namespace Device.Infrastructure.Persistence;
 

@@ -1,13 +1,8 @@
-using AutoMapper;
-using Contracts.Enums;
 using Contracts.Events.RelayEvents;
-using Contracts.Results;
 using Device.Application.DTOs.RelayCommands;
 using Device.Application.Extesions;
+using Device.Application.Factories;
 using Device.Application.Interfaces;
-using Device.Domain.Entities;
-using Device.Domain.Factories;
-using Device.Domain.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace Device.Application.Services;

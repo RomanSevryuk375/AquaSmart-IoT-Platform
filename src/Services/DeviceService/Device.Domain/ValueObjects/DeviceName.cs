@@ -1,5 +1,4 @@
-﻿using Contracts.Constants;
-using Contracts.Results;
+using Contracts.Constants;
 
 namespace Device.Domain.ValueObjects;
 

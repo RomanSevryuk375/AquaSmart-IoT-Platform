@@ -1,8 +1,4 @@
-using Contracts.Abstractions;
-using Contracts.Results;
 using Device.Domain.DomainEvents.ControllerEvents;
-using Device.Domain.Entities.Sensors;
-using Device.Domain.ValueObjects;
 
 namespace Device.Domain.Entities;
 

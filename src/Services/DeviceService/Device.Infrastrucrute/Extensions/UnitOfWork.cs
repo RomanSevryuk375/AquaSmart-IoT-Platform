@@ -1,6 +1,3 @@
-﻿using Device.Domain.Interfaces;
-using Device.Infrastructure.Persistence;
-
 namespace Device.Infrastructure.Extensions;
 
 public sealed class UnitOfWork(SystemDbContext context) : IUnitOfWork

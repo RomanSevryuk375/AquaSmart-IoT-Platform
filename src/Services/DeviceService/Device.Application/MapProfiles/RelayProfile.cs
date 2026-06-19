@@ -1,8 +1,5 @@
-using AutoMapper;
 using Contracts.Events.RelayEvents;
 using Device.Application.DTOs.Configurations;
-using Device.Application.DTOs.Relay;
-using Device.Domain.Entities;
 
 namespace Device.Application.MapProfiles;
 

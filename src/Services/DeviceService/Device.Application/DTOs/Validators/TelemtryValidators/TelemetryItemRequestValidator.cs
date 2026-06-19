@@ -1,5 +1,4 @@
-﻿using Device.Application.DTOs.Telemetry;
-using FluentValidation;
+using Device.Application.DTOs.Telemetry;
 
 namespace Device.Application.DTOs.Validators.TelemtryValidators;
 

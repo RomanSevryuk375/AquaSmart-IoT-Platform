@@ -1,5 +1,4 @@
-﻿using Contracts.Abstractions;
-using Device.Application.DTOs.Controller;
+using Contracts.Abstractions;
 
 namespace Device.Application.CQRS.Controller.Command.AddController;
 

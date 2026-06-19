@@ -1,13 +1,10 @@
-﻿using Contracts.Options;
-using Device.Domain.Interfaces;
+using Contracts.Options;
+using Device.Application.Interfaces;
 using Device.Infrastructure.BackgroundJobs;
 using Device.Infrastructure.Messaging;
-using Device.Infrastructure.Persistence;
 using Device.Infrastructure.Persistence.Interceptors;
 using Device.Infrastructure.Persistence.Outbox;
 using Device.Infrastructure.Persistence.Repositories;
-using MassTransit;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;

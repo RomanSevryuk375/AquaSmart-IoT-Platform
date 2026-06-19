@@ -1,5 +1,3 @@
-﻿using Contracts.Abstractions;
-
 namespace Device.Domain.Events.RelayEvents;
 
 public sealed record RelayModeChangedDomainEvent : IDomainEvent

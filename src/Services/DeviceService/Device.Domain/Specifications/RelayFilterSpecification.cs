@@ -1,20 +1,13 @@
-using Contracts.Abstractions;
-using Device.Domain.Entities;
-using Device.Domain.SpecificationParams;
-
 namespace Device.Domain.Specifications;
 
-public sealed class RelayFilterSpecification 
-    : BaseSpecification<Relay>
+public sealed class RelayFilterSpecification(Guid? controllerId, Guid? userId, RelayPurposeEnum? purpose,
+    bool? isActive, bool? isManual)
+        : BaseSpecification<Relay>(data => 
+                (!controllerId.HasValue || data.ControllerId == controllerId.Value) &&
+                (!userId.HasValue || data.UserId == userId.Value) &&
+                (!purpose.HasValue || data.Purpose == purpose.Value) &&
+                (!isActive.HasValue || data.IsActive == isActive.Value) &&
+                (!isManual.HasValue || data.IsManual == isManual.Value))
 {
-    public RelayFilterSpecification(RelayFilterParams @params) : 
-            base(data => 
-                (!@params.ControllerId.HasValue || data.ControllerId == @params.ControllerId.Value) &&
-                (!@params.UserId.HasValue || data.UserId == @params.UserId.Value) &&
-                (!@params.Purpose.HasValue || data.Purpose == @params.Purpose.Value) &&
-                (!@params.IsActive.HasValue || data.IsActive == @params.IsActive.Value) &&
-                (!@params.IsManual.HasValue || data.IsManual == @params.IsManual.Value))
-    {
-    }
 }
 

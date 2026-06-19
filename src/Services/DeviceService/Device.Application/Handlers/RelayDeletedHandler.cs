@@ -1,7 +1,6 @@
-﻿using Contracts.Events.RelayEvents;
+using Contracts.Events.RelayEvents;
 using Device.Domain.Events.RelayEvents;
 using MassTransit;
-using MediatR;
 
 namespace Device.Application.Handlers;
 
