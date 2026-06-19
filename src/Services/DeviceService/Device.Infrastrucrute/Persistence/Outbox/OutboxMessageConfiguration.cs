@@ -1,5 +1,3 @@
-using Device.Application.Models;
-
 namespace Device.Infrastructure.Persistence.Outbox;
 
 public sealed class OutboxMessageConfiguration 

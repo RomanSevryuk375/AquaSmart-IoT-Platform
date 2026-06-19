@@ -1,6 +1,6 @@
 namespace Device.Infrastructure.Persistence.Configurations;
 
-public sealed class RelayCommandsQueueEntityConfiguration
+public sealed class RelayCommandConfiguration
     : IEntityTypeConfiguration<RelayCommand>
 {
     public void Configure(EntityTypeBuilder<RelayCommand> builder)
@@ -8,13 +8,9 @@ public sealed class RelayCommandsQueueEntityConfiguration
         builder.ToTable("relay_command_queues");
 
         builder.HasKey(x => x.Id);
-
         builder.Property(x => x.ControllerId).IsRequired();
         builder.Property(x => x.RelayId).IsRequired();
-
-        builder.Property(x => x.Action)
-            .HasConversion<int>()
-            .IsRequired();
+        builder.Property(x => x.TargeState).IsRequired();
 
         builder.Property(x => x.Status)
             .HasConversion<int>()

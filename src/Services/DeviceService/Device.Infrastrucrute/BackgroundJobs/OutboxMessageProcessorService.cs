@@ -1,26 +1,28 @@
 using Contracts.Abstractions;
-using Device.Application.Interfaces;
+using Contracts.Results;
+using Device.Infrastructure.Persistence.Outbox;
+using MediatR;
 using Newtonsoft.Json;
 
-namespace Device.Application.Services;
+namespace Device.Infrastructure.BackgroundJobs;
 
 public sealed class OutboxMessageProcessorService(
     IOutboxRepository outboxRepository,
     IPublisher publisher,
-    IUnitOfWork unitOfWork) : IOutboxMessageProcessorService
+    IUnitOfWork unitOfWork)
 {
     public async Task<Result> ProcessAsync(CancellationToken cancellationToken)
     {
-        var batchSize = 50; 
+        int batchSize = 50;
 
-        var messages = await outboxRepository.GetPendingMessagesAsync(batchSize, cancellationToken);
-        if (messages is null || 
-            !messages.Any())
+        IReadOnlyList<OutboxMessage>? messages = await outboxRepository.GetPendingMessagesAsync(
+            batchSize, cancellationToken);
+        if (messages is null || !messages.Any())
         {
             return Result.Success();
         }
 
-        foreach (var message in messages)
+        foreach (OutboxMessage message in messages)
         {
             var type = Type.GetType(message.Type);
             if (type == null)
@@ -28,9 +30,7 @@ public sealed class OutboxMessageProcessorService(
                 continue;
             }
 
-            var domainEvent = JsonConvert.DeserializeObject(message.Content, type) as IDomainEvent;
-
-            if (domainEvent is null)
+            if (JsonConvert.DeserializeObject(message.Content, type) is not IDomainEvent domainEvent)
             {
                 continue;
             }

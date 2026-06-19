@@ -1,4 +1,5 @@
-﻿using Device.Application.Interfaces;
+using Contracts.Results;
+using Device.Application.Interfaces;
 using Quartz;
 
 namespace Device.Infrastructure.BackgroundJobs;
@@ -9,7 +10,7 @@ public sealed class CheckOfflineControllersJob(
 {
     public async Task Execute(IJobExecutionContext context)
     {
-        var result = await service.CheckAndDisableController(context.CancellationToken);
+        Result result = await service.CheckAndDisableControllerAsync(context.CancellationToken);
 
         if (result.IsFailure)
         {

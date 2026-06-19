@@ -4,11 +4,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" />
-    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="MassTransit" />
     <PackageReference Include="BCrypt.Net-Next" />
-    <PackageReference Include="MediatR" />
     <PackageReference Include="Newtonsoft.Json" />
   </ItemGroup>
 

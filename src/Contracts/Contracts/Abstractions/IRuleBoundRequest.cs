@@ -1,6 +1,6 @@
-﻿namespace Contracts.Abstractions;
+namespace Contracts.Abstractions;
 
 public interface IRuleBoundRequest
 {
-    Guid RuleId { get; }
+    public Guid RuleId { get; }
 }

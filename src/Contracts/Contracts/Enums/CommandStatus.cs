@@ -1,6 +1,6 @@
-﻿namespace Contracts.Enums;
+namespace Contracts.Enums;
 
-public enum CommandStatusEnum
+public enum CommandStatus
 {
     Pending = 1,
     Sent = 2,

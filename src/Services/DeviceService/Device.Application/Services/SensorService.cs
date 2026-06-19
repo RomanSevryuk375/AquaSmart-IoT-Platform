@@ -138,35 +138,32 @@ public sealed class SensorService(
             mapper.Map<SensorResponseDto>(existingSensor));
     }
 
-    public async Task<Result> SetSensorStateAsync(
+    public async Task<ConsumerResult> SetSensorStateAsync(
         Guid sensorId,
         SensorState state,
         CancellationToken cancellationToken)
     {
-        var existingSensor = await sensorRepository
+        Sensor? existingSensor = await sensorRepository
             .GetByIdAsync(sensorId, cancellationToken);
 
         if (existingSensor is null)
         {
-            return Result.Failure(Error.NotFound(
-                    "Sensor.NotFound",
-                    $"{nameof(Sensor)} {sensorId} not found"));
+            return ConsumerResult.RetryableError($"{nameof(Sensor)} {sensorId} not found");
         }
 
-        var ownership = await securityService.EnsureUserOwnsControllerAsync(
+        Result ownership = await securityService.EnsureUserOwnsControllerAsync(
             existingSensor.ControllerId, cancellationToken);
 
         if (ownership.IsFailure)
         {
-            return Result.Failure(ownership.Error);
+            return ConsumerResult.FatalError(ownership.Error.Message);
         }
 
         existingSensor.SetState(state);
 
-        await sensorRepository.UpdateAsync(existingSensor, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result.Success();
+        return ConsumerResult.Success();
     }
 
     public async Task<Result> UpdateSensorAsync(

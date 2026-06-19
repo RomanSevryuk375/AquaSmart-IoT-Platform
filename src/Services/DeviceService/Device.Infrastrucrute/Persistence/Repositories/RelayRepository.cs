@@ -5,19 +5,17 @@ public sealed class RelayRepository(SystemDbContext dbContext)
 {
     public async Task<bool> ExistsAsync(
         Guid relayId, 
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         return await Context.Relays
-            .AsNoTracking()
             .AnyAsync(x => x.Id == relayId, cancellationToken);
     }
 
     public async Task<IReadOnlyList<Relay>> GetAllByControllerId(
         Guid controllerId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         return await Context.Relays
-            .AsNoTracking()
             .Where(x => x.ControllerId == controllerId)
             .ToListAsync(cancellationToken);
     }

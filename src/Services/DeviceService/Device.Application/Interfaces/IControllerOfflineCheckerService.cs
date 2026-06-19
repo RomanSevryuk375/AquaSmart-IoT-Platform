@@ -2,6 +2,6 @@ namespace Device.Application.Interfaces;
 
 public interface IControllerOfflineCheckerService
 {
-    Task<Result> CheckAndDisableController(
-        CancellationToken cancellationToken);
+    public Task<Result> CheckAndDisableControllerAsync(
+        CancellationToken cancellationToken = default);
 }

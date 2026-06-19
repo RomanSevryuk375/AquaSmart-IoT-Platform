@@ -1,8 +1,9 @@
 using Contracts.Constants;
+using Device.Domain.ValueObjects;
 
 namespace Device.Infrastructure.Persistence.Configurations;
 
-public sealed class ControllerEntityConfiguration 
+public sealed class ControllerConfiguration 
     : IEntityTypeConfiguration<Controller>
 {
     public void Configure(EntityTypeBuilder<Controller> builder)
@@ -10,17 +11,22 @@ public sealed class ControllerEntityConfiguration
         builder.ToTable("controllers");
 
         builder.HasKey(x => x.Id);
-
         builder.Property(x => x.UserId).IsRequired();
 
         builder.Property(x => x.MacAddress)
+            .HasConversion(
+                vo => vo.Value,
+                dbVal => MacAddress.Create(dbVal).Value)
             .HasMaxLength(ControllerConstants.MacAddressLength)
             .IsRequired();
 
         builder.Property(x => x.DeviceTokenHash).IsRequired();
 
         builder.Property(x => x.Name)
-            .HasMaxLength(ControllerConstants.NameLength)
+            .HasConversion(
+                vo => vo.Value,
+                dbVal => DeviceName.Create(dbVal).Value)
+            .HasMaxLength(CommonConstants.NameLength)
             .IsRequired();
 
         builder.Property(x => x.IsOnline).IsRequired();

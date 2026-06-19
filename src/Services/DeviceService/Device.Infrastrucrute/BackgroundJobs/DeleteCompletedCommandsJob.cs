@@ -1,14 +1,16 @@
-﻿using Device.Application.Interfaces;
+using Contracts.Results;
+using Device.Application.Interfaces;
 using Quartz;
 
 namespace Device.Infrastructure.BackgroundJobs;
 
+[DisallowConcurrentExecution]
 public sealed class DeleteCompletedCommandsJob(
     IRelayCommandQueueService service) : IJob
 {
     public async Task Execute(IJobExecutionContext context)
     {
-        var result = await service.DeleteCompletedCommandsAsync(context.CancellationToken);
+        Result result = await service.DeleteCompletedCommandsAsync(context.CancellationToken);
 
         if (result.IsFailure)
         {

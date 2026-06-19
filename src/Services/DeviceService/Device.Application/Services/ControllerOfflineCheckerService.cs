@@ -7,17 +7,15 @@ public sealed class ControllerOfflineCheckerService(
     IControllerRepository repository,
     IUnitOfWork unitOfWork) : IControllerOfflineCheckerService
 {
-    public async Task<Result> CheckAndDisableController(CancellationToken cancellationToken)
+    public async Task<Result> CheckAndDisableControllerAsync(CancellationToken cancellationToken)
     {
         try
         {
-            var offlineThreshold = DateTime.UtcNow.AddMinutes(-5);
+            DateTime offlineThreshold = DateTime.UtcNow.AddMinutes(-5);
             var specification = new OfflineControllersSpecification(offlineThreshold);
 
-            var controllers = await repository.GetAllAsync(
+            IReadOnlyList<Controller> controllers = await repository.GetAllAsync(
                 specification,
-                null,
-                null,
                 cancellationToken);
 
             if (!controllers.Any())
@@ -25,10 +23,9 @@ public sealed class ControllerOfflineCheckerService(
                 return Result.Success();
             }
 
-            foreach (var controller in controllers)
+            foreach (Controller controller in controllers)
             {
                 controller.SetOffline();
-                await repository.UpdateAsync(controller, cancellationToken);
             }
 
             await unitOfWork.SaveChangesAsync(cancellationToken);

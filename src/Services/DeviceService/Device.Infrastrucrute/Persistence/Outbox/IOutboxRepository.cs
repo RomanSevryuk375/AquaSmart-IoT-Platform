@@ -1,12 +1,8 @@
-namespace Device.Domain.Interfaces;
+namespace Device.Infrastructure.Persistence.Outbox;
 
 public interface IOutboxRepository
 {
     public Task<IReadOnlyList<OutboxMessage>> GetPendingMessagesAsync(
         int batchSize, 
-        CancellationToken cancellationToken = default);
-
-    public Task UpdateAsync(
-        OutboxMessage entity, 
         CancellationToken cancellationToken = default);
 }

@@ -6,7 +6,7 @@ public sealed record RelayCommandResponseDto
     public Guid ControllerId { get; init; }
     public Guid RelayId { get; init; }
     public RuleActionEnum Action { get; init; }
-    public CommandStatusEnum Status { get; init; }
+    public CommandStatus Status { get; init; }
     public DateTime? ExpireAt { get; init; }
     public int AttemptCount { get; init; }
     public DateTime? ProcessedAt { get; init; }

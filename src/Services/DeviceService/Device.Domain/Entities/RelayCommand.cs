@@ -6,8 +6,8 @@ public sealed class RelayCommand : IEntity
         Guid id,
         Guid controllerId,
         Guid relayId,
-        RuleActionEnum action,
-        CommandStatusEnum status,
+        bool targeState,
+        CommandStatus status,
         DateTime? expireAt,
         int attemptCount,
         DateTime? processedAt,
@@ -17,7 +17,7 @@ public sealed class RelayCommand : IEntity
         Id = id;
         ControllerId = controllerId;
         RelayId = relayId;
-        Action = action;
+        TargeState = targeState;
         Status = status;
         ExpireAt = expireAt;
         AttemptCount = attemptCount;
@@ -26,11 +26,15 @@ public sealed class RelayCommand : IEntity
         CreatedAt = createdAt;
     }
 
+#pragma warning disable CS8618
+    public RelayCommand() { }
+#pragma warning restore CS8618 
+
     public Guid Id { get; private set; }
     public Guid ControllerId { get; private set; }
     public Guid RelayId { get; private set; }
-    public RuleActionEnum Action { get; private set; }
-    public CommandStatusEnum Status { get; private set; }
+    public bool TargeState { get; private set; }
+    public CommandStatus Status { get; private set; }
     public DateTime? ExpireAt { get; private set; }
     public int AttemptCount { get; private set; }
     public DateTime? ProcessedAt { get; private set; }
@@ -41,15 +45,15 @@ public sealed class RelayCommand : IEntity
         Guid id,
         Guid controllerId,
         Guid relayId,
-        RuleActionEnum action,
+        bool targetState,
         DateTime? expireAt)
     {
         var command = new RelayCommand(
             id,
             controllerId,
             relayId,
-            action,
-            status: CommandStatusEnum.Pending,
+            targetState,
+            status: CommandStatus.Pending,
             expireAt ?? DateTime.UtcNow.AddMinutes(5),
             attemptCount: 0,
             processedAt: null,
@@ -61,36 +65,36 @@ public sealed class RelayCommand : IEntity
 
     public void MarkAsSent()
     {
-        if (Status == CommandStatusEnum.Completed || 
-            Status == CommandStatusEnum.Failed)
+        if (Status == CommandStatus.Completed || 
+            Status == CommandStatus.Failed)
         {
             return;
         }
 
         ProcessedAt = DateTime.UtcNow;
         AttemptCount++;
-        Status = CommandStatusEnum.Sent;
+        Status = CommandStatus.Sent;
     }
 
     public void MarkAsCompleted()
     {
-        if (Status == CommandStatusEnum.Completed)
+        if (Status == CommandStatus.Completed)
         {
             return;
         }
 
-        Status = CommandStatusEnum.Completed;
+        Status = CommandStatus.Completed;
         ProcessedAt = DateTime.UtcNow;
     }
 
     public void MarkAsFailed(string errorMessage)
     {
-        if (Status == CommandStatusEnum.Failed)
+        if (Status == CommandStatus.Failed)
         {
             return;
         }
 
         ErrorMessage = errorMessage;
-        Status = CommandStatusEnum.Failed;
+        Status = CommandStatus.Failed;
     }
 }

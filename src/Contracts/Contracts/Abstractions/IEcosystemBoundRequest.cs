@@ -1,6 +1,6 @@
-﻿namespace Contracts.Abstractions;
+namespace Contracts.Abstractions;
 
 public interface IEcosystemBoundRequest
 {
-    Guid EcosystemId { get; }
+    public Guid EcosystemId { get; }
 }

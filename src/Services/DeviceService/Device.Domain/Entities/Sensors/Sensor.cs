@@ -1,4 +1,5 @@
 using Device.Domain.DomainEvents.SensorEvents;
+using Device.Domain.Events.SensorEvents;
 
 namespace Device.Domain.Entities.Sensors;
 
@@ -36,7 +37,10 @@ public abstract class Sensor : AggregateRoot, IEntity
 
     public void SetState(SensorState state)
     {
-        if (State == state) return;
+        if (State == state)
+        {
+            return;
+        }
 
         State = state;
         RaiseEvent(new SensorStateChangedDomainEvent

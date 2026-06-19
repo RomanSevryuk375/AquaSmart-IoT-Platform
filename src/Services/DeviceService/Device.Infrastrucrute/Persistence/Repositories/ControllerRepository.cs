@@ -5,19 +5,17 @@ public sealed class ControllerRepository(SystemDbContext dbContext)
 {
     public async Task<Controller?> GetByMacAddressAsync(
         string macAddress, 
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         return await Context.Controllers
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.MacAddress == macAddress, cancellationToken);
+            .FirstOrDefaultAsync(x => x.MacAddress.Value == macAddress, cancellationToken);
     }
 
     public async Task<Controller?> GetByDeviceTokenAsync(
         string deviceTokenHash, 
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         return await Context.Controllers
-            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.DeviceTokenHash == deviceTokenHash, cancellationToken);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Contracts.Constants;
+namespace Contracts.Constants;
 
 
 public static class CommonConstants
@@ -11,12 +11,12 @@ public static class CommonConstants
     public const string OneWireRegex = @"^[0-9A-Fa-f]{16}$";
     public const string DigitalRegex = @"^([A-Za-z]{1,4})?[0-9]{1,2}$";
     public const string AnalogRegex = @"^(A\d{1,2}|ADC\d{1,2}|ADC[1-9]_(CH|IN)\d{1,2}|\d{1,2})$";
+    public const int ConnectionAddressLength = 32;
 }
 
 public static class SensorConstants
 {
     public const int UnitLength = 32;
-    public const int ConnectionAddressLength = 32;
     public const int NameLength = 128;
 }
 

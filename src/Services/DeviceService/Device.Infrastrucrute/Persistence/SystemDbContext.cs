@@ -1,4 +1,4 @@
-using Device.Application.Models;
+using Device.Infrastructure.Persistence.Outbox;
 
 namespace Device.Infrastructure.Persistence;
 
@@ -10,8 +10,6 @@ public sealed class SystemDbContext(DbContextOptions<SystemDbContext> options)
     public DbSet<Relay> Relays { get; set; }
     public DbSet<Sensor> Sensors { get; set; }
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
+    protected override void OnModelCreating(ModelBuilder modelBuilder) =>
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(SystemDbContext).Assembly);
-    }
 }

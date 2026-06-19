@@ -1,4 +1,5 @@
 using Contracts.Constants;
+using Device.Domain.ValueObjects;
 
 namespace Device.Infrastructure.Persistence.Configurations;
 
@@ -14,16 +15,22 @@ public sealed class SensorConfiguration
         builder.Property(x => x.ControllerId).IsRequired();
         builder.Property(x => x.UserId).IsRequired();
         builder.Property(x => x.Name)
-            .HasMaxLength(SensorConstants.NameLength)
+            .HasConversion(
+                vo => vo.Value,
+                dbVal => DeviceName.Create(dbVal).Value)
+            .HasMaxLength(CommonConstants.NameLength)
             .IsRequired();
 
-        builder.Property(x => x.ConnectionProtocol)
-            .HasConversion<int>()
-            .IsRequired();
+        builder.ComplexProperty(x => x.ConnectionAddress, ca =>
+        {
+            ca.Property(p => p.Protocol)
+                .HasConversion<int>()
+                .IsRequired();
 
-        builder.Property(x => x.ConnectionAddress)
-           .HasMaxLength(SensorConstants.ConnectionAddressLength)
-           .IsRequired();
+            ca.Property(p => p.Address)
+                .HasMaxLength(CommonConstants.ConnectionAddressLength)
+                .IsRequired();
+        });
 
         builder.Property(x => x.Type)
             .HasConversion<int>()
@@ -45,5 +52,11 @@ public sealed class SensorConfiguration
             x.ControllerId,
             x.ConnectionAddress
         }).IsUnique();
+
+        builder.HasDiscriminator(x => x.Type)
+            .HasValue<TemperatureSensor>(SensorType.Temperature)
+            .HasValue<HumiditySensor>(SensorType.Humidity)
+            .HasValue<PressureSensor>(SensorType.Pressure)
+            .HasValue<VoltageSensor>(SensorType.Voltage);
     }
 }

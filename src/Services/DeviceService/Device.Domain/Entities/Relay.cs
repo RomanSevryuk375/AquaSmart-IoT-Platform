@@ -22,7 +22,7 @@ public sealed class Relay : AggregateRoot, IEntity
         ControllerId = controllerId;
         PowerSensorId = powerSensorId;
         UserId = userId;
-        DeviceName = deviceName;
+        Name = deviceName;
         ConnectionAddress = connectionAddress;
         IsNormallyOpen = isNormallyOpen;
         Purpose = purpose;
@@ -30,12 +30,16 @@ public sealed class Relay : AggregateRoot, IEntity
         IsManual = isManual;
         CreatedAt = createdAt;
     }
-    
+
+#pragma warning disable CS8618
+    public Relay() { }
+#pragma warning restore CS8618
+
     public Guid Id { get; init; }
     public Guid ControllerId { get; private set; }
     public Guid UserId { get; private set; }
     public Guid? PowerSensorId { get; private set; }
-    public DeviceName DeviceName { get; private set; }
+    public DeviceName Name { get; private set; }
     public ConnectionAddress ConnectionAddress { get; private set; }
     public bool IsNormallyOpen { get; private set; }
     public RelayPurposeEnum Purpose { get; private set; }
@@ -94,7 +98,7 @@ public sealed class Relay : AggregateRoot, IEntity
             RelayId = relay.Id,
             ControllerId = relay.ControllerId,
             PowerSensorId = relay.PowerSensorId,
-            DeviceName = relay.DeviceName.Value,
+            DeviceName = relay.Name.Value,
             Purpose = relay.Purpose,
             IsManual = relay.IsManual,
             IsActive = relay.IsActive,
@@ -128,7 +132,7 @@ public sealed class Relay : AggregateRoot, IEntity
             RelayId = Id,
             ControllerId = ControllerId,
             PowerSensorId = PowerSensorId,
-            DeviceName = DeviceName.Value,
+            DeviceName = Name.Value,
             Purpose = Purpose,
             IsManual = IsManual,
             IsActive = IsActive,
@@ -146,7 +150,7 @@ public sealed class Relay : AggregateRoot, IEntity
             return Result<Relay>.Failure(nameResut.Error);
         }
 
-        DeviceName = nameResut.Value;
+        Name = nameResut.Value;
 
         return Result.Success();
     }

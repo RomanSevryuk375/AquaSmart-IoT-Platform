@@ -1,4 +1,5 @@
 using Contracts.Events.RelayEvents;
+using Contracts.Results;
 using Device.Application.Interfaces;
 
 namespace Device.Infrastructure.Messaging;
@@ -8,12 +9,14 @@ public sealed class RelayChangeStateConsumer(IRelayCommandQueueService service)
 {
     public async Task Consume(ConsumeContext<ChangeRelayStateEvent> context)
     {
-        var result = await service.SetRelayStateAsync(
+        ConsumerResult result = await service.SetRelayStateAsync(
             context.Message, context.CancellationToken);
 
-        if (!result.IsSuccess && result.IsRetryable)
+        if (!result.IsSuccess &&
+            result.IsRetryable &&
+            result.Error is not null)
         {
-            throw new Exception(result.Error);
+            throw new ConsumerException(result.Error);
         }
     }
 }

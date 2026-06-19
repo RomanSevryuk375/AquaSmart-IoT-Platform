@@ -43,7 +43,7 @@ public static class DependencyInjection
 
         services.AddServices(configuration);
         services.AddRepositories(configuration);
-        services.AddQuartzJobs();
+        services.AddQuartzJobs(configuration);
         services.AddRabbitMq(configuration);
 
         services.AddAquaAuthorizationPolicies();

@@ -1,8 +1,9 @@
 using Contracts.Constants;
+using Device.Domain.ValueObjects;
 
 namespace Device.Infrastructure.Persistence.Configurations;
 
-public sealed class RelayEntityConfiguration 
+public sealed class RelayConfiguration 
     : IEntityTypeConfiguration<Relay>
 {
     public void Configure(EntityTypeBuilder<Relay> builder)
@@ -16,16 +17,22 @@ public sealed class RelayEntityConfiguration
         builder.Property(x => x.PowerSensorId).IsRequired(false);
 
         builder.Property(x => x.Name)
-            .HasMaxLength(RelayConstants.NameLength)
+            .HasConversion(
+                vo => vo.Value,
+                dbVal => DeviceName.Create(dbVal).Value)
+            .HasMaxLength(CommonConstants.NameLength)
             .IsRequired();
 
-        builder.Property(x => x.ConnectionProtocol)
-            .HasConversion<int>()
-            .IsRequired();
+        builder.ComplexProperty(x => x.ConnectionAddress, ca =>
+        {
+            ca.Property(p => p.Protocol)
+                .HasConversion<int>()
+                .IsRequired();
 
-        builder.Property(x => x.ConnectionAddress)
-           .HasMaxLength(RelayConstants.ConnectionAddressLength)
-           .IsRequired();
+            ca.Property(p => p.Address)
+                .HasMaxLength(CommonConstants.ConnectionAddressLength)
+                .IsRequired();
+        });
 
         builder.Property(x => x.IsNormallyOpen).IsRequired();
 

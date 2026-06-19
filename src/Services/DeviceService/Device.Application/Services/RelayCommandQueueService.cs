@@ -82,7 +82,7 @@ public sealed class RelayCommandQueueService(
 
         await relayRepository.UpdateAsync(existingRelay, cancellationToken);
 
-        if (command.Status == CommandStatusEnum.Completed)
+        if (command.Status == CommandStatus.Completed)
         {
             return Result.Success();
         }
@@ -119,7 +119,7 @@ public sealed class RelayCommandQueueService(
             return Result<IReadOnlyList<RelayCommandResponseDto>>.Failure(ownership.Error);
         }
 
-        if (command.Status == CommandStatusEnum.Failed)
+        if (command.Status == CommandStatus.Failed)
         {
             return Result.Success();
         }

@@ -25,7 +25,7 @@ public interface ISensorService
         Guid sensorId, 
         CancellationToken cancellationToken);
 
-    Task<Result> SetSensorStateAsync(
+    Task<ConsumerResult> SetSensorStateAsync(
         Guid sensorId,
         SensorState state,
         CancellationToken cancellationToken);

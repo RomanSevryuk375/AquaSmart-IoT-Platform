@@ -5,19 +5,17 @@ public sealed class SensorRepository(SystemDbContext dbContext)
 {
     public async Task<bool> ExistsAsync(
         Guid sensorId, 
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         return await Context.Sensors
-            .AsNoTracking()
             .AnyAsync(x => x.Id == sensorId, cancellationToken);
     }
 
     public async Task<IReadOnlyList<Sensor>> GetAllSensorsAsync(
         Guid controllerId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         return await Context.Sensors
-            .AsNoTracking()
             .Where(x => x.ControllerId == controllerId)
             .ToListAsync(cancellationToken);
     }

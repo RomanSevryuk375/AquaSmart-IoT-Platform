@@ -1,5 +1,7 @@
+using Contracts.Constants;
 using Contracts.Options;
 using Device.Application.Interfaces;
+using Device.Application.Services;
 using Device.Infrastructure.BackgroundJobs;
 using Device.Infrastructure.Messaging;
 using Device.Infrastructure.Persistence.Interceptors;
@@ -23,54 +25,62 @@ public static class DependencyInjection
         services.AddScoped<IRelayCommandsQueueRepository, RelayCommandsQueueRepository>();
         services.AddScoped<ISensorRepository, SensorRepository>();
 
-        var connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
-
+        string? connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
         services.AddDbContext<SystemDbContext>((sp, options) =>
         {
-            var interceptor = sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
+            ConvertDomainEventsToOutboxMessagesInterceptor interceptor =
+            sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
 
             options.UseNpgsql(connectionString)
                    .UseSnakeCaseNamingConvention()
-                   .AddInterceptors(interceptor); 
+                   .AddInterceptors(interceptor);
         });
         services.AddHealthChecks().AddNpgSql(connectionString!);
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IUserContext, UserContext>();
 
         services.AddHttpContextAccessor();
-        services.AddScoped<IUserContext, UserContext>();
 
         return services;
     }
 
-    public static IServiceCollection AddQuartzJobs(this IServiceCollection services)
+    public static IServiceCollection AddQuartzJobs(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddQuartz(options =>
+        services.AddScoped<OutboxMessageProcessorService>();
+
+        IConfigurationSection backgroudSection = configuration.GetSection(BackgroundJobsOptions.SectionName);
+        BackgroundJobsOptions backgroudJobOptions = backgroudSection.Get<BackgroundJobsOptions>()
+            ?? throw new InvalidOperationException(DiErrors.BackgroundJobsConfiguration);
+        services.Configure<BackgroundJobsOptions>(backgroudSection);
+        services.AddQuartz(opts =>
         {
-            
             var deleteCompletedTaskAsync = new JobKey(nameof(DeleteCompletedCommandsJob));
-            options.AddJob<DeleteCompletedCommandsJob>(jobOptions =>
-                jobOptions.WithIdentity(deleteCompletedTaskAsync));
-            options.AddTrigger(triggerOptions => triggerOptions
+            opts.AddJob<DeleteCompletedCommandsJob>(jobOpts =>
+                jobOpts.WithIdentity(deleteCompletedTaskAsync));
+            opts.AddTrigger(triggerOpts => triggerOpts
                 .ForJob(deleteCompletedTaskAsync)
                 .WithIdentity($"{deleteCompletedTaskAsync}-trigger")
-                .WithSimpleSchedule(x => x.WithIntervalInHours(3).RepeatForever()));
+                .WithSimpleSchedule(x => x.WithIntervalInHours(backgroudJobOptions.DeleteCompletedCommandsIntervalHours)
+                .RepeatForever()));
 
             var offlineControllerJobKey = new JobKey(nameof(CheckOfflineControllersJob));
-            options.AddJob<CheckOfflineControllersJob>(jobOptions =>
-                jobOptions.WithIdentity(offlineControllerJobKey));
-            options.AddTrigger(triggerOptions => triggerOptions
+            opts.AddJob<CheckOfflineControllersJob>(jobOpts =>
+                jobOpts.WithIdentity(offlineControllerJobKey));
+            opts.AddTrigger(triggerOpts => triggerOpts
                 .ForJob(offlineControllerJobKey)
                 .WithIdentity($"{offlineControllerJobKey}-trigger")
-                .WithSimpleSchedule(x => x.WithIntervalInSeconds(60).RepeatForever()));
+                .WithSimpleSchedule(x => x.WithIntervalInSeconds(backgroudJobOptions.OfflineCheckerIntervalSeconds)
+                .RepeatForever()));
 
             var outboxKey = new JobKey(nameof(OutboxMessageProcessorJob));
-            options.AddJob<OutboxMessageProcessorJob>(jobOptions =>
-                jobOptions.WithIdentity(outboxKey));
-            options.AddTrigger(triggerOptions => triggerOptions
+            opts.AddJob<OutboxMessageProcessorJob>(jobOpts =>
+                jobOpts.WithIdentity(outboxKey));
+            opts.AddTrigger(triggerOpts => triggerOpts
                 .ForJob(outboxKey)
                 .WithIdentity($"{outboxKey}-trigger")
-                .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever()));
+                .WithSimpleSchedule(x => x.WithIntervalInSeconds(backgroudJobOptions.OutboxProcessorIntervalSeconds)
+                .RepeatForever()));
         });
 
         services.AddQuartzHostedService(hostOptions     
@@ -81,9 +91,9 @@ public static class DependencyInjection
 
     public static IServiceCollection AddRabbitMq(this IServiceCollection services, IConfiguration configuration)
     {
-        var rabbitSection = configuration.GetSection(RabbitMqOptions.SectionName);
-        var rabbitOgtions = rabbitSection.Get<RabbitMqOptions>()
-            ?? throw new InvalidOperationException("RabbitMQ configuration is missing.");
+        IConfigurationSection rabbitSection = configuration.GetSection(RabbitMqOptions.SectionName);
+        RabbitMqOptions rabbitOgtions = rabbitSection.Get<RabbitMqOptions>()
+            ?? throw new InvalidOperationException(DiErrors.RabbitMqConfiguration);
 
         services.Configure<RabbitMqOptions>(rabbitSection);
 
@@ -105,7 +115,6 @@ public static class DependencyInjection
                 configurator.ConfigureEndpoints(context);
             });
         });
-
         services.AddHealthChecks().AddRabbitMQ(new Uri(rabbitOgtions.Host));
 
         return services;

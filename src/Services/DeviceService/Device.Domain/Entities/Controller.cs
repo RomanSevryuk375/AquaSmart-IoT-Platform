@@ -1,4 +1,4 @@
-using Device.Domain.DomainEvents.ControllerEvents;
+using Device.Domain.Events.ControllerEvents;
 
 namespace Device.Domain.Entities;
 
@@ -23,6 +23,10 @@ public sealed class Controller : AggregateRoot, IEntity
         LastSeenAt = lastSeenAt;
         CreatedAt = createdAt;
     }
+
+#pragma warning disable CS8618 
+    public Controller() { }
+#pragma warning restore CS8618 
 
     private readonly List<Sensor> _sensors = [];
     private readonly List<Relay> _relays = [];
@@ -109,7 +113,7 @@ public sealed class Controller : AggregateRoot, IEntity
     {
         IsOnline = !IsOnline;
 
-        if (IsOnline is false)
+        if (!IsOnline)
         {
             RaiseEvent(new ControllerNotOnlineDomainEvent
             {
