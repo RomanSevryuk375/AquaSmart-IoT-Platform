@@ -1,0 +1,47 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Code Analyzers -->
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="9.27.0.93347" />
+
+    <!-- Microsoft / Entity Framework -->
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.25" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.25" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.25" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
+    <PackageVersion Include="EFCore.NamingConventions" Version="8.0.3" />
+
+    <!-- Identity & Security -->
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.25" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.25" />
+    <PackageVersion Include="Microsoft.Extensions.Identity.Core" Version="8.0.25" />
+    <PackageVersion Include="Microsoft.Extensions.Identity.Stores" Version="8.0.25" />
+    <PackageVersion Include="BCrypt.Net-Next" Version="4.0.3" />
+
+    <!-- Message Broker / CQRS -->
+    <PackageVersion Include="MassTransit" Version="8.2.2" />
+    <PackageVersion Include="MassTransit.RabbitMQ" Version="8.2.2" />
+    <PackageVersion Include="MediatR" Version="14.1.0" />
+
+    <!-- Background Jobs -->
+    <PackageVersion Include="Quartz.Extensions.Hosting" Version="3.17.1" />
+    <PackageVersion Include="Cronos" Version="0.12.0" />
+
+    <!-- Utils & Mappers & Validation -->
+    <PackageVersion Include="AutoMapper" Version="16.1.1" />
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageVersion Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.9" />
+
+    <!-- API / Gateway / Diagnostics -->
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0" />
+    <PackageVersion Include="AspNetCore.HealthChecks.NpgSql" Version="8.0.2" />
+    <PackageVersion Include="AspNetCore.HealthChecks.Rabbitmq" Version="8.0.2" />
+    <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.5.0" />
+  </ItemGroup>
+</Project>
