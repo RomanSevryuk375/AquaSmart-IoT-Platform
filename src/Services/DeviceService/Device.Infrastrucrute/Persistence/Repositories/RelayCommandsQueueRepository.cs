@@ -1,7 +1,7 @@
 namespace Device.Infrastructure.Persistence.Repositories;
 
 public sealed class RelayCommandsQueueRepository(SystemDbContext dbContext)
-    : BaseRepository<RelayCommand>(dbContext), IRelayCommandsQueueRepository
+    : BaseRepository<RelayCommand>(dbContext), IRelayCommandsRepository
 {
     private const int MaxAttemptCount = 3;
     private const int RetryCooldownMinutes = 1;

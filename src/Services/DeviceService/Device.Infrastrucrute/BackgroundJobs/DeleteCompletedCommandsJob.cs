@@ -1,5 +1,4 @@
 using Contracts.Results;
-using Device.Application.Interfaces;
 using Quartz;
 
 namespace Device.Infrastructure.BackgroundJobs;

@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 
 namespace Contracts.Extensions;
 
@@ -6,8 +6,10 @@ public static class ClaimsPrincipalExtensions
 {
     public static Guid GetUserId(this ClaimsPrincipal user)
     {
-        var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        string? id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        return Guid.TryParse(id, out var guid) ? guid : Guid.Empty;
+        return Guid.TryParse(id, out Guid guid)
+            ? guid
+            : Guid.Empty;
     }
 }

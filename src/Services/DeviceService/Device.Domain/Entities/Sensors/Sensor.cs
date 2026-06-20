@@ -35,6 +35,50 @@ public abstract class Sensor : AggregateRoot, IEntity
     public abstract SensorType Type { get; }
     public abstract string Unit { get; }
 
+    public Result Update(
+        Guid controllerId,
+        string rawName,
+        ConnectionProtocol connectionProtocol,
+        string rawConnectionAddress)
+    {
+        var errors = new List<string>();
+        Result<DeviceName> nameResut = DeviceName.Create(rawName);
+        if (nameResut.IsFailure)
+        {
+            errors.Add(nameResut.Error.Message);
+        }
+
+        Result<ConnectionAddress> addressResult = ConnectionAddress.Create(
+            connectionProtocol, rawConnectionAddress);
+        if (addressResult.IsFailure)
+        {
+            errors.Add(addressResult.Error.Message);
+        }
+
+        if (errors.Count != 0)
+        {
+            return Result.Failure(Error.Validation<Sensor>(
+                string.Join(", ", errors)));
+        }
+
+        ControllerId = controllerId;
+        Name = nameResut.Value;
+        ConnectionAddress = addressResult.Value;
+
+        RaiseEvent(new SensorUpdatedDomainEvent
+        {
+            SensorId = Id,
+            ControllerId = ControllerId,
+            Name = Name.Value,
+            Type = Type,
+            State = State,
+            Unit = Unit,
+            CreatedAt = CreatedAt
+        });
+
+        return Result.Success();
+    }
+
     public void SetState(SensorState state)
     {
         if (State == state)

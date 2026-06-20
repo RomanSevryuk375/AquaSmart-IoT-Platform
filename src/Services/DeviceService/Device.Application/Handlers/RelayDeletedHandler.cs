@@ -8,12 +8,10 @@ public sealed class RelayDeletedHandler(IPublishEndpoint publishEndpoint)
     : INotificationHandler<RelayDeletedDomainEvent>
 {
     public async Task Handle(
-        RelayDeletedDomainEvent notification, 
+        RelayDeletedDomainEvent notification,
         CancellationToken cancellationToken)
     {
-        await publishEndpoint.Publish(new RelayDeletedEvent
-        {
-            RelayId = notification.RelayId,
-        }, cancellationToken);
+        await publishEndpoint.Publish(
+            new RelayDeletedEvent { RelayId = notification.RelayId }, cancellationToken);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 
 namespace Contracts.Events.RelayEvents;
 
@@ -10,7 +10,7 @@ public sealed record RelayCreatedEvent
     public Guid ControllerId { get; init; }
     public Guid? PowerSensorId { get; init; }
     public string Name { get; init; } = string.Empty;
-    public RelayPurposeEnum Purpose { get; init; }
+    public RelayPurpose Purpose { get; init; }
     public bool IsManual { get; init; }
     public bool IsActive { get; init; }
     public DateTime CreatedAt { get; init; }

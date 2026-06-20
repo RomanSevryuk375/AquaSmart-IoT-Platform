@@ -1,4 +1,6 @@
-﻿namespace Contracts.Results;
+using Contracts.Constants;
+
+namespace Contracts.Results;
 
 public class Result
 {
@@ -8,13 +10,18 @@ public class Result
 
     protected Result(bool isSuccess, Error error)
     {
-        if (isSuccess && error != Error.None || !isSuccess && error == Error.None)
+        if (ErrorInvalid(isSuccess, error))
         {
-            throw new ArgumentException("Invalid error state", nameof(error));
+            throw new ArgumentException(ResulrErrors.InvalidErrorState, nameof(error));
         }
 
         IsSuccess = isSuccess;
         Error = error;
+
+        static bool ErrorInvalid(bool isSuccess, Error error)
+        {
+            return isSuccess && error != Error.None || !isSuccess && error == Error.None;
+        }
     }
 
     public static Result Success() => new(true, Error.None);
@@ -27,7 +34,7 @@ public class Result<T> : Result
 
     public T Value => IsSuccess 
         ? _value! 
-        : throw new InvalidOperationException("Result is failure");
+        : throw new InvalidOperationException(ResulrErrors.ResultIsFailure);
 
     private Result(T? value, bool isSuccess, Error error) : base(isSuccess, error)
     {

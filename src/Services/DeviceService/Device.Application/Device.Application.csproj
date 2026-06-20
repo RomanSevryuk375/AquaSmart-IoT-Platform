@@ -4,6 +4,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Features\Common\**" />
+    <EmbeddedResource Remove="Features\Common\**" />
+    <None Remove="Features\Common\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MassTransit" />
     <PackageReference Include="BCrypt.Net-Next" />
     <PackageReference Include="Newtonsoft.Json" />
@@ -15,8 +21,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="CQRS\Common\" />
-    <Folder Include="CQRS\Controller\Query\" />
+    <Folder Include="DTOs\Telemetry\" />
+    <Folder Include="DTOs\Validators\" />
+    <Folder Include="Features\Controllers\Query\GetControllerById\" />
+    <Folder Include="Features\Controllers\Query\GetAllControllers\" />
+    <Folder Include="Features\Controllers\Query\GetControllerConfig\" />
+    <Folder Include="Features\RelayCommands\Query\GetPending\" />
+    <Folder Include="Features\Relays\Query\GetRelayById\" />
+    <Folder Include="Features\Relays\Query\GetAllRelays\" />
+    <Folder Include="Features\Sensors\Query\GetAllSensors\" />
+    <Folder Include="Features\Sensors\Query\GetSensorById\" />
   </ItemGroup>
 
 </Project>

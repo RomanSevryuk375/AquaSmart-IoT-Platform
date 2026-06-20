@@ -1,6 +1,5 @@
 using Contracts.Events.SensorEvents;
 using Contracts.Results;
-using Device.Application.Interfaces;
 
 namespace Device.Infrastructure.Messaging;
 

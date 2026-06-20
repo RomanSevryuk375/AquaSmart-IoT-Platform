@@ -13,7 +13,7 @@ public sealed class Relay : AggregateRoot, IEntity
         DeviceName deviceName,
         ConnectionAddress connectionAddress,
         bool isNormallyOpen,
-        RelayPurposeEnum purpose,
+        RelayPurpose purpose,
         bool isActive,
         bool isManual,
         DateTime createdAt)
@@ -42,7 +42,7 @@ public sealed class Relay : AggregateRoot, IEntity
     public DeviceName Name { get; private set; }
     public ConnectionAddress ConnectionAddress { get; private set; }
     public bool IsNormallyOpen { get; private set; }
-    public RelayPurposeEnum Purpose { get; private set; }
+    public RelayPurpose Purpose { get; private set; }
     public bool IsActive { get; private set; }
     public bool IsManual { get; private set; }
     public DateTime CreatedAt { get; private set; }
@@ -56,7 +56,7 @@ public sealed class Relay : AggregateRoot, IEntity
         ConnectionProtocol connectionProtocol,
         string rawConnectionAddress,
         bool isNormalyOpen,
-        RelayPurposeEnum purpose,
+        RelayPurpose purpose,
         bool isActive,
         bool isManual)
     {
@@ -98,7 +98,7 @@ public sealed class Relay : AggregateRoot, IEntity
             RelayId = relay.Id,
             ControllerId = relay.ControllerId,
             PowerSensorId = relay.PowerSensorId,
-            DeviceName = relay.Name.Value,
+            Name = relay.Name.Value,
             Purpose = relay.Purpose,
             IsManual = relay.IsManual,
             IsActive = relay.IsActive,
@@ -112,7 +112,7 @@ public sealed class Relay : AggregateRoot, IEntity
         Guid controllerId,
         ConnectionProtocol connectionProtocol,
         string rawConnectionAddress,
-        RelayPurposeEnum purpose,
+        RelayPurpose purpose,
         bool isNormalyOpen)
     {
         Result<ConnectionAddress> addressResult = ConnectionAddress.Create(
@@ -132,7 +132,7 @@ public sealed class Relay : AggregateRoot, IEntity
             RelayId = Id,
             ControllerId = ControllerId,
             PowerSensorId = PowerSensorId,
-            DeviceName = Name.Value,
+            Name = Name.Value,
             Purpose = Purpose,
             IsManual = IsManual,
             IsActive = IsActive,

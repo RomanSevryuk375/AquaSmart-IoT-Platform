@@ -1,6 +1,6 @@
 namespace Device.Domain.Specifications;
 
-public sealed class RelayFilterSpecification(Guid? controllerId, Guid? userId, RelayPurposeEnum? purpose,
+public sealed class RelayFilterSpecification(Guid? controllerId, Guid? userId, RelayPurpose? purpose,
     bool? isActive, bool? isManual)
         : BaseSpecification<Relay>(data => 
                 (!controllerId.HasValue || data.ControllerId == controllerId.Value) &&

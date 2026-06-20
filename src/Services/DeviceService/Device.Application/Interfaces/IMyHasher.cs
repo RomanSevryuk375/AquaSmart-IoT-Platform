@@ -1,7 +1,7 @@
-﻿namespace Device.Application.Interfaces;
+namespace Device.Application.Interfaces;
 
 public interface IMyHasher
 {
-    string Generate(string token);
-    bool Verify(string token, string tokenHash);
+    public string Generate(string token);
+    public bool Verify(string token, string tokenHash);
 }

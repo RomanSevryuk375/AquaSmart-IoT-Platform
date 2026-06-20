@@ -1,4 +1,5 @@
 using Device.Application.DTOs.Relay;
+using Device.Application.Features.Relays.Command.AddRelay;
 
 namespace Device.API.Controllers;
 
@@ -11,7 +12,7 @@ public class RelaysController(
     private const string NameGetById = "GetRelayByIdAsync";
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<RelayResponseDto>>> GetAllRelaysAsync(
+    public async Task<ActionResult<IReadOnlyList<RelayCreatedResponse>>> GetAllRelaysAsync(
         [FromQuery] RelayFilterDto filter,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 10,
@@ -27,7 +28,7 @@ public class RelaysController(
     }
 
     [HttpGet("{id:guid}", Name = NameGetById)]
-    public async Task<ActionResult<RelayResponseDto>> GetRelayByIdAsync(
+    public async Task<ActionResult<RelayCreatedResponse>> GetRelayByIdAsync(
         [FromRoute] Guid id, 
         CancellationToken cancellationToken = default)
     {

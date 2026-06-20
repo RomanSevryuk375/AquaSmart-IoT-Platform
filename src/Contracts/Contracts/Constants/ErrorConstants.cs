@@ -20,6 +20,13 @@ public static class DiErrors
 {
     public const string BackgroundJobsConfiguration = "Background jobs configuration is missing.";
     public const string RabbitMqConfiguration = "RabbitMQ configuration is missing.";
+    public const string JwtConfiguration = "JWT configuration missing or invalid.";
+}
+
+public static class ResulrErrors
+{
+    public const string InvalidErrorState = "Invalid error state";
+    public const string ResultIsFailure = "Result is failure";
 }
 
 public static class ControllerErrors

@@ -2,12 +2,12 @@ namespace Device.Application.Interfaces;
 
 public interface IDeviceSecurityService
 {
-    Task<Result> EnsureDeviceAccessAsync(
-        Guid controllerId, 
-        string deviceToken, 
-        CancellationToken cancellationToken);
+    public Task<Result> EnsureDeviceAccessAsync(
+        Guid controllerId,
+        string deviceToken,
+        CancellationToken cancellationToken = default);
 
-    Task<Result> EnsureUserOwnsControllerAsync(
-        Guid controllerId, 
-        CancellationToken cancellationToken);
+    public Task<Result> EnsureUserOwnsControllerAsync(
+        Guid controllerId,
+        CancellationToken cancellationToken = default);
 }

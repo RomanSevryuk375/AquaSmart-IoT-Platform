@@ -1,5 +1,5 @@
 using Device.Application.DTOs.Sensor;
-using Device.Application.DTOs.Telemetry;
+using Device.Application.Features.Sensors.Command.AddSensor;
 
 namespace Device.API.Controllers;
 
@@ -13,7 +13,7 @@ public class SensorsController(
 
     [HttpGet]
     [Authorize(Policy = SubPermissions.DeviceControl)]
-    public async Task<ActionResult<IReadOnlyList<SensorResponseDto>>> GetAllSensorsAsync(
+    public async Task<ActionResult<IReadOnlyList<SensorCreatedResponse>>> GetAllSensorsAsync(
         [FromQuery] SensorFilterDto filter,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 10,
@@ -30,7 +30,7 @@ public class SensorsController(
 
     [HttpGet("{id:guid}", Name = NameGetById)]
     [Authorize(Policy = SubPermissions.DeviceControl)]
-    public async Task<ActionResult<SensorResponseDto>> GetSensorByIdAsync(
+    public async Task<ActionResult<SensorCreatedResponse>> GetSensorByIdAsync(
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {

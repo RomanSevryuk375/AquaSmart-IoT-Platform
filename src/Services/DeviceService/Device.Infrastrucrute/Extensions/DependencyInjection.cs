@@ -1,7 +1,6 @@
 using Contracts.Constants;
 using Contracts.Options;
 using Device.Application.Interfaces;
-using Device.Application.Services;
 using Device.Infrastructure.BackgroundJobs;
 using Device.Infrastructure.Messaging;
 using Device.Infrastructure.Persistence.Interceptors;
@@ -22,7 +21,7 @@ public static class DependencyInjection
         services.AddScoped<IControllerRepository, ControllerRepository>();
         services.AddScoped<IOutboxRepository, OutboxRepository>();
         services.AddScoped<IRelayRepository, RelayRepository>();
-        services.AddScoped<IRelayCommandsQueueRepository, RelayCommandsQueueRepository>();
+        services.AddScoped<IRelayCommandsRepository, RelayCommandsQueueRepository>();
         services.AddScoped<ISensorRepository, SensorRepository>();
 
         string? connectionString = configuration.GetConnectionString(nameof(SystemDbContext));

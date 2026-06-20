@@ -1,4 +1,4 @@
-﻿using Contracts.Exceptions;
+using Contracts.Exceptions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
@@ -7,7 +7,7 @@ namespace Contracts.Middlewares;
 
 public class GlobalExceptionHandler(RequestDelegate next)
 {
-    public async Task Invoke(HttpContext context)
+    public async Task InvokeAsync(HttpContext context)
     {
         try
         {
@@ -23,7 +23,7 @@ public class GlobalExceptionHandler(RequestDelegate next)
     {
         context.Response.ContentType = "application/json";
 
-        var statusCode = exception switch
+        int statusCode = exception switch
         {
             NotFoundException => StatusCodes.Status404NotFound,
             ValidationException => StatusCodes.Status409Conflict,
@@ -52,8 +52,6 @@ public class GlobalExceptionHandler(RequestDelegate next)
 
 public static class UseMiddleware
 {
-    public static IApplicationBuilder UseGlobalExceptionHandler(this IApplicationBuilder builder)
-    {
-        return builder.UseMiddleware<GlobalExceptionHandler>();
-    }
+    public static IApplicationBuilder UseGlobalExceptionHandler(this IApplicationBuilder builder) =>
+        builder.UseMiddleware<GlobalExceptionHandler>();
 }

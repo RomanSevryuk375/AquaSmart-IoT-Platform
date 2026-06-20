@@ -4,18 +4,15 @@ using MassTransit;
 
 namespace Device.Application.Handlers;
 
-public sealed class RelayStateChangedHandler(IPublishEndpoint publishEndpoint)
-    : INotificationHandler<RelayStateChangedDomainEvent>
+public sealed class RelayStateChangedHandler(
+    IPublishEndpoint publishEndpoint,
+    IMapper mapper) : INotificationHandler<RelayStateChangedDomainEvent>
 {
     public async Task Handle(
-        RelayStateChangedDomainEvent notification, 
+        RelayStateChangedDomainEvent notification,
         CancellationToken cancellationToken)
     {
-        await publishEndpoint.Publish(new ChangeRelayStateEvent
-        {
-            RelayId = notification.RelayId,
-            Action = notification.Action,
-            ExpireAt = notification.ExpireAt,
-        }, cancellationToken);
+        await publishEndpoint.Publish(
+            mapper.Map<ChangeRelayStateEvent>(notification), cancellationToken);
     }
 }

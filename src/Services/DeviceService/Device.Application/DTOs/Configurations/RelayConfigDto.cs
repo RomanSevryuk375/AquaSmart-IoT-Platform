@@ -7,7 +7,7 @@ public sealed record RelayConfigDto
     public ConnectionProtocol ConnectionProtocol { get; init; }
     public string ConnectionAddress { get; init; } = string.Empty;
     public bool IsNormalyOpen { get; init; }
-    public RelayPurposeEnum Purpose { get; init; }
+    public RelayPurpose Purpose { get; init; }
     public bool IsActive { get; init; }
     public bool IsManual { get; init; }
 }

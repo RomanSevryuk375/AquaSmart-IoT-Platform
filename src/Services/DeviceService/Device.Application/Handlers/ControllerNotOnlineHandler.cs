@@ -4,18 +4,15 @@ using MassTransit;
 
 namespace Device.Application.Handlers;
 
-public sealed class ControllerNotOnlineHandler(IPublishEndpoint publishEndpoint)
-    : INotificationHandler<ControllerNotOnlineDomainEvent>
+public sealed class ControllerNotOnlineHandler(
+    IPublishEndpoint publishEndpoint,
+    IMapper mapper) : INotificationHandler<ControllerNotOnlineDomainEvent>
 {
     public async Task Handle(
-        ControllerNotOnlineDomainEvent notification, 
+        ControllerNotOnlineDomainEvent notification,
         CancellationToken cancellationToken)
     {
-        await publishEndpoint.Publish(new ControllerNotOnlineEvent
-        {
-            ControllerId = notification.ControllerId,
-            UserId = notification.UserId,
-            LastSeenAt = notification.LastSeenAt,
-        }, cancellationToken);
+        await publishEndpoint.Publish(
+            mapper.Map<ControllerNotOnlineEvent>(notification), cancellationToken);
     }
 }

@@ -1,5 +1,3 @@
-﻿using Contracts.Enums;
-
 namespace Contracts.Events.RelayEvents;
 
 public sealed record ChangeRelayStateEvent
@@ -8,6 +6,6 @@ public sealed record ChangeRelayStateEvent
     public DateTime OccurredOn { get; init; } = DateTime.UtcNow;
     public Guid ControllerId { get; init; }
     public Guid RelayId { get; init; }
-    public RuleActionEnum Action { get; init; }
+    public bool TargetState { get; init; }
     public DateTime? ExpireAt { get; init; }
 }

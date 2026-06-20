@@ -1,5 +1,6 @@
 using Device.Application.DTOs.Configurations;
 using Device.Application.DTOs.Controller;
+using Device.Application.Features.Controllers.Command.PingController;
 
 namespace Device.API.Controllers;
 
@@ -75,7 +76,7 @@ public sealed class ControllersController(
 
     [HttpPost("{id:guid}/ping")]
     [AllowAnonymous]
-    public async Task<ActionResult<ControllerPingResponseDto>> PingControllerAsync(
+    public async Task<ActionResult<ControllerPingResponse>> PingControllerAsync(
         [FromRoute] Guid id,
         [FromHeader(Name = "X-Device-Token")] string deviceToken,
         CancellationToken cancellationToken = default)

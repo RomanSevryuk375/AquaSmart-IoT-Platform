@@ -4,17 +4,15 @@ using MassTransit;
 
 namespace Device.Application.Handlers;
 
-public sealed class SensorStateChangedHandler(IPublishEndpoint publishEndpoint)
-    : INotificationHandler<SensorStateChangedDomainEvent>
+public sealed class SensorStateChangedHandler(
+    IPublishEndpoint publishEndpoint,
+    IMapper mapper) : INotificationHandler<SensorStateChangedDomainEvent>
 {
     public async Task Handle(
-        SensorStateChangedDomainEvent notification, 
+        SensorStateChangedDomainEvent notification,
         CancellationToken cancellationToken)
     {
-        await publishEndpoint.Publish(new SensorStateChangedEvent
-        {
-            SensorId = notification.SensorId,
-            State = notification.State
-        }, cancellationToken);
+        await publishEndpoint.Publish(
+            mapper.Map<SensorStateChangedEvent>(notification), cancellationToken);
     }
 }

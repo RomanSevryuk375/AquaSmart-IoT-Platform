@@ -1,5 +1,7 @@
 using Contracts.Events.RelayEvents;
 using Device.Application.DTOs.Configurations;
+using Device.Application.DTOs.RelayCommands;
+using Device.Domain.Events.RelayEvents;
 
 namespace Device.Application.MapProfiles;
 
@@ -7,11 +9,6 @@ public sealed class RelayProfile : Profile
 {
     public RelayProfile()
     {
-        CreateMap<Relay, RelayResponseDto>()
-            .ForMember(desc => desc.ConnectionAddress,
-                       opt => opt.MapFrom(src => 
-                            $"{src.ConnectionProtocol}.{src.ConnectionAddress}"));
-
         CreateMap<Relay, RelayCreatedEvent>()
             .ForMember(desc => desc.RelayId,
                        opt => opt.MapFrom(src => src.Id));
@@ -23,5 +20,15 @@ public sealed class RelayProfile : Profile
         CreateMap<Relay, RelayConfigDto>()
             .ForMember(desc => desc.RelayId,
                        opt => opt.MapFrom(src => src.Id));
+
+        CreateMap<RelayCommand, RelayCommandResponseDto>();
+
+        CreateMap<RelayCreatedDomainEvent, RelayCreatedEvent>();
+
+        CreateMap<RelayModeChangedDomainEvent, RelayModeChangedEvent>();
+
+        CreateMap<RelayStateChangedDomainEvent, ChangeRelayStateEvent>();
+
+        CreateMap<RelayUpdatedDomainEvent, RelayUpdatedEvent>();
     }
 }
