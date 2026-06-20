@@ -1,3 +1,5 @@
+// Ignore Spelling: Validator
+
 namespace Device.Application.Features.RelayCommands.Command.SetRelayState;
 
 internal sealed class SetRelayStateValidator

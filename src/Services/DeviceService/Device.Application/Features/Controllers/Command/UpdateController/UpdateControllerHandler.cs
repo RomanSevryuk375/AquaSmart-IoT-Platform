@@ -1,32 +1,25 @@
-using Device.Application.Interfaces;
-
 namespace Device.Application.Features.Controllers.Command.UpdateController;
 
 internal sealed class UpdateControllerHandler(
     IControllerRepository controllerRepository,
-    IDeviceSecurityService securityService,
     IUnitOfWork unitOfWork) : IRequestHandler<UpdateControllerCommand, Result>
 {
     public async Task<Result> Handle(
         UpdateControllerCommand request,
         CancellationToken cancellationToken)
     {
-        Domain.Entities.Controller? controller = await controllerRepository
-            .GetByIdAsync(request.ControllerId, cancellationToken);
-
-        Result ownership = await securityService.EnsureUserOwnsControllerAsync(
+        Controller? controller = await controllerRepository.GetByIdAsync(
             request.ControllerId, cancellationToken);
-        if (ownership.IsFailure || controller is null)
+        if (controller is null)
         {
-            return Result<ControllerResponseDto>
-                .Failure(ownership.Error);
+            return Result<bool>.Failure(Error.NotFound<Controller>(
+                $"Controller {request.ControllerId} not found."));
         }
 
         Result? result = controller.Update(
             request.MacAddress,
             request.Name);
-
-        if (result is not null)
+        if (result.IsFailure)
         {
             return Result.Failure(result.Error);
         }

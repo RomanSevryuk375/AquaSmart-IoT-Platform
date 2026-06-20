@@ -1,3 +1,5 @@
+// Ignore Spelling: Validator
+
 namespace Device.Application.Features.Controllers.Command.PingController;
 
 internal sealed class PingControllerValidator

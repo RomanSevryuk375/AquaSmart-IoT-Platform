@@ -33,7 +33,7 @@ public abstract class BaseRepository<T>(SystemDbContext dbContext)
     }
 
     public async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
-        await _set.FirstOrDefaultAsync(x => x.Id == id, cancellationToken: cancellationToken);
+        await _set.FindAsync([id], cancellationToken: cancellationToken);
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default) =>
         await _set.Where(x => x.Id == id).ExecuteDeleteAsync(cancellationToken);

@@ -1,3 +1,5 @@
+// Ignore Spelling: Validator
+
 namespace Device.Application.Features.Relays.Command.SetRelayPowerSensor;
 
 internal sealed class SetRelayPowerSensorValidator

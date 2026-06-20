@@ -1,8 +1,10 @@
 using Contracts.Abstractions;
+using Device.Application.Interfaces;
 
 namespace Device.Application.Features.Sensors.Command.AddSensor;
 
-internal class AddSensorCommand : ICommand<SensorCreatedResponse>
+internal class AddSensorCommand
+    : ICommand<SensorCreatedResponse>, IControllerBoundRequest
 {
     public Guid ControllerId { get; init; }
     public string Name { get; init; } = string.Empty;

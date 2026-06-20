@@ -1,6 +1,6 @@
 namespace Device.Application.Features.RelayCommands.Command.DeleteCompleted;
 
-internal class DeleteCompleted(
+internal class DeleteCompletedHandler(
     IRelayCommandsRepository commandsRepository,
     IUnitOfWork unitOfWork) : IRequestHandler<DeleteCompletedCommand, Result>
 {

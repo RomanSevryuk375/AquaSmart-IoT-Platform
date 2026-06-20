@@ -1,8 +1,10 @@
 using Contracts.Abstractions;
+using Device.Application.Interfaces;
 
 namespace Device.Application.Features.Controllers.Command.UpdateController;
 
-internal sealed class UpdateControllerCommand : ICommand
+internal sealed class UpdateControllerCommand
+    : ICommand, IControllerBoundRequest
 {
     public Guid UserId { get; init; }
     public Guid ControllerId { get; init; }

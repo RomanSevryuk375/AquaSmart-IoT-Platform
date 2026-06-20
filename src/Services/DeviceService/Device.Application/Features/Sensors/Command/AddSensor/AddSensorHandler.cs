@@ -5,7 +5,6 @@ using MassTransit;
 namespace Device.Application.Features.Sensors.Command.AddSensor;
 
 internal sealed class AddSensorHandler(
-    IDeviceSecurityService securityService,
     ISensorRepository sensorRepository,
     IUnitOfWork unitOfWork,
     IUserContext userContext,
@@ -15,13 +14,6 @@ internal sealed class AddSensorHandler(
         AddSensorCommand request,
         CancellationToken cancellationToken)
     {
-        Result ownership = await securityService.EnsureUserOwnsControllerAsync(
-            request.ControllerId, cancellationToken);
-        if (ownership.IsFailure)
-        {
-            return Result<SensorCreatedResponse>.Failure(ownership.Error);
-        }
-
         Result<Sensor> sensor = SensorFactory.CreateSensor(
             id: NewId.NextGuid(), request.ControllerId, userContext.UserId,
             request.Name,

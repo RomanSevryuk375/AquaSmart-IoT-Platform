@@ -1,3 +1,5 @@
+// Ignore Spelling: Validator
+
 namespace Device.Application.Features.Sensors.Command.SetSensorState;
 
 internal sealed class SetSensorStateValidator

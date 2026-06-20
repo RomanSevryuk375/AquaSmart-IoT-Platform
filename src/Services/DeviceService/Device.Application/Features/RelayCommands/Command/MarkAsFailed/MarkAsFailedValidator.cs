@@ -1,3 +1,5 @@
+// Ignore Spelling: Validator
+
 namespace Device.Application.Features.RelayCommands.Command.MarkAsFailed;
 
 internal sealed class MarkAsFailedValidator

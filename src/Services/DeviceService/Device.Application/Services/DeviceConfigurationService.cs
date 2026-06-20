@@ -18,7 +18,7 @@ public sealed class DeviceConfigurationService(
         string deviceToken,
         CancellationToken cancellationToken)
     {
-        var controller = await controllerRepository
+        Controller? controller = await controllerRepository
             .GetByMacAddressAsync(macAddress, cancellationToken);
 
         if (controller is null)
@@ -29,7 +29,7 @@ public sealed class DeviceConfigurationService(
                     "Controller not found"));
         }
 
-        var ownership = await securityService.EnsureDeviceAccessAsync(
+        Result ownership = await securityService.EnsureDeviceAccessAsync(
             controller.Id, deviceToken, cancellationToken);
 
         if (ownership.IsFailure)
@@ -38,10 +38,10 @@ public sealed class DeviceConfigurationService(
                 .Failure(ownership.Error);
         }
 
-        var relays = await relayRepository
+        IReadOnlyList<Relay> relays = await relayRepository
             .GetAllByControllerId(controller.Id, cancellationToken);
 
-        var sensors = await sensorRepository
+        IReadOnlyList<Sensor> sensors = await sensorRepository
             .GetAllSensorsAsync(controller.Id, cancellationToken);
 
         return Result<ConfigResponseDto>.Success(

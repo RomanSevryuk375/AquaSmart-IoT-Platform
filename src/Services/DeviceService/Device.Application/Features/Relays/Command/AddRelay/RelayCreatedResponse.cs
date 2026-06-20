@@ -7,7 +7,7 @@ public sealed record RelayCreatedResponse
     public Guid? PowerSensorId { get; init; }
     public string Name { get; init; } = string.Empty;
     public string ConnectionAddress { get; init; } = string.Empty;
-    public bool IsNormalyOpen { get; init; }
+    public bool IsNormallyOpen { get; init; }
     public RelayPurpose Purpose { get; init; }
     public bool IsActive { get; init; }
     public bool IsManual { get; init; }

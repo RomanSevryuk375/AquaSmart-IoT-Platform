@@ -1,11 +1,8 @@
-using Device.Application.Interfaces;
-
 namespace Device.Application.Features.Relays.Command.SetRelayPowerSensor;
 
 internal sealed class SetRelayPowerSensorHandler(
     IRelayRepository relayRepository,
     ISensorRepository sensorRepository,
-    IDeviceSecurityService securityService,
     IUnitOfWork unitOfWork) : IRequestHandler<SetRelayPowerSensorCommand, Result>
 {
     public async Task<Result> Handle(
@@ -14,11 +11,6 @@ internal sealed class SetRelayPowerSensorHandler(
     {
         Relay? existingRelay = await relayRepository.GetByIdAsync(
             request.RelayId, cancellationToken);
-        if (existingRelay is null)
-        {
-            return Result.Failure(Error.NotFound<Relay>(
-                    $"{nameof(Relay)} {request.RelayId} not found"));
-        }
 
         Sensor? powerSensor = await sensorRepository.GetByIdAsync(
             request.PowerSensorId, cancellationToken);
@@ -28,14 +20,7 @@ internal sealed class SetRelayPowerSensorHandler(
                     $"{nameof(Sensor)} {request.PowerSensorId} not found"));
         }
 
-        Result ownership = await securityService.EnsureUserOwnsControllerAsync(
-            existingRelay.ControllerId, cancellationToken);
-        if (ownership.IsFailure)
-        {
-            return Result.Failure(ownership.Error);
-        }
-
-        if (existingRelay.ControllerId != powerSensor.ControllerId)
+        if (existingRelay!.ControllerId != powerSensor.ControllerId)
         {
             return Result.Failure(Error.Validation<Relay>(
                 "Sensor and Relay must belong to the same controller"));

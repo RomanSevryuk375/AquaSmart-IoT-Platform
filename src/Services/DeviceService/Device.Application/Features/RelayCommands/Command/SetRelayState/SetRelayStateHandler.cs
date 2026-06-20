@@ -1,4 +1,3 @@
-using Device.Application.Factories;
 using MassTransit;
 
 namespace Device.Application.Features.RelayCommands.Command.SetRelayState;
@@ -6,7 +5,7 @@ namespace Device.Application.Features.RelayCommands.Command.SetRelayState;
 internal sealed class SetRelayStateHandler(
     IRelayRepository relayRepository,
     IControllerRepository controllerRepository,
-    IRelayCommandsRepository queueRepository
+    IRelayCommandsRepository queueRepository,
     IUnitOfWork unitOfWork) : IRequestHandler<SetRelayStateCommand, Result>
 {
     public async Task<Result> Handle(
@@ -32,16 +31,12 @@ internal sealed class SetRelayStateHandler(
         if (UnavalibleCommand(request, existingRelay))
         {
             return Result.Failure(Error.Conflict<RelayCommand>(
-                "Command is unavalible or was expired."));
+                "Command is unavailable or was expired."));
         }
 
         Result<RelayCommand> newCommand = RelayCommand.Create(
-            id: NewId.NextGuid(),
-            existingController.Id,
-            existingRelay.Id,
-            request.TargetState,
-            request.ExpireAt);
-
+            id: NewId.NextGuid(), existingController.Id, existingRelay.Id,
+            request.TargetState, request.ExpireAt);
         if (newCommand.IsFailure)
         {
             return Result.Failure(newCommand.Error);
@@ -62,11 +57,11 @@ internal sealed class SetRelayStateHandler(
     }
 
     private static bool UnavalibleCommand(
-        SetRelayStateCommand request,
-        Relay existingRelay)
+        SetRelayStateCommand request, Relay existingRelay)
     {
         return existingRelay.IsManual ||
-              (request.ExpireAt.HasValue && request.ExpireAt.Value < DateTime.UtcNow) ||
-               existingRelay.IsActive == StateEvaluatorFactory.EvaluateEnum(request.Action);
+              (request.ExpireAt.HasValue &&
+               request.ExpireAt.Value < DateTime.UtcNow) ||
+               existingRelay.IsActive == request.TargetState;
     }
 }

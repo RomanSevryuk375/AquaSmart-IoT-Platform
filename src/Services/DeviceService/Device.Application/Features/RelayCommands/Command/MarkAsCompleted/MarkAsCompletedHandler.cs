@@ -1,12 +1,9 @@
-using Device.Application.Interfaces;
-
 namespace Device.Application.Features.RelayCommands.Command.MarkAsCompleted;
 
 internal sealed class MarkAsCompletedHandler(
     IRelayCommandsRepository queueRepository,
     IRelayRepository relayRepository,
-    IUnitOfWork unitOfWork,
-    IDeviceSecurityService securityService) : IRequestHandler<MarkAsCompletedCommand, Result>
+    IUnitOfWork unitOfWork) : IRequestHandler<MarkAsCompletedCommand, Result>
 {
     public async Task<Result> Handle(
         MarkAsCompletedCommand request,
@@ -24,16 +21,8 @@ internal sealed class MarkAsCompletedHandler(
             command.RelayId, cancellationToken);
         if (existingRelay is null)
         {
-            return Result.Failure(Error.NotFound(
-                    "Relay.NotFound",
+            return Result.Failure(Error.NotFound<Relay>(
                     $"{nameof(Relay)} {command.RelayId} not found"));
-        }
-
-        Result ownership = await securityService.EnsureDeviceAccessAsync(
-            command.ControllerId, request.DeviceToken, cancellationToken);
-        if (ownership.IsFailure)
-        {
-            return Result.Failure(ownership.Error);
         }
 
         existingRelay.SetState(command.TargeState);

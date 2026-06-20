@@ -1,5 +1,3 @@
-
-using Device.Application.Features.Sensors.Command.AddSensor;
 using Device.Application.Interfaces;
 
 namespace Device.Application.Features.Sensors.Command.UpdateSensor;
@@ -15,20 +13,7 @@ internal sealed class UpdateSensorHandler(
     {
         Sensor? existingSensor = await sensorRepository.GetByIdAsync(
             request.SensorId, cancellationToken);
-        if (existingSensor is null)
-        {
-            return Result.Failure(Error.NotFound<Sensor>(
-                    $"{nameof(Sensor)} {request.SensorId} not found"));
-        }
-
-        Result ownership = await securityService.EnsureUserOwnsControllerAsync(
-            existingSensor.ControllerId, cancellationToken);
-        if (ownership.IsFailure)
-        {
-            return Result<SensorCreatedResponse>.Failure(ownership.Error);
-        }
-
-        if (request.ControllerId != existingSensor.ControllerId)
+        if (request.ControllerId != existingSensor!.ControllerId)
         {
             Result newControllerOwnership = await securityService.EnsureUserOwnsControllerAsync(
                 request.ControllerId, cancellationToken);
@@ -41,9 +26,7 @@ internal sealed class UpdateSensorHandler(
 
         Result result = existingSensor.Update(
             request.ControllerId,
-            request.Name,
-            request.ConnectionProtocol,
-            request.ConnectionAddress);
+            request.Name, request.ConnectionProtocol, request.ConnectionAddress);
         if (result.IsFailure)
         {
             return Result.Failure(result.Error);

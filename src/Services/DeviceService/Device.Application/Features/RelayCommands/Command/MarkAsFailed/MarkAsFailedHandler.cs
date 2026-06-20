@@ -1,11 +1,7 @@
-using Device.Application.DTOs.RelayCommands;
-using Device.Application.Interfaces;
-
 namespace Device.Application.Features.RelayCommands.Command.MarkAsFailed;
 
 internal sealed class MarkAsFailedHandler(
     IRelayCommandsRepository queueRepository,
-    IDeviceSecurityService securityService,
     IUnitOfWork unitOfWork) : IRequestHandler<MarkAsFailedCommand, Result>
 {
     public async Task<Result> Handle(
@@ -18,13 +14,6 @@ internal sealed class MarkAsFailedHandler(
         {
             return Result.Failure(Error.NotFound<RelayCommand>(
                     $"{nameof(RelayCommand)} {request.CommandId} not found"));
-        }
-
-        Result ownership = await securityService.EnsureDeviceAccessAsync(
-            command.ControllerId, request.DeviceToken, cancellationToken);
-        if (ownership.IsFailure)
-        {
-            return Result<IReadOnlyList<RelayCommandResponseDto>>.Failure(ownership.Error);
         }
 
         if (command.Status == CommandStatus.Failed)

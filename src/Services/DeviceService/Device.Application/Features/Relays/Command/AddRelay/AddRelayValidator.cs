@@ -1,3 +1,5 @@
+// Ignore Spelling: Validator
+
 using Contracts.Constants;
 
 namespace Device.Application.Features.Relays.Command.AddRelay;
@@ -25,7 +27,7 @@ internal sealed class AddRelayValidator
             .NotEmpty()
             .MaximumLength(CommonConstants.ConnectionAddressLength);
 
-        RuleFor(x => x.IsNormalyOpen)
+        RuleFor(x => x.IsNormallyOpen)
             .NotEmpty();
 
         RuleFor(x => x.Purpose)

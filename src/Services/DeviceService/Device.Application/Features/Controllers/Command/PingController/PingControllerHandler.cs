@@ -1,25 +1,19 @@
-using Device.Application.Interfaces;
-
 namespace Device.Application.Features.Controllers.Command.PingController;
 
 internal class PingControllerHandler(
     IControllerRepository controllerRepository,
-    IDeviceSecurityService securityService,
     IUnitOfWork unitOfWork) : IRequestHandler<PingControllerCommand, Result<ControllerPingResponse>>
 {
     public async Task<Result<ControllerPingResponse>> Handle(
         PingControllerCommand request,
         CancellationToken cancellationToken)
     {
-        Controller? controller = await controllerRepository
-            .GetByIdAsync(request.ControllerId, cancellationToken);
-
-        Result ownership = await securityService.EnsureDeviceAccessAsync(
-            request.ControllerId, request.DeviceToken, cancellationToken);
-        if (ownership.IsFailure || controller is null)
+        Controller? controller = await controllerRepository.GetByIdAsync(
+            request.ControllerId, cancellationToken);
+        if (controller is null)
         {
-            return Result<ControllerPingResponse>
-                .Failure(ownership.Error);
+            return Result<ControllerPingResponse>.Failure(Error.NotFound<Controller>(
+                $"Controller {request.ControllerId} not found."));
         }
 
         controller.RecordPing();
