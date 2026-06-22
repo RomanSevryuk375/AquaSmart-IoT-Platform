@@ -1,36 +1,43 @@
+using System.Reflection;
+using Device.Application.Behaviors;
 using Device.Application.Interfaces;
 using Device.Application.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace Device.Application.Extesions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddServices (this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
     {
+        Assembly assembly = typeof(DependencyInjection).Assembly;
+
         services.AddScoped<IControllerOfflineCheckerService, ControllerOfflineCheckerService>();
-        services.AddScoped<IControllerService, ControllerService>();
         services.AddScoped<IDeviceConfigurationService, DeviceConfigurationService>();
         services.AddScoped<IDeviceSecurityService, DeviceSecurityService>();
-        services.AddScoped<IRelayCommandQueueService, RelayCommandQueueService>();
-        services.AddScoped<IRelayService, RelayService>();
-        services.AddScoped<ISensorService, SensorService>();
-        services.AddScoped<ITelemtryBatchService, TelemetryBatchService>();
 
         services.AddSingleton<IMyHasher, MyHasher>();
 
-        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+        services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssembly(assembly);
 
-        services.AddAutoMapper(config => 
-            config.AddMaps(typeof(DependencyInjection).Assembly));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ControllerSecurityBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(CommandSecurityBehaviod<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(DeviceSecurityBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(RelaySecurityBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(SensorSecurityBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(TelemetrySecurityBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
+        });
 
-        services.AddMediatR(config => 
-            config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+        services.AddValidatorsFromAssembly(assembly);
 
-        services.Configure<DeviceSettings>(
-            configuration.GetSection(DeviceSettings.SectionName));
+        services.AddAutoMapper(config => config.AddMaps(assembly));
+
+        services.Configure<DeviceSettings>(configuration.GetSection(DeviceSettings.SectionName));
 
         return services;
     }
