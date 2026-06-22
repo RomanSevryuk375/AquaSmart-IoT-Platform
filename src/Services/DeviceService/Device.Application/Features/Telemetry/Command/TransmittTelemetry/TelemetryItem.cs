@@ -1,4 +1,4 @@
-namespace Device.Application.Features.Telemetry.Command.TransmitTelemetry;
+namespace Device.Application.Features.Telemetry.Command.TransmittTelemetry;
 
 public sealed record TelemetryItem
 {

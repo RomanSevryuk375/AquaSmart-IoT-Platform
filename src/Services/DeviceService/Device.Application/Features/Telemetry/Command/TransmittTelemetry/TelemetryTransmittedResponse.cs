@@ -1,6 +1,6 @@
-namespace Device.Application.Features.Telemetry.Command.TransmitTelemetry;
+namespace Device.Application.Features.Telemetry.Command.TransmittTelemetry;
 
-public sealed record TelemetryTransmitedResponse
+public sealed record TelemetryTransmittedResponse
 {
     public int AcceptedCount { get; set; }
     public List<string> ValidationErrors { get; set; } = [];

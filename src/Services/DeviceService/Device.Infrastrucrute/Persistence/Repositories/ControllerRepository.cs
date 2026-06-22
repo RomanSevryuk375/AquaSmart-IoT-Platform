@@ -1,10 +1,10 @@
 namespace Device.Infrastructure.Persistence.Repositories;
 
-public sealed class ControllerRepository(SystemDbContext dbContext) 
+public sealed class ControllerRepository(SystemDbContext dbContext)
     : BaseRepository<Controller>(dbContext), IControllerRepository
 {
     public async Task<Controller?> GetByMacAddressAsync(
-        string macAddress, 
+        string macAddress,
         CancellationToken cancellationToken = default)
     {
         return await Context.Controllers
@@ -12,7 +12,7 @@ public sealed class ControllerRepository(SystemDbContext dbContext)
     }
 
     public async Task<Controller?> GetByDeviceTokenAsync(
-        string deviceTokenHash, 
+        string deviceTokenHash,
         CancellationToken cancellationToken = default)
     {
         return await Context.Controllers

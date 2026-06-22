@@ -21,8 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\Telemetry\" />
-    <Folder Include="DTOs\Validators\" />
     <Folder Include="Features\Controllers\Query\GetControllerById\" />
     <Folder Include="Features\Controllers\Query\GetAllControllers\" />
     <Folder Include="Features\Controllers\Query\GetControllerConfig\" />

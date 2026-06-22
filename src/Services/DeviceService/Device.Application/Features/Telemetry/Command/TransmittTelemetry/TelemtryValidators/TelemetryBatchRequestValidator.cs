@@ -1,9 +1,11 @@
+// Ignore Spelling: Validator
+
 using Contracts.Constants;
 
-namespace Device.Application.Features.Telemetry.Command.TransmitTelemetry.TelemtryValidators;
+namespace Device.Application.Features.Telemetry.Command.TransmittTelemetry.TelemtryValidators;
 
-internal sealed class TelemetryBatchRequestValidator 
-    : AbstractValidator<TransmitTelemetryCommand>
+internal sealed class TelemetryBatchRequestValidator
+    : AbstractValidator<TransmittTelemetryCommand>
 {
     public TelemetryBatchRequestValidator()
     {

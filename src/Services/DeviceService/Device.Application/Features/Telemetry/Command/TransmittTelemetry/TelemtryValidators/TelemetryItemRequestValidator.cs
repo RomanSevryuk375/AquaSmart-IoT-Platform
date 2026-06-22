@@ -1,6 +1,8 @@
-namespace Device.Application.Features.Telemetry.Command.TransmitTelemetry.TelemtryValidators;
+// Ignore Spelling: Validator
 
-public sealed class TelemetryItemRequestValidator 
+namespace Device.Application.Features.Telemetry.Command.TransmittTelemetry.TelemtryValidators;
+
+public sealed class TelemetryItemRequestValidator
     : AbstractValidator<TelemetryItem>
 {
     public TelemetryItemRequestValidator()
@@ -20,6 +22,5 @@ public sealed class TelemetryItemRequestValidator
             .Must(BeInPast).WithMessage("RecordedAt can not be in the future.");
     }
 
-    private bool BeInPast(DateTime recordedAt) =>
-        recordedAt < DateTime.UtcNow.AddMinutes(5);
+    private bool BeInPast(DateTime recordedAt) => recordedAt < DateTime.UtcNow.AddMinutes(5);
 }
