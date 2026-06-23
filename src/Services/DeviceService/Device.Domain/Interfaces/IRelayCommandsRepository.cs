@@ -6,6 +6,6 @@ public interface IRelayCommandsRepository : IRepository<RelayCommand>
         CancellationToken cancellationToken = default);
 
     public Task<IReadOnlyList<RelayCommand>> GetPendingByControllerIdAsync(
-        Guid controllerId, 
+        Guid controllerId,
         CancellationToken cancellationToken = default);
 }

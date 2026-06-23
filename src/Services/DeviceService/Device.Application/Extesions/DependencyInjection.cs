@@ -9,14 +9,11 @@ namespace Device.Application.Extesions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
     {
-        Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-
         Assembly assembly = typeof(DependencyInjection).Assembly;
 
         services.AddScoped<IControllerOfflineCheckerService, ControllerOfflineCheckerService>();
-        services.AddScoped<IDeviceConfigurationService, DeviceConfigurationService>();
         services.AddScoped<IDeviceSecurityService, DeviceSecurityService>();
 
         services.AddSingleton<IMyHasher, MyHasher>();

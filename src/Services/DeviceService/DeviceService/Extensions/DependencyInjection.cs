@@ -6,7 +6,7 @@ namespace Device.API.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddApi(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHttpContextAccessor();
         services.AddEndpointsApiExplorer();
@@ -41,10 +41,8 @@ public static class DependencyInjection
         services.AddCommonAuthentication(configuration);
         services.AddControllers();
 
-        services.AddServices(configuration);
-        services.AddRepositories(configuration);
-        services.AddQuartzJobs(configuration);
-        services.AddRabbitMq(configuration);
+        services.AddApplication(configuration)
+                .AddInfrastructure(configuration);
 
         services.AddAquaAuthorizationPolicies();
 

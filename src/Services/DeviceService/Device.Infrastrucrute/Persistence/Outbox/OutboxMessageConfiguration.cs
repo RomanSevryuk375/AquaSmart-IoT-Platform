@@ -1,6 +1,6 @@
 namespace Device.Infrastructure.Persistence.Outbox;
 
-public sealed class OutboxMessageConfiguration 
+public sealed class OutboxMessageConfiguration
     : IEntityTypeConfiguration<OutboxMessage>
 {
     public void Configure(EntityTypeBuilder<OutboxMessage> builder)

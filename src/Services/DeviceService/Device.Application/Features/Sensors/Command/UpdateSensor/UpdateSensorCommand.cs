@@ -3,7 +3,7 @@ using Device.Application.Interfaces;
 
 namespace Device.Application.Features.Sensors.Command.UpdateSensor;
 
-internal sealed record UpdateSensorCommand
+public sealed record UpdateSensorCommand
     : ICommand, ISensorBoundRequest, IControllerBoundRequest
 {
     public Guid SensorId { get; init; }

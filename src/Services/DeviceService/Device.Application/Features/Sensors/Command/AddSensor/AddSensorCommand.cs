@@ -3,7 +3,7 @@ using Device.Application.Interfaces;
 
 namespace Device.Application.Features.Sensors.Command.AddSensor;
 
-internal class AddSensorCommand
+public class AddSensorCommand
     : ICommand<SensorCreatedResponse>, IControllerBoundRequest
 {
     public Guid ControllerId { get; init; }

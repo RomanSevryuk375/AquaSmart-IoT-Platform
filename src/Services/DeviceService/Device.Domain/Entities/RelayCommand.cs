@@ -65,7 +65,7 @@ public sealed class RelayCommand : IEntity
 
     public void MarkAsSent()
     {
-        if (Status == CommandStatus.Completed || 
+        if (Status == CommandStatus.Completed ||
             Status == CommandStatus.Failed)
         {
             return;

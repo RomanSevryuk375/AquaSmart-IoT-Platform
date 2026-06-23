@@ -3,7 +3,7 @@ using Device.Domain.ValueObjects;
 
 namespace Device.Infrastructure.Persistence.Configurations;
 
-public sealed class SensorConfiguration 
+public sealed class SensorConfiguration
     : IEntityTypeConfiguration<Sensor>
 {
     public void Configure(EntityTypeBuilder<Sensor> builder)

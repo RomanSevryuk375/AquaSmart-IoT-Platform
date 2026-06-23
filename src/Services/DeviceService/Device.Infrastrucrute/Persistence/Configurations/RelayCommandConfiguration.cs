@@ -22,10 +22,10 @@ public sealed class RelayCommandConfiguration
         builder.Property(x => x.ErrorMessage).IsRequired(false);
         builder.Property(x => x.CreatedAt).IsRequired();
 
-        builder.HasIndex(x => new 
-        { 
-            x.ControllerId, 
-            x.Status 
+        builder.HasIndex(x => new
+        {
+            x.ControllerId,
+            x.Status
         });
     }
 }

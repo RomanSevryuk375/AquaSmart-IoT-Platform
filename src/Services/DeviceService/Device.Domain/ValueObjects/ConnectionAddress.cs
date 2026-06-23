@@ -1,5 +1,5 @@
-using Contracts.Constants;
 using System.Text.RegularExpressions;
+using Contracts.Constants;
 
 namespace Device.Domain.ValueObjects;
 
@@ -49,7 +49,7 @@ public sealed partial record ConnectionAddress
         string hexPart = address[I2cHexPartLength..];
         int numericValue = Convert.ToInt32(hexPart, 16);
 
-        if (numericValue < CommonConstants.MinI2cnumericValue || 
+        if (numericValue < CommonConstants.MinI2cnumericValue ||
             numericValue > CommonConstants.MaxI2cnumericValue)
         {
             return Result<ConnectionAddress>.Failure(Error.Validation<ConnectionAddress>(
@@ -76,7 +76,7 @@ public sealed partial record ConnectionAddress
         }
 
         return Result<ConnectionAddress>.Success(new ConnectionAddress(
-            ConnectionProtocol.OneWire, 
+            ConnectionProtocol.OneWire,
             address));
     }
 
@@ -118,8 +118,5 @@ public sealed partial record ConnectionAddress
     [GeneratedRegex(CommonConstants.AnalogRegex, RegexOptions.CultureInvariant)]
     private static partial Regex AnalogRegex();
 
-    public override string ToString()
-    {
-        return $"{Protocol}_{Address}";
-    }
+    public override string ToString() => $"{Protocol}_{Address}";
 }

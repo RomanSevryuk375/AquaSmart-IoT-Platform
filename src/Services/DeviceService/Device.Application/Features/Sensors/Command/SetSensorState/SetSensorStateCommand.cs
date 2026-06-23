@@ -3,7 +3,7 @@ using Device.Application.Interfaces;
 
 namespace Device.Application.Features.Sensors.Command.SetSensorState;
 
-internal sealed record SetSensorStateCommand
+public sealed record SetSensorStateCommand
     : ICommand, ISensorBoundRequest
 {
     public Guid SensorId { get; init; }

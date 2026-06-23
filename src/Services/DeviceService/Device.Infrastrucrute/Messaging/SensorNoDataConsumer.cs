@@ -1,23 +1,25 @@
 using Contracts.Events.SensorEvents;
 using Contracts.Results;
+using Device.Application.Features.Sensors.Command.SetSensorState;
+using MediatR;
 
 namespace Device.Infrastructure.Messaging;
 
-public sealed class SensorNoDataConsumer(
-    ISensorService sensorService) : IConsumer<SensorNoDataEvent>
+public sealed class SensorNoDataConsumer(ISender sender)
+    : IConsumer<SensorNoDataEvent>
 {
     public async Task Consume(ConsumeContext<SensorNoDataEvent> context)
     {
-        ConsumerResult result = await sensorService.SetSensorStateAsync(
-            context.Message.SensorId,
-            context.Message.State,
-            context.CancellationToken);
-
-        if (!result.IsSuccess &&
-            result.IsRetryable &&
-            result.Error is not null)
+        var command = new SetSensorStateCommand
         {
-            throw new ConsumerException(result.Error);
+            SensorId = context.Message.SensorId,
+            SensorState = context.Message.State,
+        };
+
+        Result result = await sender.Send(command, context.CancellationToken);
+        if (!result.IsSuccess && result.Error is not null)
+        {
+            throw new ConsumerException(result.Error.Message);
         }
     }
 }

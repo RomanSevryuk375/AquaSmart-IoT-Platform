@@ -1,7 +1,6 @@
 using Contracts.Events.RelayEvents;
 using Contracts.Events.SensorEvents;
 using Device.Application.Features.Controllers.Query.GetControllerConfig;
-using Device.Domain.DomainEvents.SensorEvents;
 using Device.Domain.Events.RelayEvents;
 using Device.Domain.Events.SensorEvents;
 

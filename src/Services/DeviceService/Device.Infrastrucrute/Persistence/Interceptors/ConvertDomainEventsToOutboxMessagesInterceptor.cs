@@ -13,7 +13,7 @@ public sealed class ConvertDomainEventsToOutboxMessagesInterceptor : SaveChanges
         CancellationToken cancellationToken = default)
     {
         DbContext? dbContext = eventData.Context;
-        
+
         if (dbContext is null)
         {
             return base.SavingChangesAsync(eventData, result, cancellationToken);

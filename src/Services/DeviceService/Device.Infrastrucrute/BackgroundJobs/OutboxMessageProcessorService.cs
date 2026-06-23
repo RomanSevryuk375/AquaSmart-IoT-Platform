@@ -25,7 +25,7 @@ public sealed class OutboxMessageProcessorService(
         foreach (OutboxMessage message in messages)
         {
             var type = Type.GetType(message.Type);
-            if (type == null)
+            if (type is null)
             {
                 continue;
             }

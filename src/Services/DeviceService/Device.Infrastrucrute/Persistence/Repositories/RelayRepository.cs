@@ -4,7 +4,7 @@ public sealed class RelayRepository(SystemDbContext dbContext)
     : BaseRepository<Relay>(dbContext), IRelayRepository
 {
     public async Task<bool> ExistsAsync(
-        Guid relayId, 
+        Guid relayId,
         CancellationToken cancellationToken = default)
     {
         return await Context.Relays

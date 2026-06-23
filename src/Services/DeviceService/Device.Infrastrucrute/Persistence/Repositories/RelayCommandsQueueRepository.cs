@@ -16,7 +16,7 @@ public sealed class RelayCommandsQueueRepository(SystemDbContext dbContext)
         return await Context.RelayCommands
             .Where(x => x.ControllerId == controllerId)
             .Where(x => x.ExpireAt == null || x.ExpireAt > now)
-            .Where(x => 
+            .Where(x =>
                 x.Status == CommandStatus.Pending ||
                 (x.Status == CommandStatus.Sent &&
                 x.AttemptCount < MaxAttemptCount &&
@@ -29,7 +29,7 @@ public sealed class RelayCommandsQueueRepository(SystemDbContext dbContext)
         CancellationToken cancellationToken = default)
     {
         await Context.RelayCommands
-            .Where(x => x.Status == CommandStatus.Completed 
+            .Where(x => x.Status == CommandStatus.Completed
                      || x.ExpireAt < DateTime.UtcNow)
             .ExecuteDeleteAsync(cancellationToken);
     }

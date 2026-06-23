@@ -17,6 +17,14 @@ namespace Device.Infrastructure.Extensions;
 
 public static class DependencyInjection
 {
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
+        return services
+            .AddRepositories(configuration)
+            .AddQuartzJobs(configuration)
+            .AddRabbitMq(configuration);
+    }
+
     public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<ConvertDomainEventsToOutboxMessagesInterceptor>();
@@ -39,7 +47,9 @@ public static class DependencyInjection
         });
         services.AddHealthChecks().AddNpgSql(connectionString!);
 
+        Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
         services.AddScoped<ISqlConnectionFactory, SqlConnectionFactory>();
+
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IUserContext, UserContext>();
 

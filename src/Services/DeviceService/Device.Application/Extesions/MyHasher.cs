@@ -1,4 +1,6 @@
-﻿using Device.Application.Interfaces;
+// Ignore Spelling: Hasher
+
+using Device.Application.Interfaces;
 
 namespace Device.Application.Extesions;
 

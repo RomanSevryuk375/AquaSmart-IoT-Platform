@@ -3,7 +3,8 @@ using Device.Application.Interfaces;
 
 namespace Device.Application.Features.RelayCommands.Command.SetRelayState;
 
-internal sealed record SetRelayStateCommand : ICommand, IControllerBoundRequest
+public sealed record SetRelayStateCommand
+    : ICommand, IControllerBoundRequest
 {
     public Guid ControllerId { get; init; }
     public Guid RelayId { get; init; }

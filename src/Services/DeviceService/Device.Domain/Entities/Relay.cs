@@ -9,7 +9,7 @@ public sealed class Relay : AggregateRoot, IEntity
         Guid id,
         Guid controllerId,
         Guid userId,
-        Guid? powerSensorId, 
+        Guid? powerSensorId,
         DeviceName deviceName,
         ConnectionAddress connectionAddress,
         bool isNormallyOpen,
@@ -47,7 +47,7 @@ public sealed class Relay : AggregateRoot, IEntity
     public bool IsManual { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public static Result<Relay> Create (
+    public static Result<Relay> Create(
         Guid id,
         Guid controllerId,
         Guid userId,
@@ -55,7 +55,7 @@ public sealed class Relay : AggregateRoot, IEntity
         string rawName,
         ConnectionProtocol connectionProtocol,
         string rawConnectionAddress,
-        bool isNormalyOpen,
+        bool isNormallyOpen,
         RelayPurpose purpose,
         bool isActive,
         bool isManual)
@@ -87,7 +87,7 @@ public sealed class Relay : AggregateRoot, IEntity
             powerSensorId,
             nameResut.Value,
             addressResult.Value,
-            isNormalyOpen,
+            isNormallyOpen,
             purpose,
             isActive,
             isManual,
@@ -113,7 +113,7 @@ public sealed class Relay : AggregateRoot, IEntity
         ConnectionProtocol connectionProtocol,
         string rawConnectionAddress,
         RelayPurpose purpose,
-        bool isNormalyOpen)
+        bool isNormallyOpen)
     {
         Result<ConnectionAddress> addressResult = ConnectionAddress.Create(
             connectionProtocol, rawConnectionAddress);
@@ -124,7 +124,7 @@ public sealed class Relay : AggregateRoot, IEntity
 
         ControllerId = controllerId;
         ConnectionAddress = addressResult.Value;
-        IsNormallyOpen = isNormalyOpen;
+        IsNormallyOpen = isNormallyOpen;
         Purpose = purpose;
 
         RaiseEvent(new RelayUpdatedDomainEvent
@@ -208,11 +208,5 @@ public sealed class Relay : AggregateRoot, IEntity
         });
     }
 
-    public void MarkAsDeleted()
-    {
-        RaiseEvent(new RelayDeletedDomainEvent
-        {
-            RelayId = Id,
-        });
-    }
+    public void MarkAsDeleted() => RaiseEvent(new RelayDeletedDomainEvent { RelayId = Id, });
 }

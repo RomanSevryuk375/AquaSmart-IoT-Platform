@@ -1,5 +1,5 @@
 using Contracts.Events.SensorEvents;
-using Device.Domain.DomainEvents.SensorEvents;
+using Device.Domain.Events.SensorEvents;
 using MassTransit;
 
 namespace Device.Application.Handlers;

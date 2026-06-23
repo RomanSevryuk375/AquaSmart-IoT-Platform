@@ -3,7 +3,7 @@ using Device.Domain.ValueObjects;
 
 namespace Device.Infrastructure.Persistence.Configurations;
 
-public sealed class RelayConfiguration 
+public sealed class RelayConfiguration
     : IEntityTypeConfiguration<Relay>
 {
     public void Configure(EntityTypeBuilder<Relay> builder)
@@ -44,9 +44,9 @@ public sealed class RelayConfiguration
         builder.Property(x => x.IsManual).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
 
-        builder.HasIndex(x => new 
-        { 
-            x.ControllerId, 
+        builder.HasIndex(x => new
+        {
+            x.ControllerId,
             x.PowerSensorId,
             x.ConnectionAddress
         }).IsUnique();

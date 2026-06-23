@@ -1,6 +1,6 @@
 namespace Device.Application.Features.Controllers.Command.PingController;
 
-internal class PingControllerHandler(
+internal sealed class PingControllerHandler(
     IControllerRepository controllerRepository,
     IUnitOfWork unitOfWork) : IRequestHandler<PingControllerCommand, Result<ControllerPingResponse>>
 {

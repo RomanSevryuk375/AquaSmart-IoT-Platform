@@ -1,49 +1,71 @@
-using Device.Application.DTOs.Relay;
+using Contracts.Enums;
 using Device.Application.Features.Relays.Command.AddRelay;
+using Device.Application.Features.Relays.Command.DeleteRelay;
+using Device.Application.Features.Relays.Command.UpdateRelay;
+using Device.Application.Features.Relays.Query.GetAllRelays;
+using Device.Application.Features.Relays.Query.GetRelayById;
+using Device.Application.Features.Relays.Query.Shared;
+using MediatR;
 
 namespace Device.API.Controllers;
 
 [ApiController]
 [Authorize(Policy = SubPermissions.DeviceControl)]
 [Route("api/device/v1/relays")]
-public class RelaysController(
-    IRelayService relayService) : ControllerBase
+public sealed class RelaysController(
+    ISender sender,
+    IUserContext userContext) : ControllerBase
 {
-    private const string NameGetById = "GetRelayByIdAsync";
+    private const string NameGetById = "GetRelayById";
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<RelayCreatedResponse>>> GetAllRelaysAsync(
-        [FromQuery] RelayFilterDto filter,
+    public async Task<ActionResult<IReadOnlyList<RelayDto>>> GetAllRelaysAsync(
+        [FromQuery] Guid? controllerId,
+        [FromQuery] RelayPurpose? purpose,
+        [FromQuery] bool? isActive,
+        [FromQuery] bool? isManual,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 10,
         CancellationToken cancellationToken = default)
     {
-        var result = await relayService.GetAllRelaysAsync(
-            filter, 
-            skip, 
-            take, 
-            cancellationToken);
+        var query = new GetAllRelaysQuery
+        {
+            UserId = userContext.UserId,
+            ControllerId = controllerId,
+            Purpose = purpose,
+            IsActive = isActive,
+            IsManual = isManual,
+            Skip = skip,
+            Take = take
+        };
+
+        Result<IReadOnlyList<RelayDto>> result = await sender.Send(query, cancellationToken);
 
         return this.ToActionResult(result);
     }
 
     [HttpGet("{id:guid}", Name = NameGetById)]
-    public async Task<ActionResult<RelayCreatedResponse>> GetRelayByIdAsync(
-        [FromRoute] Guid id, 
+    public async Task<ActionResult<RelayDto>> GetRelayByIdAsync(
+        [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        var result = await relayService.GetRelayByIdAsync(id, cancellationToken);
+        var query = new GetRelayByIdQuery
+        {
+            UserId = userContext.UserId,
+            RelayId = id
+        };
+
+        Result<RelayDto> result = await sender.Send(query, cancellationToken);
 
         return this.ToActionResult(result);
     }
 
     [HttpPost]
     public async Task<ActionResult> AddRelayAsync(
-        [FromBody] RelayRequestDto request,
+        [FromBody] AddRelayCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await relayService.AddRelayAsync(request, cancellationToken);
-
+        Result<RelayCreatedResponse> result = await sender.Send(command, cancellationToken);
         if (result.IsFailure)
         {
             return this.ToActionResult(result);
@@ -51,27 +73,31 @@ public class RelaysController(
 
         return CreatedAtRoute(
             NameGetById,
-            new { id = result.Value.Id },
+            new { id = result.Value },
             result.Value);
     }
 
     [HttpPut("{id:guid}")]
     public async Task<ActionResult> UpdateRelayAsync(
         [FromRoute] Guid id,
-        [FromBody] RelayUpdateRequestDto request,
+        [FromBody] UpdateRelayCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await relayService.UpdateRelayAsync(id, request, cancellationToken);
+        UpdateRelayCommand enrichedCommand = command with { RelayId = id };
+
+        Result result = await sender.Send(enrichedCommand, cancellationToken);
 
         return this.ToActionResult(result);
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> DeleteRelayAsync(
-        [FromRoute] Guid id, 
+        [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        var result = await relayService.DeleteRelayAsync(id, cancellationToken);
+        var command = new DeleteRelayCommand { RelayId = id };
+
+        Result result = await sender.Send(command, cancellationToken);
 
         return this.ToActionResult(result);
     }

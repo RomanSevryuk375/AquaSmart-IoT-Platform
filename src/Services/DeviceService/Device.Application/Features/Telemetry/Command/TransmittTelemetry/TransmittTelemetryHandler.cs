@@ -7,10 +7,10 @@ internal sealed class TransmittTelemetryHandler(
     ISensorRepository sensorRepository,
     IControllerRepository controllerRepository,
     IPublishEndpoint publishEndpoint)
-    : IRequestHandler<TransmittTelemetryCommand, Result<TelemetryTransmittedResponse>>
+    : IRequestHandler<TransmitTelemetryCommand, Result<TelemetryTransmittedResponse>>
 {
     public async Task<Result<TelemetryTransmittedResponse>> Handle(
-        TransmittTelemetryCommand request,
+        TransmitTelemetryCommand request,
         CancellationToken cancellationToken)
     {
         Controller? existingController = await controllerRepository.GetByMacAddressAsync(
@@ -43,7 +43,7 @@ internal sealed class TransmittTelemetryHandler(
         TelemetryItem item,
         HashSet<Guid> controllerSensorIds,
         TelemetryTransmittedResponse response,
-        TransmittTelemetryCommand request,
+        TransmitTelemetryCommand request,
         List<TelemetryBatchEventItem> batchItemsForEvent)
     {
         if (controllerSensorIds.Contains(item.SensorId))

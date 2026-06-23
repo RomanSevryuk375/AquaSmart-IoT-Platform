@@ -1,4 +1,3 @@
-using Device.Domain.DomainEvents.SensorEvents;
 using Device.Domain.Events.SensorEvents;
 
 namespace Device.Domain.Entities.Sensors;
@@ -100,7 +99,7 @@ public abstract class Sensor : AggregateRoot, IEntity
         {
             SensorId = Id,
             ControllerId = ControllerId,
-            Name = Name.Value, 
+            Name = Name.Value,
             Type = Type,
             State = State,
             Unit = Unit,

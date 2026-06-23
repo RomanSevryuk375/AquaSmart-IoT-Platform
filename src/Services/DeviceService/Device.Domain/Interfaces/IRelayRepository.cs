@@ -3,7 +3,7 @@ namespace Device.Domain.Interfaces;
 public interface IRelayRepository : IRepository<Relay>
 {
     public Task<bool> ExistsAsync(
-        Guid relayId, 
+        Guid relayId,
         CancellationToken cancellationToken = default);
 
     public Task<IReadOnlyList<Relay>> GetAllByControllerId(

@@ -2,7 +2,7 @@ using Device.Infrastructure.Persistence.Outbox;
 
 namespace Device.Infrastructure.Persistence;
 
-public sealed class SystemDbContext(DbContextOptions<SystemDbContext> options) 
+public sealed class SystemDbContext(DbContextOptions<SystemDbContext> options)
     : DbContext(options)
 {
     public DbSet<Controller> Controllers { get; set; }

@@ -28,9 +28,6 @@ public sealed class Controller : AggregateRoot, IEntity
     public Controller() { }
 #pragma warning restore CS8618 
 
-    private readonly List<Sensor> _sensors = [];
-    private readonly List<Relay> _relays = [];
-
     public Guid Id { get; init; }
     public Guid UserId { get; private set; }
     public MacAddress MacAddress { get; private set; }
@@ -40,8 +37,6 @@ public sealed class Controller : AggregateRoot, IEntity
     public DateTime LastSeenAt { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public IReadOnlyList<Sensor> Sensors => _sensors.AsReadOnly();
-    public IReadOnlyList<Relay> Relays => _relays.AsReadOnly();
 
     public static Result<Controller> Create(
         Guid id, Guid userId, string rawMacAddress, string deviceTokenHash, string rawName, bool isOnline)
@@ -134,19 +129,5 @@ public sealed class Controller : AggregateRoot, IEntity
             ControllerId = Id,
             LastSeenAt = LastSeenAt,
         });
-    }
-
-    public void AddSensor(Sensor sensor) => _sensors.Add(sensor);
-    public void RemoveSensor(Sensor sensor)
-    {
-        sensor.MarkAsDeleted();
-        _sensors.Remove(sensor);
-    }
-
-    public void AddRelay(Relay relay) => _relays.Add(relay);
-    public void RemoveRelay(Relay relay)
-    {
-        relay.MarkAsDeleted();
-        _relays.Remove(relay);
     }
 }

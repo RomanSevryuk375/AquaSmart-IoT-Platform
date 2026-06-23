@@ -3,7 +3,7 @@ using Device.Application.Interfaces;
 
 namespace Device.Application.Features.Controllers.Command.UpdateController;
 
-internal sealed class UpdateControllerCommand
+public sealed record UpdateControllerCommand
     : ICommand, IControllerBoundRequest
 {
     public Guid UserId { get; init; }

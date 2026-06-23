@@ -5,7 +5,7 @@ public static class CommonErrors
 {
     public const string IdEmpty = "Id must not be empty.";
     public const string NameEmpty = "Device name must not be empty.";
-    public static readonly string InvalidNameLength = $"Name must be under {ControllerConstants.NameLength} characters.";
+    public static readonly string InvalidNameLength = $"Name must be under {CommonConstants.NameLength} characters.";
     public const string AddressEmpty = "Connection address must not be empty.";
     public const string I2cInvalidFormat = "Invalid I2C format. Expected format: '0x00' to '0x7F'.";
     public const string I2cInvalid7bitAddress = "I2C 7-bit address must be between 0x00 and 0x7F.";

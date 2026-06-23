@@ -3,7 +3,7 @@ using Device.Application.Interfaces;
 
 namespace Device.Application.Features.Controllers.Command.PingController;
 
-internal sealed record PingControllerCommand
+public sealed record PingControllerCommand
     : ICommand<ControllerPingResponse>, IDeviceBoundRequest
 {
     public Guid ControllerId { get; init; }

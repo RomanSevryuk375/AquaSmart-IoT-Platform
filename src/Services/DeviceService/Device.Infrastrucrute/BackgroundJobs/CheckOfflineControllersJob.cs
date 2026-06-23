@@ -11,7 +11,6 @@ public sealed class CheckOfflineControllersJob(
     public async Task Execute(IJobExecutionContext context)
     {
         Result result = await service.CheckAndDisableControllerAsync(context.CancellationToken);
-
         if (result.IsFailure)
         {
             throw new JobExecutionException(result.Error.Message);

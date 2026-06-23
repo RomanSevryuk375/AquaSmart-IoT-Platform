@@ -3,7 +3,7 @@ using Device.Application.Interfaces;
 
 namespace Device.Application.Features.Relays.Command.DeleteRelay;
 
-internal sealed record DeleteRelayCommand
+public sealed record DeleteRelayCommand
     : ICommand, IRelayBoundRequest
 {
     public Guid RelayId { get; init; }

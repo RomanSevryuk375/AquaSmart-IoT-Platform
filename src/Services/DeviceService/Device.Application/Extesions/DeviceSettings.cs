@@ -1,4 +1,6 @@
-﻿namespace Device.Application.Extesions;
+// Ignore Spelling: Ttl
+
+namespace Device.Application.Extesions;
 
 public sealed record DeviceSettings
 {

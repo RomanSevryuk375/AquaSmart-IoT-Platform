@@ -3,7 +3,7 @@ using Device.Application.Interfaces;
 
 namespace Device.Application.Features.Relays.Command.SetRelayPowerSensor;
 
-internal sealed record SetRelayPowerSensorCommand
+public sealed record SetRelayPowerSensorCommand
     : ICommand, IRelayBoundRequest
 {
     public Guid RelayId { get; init; }

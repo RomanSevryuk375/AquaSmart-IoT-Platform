@@ -3,7 +3,8 @@ using Device.Application.Interfaces;
 
 namespace Device.Application.Features.RelayCommands.Command.MarkAsFailed;
 
-internal sealed record MarkAsFailedCommand : ICommand, ICommandBoundRequest
+public sealed record MarkAsFailedCommand
+    : ICommand, ICommandBoundRequest
 {
     public Guid CommandId { get; init; }
     public string DeviceToken { get; init; } = string.Empty;

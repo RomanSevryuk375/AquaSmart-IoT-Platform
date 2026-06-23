@@ -7,9 +7,9 @@ internal sealed class AddControllerHandler(
     IUserContext userContext,
     IMyHasher myHasher,
     IControllerRepository controllerRepository,
-    IUnitOfWork unitOfWork) : IRequestHandler<AddControllerCommand, Result<ControllerRegistredResponse>>
+    IUnitOfWork unitOfWork) : IRequestHandler<AddControllerCommand, Result<ControllerRegisteredResponse>>
 {
-    public async Task<Result<ControllerRegistredResponse>> Handle(
+    public async Task<Result<ControllerRegisteredResponse>> Handle(
         AddControllerCommand request,
         CancellationToken cancellationToken)
     {
@@ -24,15 +24,15 @@ internal sealed class AddControllerHandler(
             request.IsOnline);
         if (controller.IsFailure)
         {
-            return Result<ControllerRegistredResponse>.Failure(
+            return Result<ControllerRegisteredResponse>.Failure(
                 controller.Error);
         }
 
         Guid result = await controllerRepository.AddAsync(controller.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result<ControllerRegistredResponse>.Success(
-            new ControllerRegistredResponse
+        return Result<ControllerRegisteredResponse>.Success(
+            new ControllerRegisteredResponse
             {
                 ControllerId = result,
                 DeviceToken = deviceToken

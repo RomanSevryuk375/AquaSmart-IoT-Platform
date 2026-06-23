@@ -1,3 +1,5 @@
+// Ignore Spelling: Validator
+
 using Contracts.Constants;
 
 namespace Device.Application.Features.Controllers.Command.AddController;

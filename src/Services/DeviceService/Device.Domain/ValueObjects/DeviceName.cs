@@ -8,7 +8,7 @@ public sealed record DeviceName
 
     private DeviceName(string name)
     {
-        Value = name;   
+        Value = name;
     }
 
     public static Result<DeviceName> Create(string name)

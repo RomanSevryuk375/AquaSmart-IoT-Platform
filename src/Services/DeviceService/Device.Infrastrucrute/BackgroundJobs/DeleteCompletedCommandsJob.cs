@@ -1,16 +1,17 @@
 using Contracts.Results;
+using Device.Application.Features.RelayCommands.Command.DeleteCompleted;
+using MediatR;
 using Quartz;
 
 namespace Device.Infrastructure.BackgroundJobs;
 
 [DisallowConcurrentExecution]
 public sealed class DeleteCompletedCommandsJob(
-    IRelayCommandQueueService service) : IJob
+    ISender sender) : IJob
 {
     public async Task Execute(IJobExecutionContext context)
     {
-        Result result = await service.DeleteCompletedCommandsAsync(context.CancellationToken);
-
+        Result result = await sender.Send(new DeleteCompletedCommand(), context.CancellationToken);
         if (result.IsFailure)
         {
             throw new JobExecutionException(result.Error.Message);

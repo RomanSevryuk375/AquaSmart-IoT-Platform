@@ -3,7 +3,7 @@ using Device.Application.Interfaces;
 
 namespace Device.Application.Features.Relays.Command.UpdateRelay;
 
-internal sealed record UpdateRelayCommand
+public sealed record UpdateRelayCommand
     : ICommand, IRelayBoundRequest, IControllerBoundRequest
 {
     public Guid RelayId { get; init; }
