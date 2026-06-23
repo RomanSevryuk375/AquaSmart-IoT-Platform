@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Contracts.Events.RelayEvents;
 using Contracts.Results;
 using Control.Application.Interfaces;
@@ -47,7 +47,7 @@ public sealed class RelayService(
                 .RetryableError($"Relay {relay.RelayId} not found. ");
         }
 
-        existingRelay.SetState(StateEvaluatorFactory.EvaluateEnum(relay.Action), expireAt);
+        existingRelay.SetState(relay.TargetState, expireAt);
 
         await relayRepository.UpdateAsync(existingRelay, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -174,7 +174,7 @@ public sealed class RelayService(
                 Guid ControllerId,
                 Guid? PowerSensorId,
                 string Name,
-                RelayPurposeEnum Purpose,
+                RelayPurpose Purpose,
                 bool IsManual,
                 bool IsActive,
                 DateTime CreatedAt);

@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Contracts.Events.RelayEvents;
 using Contracts.Events.SensorEvents;
 using Contracts.Results;
@@ -93,7 +93,7 @@ public sealed class SensorService(
                 $"Ecosystem {sensor.EcosystemId} not found.");
         }
 
-        sensor.SetState(SensorStateEnum.Faulty);
+        sensor.SetState(SensorState.Faulty);
 
         await sensorRepository.UpdateAsync(sensor, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -111,7 +111,7 @@ public sealed class SensorService(
             {
                 ControllerId = ecosystem.ControllerId,
                 RelayId = rule.RelayId,
-                Action = RuleActionEnum.SwitchOff,
+                TargetState = false,
                 ExpireAt = DateTime.UtcNow.AddMinutes(5)
             }, cancellationToken);
 
@@ -214,7 +214,7 @@ public sealed class SensorService(
         Guid SensorId,
         Guid ControllerId,
         string Name,
-        SensorTypeEnum Type,
-        SensorStateEnum State,
+        SensorType Type,
+        SensorState State,
         DateTime CreatedAt);
 }

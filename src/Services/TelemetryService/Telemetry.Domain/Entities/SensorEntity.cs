@@ -12,8 +12,8 @@ public sealed class SensorEntity : AggregateRoot, IEntity
         Guid controllerId,
         Guid ecosystemId,
         string name,
-        SensorTypeEnum type,
-        SensorStateEnum state,
+        SensorType type,
+        SensorState state,
         string unit,
         double lastValue,
         DateTime updatedAt,
@@ -37,8 +37,8 @@ public sealed class SensorEntity : AggregateRoot, IEntity
     public Guid ControllerId { get; private set; }
     public Guid EcosystemId { get; private set; }
     public string Name { get; private set; }
-    public SensorTypeEnum Type { get; private set; }
-    public SensorStateEnum State { get; private set; }
+    public SensorType Type { get; private set; }
+    public SensorState State { get; private set; }
     public string Unit { get; private set; }
     public double LastValue { get; private set; }
     public DateTime UpdatedAt { get; private set; }
@@ -50,8 +50,8 @@ public sealed class SensorEntity : AggregateRoot, IEntity
         Guid controllerId,
         Guid ecosystemId,
         string name,
-        SensorTypeEnum type,
-        SensorStateEnum state,
+        SensorType type,
+        SensorState state,
         string unit,
         double lastValue,
         DateTime updatedAt,
@@ -110,7 +110,7 @@ public sealed class SensorEntity : AggregateRoot, IEntity
 
     public Result Update(
         Guid controllerId,
-        SensorTypeEnum type,
+        SensorType type,
         string unit)
     {
         var errors = new List<string>();
@@ -158,14 +158,14 @@ public sealed class SensorEntity : AggregateRoot, IEntity
         UpdatedAt = DateTime.UtcNow;
         LastValue = newValue;
 
-        if (IsDataDelayed || State == SensorStateEnum.NoData) 
+        if (IsDataDelayed || State == SensorState.NoData) 
         {
             IsDataDelayed = false;
-            State = SensorStateEnum.Active;
+            State = SensorState.Active;
         }
     }
 
-    public void SetState(SensorStateEnum newStatus)
+    public void SetState(SensorState newStatus)
     {
         if (State == newStatus)
         {
@@ -175,7 +175,7 @@ public sealed class SensorEntity : AggregateRoot, IEntity
         State = newStatus;
     }
 
-    public void SetType(SensorTypeEnum type)
+    public void SetType(SensorType type)
     {
         if (Type == type)
         {
@@ -188,7 +188,7 @@ public sealed class SensorEntity : AggregateRoot, IEntity
     public void MarkAsNoData()
     {
         IsDataDelayed = true;
-        State = SensorStateEnum.NoData;
+        State = SensorState.NoData;
 
         RaiseEvent(new SensorNoDataDomainEvent
         {

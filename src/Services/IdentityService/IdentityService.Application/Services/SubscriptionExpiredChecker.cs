@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Contracts.Events.UserEvents;
 using IdentityService.Application.Interfaces;
 using IdentityService.Domain.Interfaces;
@@ -21,7 +21,7 @@ public class SubscriptionExpiredChecker(
         foreach (var user in users)
         {
             user.SetSubscription(Guid
-                .Parse(SubscriptionEnum.Free), SubscriptionEnum.FreeDuration);
+                .Parse(Subscription.Free), Subscription.FreeDuration);
 
             await userRepository
                 .UpdateAsync(user, cancellationToken);

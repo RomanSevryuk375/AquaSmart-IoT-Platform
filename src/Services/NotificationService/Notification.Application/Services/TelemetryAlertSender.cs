@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Contracts.Events.TelemetryEvents;
 using Contracts.Results;
 using Notification.Application.Interfaces;
@@ -38,7 +38,7 @@ public class TelemetryAlertSender(
         var (notification, errors) = NotificationEntity.Create(
             alertEvent.UserId,
             alertEvent.EcosytemId,
-            NotificationLevelEnum.Critical,
+            NotificationLevel.Critical,
             $"In aquarium {existingEcosystem.Name}," +
             $" sensor {alertEvent.SensorId} sent data {alertEvent.Value}, " +
             $"relay responsible for this sensor " +

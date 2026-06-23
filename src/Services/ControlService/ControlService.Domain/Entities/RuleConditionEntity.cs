@@ -1,4 +1,4 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Enums;
 using Contracts.Results;
 
@@ -10,7 +10,7 @@ public sealed class RuleConditionEntity : IEntity
         Guid id,
         Guid automationRuleId,
         Guid sensorId,
-        RuleConditionEnum condition,
+        RuleCondition condition,
         double threshold,
         double hysteresis,
         DateTime createdAt)
@@ -27,7 +27,7 @@ public sealed class RuleConditionEntity : IEntity
     public Guid Id { get; private set; }
     public Guid AutomationRuleId { get; private set; }
     public Guid SensorId { get; private set; }
-    public RuleConditionEnum Condition { get; private set; }
+    public RuleCondition Condition { get; private set; }
     public double Threshold { get; private set; }
     public double Hysteresis { get; private set; }
     public DateTime CreatedAt { get; private set; }
@@ -35,7 +35,7 @@ public sealed class RuleConditionEntity : IEntity
     public static Result<RuleConditionEntity> Create(
         Guid automationRuleId,
         Guid sensorId,
-        RuleConditionEnum condition,
+        RuleCondition condition,
         double threshold,
         double hysteresis)
     {
@@ -72,7 +72,7 @@ public sealed class RuleConditionEntity : IEntity
     }
 
     public Result Update(
-        RuleConditionEnum condition,
+        RuleCondition condition,
         double threshold,
         double hysteresis)
     {
@@ -97,7 +97,7 @@ public sealed class RuleConditionEntity : IEntity
         return Result.Success();
     }
 
-    public void SetCondition(RuleConditionEnum condition)
+    public void SetCondition(RuleCondition condition)
     {
         if (Condition == condition)
         {

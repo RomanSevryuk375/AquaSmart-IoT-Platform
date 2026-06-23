@@ -1,5 +1,3 @@
-using Device.Application.Extesions;
-using Device.Infrastructure.Extensions;
 using Microsoft.OpenApi.Models;
 
 namespace Device.API.Extensions;
@@ -10,7 +8,18 @@ public static class DependencyInjection
     {
         services.AddHttpContextAccessor();
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(options =>
+        services.AddMySwaggerGen();
+
+        services.AddCommonAuthentication(configuration);
+        services.AddAquaAuthorizationPolicies();
+        services.AddControllers();
+
+        return services;
+    }
+
+    public static IServiceCollection AddMySwaggerGen(this IServiceCollection services)
+    {
+        return services.AddSwaggerGen(options =>
         {
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
@@ -37,15 +46,5 @@ public static class DependencyInjection
                 }
             });
         });
-
-        services.AddCommonAuthentication(configuration);
-        services.AddControllers();
-
-        services.AddApplication(configuration)
-                .AddInfrastructure(configuration);
-
-        services.AddAquaAuthorizationPolicies();
-
-        return services;
     }
 }

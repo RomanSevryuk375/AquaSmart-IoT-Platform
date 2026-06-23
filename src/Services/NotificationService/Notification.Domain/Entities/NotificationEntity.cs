@@ -1,4 +1,4 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Enums;
 
 namespace Notification.Domain.Entities;
@@ -9,7 +9,7 @@ public sealed class NotificationEntity : IEntity
         Guid id, 
         Guid userId, 
         Guid? ecosystemId, 
-        NotificationLevelEnum level, 
+        NotificationLevel level, 
         string message, 
         bool isRead,
         DateTime createdAt,
@@ -34,7 +34,7 @@ public sealed class NotificationEntity : IEntity
     public Guid Id { get; private set; }
     public Guid UserId { get; private set; }
     public Guid? EcosystemId { get; private set; }
-    public NotificationLevelEnum Level { get; private set; }
+    public NotificationLevel Level { get; private set; }
     public string Message { get; private set; } = string.Empty;
     public bool IsRead { get; private set; }
     public DateTime CreatedAt { get; private set; }
@@ -47,7 +47,7 @@ public sealed class NotificationEntity : IEntity
     public static (NotificationEntity? notification, List<string> errors) Create(
         Guid userId, 
         Guid? ecosystemId, 
-        NotificationLevelEnum level, 
+        NotificationLevel level, 
         string message)
     {
         var errors = new List<string>();

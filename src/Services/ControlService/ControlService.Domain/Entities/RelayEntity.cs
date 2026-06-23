@@ -1,4 +1,4 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Enums;
 using Contracts.Results;
 using Control.Domain.Events;
@@ -14,7 +14,7 @@ public sealed class RelayEntity : AggregateRoot, IEntity
         Guid controllerId,
         Guid? powerSensorId,
         string name,
-        RelayPurposeEnum purpose,
+        RelayPurpose purpose,
         bool isManual,
         bool isActive,
         DateTime createdAt)
@@ -34,7 +34,7 @@ public sealed class RelayEntity : AggregateRoot, IEntity
     public Guid EcosystemId { get; private set; }
     public Guid? PowerSensorId { get; private set; }
     public string Name { get; private set; }
-    public RelayPurposeEnum Purpose { get; private set; }
+    public RelayPurpose Purpose { get; private set; }
     public bool IsManual { get; private set; }
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
@@ -45,7 +45,7 @@ public sealed class RelayEntity : AggregateRoot, IEntity
         Guid controllerId,
         Guid? powerSensorId,
         string name,
-        RelayPurposeEnum purpose,
+        RelayPurpose purpose,
         bool isManual,
         bool isActive,
         DateTime createdAt)
@@ -99,7 +99,7 @@ public sealed class RelayEntity : AggregateRoot, IEntity
         return Result<RelayEntity>.Success(relay);
     }
 
-    public void SetPurpose(RelayPurposeEnum purpose)
+    public void SetPurpose(RelayPurpose purpose)
     {
         if (Purpose == purpose)
         {

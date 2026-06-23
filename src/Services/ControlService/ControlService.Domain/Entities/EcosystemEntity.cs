@@ -1,4 +1,4 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Enums;
 using Contracts.Results;
 using Control.Domain.Events;
@@ -10,7 +10,7 @@ public sealed class EcosystemEntity : AggregateRoot, IEntity
     private EcosystemEntity(
         Guid id, 
         Guid userId,
-        EcosystemTypeEnum type,
+        EcosystemType type,
         string name, 
         double? volume,
         Guid controllerId, 
@@ -27,7 +27,7 @@ public sealed class EcosystemEntity : AggregateRoot, IEntity
 
     public Guid Id { get; private set; }
     public Guid UserId { get; private set; }
-    public EcosystemTypeEnum Type { get; private set; }
+    public EcosystemType Type { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public double? Volume { get; private set; } 
     public Guid ControllerId { get; private set; }
@@ -35,7 +35,7 @@ public sealed class EcosystemEntity : AggregateRoot, IEntity
 
     public static Result<EcosystemEntity> Create(
         Guid userId,
-        EcosystemTypeEnum type,
+        EcosystemType type,
         string name,
         double? volume,
         Guid controllerId)

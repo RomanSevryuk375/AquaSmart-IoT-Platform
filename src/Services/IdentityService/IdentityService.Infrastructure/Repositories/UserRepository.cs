@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using IdentityService.Domain.Entities;
 using IdentityService.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +14,7 @@ public class UserRepository(IdentityDbContext dbContext)
         return await dbContext.Users
             .AsNoTracking()
             .Where(x => (x.SubscriptionEndDate < DateTime.UtcNow) 
-                     && (x.SubscriptionId != Guid.Parse(SubscriptionEnum.Free)))
+                     && (x.SubscriptionId != Guid.Parse(Subscription.Free)))
             .ToListAsync(cancellationToken);
     }
 

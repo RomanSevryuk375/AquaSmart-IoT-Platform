@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 
 namespace Control.Domain.SpecificationParams;
 
@@ -6,6 +6,6 @@ public sealed record AutomationRuleFilterParams
 {
     public Guid? EcosystemId { get; init; }
     public Guid? RelayId { get; init; }
-    public RuleActionEnum? Action { get; init; }
-    public OperatorEnum? Operator { get; init; }
+    public RuleAction? Action { get; init; }
+    public Operator? Operator { get; init; }
 }

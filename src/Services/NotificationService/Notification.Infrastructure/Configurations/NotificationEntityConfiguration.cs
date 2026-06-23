@@ -1,4 +1,4 @@
-﻿using Contracts.Constants;
+using Contracts.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notification.Domain.Entities;
@@ -22,7 +22,7 @@ public sealed class NotificationEntityConfiguration
             .IsRequired();
 
         builder.Property(x => x.Message)
-            .HasMaxLength(NotificationConstants.messageLength)
+            .HasMaxLength(NotificationConstants.MessageLength)
             .IsRequired();
 
         builder.Property(x => x.IsRead).IsRequired();

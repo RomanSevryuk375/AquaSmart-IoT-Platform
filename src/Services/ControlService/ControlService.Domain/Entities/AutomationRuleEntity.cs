@@ -1,4 +1,4 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Enums;
 using Contracts.Results;
 
@@ -11,8 +11,8 @@ public class AutomationRuleEntity : IEntity
         Guid ecosystemId,
         Guid relayId,
         string name,
-        OperatorEnum @operator,
-        RuleActionEnum action, 
+        Operator @operator,
+        RuleAction action, 
         bool isActive,
         DateTime createdAt)
     {
@@ -30,8 +30,8 @@ public class AutomationRuleEntity : IEntity
     public Guid EcosystemId { get; private set; }
     public Guid RelayId { get; private set; }
     public string Name { get; private set; }
-    public OperatorEnum Operator { get; private set; }
-    public RuleActionEnum Action { get; private set; }
+    public Operator Operator { get; private set; }
+    public RuleAction Action { get; private set; }
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
@@ -41,8 +41,8 @@ public class AutomationRuleEntity : IEntity
         Guid ecosystemId,
         string name,
         Guid relayId,
-        OperatorEnum @operator,
-        RuleActionEnum action,
+        Operator @operator,
+        RuleAction action,
         bool isActive)
     {
         var errors = new List<string>();
@@ -86,8 +86,8 @@ public class AutomationRuleEntity : IEntity
     public Result Update (
         string name,
         Guid relayId,
-        OperatorEnum @operator,
-        RuleActionEnum action)
+        Operator @operator,
+        RuleAction action)
     {
         var errors = new List<string>();
 
@@ -116,7 +116,7 @@ public class AutomationRuleEntity : IEntity
         return Result.Success();
     }
 
-    public void SetAction(RuleActionEnum action)
+    public void SetAction(RuleAction action)
     {
         if (Action == action)
         {

@@ -1,6 +1,5 @@
 namespace Contracts.Constants;
 
-
 public static class CommonConstants
 {
     public const int NameLength = 128;
@@ -17,12 +16,35 @@ public static class CommonConstants
 public static class SensorConstants
 {
     public const int UnitLength = 32;
+    public const int NameLength = CommonConstants.NameLength;
 }
 
 public static class ControllerConstants
 {
     public const string MacAddressRegex = @"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$";
     public const int MacAddressLength = 17;
+    public const int NameLength = CommonConstants.NameLength;
+}
+
+public static class RelayConstants
+{
+    public const int NameLength = CommonConstants.NameLength;
+    public const int ConnectionAddressLength = CommonConstants.ConnectionAddressLength;
+}
+
+public static class RuleConstants
+{
+    public const int NameLength = CommonConstants.NameLength;
+}
+
+public static class EcosystemConstants
+{
+    public const int NameLength = CommonConstants.NameLength;
+}
+
+public static class ReminderConstants
+{
+    public const int NameLength = CommonConstants.NameLength;
 }
 
 public static class MaintenanceLogConstants

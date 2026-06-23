@@ -1,4 +1,4 @@
-﻿using Contracts.Authorization;
+using Contracts.Authorization;
 using Contracts.Enums;
 using IdentityService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -32,10 +32,10 @@ public class SubscriptionEntityConfigurations
         builder.HasData(
             new
             {
-                Id = Guid.Parse(SubscriptionEnum.Free),
+                Id = Guid.Parse(Subscription.Free),
                 Name = "Free",
                 Price = 0m,
-                DurationDays = SubscriptionEnum.FreeDuration,
+                DurationDays = Subscription.FreeDuration,
                 Permissions = new List<string>
                 {
                     SubPermissions.TankRead,
@@ -57,10 +57,10 @@ public class SubscriptionEntityConfigurations
             },
             new
             {
-                Id = Guid.Parse(SubscriptionEnum.Professional),
+                Id = Guid.Parse(Subscription.Professional),
                 Name = "Professional",
                 Price = 9.99m,
-                DurationDays = SubscriptionEnum.ProfessionalDuration,
+                DurationDays = Subscription.ProfessionalDuration,
                 Permissions = new List<string>
                 {
                     SubPermissions.TankRead,
@@ -85,10 +85,10 @@ public class SubscriptionEntityConfigurations
             },
             new
             {
-                Id = Guid.Parse(SubscriptionEnum.Elite),
+                Id = Guid.Parse(Subscription.Elite),
                 Name = "Elite",
                 Price = 19.99m,
-                DurationDays = SubscriptionEnum.EliteDuration,
+                DurationDays = Subscription.EliteDuration,
                 Permissions = new List<string>
                 {
                     SubPermissions.TankRead,

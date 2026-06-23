@@ -1,4 +1,4 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 
 namespace IdentityService.Domain.Entities;
 
@@ -21,7 +21,7 @@ public class SubscriptionEntity : IEntity
     }
 
     public Guid Id { get; private set; }
-    public string Name { get; private set; }
+    public string Name { get; private set; } = string.Empty;
     public decimal Price { get; private set; }
     public int DurationDays { get; private set; }
     public List<string> Permissions { get; private set; } = [];

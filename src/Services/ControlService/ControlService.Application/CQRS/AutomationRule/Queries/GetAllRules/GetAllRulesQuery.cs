@@ -1,4 +1,4 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Enums;
 using Contracts.Results;
 
@@ -9,8 +9,8 @@ public sealed record GetAllRulesQuery
 {
     public Guid EcosystemId { get; init; }
     public Guid? RelayId { get; init; }
-    public RuleActionEnum? Action { get; init; }
-    public OperatorEnum? Operator { get; init; }
+    public RuleAction? Action { get; init; }
+    public Operator? Operator { get; init; }
     public int Skip { get; init; } = 0;
     public int Take { get; init; } = 10;
 }

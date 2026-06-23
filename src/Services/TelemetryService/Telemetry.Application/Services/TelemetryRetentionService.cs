@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Microsoft.Extensions.Options;
 using Telemetry.Application.Extensions;
 using Telemetry.Application.Interfaces;
@@ -21,11 +21,11 @@ public sealed class TelemetryRetentionService(
         var minuteThreshold = DateTime.UtcNow
             .AddDays(telemetrySettings.Value.MaxLiveTimeForMinutesDataInDayes); 
         await aggregateRepo
-            .DeleteOldRawDataAsync(PeriodTypeEnum.Minute, minuteThreshold, cancellationToken);
+            .DeleteOldRawDataAsync(PeriodType.Minute, minuteThreshold, cancellationToken);
 
         var hourlyThreshold = DateTime.UtcNow
             .AddDays(telemetrySettings.Value.MaxLiveTimeForHourseDataInDayes); 
         await aggregateRepo
-            .DeleteOldRawDataAsync(PeriodTypeEnum.Hourly, hourlyThreshold, cancellationToken);
+            .DeleteOldRawDataAsync(PeriodType.Hourly, hourlyThreshold, cancellationToken);
     }
 }

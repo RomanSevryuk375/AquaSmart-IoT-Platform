@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Microsoft.AspNetCore.SignalR;
 using Telemetry.Application.DTOs;
 using Telemetry.Application.Interfaces;
@@ -10,7 +10,7 @@ public sealed class RawTelemetryNotifier(
 {
     public async Task AggregatePointGenerated(
         string ecosystemId,
-        PeriodTypeEnum period, 
+        PeriodType period, 
         TelemetryChartPointDto point)
     {
         await hubContext.Clients

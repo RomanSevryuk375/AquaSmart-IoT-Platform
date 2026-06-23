@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Contracts.Results;
 using MassTransit.Initializers;
 using System.Data;
@@ -36,7 +36,7 @@ public sealed class CompressorService(
         foreach (var item in data)
         {
             await CreateAndSaveAggregatedTelemetryAsync(
-                item, from, PeriodTypeEnum.Minute, cancellationToken);
+                item, from, PeriodType.Minute, cancellationToken);
         }
 
         var sensorIds = data.Select(x => x.SensorId).ToList();
@@ -44,7 +44,7 @@ public sealed class CompressorService(
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await telemetryRaw.MarkAsAggregatedAsync(sensorIds, from, to, cancellationToken);
 
-        await NotifyClientsAsync(data, from, PeriodTypeEnum.Minute, cancellationToken);
+        await NotifyClientsAsync(data, from, PeriodType.Minute, cancellationToken);
 
         return Result.Success();
     }
@@ -57,7 +57,7 @@ public sealed class CompressorService(
         var from = to.AddHours(HourlyInterval);
 
         var data = await telemetryAggregate.GetSummaryForPeriodAsync(
-            PeriodTypeEnum.Minute, from, to, cancellationToken);
+            PeriodType.Minute, from, to, cancellationToken);
         if (data is null)
         {
             return Result.Success();
@@ -68,7 +68,7 @@ public sealed class CompressorService(
         foreach (var item in data)
         {
             await CreateAndSaveAggregatedTelemetryAsync(
-                item, from, PeriodTypeEnum.Hourly, cancellationToken);
+                item, from, PeriodType.Hourly, cancellationToken);
 
             sensorIds.Add(item.SensorId);
         }
@@ -76,7 +76,7 @@ public sealed class CompressorService(
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await telemetryAggregate.MarkAsAggregatedAsync(sensorIds, from, to, cancellationToken);
 
-        await NotifyClientsAsync(data, from, PeriodTypeEnum.Hourly, cancellationToken);
+        await NotifyClientsAsync(data, from, PeriodType.Hourly, cancellationToken);
 
         return Result.Success();
     }
@@ -89,7 +89,7 @@ public sealed class CompressorService(
         var from = to.AddHours(DailyInterval);
 
         var data = await telemetryAggregate.GetSummaryForPeriodAsync(
-            PeriodTypeEnum.Hourly, from, to, cancellationToken);
+            PeriodType.Hourly, from, to, cancellationToken);
         if (data is null)
         {
             return Result.Success();
@@ -99,7 +99,7 @@ public sealed class CompressorService(
         foreach (var item in data)
         {
             await CreateAndSaveAggregatedTelemetryAsync(
-                item, from, PeriodTypeEnum.Daily, cancellationToken);
+                item, from, PeriodType.Daily, cancellationToken);
 
             sensorIds.Add(item.SensorId);
         }
@@ -107,7 +107,7 @@ public sealed class CompressorService(
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await telemetryAggregate.MarkAsAggregatedAsync(sensorIds, from, to, cancellationToken);
 
-        await NotifyClientsAsync(data, from, PeriodTypeEnum.Daily, cancellationToken);
+        await NotifyClientsAsync(data, from, PeriodType.Daily, cancellationToken);
 
         return Result.Success();
     }
@@ -115,7 +115,7 @@ public sealed class CompressorService(
     private async Task CreateAndSaveAggregatedTelemetryAsync(
         TelemetrySummary telemetry,
         DateTime from,
-        PeriodTypeEnum periodType,
+        PeriodType periodType,
         CancellationToken cancellationToken)
     {
         var result = TelemetryAggregateEntity.Create(
@@ -137,7 +137,7 @@ public sealed class CompressorService(
     private async Task NotifyClientsAsync(
         IReadOnlyList<TelemetrySummary> data,
         DateTime periodStart,
-        PeriodTypeEnum periodType,
+        PeriodType periodType,
         CancellationToken cancellationToken)
     {
         var sensorIds = data.Select(x => x.SensorId).Distinct().ToList();

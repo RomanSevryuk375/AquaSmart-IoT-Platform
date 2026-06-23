@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Contracts.Events.SensorEvents;
 using Contracts.Results;
 using Telemetry.Application.Interfaces;
@@ -155,8 +155,8 @@ public class SensorService(
         Guid SensorId,
         Guid ControllerId,
         string Name,
-        SensorTypeEnum Type,
-        SensorStateEnum State,
+        SensorType Type,
+        SensorState State,
         string Unit,
         DateTime CreatedAt);
 }

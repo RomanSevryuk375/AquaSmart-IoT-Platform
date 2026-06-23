@@ -1,12 +1,15 @@
 using Contracts.Middlewares;
 using Device.API.Extensions;
+using Device.Application.Extesions;
+using Device.Infrastructure.Extensions;
 using Device.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddApi(builder.Configuration);
-
+builder.Services.AddInfrastructure(builder.Configuration)
+                .AddApplication(builder.Configuration)
+                .AddApi(builder.Configuration);
 
 WebApplication app = builder.Build();
 

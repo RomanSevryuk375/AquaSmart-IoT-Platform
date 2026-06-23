@@ -1,26 +1,26 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 
 namespace Control.Domain.Factories;
 
 public static class StateEvaluatorFactory
 {
-    public static bool EvaluateEnum(RuleActionEnum action)
+    public static bool EvaluateEnum(RuleAction action)
     {
         return action switch
         {
-            RuleActionEnum.SwitchOn => true,
-            RuleActionEnum.SwitchOff => false,
+            RuleAction.SwitchOn => true,
+            RuleAction.SwitchOff => false,
 
             _ => false,
         };
     }
 
-    public static RuleActionEnum EvaluateBool(bool value)
+    public static RuleAction EvaluateBool(bool value)
     {
         return value switch
         {
-            true => RuleActionEnum.SwitchOn,
-            false => RuleActionEnum.SwitchOff,
+            true => RuleAction.SwitchOn,
+            false => RuleAction.SwitchOff,
         };
     }
 }

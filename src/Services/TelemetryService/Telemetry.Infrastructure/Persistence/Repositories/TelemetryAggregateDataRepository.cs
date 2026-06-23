@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Microsoft.EntityFrameworkCore;
 using Telemetry.Domain.Entities;
 using Telemetry.Domain.Interfaces;
@@ -9,7 +9,7 @@ public sealed class TelemetryAggregateDataRepository(SystemDbContext dbContext)
     : BaseRepository<TelemetryAggregateEntity>(dbContext), ITelemetryAggregateDataRepository
 {
     public async Task<IReadOnlyList<TelemetrySummary>> GetSummaryForPeriodAsync(
-        PeriodTypeEnum sourcePeriod, 
+        PeriodType sourcePeriod, 
         DateTime from, 
         DateTime to, 
         CancellationToken cancellationToken)
@@ -31,7 +31,7 @@ public sealed class TelemetryAggregateDataRepository(SystemDbContext dbContext)
     }
 
     public async Task DeleteOldRawDataAsync(
-        PeriodTypeEnum period,
+        PeriodType period,
         DateTime olderThan,
         CancellationToken cancellationToken)
     {

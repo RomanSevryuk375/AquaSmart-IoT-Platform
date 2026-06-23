@@ -1,4 +1,4 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Enums;
 using Telemetry.Domain.Entities;
 
@@ -7,12 +7,12 @@ namespace Telemetry.Domain.Interfaces;
 public interface ITelemetryAggregateDataRepository : IRepository<TelemetryAggregateEntity>
 {
     Task DeleteOldRawDataAsync(
-        PeriodTypeEnum period,
+        PeriodType period,
         DateTime olderThan,
         CancellationToken cancellationToken);
 
     Task<IReadOnlyList<TelemetrySummary>> GetSummaryForPeriodAsync(
-        PeriodTypeEnum sourcePeriod,
+        PeriodType sourcePeriod,
         DateTime from,
         DateTime to,
         CancellationToken cancellationToken);

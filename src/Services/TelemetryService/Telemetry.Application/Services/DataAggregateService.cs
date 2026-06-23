@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Contracts.Enums;
 using Contracts.Results;
 using Telemetry.Application.DTOs;
@@ -58,20 +58,20 @@ public sealed class DataAggregateService(
             });
     }
 
-    private static PeriodTypeEnum DetermineBestPeriod(DateTime from, DateTime to)
+    private static PeriodType DetermineBestPeriod(DateTime from, DateTime to)
     {
         var duration = to - from;
 
         if (duration.TotalHours <= MaxHoursForMinuteInterval)
         {
-            return PeriodTypeEnum.Minute;
+            return PeriodType.Minute;
         }
 
         if (duration.TotalDays <= MaxDaysForHourlyInterval)
         {
-            return PeriodTypeEnum.Hourly;
+            return PeriodType.Hourly;
         }
 
-        return PeriodTypeEnum.Daily;
+        return PeriodType.Daily;
     }
 }

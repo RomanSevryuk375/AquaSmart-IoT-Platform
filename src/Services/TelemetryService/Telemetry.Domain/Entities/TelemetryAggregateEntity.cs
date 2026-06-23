@@ -1,4 +1,4 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Enums;
 using Contracts.Results;
 
@@ -10,7 +10,7 @@ public sealed class TelemetryAggregateEntity : IEntity
         Guid id,
         Guid sensorId,
         DateTime periodStart,
-        PeriodTypeEnum period,
+        PeriodType period,
         double minValue,
         double maxValue,
         double avgValue,
@@ -33,7 +33,7 @@ public sealed class TelemetryAggregateEntity : IEntity
     public Guid Id { get; private set; }
     public Guid SensorId { get; private set; }
     public DateTime PeriodStart { get; private set; }
-    public PeriodTypeEnum Period { get; private set; }
+    public PeriodType Period { get; private set; }
     public double MinValue { get; private set; }
     public double MaxValue { get; private set; }
     public double AvgValue { get; private set; }
@@ -45,7 +45,7 @@ public sealed class TelemetryAggregateEntity : IEntity
     public static Result<TelemetryAggregateEntity> Create(
         Guid sensorId,
         DateTime periodStart,
-        PeriodTypeEnum period,
+        PeriodType period,
         double minValue,
         double maxValue,
         double avgValue,

@@ -1,4 +1,4 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Microsoft.AspNetCore.Identity;
 using System.Text.RegularExpressions;
 
@@ -30,7 +30,7 @@ public class UserEntity : IdentityUser<Guid>, IEntity
     public Guid SubscriptionId { get; private set; }
     public DateTime SubscriptionEndDate { get; private set; }
     public DateTime CreatedAt { get; private set; }
-    public string TimeZone { get; private set; }
+    public string TimeZone { get; private set; } = string.Empty;
 
     public static (UserEntity? user, List<string> errors) Create(
         string name, 

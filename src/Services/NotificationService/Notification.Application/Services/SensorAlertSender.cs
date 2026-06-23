@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Contracts.Events.SensorEvents;
 using Contracts.Results;
 using Notification.Application.Interfaces;
@@ -38,7 +38,7 @@ public class SensorAlertSender(
         var (notification, errors) = NotificationEntity.Create(
             alertEvent.UserId,
             alertEvent.EcosytemId,
-            NotificationLevelEnum.Critical,
+            NotificationLevel.Critical,
             $"Sensor {alertEvent.SensorId} " +
             $"from aquarium {existingEcosystem.Name} did not send data " +
             $"at time {alertEvent.LastSeenAt:HH:mm:ss}");

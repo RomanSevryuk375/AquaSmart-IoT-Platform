@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Contracts.Events.ControllerEvents;
 using Contracts.Results;
 using Notification.Application.Interfaces;
@@ -38,7 +38,7 @@ public sealed class ControllerAlertSender(
         var (notification, errors) = NotificationEntity.Create(
             controllerEvent.UserId,
             existingEcosystem.Id,
-            NotificationLevelEnum.Critical,
+            NotificationLevel.Critical,
             $"Controller {controllerEvent.ControllerId} " +
             $"was last online at {controllerEvent.LastSeenAt:HH:mm:ss}");
 

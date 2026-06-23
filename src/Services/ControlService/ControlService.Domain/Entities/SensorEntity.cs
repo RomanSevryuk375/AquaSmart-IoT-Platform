@@ -1,4 +1,4 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Enums;
 using Contracts.Results;
 
@@ -11,8 +11,8 @@ public sealed class SensorEntity : IEntity
         Guid controllerId,
         Guid ecosystemId, 
         string name,
-        SensorStateEnum state,
-        SensorTypeEnum type, 
+        SensorState state,
+        SensorType type, 
         double lastValue,
         DateTime createdAt)
     {
@@ -30,8 +30,8 @@ public sealed class SensorEntity : IEntity
     public Guid ControllerId { get; private set; }
     public Guid EcosystemId { get; private set; }
     public string Name { get; private set; }
-    public SensorStateEnum State { get; private set; }
-    public SensorTypeEnum Type { get; private set; }
+    public SensorState State { get; private set; }
+    public SensorType Type { get; private set; }
     public double LastValue { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
@@ -40,8 +40,8 @@ public sealed class SensorEntity : IEntity
         Guid controllerId,
         Guid ecosystemId,
         string name,
-        SensorStateEnum state,
-        SensorTypeEnum type,
+        SensorState state,
+        SensorType type,
         DateTime createdAt)
     {
         var errors = new List<string>();
@@ -87,7 +87,7 @@ public sealed class SensorEntity : IEntity
         return Result<SensorEntity>.Success(sensor);
     }
 
-    public void SetState(SensorStateEnum state)
+    public void SetState(SensorState state)
     {
         if (State == state)
         {
@@ -102,7 +102,7 @@ public sealed class SensorEntity : IEntity
         LastValue = value;
     }
 
-    public void SetType(SensorTypeEnum type)
+    public void SetType(SensorType type)
     {
         if (Type == type)
         {

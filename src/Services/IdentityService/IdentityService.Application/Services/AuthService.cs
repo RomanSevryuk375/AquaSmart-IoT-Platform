@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Contracts.Events.UserEvents;
 using Contracts.Results;
 using IdentityService.Application.DTOs;
@@ -36,7 +36,7 @@ public class AuthService(
             registerDto.Name,
             registerDto.Email,
             registerDto.PhoneNumber,
-            Guid.Parse(SubscriptionEnum.Free),
+            Guid.Parse(Subscription.Free),
             registerDto.TimaZone);
 
         if (user is null)

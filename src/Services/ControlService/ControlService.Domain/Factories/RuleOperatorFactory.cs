@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 
 namespace Control.Domain.Factories;
 
@@ -6,8 +6,8 @@ public static class RuleOperatorFactory
 {
     public static bool? CalculateTargetState(
         List<bool?> results,
-        OperatorEnum @operator,
-        RuleActionEnum action)
+        Operator @operator,
+        RuleAction action)
     {
         if (results.Count == 0)
         {
@@ -16,10 +16,10 @@ public static class RuleOperatorFactory
 
         bool? isRuleTriggered = @operator switch
         {
-            OperatorEnum.AND => EvaluateAnd(results),
-            OperatorEnum.OR => EvaluateOr(results),
-            OperatorEnum.NOT => EvaluateNot(results),
-            OperatorEnum.XOR => EvaluateXor(results),
+            Operator.AND => EvaluateAnd(results),
+            Operator.OR => EvaluateOr(results),
+            Operator.NOT => EvaluateNot(results),
+            Operator.XOR => EvaluateXor(results),
 
             _ => throw new ArgumentOutOfRangeException(nameof(@operator))
         };
@@ -30,8 +30,8 @@ public static class RuleOperatorFactory
         }
 
         return isRuleTriggered.Value
-            ? (action == RuleActionEnum.SwitchOn)
-            : (action == RuleActionEnum.SwitchOff);
+            ? (action == RuleAction.SwitchOn)
+            : (action == RuleAction.SwitchOff);
     }
 
     private static bool? EvaluateAnd(List<bool?> results)

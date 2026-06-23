@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Contracts.Events.RelayEvents;
 using Contracts.Results;
 using Control.Application.Interfaces;
@@ -67,7 +67,7 @@ public sealed class ScheduleProcessor(
                 {
                     ControllerId = relay.ControllerId,
                     RelayId = relay.Id,
-                    Action = RuleActionEnum.SwitchOff,
+                    TargetState = false,
                     ExpireAt = turnOffTime.AddMinutes(5) 
                 }, cancellationToken);
         }

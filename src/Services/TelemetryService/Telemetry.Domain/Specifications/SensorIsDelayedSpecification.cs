@@ -1,4 +1,4 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Enums;
 using Telemetry.Domain.Entities;
 
@@ -11,7 +11,7 @@ public sealed class SensorIsDelayedSpecification
         DateTime offlineThreshold) : 
         base(data => 
             data.UpdatedAt < offlineThreshold && 
-            data.State == SensorStateEnum.Active)
+            data.State == SensorState.Active)
     {   
     }
 }
