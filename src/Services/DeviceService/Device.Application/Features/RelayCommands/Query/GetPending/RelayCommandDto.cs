@@ -1,6 +1,8 @@
-namespace Device.Application.DTOs.RelayCommands;
+// Ignore Spelling: Dto
 
-public sealed record RelayCommandResponseDto
+namespace Device.Application.Features.RelayCommands.Query.GetPending;
+
+public sealed record RelayCommandDto
 {
     public Guid Id { get; init; }
     public Guid ControllerId { get; init; }

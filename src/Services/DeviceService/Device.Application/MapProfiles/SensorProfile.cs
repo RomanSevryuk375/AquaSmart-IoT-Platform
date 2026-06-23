@@ -1,6 +1,6 @@
 using Contracts.Events.RelayEvents;
 using Contracts.Events.SensorEvents;
-using Device.Application.DTOs.Configurations;
+using Device.Application.Features.Controllers.Query.GetControllerConfig;
 using Device.Domain.DomainEvents.SensorEvents;
 using Device.Domain.Events.RelayEvents;
 using Device.Domain.Events.SensorEvents;
@@ -23,7 +23,7 @@ public sealed class SensorProfile : Profile
             .ForMember(desc => desc.SensorId,
                        opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<Sensor, SensorConfigDto>()
+        CreateMap<Sensor, SensorConfig>()
             .ForMember(desc => desc.SensorId,
                        opt => opt.MapFrom(src => src.Id));
 

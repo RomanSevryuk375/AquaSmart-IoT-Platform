@@ -11,6 +11,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
     {
+        Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
         Assembly assembly = typeof(DependencyInjection).Assembly;
 
         services.AddScoped<IControllerOfflineCheckerService, ControllerOfflineCheckerService>();

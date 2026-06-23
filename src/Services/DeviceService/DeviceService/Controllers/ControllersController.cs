@@ -1,6 +1,6 @@
-using Device.Application.DTOs.Configurations;
 using Device.Application.DTOs.Controller;
 using Device.Application.Features.Controllers.Command.PingController;
+using Device.Application.Features.Controllers.Query.GetControllerConfig;
 
 namespace Device.API.Controllers;
 
@@ -31,7 +31,7 @@ public sealed class ControllersController(
 
     [HttpGet("me/config")]
     [AllowAnonymous]
-    public async Task<ActionResult<ConfigResponseDto>> GetAllControllersAsync(
+    public async Task<ActionResult<ControllerConfig>> GetAllControllersAsync(
         [FromHeader(Name = "X-Mac-Address")] string macAddress,
         [FromHeader(Name = "X-Device-Token")] string deviceToken,
         CancellationToken cancellationToken = default)

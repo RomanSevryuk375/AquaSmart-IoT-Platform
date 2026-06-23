@@ -1,7 +1,10 @@
+// Ignore Spelling: Mq
+
 using Contracts.Constants;
 using Contracts.Options;
 using Device.Application.Interfaces;
 using Device.Infrastructure.BackgroundJobs;
+using Device.Infrastructure.Factories;
 using Device.Infrastructure.Messaging;
 using Device.Infrastructure.Persistence.Interceptors;
 using Device.Infrastructure.Persistence.Outbox;
@@ -14,7 +17,7 @@ namespace Device.Infrastructure.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddRepositories (this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<ConvertDomainEventsToOutboxMessagesInterceptor>();
 
@@ -36,6 +39,7 @@ public static class DependencyInjection
         });
         services.AddHealthChecks().AddNpgSql(connectionString!);
 
+        services.AddScoped<ISqlConnectionFactory, SqlConnectionFactory>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IUserContext, UserContext>();
 
@@ -82,7 +86,7 @@ public static class DependencyInjection
                 .RepeatForever()));
         });
 
-        services.AddQuartzHostedService(hostOptions     
+        services.AddQuartzHostedService(hostOptions
             => hostOptions.WaitForJobsToComplete = true);
 
         return services;

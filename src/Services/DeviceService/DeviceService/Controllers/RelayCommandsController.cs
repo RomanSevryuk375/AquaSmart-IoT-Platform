@@ -1,4 +1,4 @@
-using Device.Application.DTOs.RelayCommands;
+using Device.Application.Features.RelayCommands.Query.GetPending;
 
 namespace Device.API.Controllers;
 
@@ -9,7 +9,7 @@ public sealed class RelayCommandsController(
 {
     [HttpGet("pending/{controllerId:guid}")]
     [AllowAnonymous]
-    public async Task<ActionResult<IReadOnlyList<RelayCommandResponseDto>>> GetPendingCommands(
+    public async Task<ActionResult<IReadOnlyList<RelayCommandDto>>> GetPendingCommands(
         [FromRoute] Guid controllerId,
         [FromHeader(Name = "X-Device-Token")] string deviceToken,
         CancellationToken cancellationToken)

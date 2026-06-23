@@ -1,6 +1,6 @@
 using Contracts.Events.RelayEvents;
-using Device.Application.DTOs.Configurations;
-using Device.Application.DTOs.RelayCommands;
+using Device.Application.Features.Controllers.Query.GetControllerConfig;
+using Device.Application.Features.RelayCommands.Query.GetPending;
 using Device.Domain.Events.RelayEvents;
 
 namespace Device.Application.MapProfiles;
@@ -17,11 +17,11 @@ public sealed class RelayProfile : Profile
             .ForMember(desc => desc.RelayId,
                        opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<Relay, RelayConfigDto>()
+        CreateMap<Relay, RelayConfig>()
             .ForMember(desc => desc.RelayId,
                        opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<RelayCommand, RelayCommandResponseDto>();
+        CreateMap<RelayCommand, RelayCommandDto>();
 
         CreateMap<RelayCreatedDomainEvent, RelayCreatedEvent>();
 
