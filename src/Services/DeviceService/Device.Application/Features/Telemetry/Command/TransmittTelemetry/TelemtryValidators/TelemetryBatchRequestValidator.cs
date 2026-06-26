@@ -1,4 +1,4 @@
-// Ignore Spelling: Validator
+﻿// Ignore Spelling: Validator
 
 using Contracts.Constants;
 
@@ -10,13 +10,13 @@ internal sealed class TelemetryBatchRequestValidator
     public TelemetryBatchRequestValidator()
     {
         RuleFor(x => x.MacAddress)
-            .NotEmpty().WithMessage("MacAddress is required.")
+            .NotEmpty().WithMessage(ValidationMessages.MacAddressRequired)
             .Matches(ControllerConstants.MacAddressRegex).WithMessage("Invalid MacAddress format.");
 
         RuleFor(x => x.Items)
-            .NotNull().WithMessage("Items list cannot be null.")
-            .NotEmpty().WithMessage("Telemetry batch cannot be empty.")
-            .Must(x => x.Count <= 50).WithMessage("Maximum batch size is 50 items.");
+            .NotNull().WithMessage(ValidationMessages.ItemsListNull)
+            .NotEmpty().WithMessage(ValidationMessages.TelemetryBatchEmpty)
+            .Must(x => x.Count <= 50).WithMessage(ValidationMessages.MaxBatchSize);
 
         RuleForEach(x => x.Items).SetValidator(new TelemetryItemRequestValidator());
     }

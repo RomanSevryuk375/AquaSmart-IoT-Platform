@@ -1,4 +1,4 @@
-using Contracts.Enums;
+﻿using Contracts.Enums;
 using Device.Application.Features.Sensors.Command.AddSensor;
 using Device.Application.Features.Sensors.Command.DeleteSensor;
 using Device.Application.Features.Sensors.Command.UpdateSensor;
@@ -11,7 +11,7 @@ using MediatR;
 namespace Device.API.Controllers;
 
 [ApiController]
-[Route("api/device/v1/sensors")]
+[Route(ApiConstants.Routes.Sensors)]
 public sealed class SensorsController(
     ISender sender,
     IUserContext userContext) : ControllerBase
@@ -83,7 +83,7 @@ public sealed class SensorsController(
     [AllowAnonymous]
     public async Task<ActionResult> ReceiveBatchTelemetryAsync(
         [FromBody] TransmitTelemetryCommand command,
-        [FromHeader(Name = "X-Device-Token")] string deviceToken,
+        [FromHeader(Name = ApiConstants.Headers.DeviceToken)] string deviceToken,
         CancellationToken cancellationToken = default)
     {
         TransmitTelemetryCommand enrichedCommand = command with { DeviceToken = deviceToken };

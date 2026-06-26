@@ -1,4 +1,4 @@
-using Device.Application.Interfaces;
+﻿using Device.Application.Interfaces;
 
 namespace Device.Application.Services;
 
@@ -16,14 +16,14 @@ public sealed class DeviceSecurityService(
         if (controller is null)
         {
             return Result.Failure(Error.NotFound<Controller>(
-                "Controller not found"));
+                ErrorMessages.ControllerNotFoundPlain));
         }
 
         if (controller.UserId != userContext.UserId)
         {
             return Result.Failure(Error.Conflict(
-                "Access.Denied",
-                "Forbidden: You don't own this controller"));
+                ErrorMessages.AccessDenied,
+                ErrorMessages.YouDontOwnThisController));
         }
 
         return Result.Success();
@@ -39,14 +39,14 @@ public sealed class DeviceSecurityService(
         if (controller is null)
         {
             return Result.Failure(Error.NotFound<Controller>(
-                "Controller not found"));
+                ErrorMessages.ControllerNotFoundPlain));
         }
 
         if (!myHasher.Verify(deviceToken, controller.DeviceTokenHash))
         {
             return Result.Failure(Error.Conflict(
-                "Access.Denied",
-                "Invalid device token"));
+                ErrorMessages.AccessDenied,
+                ErrorMessages.InvalidDeviceToken));
         }
 
         return Result.Success();

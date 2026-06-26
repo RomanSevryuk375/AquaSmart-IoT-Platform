@@ -1,4 +1,4 @@
-using Contracts.Events.TelemetryEvents;
+﻿using Contracts.Events.TelemetryEvents;
 using MassTransit;
 
 namespace Device.Application.Features.Telemetry.Command.TransmittTelemetry;
@@ -49,7 +49,7 @@ internal sealed class TransmittTelemetryHandler(
         if (controllerSensorIds.Contains(item.SensorId))
         {
             response.ValidationErrors.Add(
-                $"Sensor {item.SensorId} does not belong to controller {request.MacAddress}.");
+                string.Format(ErrorMessages.SensorNotBelongToController, item.SensorId, request.MacAddress));
             response.SkippedCount++;
             return;
         }

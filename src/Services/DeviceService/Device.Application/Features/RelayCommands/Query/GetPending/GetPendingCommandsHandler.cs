@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using Dapper;
 using Device.Application.Interfaces;
 
@@ -30,7 +30,7 @@ internal sealed class GetPendingCommandsHandler(
         if (tokenHash is null || !hasher.Verify(request.DeviceToken, tokenHash))
         {
             return Result<IReadOnlyList<RelayCommandDto>>.Failure(Error.NotFound<Controller>(
-                "Invalid credentials or controller not found."));
+                ErrorMessages.InvalidCredentialsOrControllerNotFound));
         }
 
         DateTime now = DateTime.UtcNow;

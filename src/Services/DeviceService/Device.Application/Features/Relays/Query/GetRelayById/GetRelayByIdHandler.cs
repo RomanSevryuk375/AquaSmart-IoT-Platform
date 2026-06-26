@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using Dapper;
 using Device.Application.Features.Relays.Query.Shared;
 
@@ -30,7 +30,7 @@ internal sealed class GetRelayByIdHandler(
         if (relay is null)
         {
             return Result<RelayDto>.Failure(Error.NotFound<Relay>(
-                $"Relay {request.RelayId} not found or access denied."));
+                string.Format(ErrorMessages.RelayNotFoundOrAccessDenied, request.RelayId)));
         }
 
         return Result<RelayDto>.Success(relay);

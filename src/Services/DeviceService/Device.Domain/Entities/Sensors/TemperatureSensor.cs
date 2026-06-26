@@ -1,4 +1,4 @@
-namespace Device.Domain.Entities.Sensors;
+﻿namespace Device.Domain.Entities.Sensors;
 
 public sealed class TemperatureSensor : Sensor
 {
@@ -14,5 +14,5 @@ public sealed class TemperatureSensor : Sensor
     public TemperatureSensor() { }
 #pragma warning restore CS8618 
     public override SensorType Type => SensorType.Temperature;
-    public override string Unit => "°C";
+    public override string Unit => UnitConstants.Celsius;
 }

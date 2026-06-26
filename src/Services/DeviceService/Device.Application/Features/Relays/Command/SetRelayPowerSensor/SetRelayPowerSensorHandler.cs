@@ -1,4 +1,4 @@
-namespace Device.Application.Features.Relays.Command.SetRelayPowerSensor;
+﻿namespace Device.Application.Features.Relays.Command.SetRelayPowerSensor;
 
 internal sealed class SetRelayPowerSensorHandler(
     IRelayRepository relayRepository,
@@ -17,13 +17,13 @@ internal sealed class SetRelayPowerSensorHandler(
         if (powerSensor is null)
         {
             return Result.Failure(Error.NotFound<VoltageSensor>(
-                    $"{nameof(Sensor)} {request.PowerSensorId} not found"));
+                    string.Format(ErrorMessages.SensorNotFound, request.PowerSensorId)));
         }
 
         if (existingRelay!.ControllerId != powerSensor.ControllerId)
         {
             return Result.Failure(Error.Validation<Relay>(
-                "Sensor and Relay must belong to the same controller"));
+                ErrorMessages.SensorAndRelaySameController));
         }
 
         existingRelay.SetPowerSensor(powerSensor);

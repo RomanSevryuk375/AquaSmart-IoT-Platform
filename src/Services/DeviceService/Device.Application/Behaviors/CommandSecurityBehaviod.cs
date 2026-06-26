@@ -1,4 +1,4 @@
-using Device.Application.Interfaces;
+﻿using Device.Application.Interfaces;
 
 namespace Device.Application.Behaviors;
 
@@ -17,7 +17,7 @@ internal sealed class CommandSecurityBehaviod<TRequest, TResponse>(
         if (command is null)
         {
             return BehaviorHelpers.CreateFailedResult<TResponse>(Error.NotFound<RelayCommand>(
-                $"{nameof(RelayCommand)} {request.CommandId} not found"));
+                string.Format(ErrorMessages.RelayCommandNotFound, request.CommandId)));
         }
 
 

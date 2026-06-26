@@ -1,4 +1,4 @@
-namespace Device.Domain.Entities.Sensors;
+﻿namespace Device.Domain.Entities.Sensors;
 
 public sealed class PressureSensor : Sensor
 {
@@ -14,5 +14,5 @@ public sealed class PressureSensor : Sensor
     public PressureSensor() { }
 #pragma warning restore CS8618 
     public override SensorType Type => SensorType.Pressure;
-    public override string Unit => "Pa";
+    public override string Unit => UnitConstants.Pascal;
 }

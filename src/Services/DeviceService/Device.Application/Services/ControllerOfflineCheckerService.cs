@@ -1,4 +1,4 @@
-using Device.Application.Interfaces;
+﻿using Device.Application.Interfaces;
 using Device.Domain.Specifications;
 
 namespace Device.Application.Services;
@@ -34,7 +34,7 @@ public sealed class ControllerOfflineCheckerService(
         }
         catch (Exception ex)
         {
-            return Result.Failure(Error.Failure("Job.DatabaseError", ex.Message));
+            return Result.Failure(Error.Failure(ErrorMessages.DatabaseError, ex.Message));
         }
     }
 }

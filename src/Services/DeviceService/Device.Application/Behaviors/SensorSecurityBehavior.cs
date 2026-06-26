@@ -1,4 +1,4 @@
-using Device.Application.Interfaces;
+﻿using Device.Application.Interfaces;
 
 namespace Device.Application.Behaviors;
 
@@ -17,7 +17,7 @@ internal sealed class SensorSecurityBehavior<TRequest, TResponse>(
         if (existingSensor is null)
         {
             return BehaviorHelpers.CreateFailedResult<TResponse>(Error.NotFound<Sensor>(
-                    $"{nameof(Sensor)} {request.SensorId} not found"));
+                    string.Format(ErrorMessages.SensorNotFound, request.SensorId)));
         }
 
         Result ownership = await securityService.EnsureUserOwnsControllerAsync(

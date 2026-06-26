@@ -1,4 +1,4 @@
-using Device.Application.Interfaces;
+﻿using Device.Application.Interfaces;
 
 namespace Device.Application.Behaviors;
 
@@ -17,13 +17,13 @@ internal class TelemetrySecurityBehavior<TRequest, TResponse>(
         if (existingController is null)
         {
             return BehaviorHelpers.CreateFailedResult<TResponse>(Error.NotFound<Controller>(
-                    $"{nameof(Controller)} {request.MacAddress} not found"));
+                    string.Format(ErrorMessages.ControllerNotFound, request.MacAddress)));
         }
 
         if (!myHasher.Verify(request.DeviceToken, existingController.DeviceTokenHash))
         {
             return BehaviorHelpers.CreateFailedResult<TResponse>(Error.Conflict(
-                "Access.Denied", "You are not the owner of this controller"));
+                ErrorMessages.AccessDenied, ErrorMessages.YouAreNotOwnerOfController));
         }
 
         return await next();

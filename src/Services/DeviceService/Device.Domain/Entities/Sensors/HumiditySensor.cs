@@ -1,4 +1,4 @@
-namespace Device.Domain.Entities.Sensors;
+﻿namespace Device.Domain.Entities.Sensors;
 
 public sealed class HumiditySensor : Sensor
 {
@@ -15,5 +15,5 @@ public sealed class HumiditySensor : Sensor
 #pragma warning restore CS8618 
 
     public override SensorType Type => SensorType.Humidity;
-    public override string Unit => "%";
+    public override string Unit => UnitConstants.Percent;
 }

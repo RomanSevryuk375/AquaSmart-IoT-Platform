@@ -1,4 +1,4 @@
-using Device.Application.Features.RelayCommands.Command.MarkAsCompleted;
+﻿using Device.Application.Features.RelayCommands.Command.MarkAsCompleted;
 using Device.Application.Features.RelayCommands.Command.MarkAsFailed;
 using Device.Application.Features.RelayCommands.Command.ToggleRelayMode;
 using Device.Application.Features.RelayCommands.Command.ToggleRelayState;
@@ -8,14 +8,14 @@ using MediatR;
 namespace Device.API.Controllers;
 
 [ApiController]
-[Route("api/device/v1/commands")]
+[Route(ApiConstants.Routes.Commands)]
 public sealed class RelayCommandsController(ISender sender) : ControllerBase
 {
     [HttpGet("pending/{controllerId:guid}")]
     [AllowAnonymous]
     public async Task<ActionResult<IReadOnlyList<RelayCommandDto>>> GetPendingCommandsAsync(
         [FromRoute] Guid controllerId,
-        [FromHeader(Name = "X-Device-Token")] string deviceToken,
+        [FromHeader(Name = ApiConstants.Headers.DeviceToken)] string deviceToken,
         CancellationToken cancellationToken = default)
     {
         var query = new GetPendingCommandsQuery
@@ -33,7 +33,7 @@ public sealed class RelayCommandsController(ISender sender) : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> MarkAsCompletedAsync(
         [FromRoute] Guid commandId,
-        [FromHeader(Name = "X-Device-Token")] string deviceToken,
+        [FromHeader(Name = ApiConstants.Headers.DeviceToken)] string deviceToken,
         CancellationToken cancellationToken = default)
     {
         var command = new MarkAsCompletedCommand
@@ -52,7 +52,7 @@ public sealed class RelayCommandsController(ISender sender) : ControllerBase
     public async Task<IActionResult> MarkAsFailedAsync(
         [FromRoute] Guid commandId,
         [FromBody] string errorMessage,
-        [FromHeader(Name = "X-Device-Token")] string deviceToken,
+        [FromHeader(Name = ApiConstants.Headers.DeviceToken)] string deviceToken,
         CancellationToken cancellationToken = default)
     {
         var command = new MarkAsFailedCommand

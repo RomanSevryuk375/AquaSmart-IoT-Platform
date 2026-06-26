@@ -1,4 +1,4 @@
-namespace Device.Application.Features.Controllers.Command.PingController;
+﻿namespace Device.Application.Features.Controllers.Command.PingController;
 
 internal sealed class PingControllerHandler(
     IControllerRepository controllerRepository,
@@ -13,7 +13,7 @@ internal sealed class PingControllerHandler(
         if (controller is null)
         {
             return Result<ControllerPingResponse>.Failure(Error.NotFound<Controller>(
-                $"Controller {request.ControllerId} not found."));
+                string.Format(ErrorMessages.ControllerNotFound, request.ControllerId)));
         }
 
         controller.RecordPing();

@@ -1,4 +1,4 @@
-namespace Device.Domain.Entities.Sensors;
+﻿namespace Device.Domain.Entities.Sensors;
 
 public sealed class VoltageSensor : Sensor
 {
@@ -14,5 +14,5 @@ public sealed class VoltageSensor : Sensor
     public VoltageSensor() { }
 #pragma warning restore CS8618 
     public override SensorType Type => SensorType.Voltage;
-    public override string Unit => "V";
+    public override string Unit => UnitConstants.Volt;
 }

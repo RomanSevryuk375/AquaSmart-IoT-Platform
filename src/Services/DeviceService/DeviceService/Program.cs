@@ -1,4 +1,4 @@
-using Contracts.Middlewares;
+﻿using Contracts.Middlewares;
 using Device.API.Extensions;
 using Device.Application.Extesions;
 using Device.Infrastructure.Extensions;
@@ -27,7 +27,7 @@ app.UseSwaggerUI();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapHealthChecks("/health");
+app.MapHealthChecks(ApiConstants.HealthRoute);
 app.MapControllers();
 
 await app.RunAsync();

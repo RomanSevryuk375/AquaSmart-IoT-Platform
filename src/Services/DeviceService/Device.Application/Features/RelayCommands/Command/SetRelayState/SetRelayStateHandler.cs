@@ -1,4 +1,4 @@
-using MassTransit;
+﻿using MassTransit;
 
 namespace Device.Application.Features.RelayCommands.Command.SetRelayState;
 
@@ -17,7 +17,7 @@ internal sealed class SetRelayStateHandler(
         if (existingRelay is null)
         {
             return Result.Failure(Error.NotFound<Relay>(
-                $"Relay {request.RelayId} not found"));
+                string.Format(ErrorMessages.RelayNotFound, request.RelayId)));
         }
 
         Controller? existingController = await controllerRepository.GetByIdAsync(
@@ -25,13 +25,13 @@ internal sealed class SetRelayStateHandler(
         if (existingController is null)
         {
             return Result.Failure(Error.NotFound<Controller>(
-                $"Controller {request.ControllerId} not found"));
+                string.Format(ErrorMessages.ControllerNotFound, request.ControllerId)));
         }
 
         if (UnavalibleCommand(request, existingRelay))
         {
             return Result.Failure(Error.Conflict<RelayCommand>(
-                "Command is unavailable or was expired."));
+                ErrorMessages.CommandUnavailable));
         }
 
         Result<RelayCommand> newCommand = RelayCommand.Create(
@@ -52,7 +52,7 @@ internal sealed class SetRelayStateHandler(
         catch (Exception ex)
         {
             return Result.Failure(Error.Failure(
-                "External.Error", ex.Message));
+                ErrorMessages.ExternalError, ex.Message));
         }
     }
 

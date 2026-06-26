@@ -5,21 +5,23 @@ namespace Device.Application.Features.Telemetry.Command.TransmittTelemetry.Telem
 public sealed class TelemetryItemRequestValidator
     : AbstractValidator<TelemetryItem>
 {
+    private const int MaxExternalMessageLength = 100;
+
     public TelemetryItemRequestValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(x => x.SensorId)
-            .NotEmpty().WithMessage("SensorId must not be empty.")
-            .NotEqual(Guid.Empty).WithMessage("SensorId cannot be an empty Guid.");
+            .NotEmpty().WithMessage(ValidationMessages.SensorIdEmpty)
+            .NotEqual(Guid.Empty).WithMessage(ValidationMessages.SensorIdEmptyGuid);
 
         RuleFor(x => x.ExternalMessageId)
-            .NotEmpty().WithMessage("ExternalMessageId must not be empty.")
-            .MaximumLength(100).WithMessage("ExternalMessageId is too long (max 100).");
+            .NotEmpty().WithMessage(ValidationMessages.ExternalMessageIdEmpty)
+            .MaximumLength(MaxExternalMessageLength).WithMessage(ValidationMessages.ExternalMessageIdTooLong);
 
         RuleFor(x => x.RecordedAt)
-            .NotEmpty().WithMessage("RecordedAt must be provided.")
-            .Must(BeInPast).WithMessage("RecordedAt can not be in the future.");
+            .NotEmpty().WithMessage(ValidationMessages.RecordedAtProvided)
+            .Must(BeInPast).WithMessage(ValidationMessages.RecordedAtFuture);
     }
 
     private bool BeInPast(DateTime recordedAt) => recordedAt < DateTime.UtcNow.AddMinutes(5);

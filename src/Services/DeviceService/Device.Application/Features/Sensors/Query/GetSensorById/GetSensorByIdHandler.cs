@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using Dapper;
 using Device.Application.Features.Sensors.Query.Shared;
 
@@ -29,7 +29,7 @@ internal sealed class GetSensorByIdHandler(
         if (sensor is null)
         {
             return Result<SensorDto>.Failure(Error.NotFound<Sensor>(
-                $"Sensor {request.SensorId} not found or access denied."));
+                string.Format(ErrorMessages.SensorNotFoundOrAccessDenied, request.SensorId)));
         }
 
         return Result<SensorDto>.Success(sensor);

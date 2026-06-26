@@ -1,4 +1,4 @@
-namespace Device.Application.Features.Controllers.Command.ToggleCommandState;
+﻿namespace Device.Application.Features.Controllers.Command.ToggleCommandState;
 
 internal sealed class ToggleControllerStateHandler(
     IControllerRepository controllerRepository,
@@ -13,7 +13,7 @@ internal sealed class ToggleControllerStateHandler(
         if (controller is null)
         {
             return Result<bool>.Failure(Error.NotFound<Controller>(
-                $"Controller {request.ControllerId} not found."));
+                string.Format(ErrorMessages.ControllerNotFound, request.ControllerId)));
         }
 
         controller.ToggleState();

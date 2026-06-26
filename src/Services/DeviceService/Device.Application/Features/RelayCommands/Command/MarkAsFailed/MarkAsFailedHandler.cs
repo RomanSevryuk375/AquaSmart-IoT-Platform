@@ -1,4 +1,4 @@
-namespace Device.Application.Features.RelayCommands.Command.MarkAsFailed;
+﻿namespace Device.Application.Features.RelayCommands.Command.MarkAsFailed;
 
 internal sealed class MarkAsFailedHandler(
     IRelayCommandsRepository queueRepository,
@@ -13,7 +13,7 @@ internal sealed class MarkAsFailedHandler(
         if (command is null)
         {
             return Result.Failure(Error.NotFound<RelayCommand>(
-                    $"{nameof(RelayCommand)} {request.CommandId} not found"));
+                    string.Format(ErrorMessages.RelayCommandNotFound, request.CommandId)));
         }
 
         if (command.Status == CommandStatus.Failed)

@@ -1,4 +1,4 @@
-namespace Device.Application.Features.RelayCommands.Command.MarkAsCompleted;
+﻿namespace Device.Application.Features.RelayCommands.Command.MarkAsCompleted;
 
 internal sealed class MarkAsCompletedHandler(
     IRelayCommandsRepository queueRepository,
@@ -14,7 +14,7 @@ internal sealed class MarkAsCompletedHandler(
         if (command is null)
         {
             return Result.Failure(Error.NotFound<RelayCommand>(
-                    $"{nameof(RelayCommand)} {request.CommandId} not found"));
+                    string.Format(ErrorMessages.RelayCommandNotFound, request.CommandId)));
         }
 
         Relay? existingRelay = await relayRepository.GetByIdAsync(
@@ -22,7 +22,7 @@ internal sealed class MarkAsCompletedHandler(
         if (existingRelay is null)
         {
             return Result.Failure(Error.NotFound<Relay>(
-                    $"{nameof(Relay)} {command.RelayId} not found"));
+                    string.Format(ErrorMessages.RelayNotFound, command.RelayId)));
         }
 
         existingRelay.SetState(command.TargeState);

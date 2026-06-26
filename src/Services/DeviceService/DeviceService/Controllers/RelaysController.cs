@@ -1,4 +1,4 @@
-using Contracts.Enums;
+﻿using Contracts.Enums;
 using Device.Application.Features.Relays.Command.AddRelay;
 using Device.Application.Features.Relays.Command.DeleteRelay;
 using Device.Application.Features.Relays.Command.UpdateRelay;
@@ -11,7 +11,7 @@ namespace Device.API.Controllers;
 
 [ApiController]
 [Authorize(Policy = SubPermissions.DeviceControl)]
-[Route("api/device/v1/relays")]
+[Route(ApiConstants.Routes.Relays)]
 public sealed class RelaysController(
     ISender sender,
     IUserContext userContext) : ControllerBase

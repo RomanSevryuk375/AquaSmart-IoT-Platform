@@ -1,4 +1,4 @@
-using Device.Application.Features.Controllers.Command.AddController;
+﻿using Device.Application.Features.Controllers.Command.AddController;
 using Device.Application.Features.Controllers.Command.DeleteController;
 using Device.Application.Features.Controllers.Command.PingController;
 using Device.Application.Features.Controllers.Command.UpdateController;
@@ -11,7 +11,7 @@ using MediatR;
 namespace Device.API.Controllers;
 
 [ApiController]
-[Route("api/device/v1/controllers")]
+[Route(ApiConstants.Routes.Controllers)]
 public sealed class ControllersController(
     ISender sender,
     IUserContext userContext) : ControllerBase
@@ -44,8 +44,8 @@ public sealed class ControllersController(
     [HttpGet("me/config")]
     [AllowAnonymous]
     public async Task<ActionResult<ControllerConfig>> GetControllerConfigAsync(
-        [FromHeader(Name = "X-Mac-Address")] string macAddress,
-        [FromHeader(Name = "X-Device-Token")] string deviceToken,
+        [FromHeader(Name = ApiConstants.Headers.MacAddress)] string macAddress,
+        [FromHeader(Name = ApiConstants.Headers.DeviceToken)] string deviceToken,
         CancellationToken cancellationToken = default)
     {
         var query = new GetControllerConfigQuery
@@ -98,7 +98,7 @@ public sealed class ControllersController(
     [AllowAnonymous]
     public async Task<ActionResult> PingControllerAsync(
         [FromRoute] Guid id,
-        [FromHeader(Name = "X-Device-Token")] string deviceToken,
+        [FromHeader(Name = ApiConstants.Headers.DeviceToken)] string deviceToken,
         CancellationToken cancellationToken = default)
     {
         var command = new PingControllerCommand

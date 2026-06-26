@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using Dapper;
 using Device.Application.Features.Controllers.Query.Shared;
 
@@ -28,7 +28,7 @@ internal sealed class GetControllerByIdHandler(
         if (controller is null)
         {
             return Result<ControllerDto>.Failure(Error.NotFound<Controller>(
-                $"Controller {request.ControllerId} not found."));
+                string.Format(ErrorMessages.ControllerNotFound, request.ControllerId)));
         }
 
         return Result<ControllerDto>.Success(controller);

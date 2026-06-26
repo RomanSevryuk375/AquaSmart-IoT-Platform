@@ -1,4 +1,4 @@
-
+﻿
 using Device.Application.Interfaces;
 
 namespace Device.Application.Behaviors;
@@ -18,7 +18,7 @@ internal sealed class RelaySecurityBehavior<TRequest, TResponse>(
         if (existingRelay is null)
         {
             return BehaviorHelpers.CreateFailedResult<TResponse>(Error.NotFound<Relay>(
-                $"{nameof(Relay)} {request.RelayId} not found"));
+                string.Format(ErrorMessages.RelayNotFound, request.RelayId)));
         }
 
         Result ownership = await securityService.EnsureUserOwnsControllerAsync(

@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using Dapper;
 using Device.Application.Extesions;
 using Device.Application.Interfaces;
@@ -48,7 +48,7 @@ internal sealed class GetControllerConfigHandler(
             !myHasher.Verify(request.DeviceToken, controllerAuth.DeviceTokenHash))
         {
             return Result<ControllerConfig>.Failure(Error.NotFound<Controller>(
-                "Invalid credentials."));
+                ErrorMessages.InvalidCredentials));
         }
 
         IEnumerable<RelayConfig> relayConfig = await multi.ReadAsync<RelayConfig>();

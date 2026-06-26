@@ -1,4 +1,4 @@
-namespace Device.Application.Features.Controllers.Command.UpdateController;
+﻿namespace Device.Application.Features.Controllers.Command.UpdateController;
 
 internal sealed class UpdateControllerHandler(
     IControllerRepository controllerRepository,
@@ -13,7 +13,7 @@ internal sealed class UpdateControllerHandler(
         if (controller is null)
         {
             return Result<bool>.Failure(Error.NotFound<Controller>(
-                $"Controller {request.ControllerId} not found."));
+                string.Format(ErrorMessages.ControllerNotFound, request.ControllerId)));
         }
 
         Result? result = controller.Update(
