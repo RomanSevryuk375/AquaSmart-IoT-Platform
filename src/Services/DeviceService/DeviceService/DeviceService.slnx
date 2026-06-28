@@ -2,9 +2,14 @@
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
   </Folder>
+  <Folder Name="/src/">
+    <Project Path="../Device.Application/Device.Application.csproj" Id="7fd0c524-265e-4942-8f62-d04b17625ecd" />
+    <Project Path="../Device.Domain/Device.Domain.csproj" Id="313e48db-471f-4516-97e6-d958cd872b5d" />
+    <Project Path="../Device.Infrastrucrute/Device.Infrastructure.csproj" Id="8fe94c9a-0311-42ce-b485-c328be58cb19" />
+    <Project Path="Device.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="../Device.Domain.UnitTests/Device.Domain.UnitTests.csproj" Id="58dd8f7b-0862-4756-9b7f-0ba62af327f5" />
+  </Folder>
   <Project Path="../../../Contracts/Contracts/Contracts.csproj" />
-  <Project Path="../Device.Application/Device.Application.csproj" Id="7fd0c524-265e-4942-8f62-d04b17625ecd" />
-  <Project Path="../Device.Domain/Device.Domain.csproj" Id="313e48db-471f-4516-97e6-d958cd872b5d" />
-  <Project Path="../Device.Infrastrucrute/Device.Infrastructure.csproj" Id="8fe94c9a-0311-42ce-b485-c328be58cb19" />
-  <Project Path="Device.API.csproj" />
 </Solution>

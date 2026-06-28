@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using Contracts.Constants;
 
 namespace Device.Domain.ValueObjects;
 
@@ -14,6 +13,12 @@ public sealed partial record MacAddress
 
     public static Result<MacAddress> Create(string macAddress)
     {
+        if (string.IsNullOrWhiteSpace(macAddress))
+        {
+            return Result<MacAddress>.Failure(Error.Validation<MacAddress>(
+                ControllerErrors.MacAddressEmpty));
+        }
+
         string cleanMac = macAddress.Trim();
 
         if (string.IsNullOrWhiteSpace(cleanMac))
