@@ -1,6 +1,7 @@
 using Contracts.Constants;
 using Contracts.Results;
 using Device.Domain.ValueObjects;
+using Device.TestShared.Constants;
 using FluentAssertions;
 
 namespace Device.Domain.UnitTests.ValueObjects;
@@ -11,14 +12,14 @@ public class DeviceNameTests
     public void Create_WithValidName_ReturnsSuccessAndTrimmedValue()
     {
         // Arrange
-        string validName = "  My Aquarium Sensor  ";
+        string validName = $"  {TestConstants.ValidDeviceName}  ";
 
         // Act
         Result<DeviceName> result = DeviceName.Create(validName);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Value.Should().Be("My Aquarium Sensor");
+        result.Value.Value.Should().Be(TestConstants.ValidDeviceName);
     }
 
     [Theory]
@@ -39,7 +40,7 @@ public class DeviceNameTests
     public void Create_WithTooLongName_ReturnsValidationFailure()
     {
         // Arrange
-        string longName = new string('A', 129);
+        string longName = new('A', CommonConstants.NameLength + 1);
 
         // Act
         Result<DeviceName> result = DeviceName.Create(longName);

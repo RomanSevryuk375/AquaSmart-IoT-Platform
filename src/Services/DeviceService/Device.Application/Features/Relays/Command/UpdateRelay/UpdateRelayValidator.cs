@@ -1,7 +1,5 @@
 // Ignore Spelling: Validator
 
-using Contracts.Constants;
-
 namespace Device.Application.Features.Relays.Command.UpdateRelay;
 
 internal sealed class UpdateRelayValidator

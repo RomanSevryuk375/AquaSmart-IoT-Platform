@@ -1,6 +1,7 @@
 using Contracts.Constants;
 using Contracts.Results;
 using Device.Domain.ValueObjects;
+using Device.TestShared.Constants;
 using FluentAssertions;
 
 namespace Device.Domain.UnitTests.ValueObjects;
@@ -11,15 +12,14 @@ public class MacAddressTests
     public void Create_WithValidMacAddress_ReturnsSuccessAndUpperCasedValue()
     {
         // Arrange
-        string validMac = " 00:1a:2b:3c:4d:5e ";
-        string expectedMac = "00:1A:2B:3C:4D:5E";
+        string validMac = $" {TestConstants.ValidMacAddress.ToLowerInvariant()} ";
 
         // Act
         Result<MacAddress> result = MacAddress.Create(validMac);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Value.Should().Be(expectedMac);
+        result.Value.Value.Should().Be(TestConstants.ValidMacAddress);
     }
 
     [Theory]
@@ -40,7 +40,7 @@ public class MacAddressTests
     public void Create_WithInvalidLength_ReturnsValidationFailure()
     {
         // Arrange
-        string invalidMac = "00:11:22";
+        string invalidMac = TestConstants.ValidMacAddress[..8];
 
         // Act
         Result<MacAddress> result = MacAddress.Create(invalidMac);

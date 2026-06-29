@@ -10,6 +10,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="../Device.Domain.UnitTests/Device.Domain.UnitTests.csproj" Id="58dd8f7b-0862-4756-9b7f-0ba62af327f5" />
+    <Project Path="../Device.TestShared/Device.TestShared.csproj" Id="efe2b16d-46aa-4c6d-8242-1c806269165f" />
   </Folder>
   <Project Path="../../../Contracts/Contracts/Contracts.csproj" />
 </Solution>

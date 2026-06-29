@@ -2,6 +2,7 @@ using Contracts.Constants;
 using Contracts.Enums;
 using Contracts.Results;
 using Device.Domain.ValueObjects;
+using Device.TestShared.Constants;
 using FluentAssertions;
 
 namespace Device.Domain.UnitTests.ValueObjects;
@@ -30,14 +31,13 @@ public class ConnectionAddressTests
         var unsupportedProtocol = (ConnectionProtocol)999;
 
         // Act
-        Result<ConnectionAddress> result = ConnectionAddress.Create(unsupportedProtocol, "0x38");
+        Result<ConnectionAddress> result = ConnectionAddress.Create(
+            unsupportedProtocol, TestConstants.ValidI2cAddress);
 
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Message.Should().Be(CommonErrors.InvalidAddressProtocol);
     }
-
-    #region I2C Tests
 
     [Theory]
     [InlineData("0x00")]
@@ -80,14 +80,10 @@ public class ConnectionAddressTests
         result.Error.Message.Should().Be(CommonErrors.I2cInvalid7bitAddress);
     }
 
-    #endregion
-
-    #region OneWire Tests
-
     [Fact]
     public void Create_WithValidOneWireAddress_ReturnsSuccess()
     {
-        // Arrange
+        // Arrange 
         string validAddress = "28FF4A1B2C3D4E5F";
 
         // Act
@@ -97,10 +93,6 @@ public class ConnectionAddressTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Address.Should().Be(validAddress);
     }
-
-    #endregion
-
-    #region Digital Tests
 
     [Theory]
     [InlineData("PA5")]
@@ -117,10 +109,6 @@ public class ConnectionAddressTests
         result.Value.Address.Should().Be(validAddress);
     }
 
-    #endregion
-
-    #region Analog Tests
-
     [Theory]
     [InlineData("A0")]
     [InlineData("ADC1_CH3")]
@@ -134,6 +122,4 @@ public class ConnectionAddressTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Address.Should().Be(validAddress);
     }
-
-    #endregion
 }

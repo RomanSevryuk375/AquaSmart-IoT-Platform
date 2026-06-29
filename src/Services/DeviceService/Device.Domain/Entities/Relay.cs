@@ -1,4 +1,3 @@
-using Contracts.Constants;
 using Device.Domain.Events.RelayEvents;
 
 namespace Device.Domain.Entities;

@@ -1,5 +1,3 @@
-using Contracts.Constants;
-
 namespace Device.Domain.Factories;
 
 public static class SensorFactory

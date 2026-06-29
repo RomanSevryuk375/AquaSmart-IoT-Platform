@@ -1,5 +1,3 @@
-using Contracts.Constants;
-
 namespace Device.Domain.ValueObjects;
 
 public sealed record DeviceName

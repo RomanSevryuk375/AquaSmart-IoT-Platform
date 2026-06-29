@@ -10,15 +10,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Device.Domain\Device.Domain.csproj" />
+    <ProjectReference Include="..\Device.TestShared\Device.TestShared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Entities\" />
-    <Folder Include="Factories\" />
   </ItemGroup>
 
 </Project>

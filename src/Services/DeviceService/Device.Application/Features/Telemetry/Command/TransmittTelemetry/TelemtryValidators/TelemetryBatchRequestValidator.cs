@@ -1,6 +1,4 @@
-﻿// Ignore Spelling: Validator
-
-using Contracts.Constants;
+// Ignore Spelling: Validator
 
 namespace Device.Application.Features.Telemetry.Command.TransmittTelemetry.TelemtryValidators;
 

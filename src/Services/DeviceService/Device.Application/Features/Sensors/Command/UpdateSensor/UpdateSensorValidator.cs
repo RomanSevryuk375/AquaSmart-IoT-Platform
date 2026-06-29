@@ -1,7 +1,5 @@
 // Ignore Spelling: Validator
 
-using Contracts.Constants;
-
 namespace Device.Application.Features.Sensors.Command.UpdateSensor;
 
 internal sealed class UpdateSensorValidator

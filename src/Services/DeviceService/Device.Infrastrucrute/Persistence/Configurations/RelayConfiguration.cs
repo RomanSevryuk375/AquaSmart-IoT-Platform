@@ -1,4 +1,3 @@
-using Contracts.Constants;
 using Device.Domain.ValueObjects;
 
 namespace Device.Infrastructure.Persistence.Configurations;

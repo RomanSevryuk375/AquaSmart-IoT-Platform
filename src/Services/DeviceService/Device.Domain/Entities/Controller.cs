@@ -43,6 +43,11 @@ public sealed class Controller : AggregateRoot, IEntity
     {
         var errors = new List<string>();
 
+        if (userId == Guid.Empty)
+        {
+            errors.Add(CommonErrors.IdEmpty);
+        }
+
         Result<MacAddress> macAddressResult = MacAddress.Create(rawMacAddress);
         if (macAddressResult.IsFailure)
         {
