@@ -1,10 +1,10 @@
+using System.Text;
 using Contracts.Constants;
 using Contracts.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 namespace Contracts.Authorization;
 

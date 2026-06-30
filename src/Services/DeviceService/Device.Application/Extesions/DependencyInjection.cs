@@ -24,7 +24,7 @@ public static class DependencyInjection
 
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ControllerSecurityBehavior<,>));
-            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(CommandSecurityBehaviod<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(CommandSecurityBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(DeviceSecurityBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(RelaySecurityBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(SensorSecurityBehavior<,>));

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Device.Domain\Device.Domain.csproj" />
+    <ProjectReference Include="..\Device.Infrastrucrute\Device.Infrastructure.csproj" />
     <ProjectReference Include="..\Device.TestShared\Device.TestShared.csproj" />
   </ItemGroup>
 

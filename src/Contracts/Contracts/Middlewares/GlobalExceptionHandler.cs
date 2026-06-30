@@ -1,7 +1,7 @@
+using System.ComponentModel.DataAnnotations;
 using Contracts.Exceptions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using System.ComponentModel.DataAnnotations;
 
 namespace Contracts.Middlewares;
 
@@ -32,7 +32,7 @@ public class GlobalExceptionHandler(RequestDelegate next)
             ArgumentException => StatusCodes.Status400BadRequest,
             EmailIsBusyException => StatusCodes.Status400BadRequest,
             RegisterException => StatusCodes.Status409Conflict,
-            InvalidCredentialsException => StatusCodes.Status400BadRequest,  
+            InvalidCredentialsException => StatusCodes.Status400BadRequest,
             UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
 
             _ => StatusCodes.Status500InternalServerError

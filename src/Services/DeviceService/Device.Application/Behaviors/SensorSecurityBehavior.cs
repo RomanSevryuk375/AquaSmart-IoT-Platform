@@ -1,8 +1,8 @@
-﻿using Device.Application.Interfaces;
+using Device.Application.Interfaces;
 
 namespace Device.Application.Behaviors;
 
-internal sealed class SensorSecurityBehavior<TRequest, TResponse>(
+public sealed class SensorSecurityBehavior<TRequest, TResponse>(
     ISensorRepository sensorRepository,
     IDeviceSecurityService securityService)
     : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>, ISensorBoundRequest

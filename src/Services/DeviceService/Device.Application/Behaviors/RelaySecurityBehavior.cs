@@ -1,9 +1,9 @@
-﻿
+
 using Device.Application.Interfaces;
 
 namespace Device.Application.Behaviors;
 
-internal sealed class RelaySecurityBehavior<TRequest, TResponse>(
+public sealed class RelaySecurityBehavior<TRequest, TResponse>(
     IRelayRepository relayRepository,
     IDeviceSecurityService securityService)
     : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>, IRelayBoundRequest

@@ -1,6 +1,6 @@
 namespace Device.Application.Interfaces;
 
-internal interface IControllerBoundRequest
+public interface IControllerBoundRequest
 {
     public Guid ControllerId { get; }
 }

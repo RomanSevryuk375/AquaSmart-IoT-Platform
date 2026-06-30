@@ -2,7 +2,7 @@ using FluentValidation.Results;
 
 namespace Device.Application.Behaviors;
 
-internal sealed class ValidationBehavior<TRequest, TResponse>(
+public sealed class ValidationBehavior<TRequest, TResponse>(
     IEnumerable<IValidator<TRequest>> validators)
     : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
 {

@@ -2,7 +2,7 @@ using Device.Application.Interfaces;
 
 namespace Device.Application.Behaviors;
 
-internal sealed class DeviceSecurityBehavior<TRequest, TResponse>(
+public sealed class DeviceSecurityBehavior<TRequest, TResponse>(
     IDeviceSecurityService securityService)
     : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>, IDeviceBoundRequest
 {

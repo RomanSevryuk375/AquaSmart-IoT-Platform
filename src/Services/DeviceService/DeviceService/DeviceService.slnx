@@ -9,7 +9,9 @@
     <Project Path="Device.API.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="../Device.Application.UnitTests/Device.Application.UnitTests.csproj" Id="8eab14ea-798c-4ce2-911b-8d0e812844fe" />
     <Project Path="../Device.Domain.UnitTests/Device.Domain.UnitTests.csproj" Id="58dd8f7b-0862-4756-9b7f-0ba62af327f5" />
+    <Project Path="../Device.Infrastructure.IntegrationTests/Device.Infrastructure.IntegrationTests.csproj" Id="a3647c50-a892-44ac-9db7-587c6071bbd4" />
     <Project Path="../Device.TestShared/Device.TestShared.csproj" Id="efe2b16d-46aa-4c6d-8242-1c806269165f" />
   </Folder>
   <Project Path="../../../Contracts/Contracts/Contracts.csproj" />

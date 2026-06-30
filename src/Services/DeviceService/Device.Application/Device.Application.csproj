@@ -1,8 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-  </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="Features\Common\**" />
     <EmbeddedResource Remove="Features\Common\**" />

@@ -1,6 +1,6 @@
 namespace Contracts.Abstractions;
 
-public abstract class AggregateRoot 
+public abstract class AggregateRoot
 {
     private readonly List<IDomainEvent> _domainEvents = [];
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();

@@ -1,11 +1,11 @@
-﻿using Device.Application.Interfaces;
+using Device.Application.Interfaces;
 
 namespace Device.Application.Behaviors;
 
-internal class TelemetrySecurityBehavior<TRequest, TResponse>(
+public sealed class TelemetrySecurityBehavior<TRequest, TResponse>(
     IControllerRepository controllerRepository,
     IMyHasher myHasher)
-    : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>, IMacAddressTokenBoudRequest
+    : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>, IMacAddressTokenBoundRequest
 {
     public async Task<TResponse> Handle(
         TRequest request,

@@ -1,8 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-  </PropertyGroup>
-
   <ItemGroup>
 	<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" />	  
   </ItemGroup>

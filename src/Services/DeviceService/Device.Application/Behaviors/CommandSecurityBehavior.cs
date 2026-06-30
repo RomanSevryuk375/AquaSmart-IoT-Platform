@@ -1,8 +1,8 @@
-﻿using Device.Application.Interfaces;
+using Device.Application.Interfaces;
 
 namespace Device.Application.Behaviors;
 
-internal sealed class CommandSecurityBehaviod<TRequest, TResponse>(
+public sealed class CommandSecurityBehavior<TRequest, TResponse>(
     IRelayCommandsRepository commandsRepository,
     IDeviceSecurityService securityService)
     : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>, ICommandBoundRequest

@@ -1,10 +1,10 @@
-﻿namespace Contracts.Results;
+namespace Contracts.Results;
 
 public class ConsumerResult
 {
     public bool IsSuccess { get; }
     public string? Error { get; }
-    public bool IsRetryable { get; } 
+    public bool IsRetryable { get; }
 
     protected ConsumerResult(bool success, string? error, bool retryable)
     {

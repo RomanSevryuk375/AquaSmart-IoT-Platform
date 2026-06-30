@@ -1,6 +1,6 @@
 namespace Device.Application.Interfaces;
 
-internal interface ISensorBoundRequest
+public interface ISensorBoundRequest
 {
     public Guid SensorId { get; }
 }

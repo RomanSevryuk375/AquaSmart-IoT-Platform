@@ -32,8 +32,8 @@ public class Result<T> : Result
 {
     private readonly T? _value;
 
-    public T Value => IsSuccess 
-        ? _value! 
+    public T Value => IsSuccess
+        ? _value!
         : throw new InvalidOperationException(ResulrErrors.ResultIsFailure);
 
     private Result(T? value, bool isSuccess, Error error) : base(isSuccess, error)
@@ -44,5 +44,8 @@ public class Result<T> : Result
     public static Result<T> Success(T value) => new(value, true, Error.None);
     public static new Result<T> Failure(Error error) => new(default, false, error);
 
-    public static implicit operator Result<T>(T value) => Success(value);
+    public static implicit operator Result<T>(T value)
+    {
+        return Success(value);
+    }
 }
