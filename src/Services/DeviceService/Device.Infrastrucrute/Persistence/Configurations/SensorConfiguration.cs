@@ -20,16 +20,13 @@ public sealed class SensorConfiguration
             .HasMaxLength(CommonConstants.NameLength)
             .IsRequired();
 
-        builder.ComplexProperty(x => x.ConnectionAddress, ca =>
-        {
-            ca.Property(p => p.Protocol)
-                .HasConversion<int>()
-                .IsRequired();
-
-            ca.Property(p => p.Address)
-                .HasMaxLength(CommonConstants.ConnectionAddressLength)
-                .IsRequired();
-        });
+        builder.Property(x => x.ConnectionAddress)
+            .HasConversion(
+                vo => vo.ToString(),
+                dbVal => ConnectionAddress.Parse(dbVal))
+            .HasColumnName("connection_address")
+            .HasMaxLength(64)
+            .IsRequired();
 
         builder.Property(x => x.Type)
             .HasConversion<int>()
@@ -46,6 +43,7 @@ public sealed class SensorConfiguration
         builder.Property(x => x.CreatedAt).IsRequired();
 
         builder.HasIndex(x => x.UserId);
+
         builder.HasIndex(x => new
         {
             x.ControllerId,

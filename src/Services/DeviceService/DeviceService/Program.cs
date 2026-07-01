@@ -1,4 +1,4 @@
-﻿using Contracts.Middlewares;
+using Contracts.Middlewares;
 using Device.API.Extensions;
 using Device.Application.Extesions;
 using Device.Infrastructure.Extensions;
@@ -31,3 +31,7 @@ app.MapHealthChecks(ApiConstants.HealthRoute);
 app.MapControllers();
 
 await app.RunAsync();
+
+#pragma warning disable S1118 
+public partial class Program { }
+#pragma warning restore S1118 

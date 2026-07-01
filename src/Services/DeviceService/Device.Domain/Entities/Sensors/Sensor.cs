@@ -10,6 +10,8 @@ public abstract class Sensor : AggregateRoot, IEntity
         Guid userId,
         DeviceName name,
         ConnectionAddress connectionAddress,
+        SensorType type,
+        string unit,
         DateTime createdAt)
     {
         Id = id;
@@ -17,11 +19,15 @@ public abstract class Sensor : AggregateRoot, IEntity
         UserId = userId;
         Name = name;
         ConnectionAddress = connectionAddress;
+        Type = type;
+        Unit = unit;
         State = SensorState.NoData;
         CreatedAt = createdAt;
     }
 
+#pragma warning disable CS8618 
     protected Sensor() { }
+#pragma warning restore CS8618
 
     public Guid Id { get; init; }
     public Guid ControllerId { get; private set; }
@@ -31,8 +37,8 @@ public abstract class Sensor : AggregateRoot, IEntity
     public SensorState State { get; private set; }
     public DateTime CreatedAt { get; init; }
 
-    public abstract SensorType Type { get; }
-    public abstract string Unit { get; }
+    public SensorType Type { get; private set; }
+    public string Unit { get; private set; }
 
     public Result Update(
         Guid controllerId,

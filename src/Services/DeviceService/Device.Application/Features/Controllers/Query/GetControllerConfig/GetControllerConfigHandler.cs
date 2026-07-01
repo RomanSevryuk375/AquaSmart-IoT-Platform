@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Dapper;
 using Device.Application.Extesions;
 using Device.Application.Interfaces;
@@ -25,20 +25,22 @@ internal sealed class GetControllerConfigHandler(
             LIMIT 1;
 
             SELECT
-                id AS relay_id, name, connection_protocol, connection_address,
-                is_normally_open, purpose, is_active,is_manual
+                id AS relay_id, 
+                name, 
+                split_part(connection_address, '_', 1) AS connection_protocol, 
+                split_part(connection_address, '_', 2) AS connection_address,
+                is_normally_open, purpose, is_active, is_manual
             FROM relays
-            WHERE controller_id = (
-                SELECT id FROM controllers
-                WHERE mac_address = @MacAddress LIMIT 1);
+            WHERE controller_id = (SELECT id FROM controllers WHERE mac_address = @MacAddress LIMIT 1);
 
             SELECT
-                id AS sensor_id, name, connection_protocol, connection_address,
+                id AS sensor_id, 
+                name, 
+                split_part(connection_address, '_', 1) AS connection_protocol, 
+                split_part(connection_address, '_', 2) AS connection_address, 
                 type, unit
             FROM sensors
-            WHERE controller_id = (
-                SELECT id FROM controllers
-                WHERE mac_address = @MacAddress LIMIT 1);
+            WHERE controller_id = (SELECT id FROM controllers WHERE mac_address = @MacAddress LIMIT 1);
             """;
 
         using SqlMapper.GridReader multi = await connection.QueryMultipleAsync(SQL, new { request.MacAddress });

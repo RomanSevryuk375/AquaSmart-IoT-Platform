@@ -10,7 +10,8 @@ public static class TestConstants
     public static readonly Guid SensorId = Guid.Parse("44444444-4444-4444-4444-444444444444");
 
     public const string ValidMacAddress = "00:1A:2B:3C:4D:5E";
-    public const string ValidTokenHash = "$2a$11$TestHash1234567890abcdef";
+    public const string ValidRawToken = "my_super_secret_token";
+    public const string ValidTokenHash = "$2a$11$Z1Qn110XzT2aP23kH6Mv7.R1oXb41p2wE1.0/kX0Vp9H9GjL8wYmW";
     public const string ValidDeviceName = "Test Device";
 
     public const string ValidI2cAddress = "0x38";

@@ -105,6 +105,14 @@ public sealed partial record ConnectionAddress
             address));
     }
 
+    public static ConnectionAddress Parse(string dbValue)
+    {
+        string[] parts = dbValue.Split('_', 2);
+        ConnectionProtocol protocol = Enum.Parse<ConnectionProtocol>(parts[0]);
+
+        return Create(protocol, parts[1]).Value;
+    }
+
     [GeneratedRegex(CommonConstants.I2cRegex, RegexOptions.CultureInvariant)]
     private static partial Regex I2cRegex();
 
