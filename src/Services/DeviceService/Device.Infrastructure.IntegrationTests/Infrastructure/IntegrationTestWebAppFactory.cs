@@ -33,16 +33,21 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
         {
             ServiceDescriptor? massTransitHostedService = services.FirstOrDefault(d =>
                 d.ImplementationType?.Name == "MassTransitHostedService");
-
             if (massTransitHostedService != null)
             {
                 services.Remove(massTransitHostedService);
             }
 
+            ServiceDescriptor? quartzHostedService = services.FirstOrDefault(d =>
+                d.ImplementationType?.Name == "QuartzHostedService");
+            if (quartzHostedService != null)
+            {
+                services.Remove(quartzHostedService);
+            }
+
             ServiceProvider serviceProvider = services.BuildServiceProvider();
             using IServiceScope scope = serviceProvider.CreateScope();
             SystemDbContext context = scope.ServiceProvider.GetRequiredService<SystemDbContext>();
-
             context.Database.Migrate();
         });
     }

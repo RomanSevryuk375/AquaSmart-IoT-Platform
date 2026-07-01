@@ -16,8 +16,10 @@ internal sealed class GetAllRelaysHandler(
 
         const string SQL = """
             SELECT 
-                id, controller_id, power_sensor_id, name, connection_protocol, 
-                connection_address, is_normally_open, purpose, is_active, 
+                id, controller_id, power_sensor_id, name,
+                split_part(connection_address, '_', 1) AS ConnectionProtocol, 
+                split_part(connection_address, '_', 2) AS ConnectionAddress, 
+                is_normally_open, purpose, is_active, 
                 is_manual, created_at
             FROM relays
             WHERE user_id = @UserId

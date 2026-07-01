@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Dapper;
 using Device.Application.Interfaces;
 
@@ -52,7 +52,7 @@ internal sealed class GetPendingCommandsHandler(
                 ORDER BY created_at
                 FOR UPDATE SKIP LOCKED)
             RETURNING 
-                id, controller_id, relay_id, action, status, 
+                id, controller_id, relay_id, targe_state, status, 
                 expire_at, attempt_count, processed_at, error_message, created_at;
             """;
 

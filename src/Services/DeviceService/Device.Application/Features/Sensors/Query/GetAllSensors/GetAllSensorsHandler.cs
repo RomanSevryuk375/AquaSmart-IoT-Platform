@@ -16,8 +16,10 @@ internal sealed class GetAllSensorsHandler(
 
         const string SQL = """
             SELECT 
-                id, controller_id, name, connection_protocol, connection_address, 
-                type, state, unit, last_value, is_data_delayed, updated_at, created_at
+                id, controller_id, name, 
+                split_part(connection_address, '_', 1) AS ConnectionProtocol, 
+                split_part(connection_address, '_', 2) AS ConnectionAddress, 
+                type, state, unit, created_at
             FROM sensors
             WHERE user_id = @UserId
               AND (@ControllerId IS NULL OR controller_id = @ControllerId)
