@@ -1,9 +1,9 @@
-﻿using Contracts.Events.TelemetryEvents;
+using Contracts.Events.TelemetryEvents;
 using MassTransit;
 
 namespace Device.Application.Features.Telemetry.Command.TransmittTelemetry;
 
-internal sealed class TransmittTelemetryHandler(
+public sealed class TransmitTelemetryHandler(
     ISensorRepository sensorRepository,
     IControllerRepository controllerRepository,
     IPublishEndpoint publishEndpoint)
@@ -46,10 +46,10 @@ internal sealed class TransmittTelemetryHandler(
         TransmitTelemetryCommand request,
         List<TelemetryBatchEventItem> batchItemsForEvent)
     {
-        if (controllerSensorIds.Contains(item.SensorId))
+        if (!controllerSensorIds.Contains(item.SensorId))
         {
-            response.ValidationErrors.Add(
-                string.Format(ErrorMessages.SensorNotBelongToController, item.SensorId, request.MacAddress));
+            response.ValidationErrors.Add(string.Format(
+                ErrorMessages.SensorNotBelongToController, item.SensorId, request.MacAddress));
             response.SkippedCount++;
             return;
         }

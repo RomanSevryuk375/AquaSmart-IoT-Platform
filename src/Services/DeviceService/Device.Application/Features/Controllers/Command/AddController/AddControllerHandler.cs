@@ -3,7 +3,7 @@ using MassTransit;
 
 namespace Device.Application.Features.Controllers.Command.AddController;
 
-internal sealed class AddControllerHandler(
+public sealed class AddControllerHandler(
     IUserContext userContext,
     IMyHasher myHasher,
     IControllerRepository controllerRepository,
@@ -28,13 +28,13 @@ internal sealed class AddControllerHandler(
                 controller.Error);
         }
 
-        Guid result = await controllerRepository.AddAsync(controller.Value, cancellationToken);
+        await controllerRepository.AddAsync(controller.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<ControllerRegisteredResponse>.Success(
             new ControllerRegisteredResponse
             {
-                ControllerId = result,
+                ControllerId = controller.Value.Id,
                 DeviceToken = deviceToken
             });
     }

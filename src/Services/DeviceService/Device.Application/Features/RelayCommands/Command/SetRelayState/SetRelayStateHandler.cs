@@ -1,8 +1,8 @@
-﻿using MassTransit;
+using MassTransit;
 
 namespace Device.Application.Features.RelayCommands.Command.SetRelayState;
 
-internal sealed class SetRelayStateHandler(
+public sealed class SetRelayStateHandler(
     IRelayRepository relayRepository,
     IControllerRepository controllerRepository,
     IRelayCommandsRepository queueRepository,

@@ -2,7 +2,7 @@ using Device.Application.Interfaces;
 
 namespace Device.Application.Features.Sensors.Command.UpdateSensor;
 
-internal sealed class UpdateSensorHandler(
+public sealed class UpdateSensorHandler(
     ISensorRepository sensorRepository,
     IDeviceSecurityService securityService,
     IUnitOfWork unitOfWork) : IRequestHandler<UpdateSensorCommand, Result>

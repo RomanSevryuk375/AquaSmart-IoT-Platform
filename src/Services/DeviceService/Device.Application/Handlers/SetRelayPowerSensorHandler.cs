@@ -6,8 +6,7 @@ namespace Device.Application.Handlers;
 
 public sealed class SetRelayPowerSensorHandler(
     IPublishEndpoint publishEndpoint,
-    IMapper mapper)
-    : INotificationHandler<SetRelayPowerSensorDomainEvent>
+    IMapper mapper) : INotificationHandler<SetRelayPowerSensorDomainEvent>
 {
     public async Task Handle(
         SetRelayPowerSensorDomainEvent notification,
