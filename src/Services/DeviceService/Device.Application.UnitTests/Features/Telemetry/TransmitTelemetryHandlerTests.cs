@@ -1,14 +1,6 @@
 using Contracts.Events.TelemetryEvents;
-using Contracts.Results;
 using Device.Application.Features.Telemetry.Command.TransmittTelemetry;
-using Device.Domain.Entities;
-using Device.Domain.Entities.Sensors;
-using Device.Domain.Interfaces;
-using Device.TestShared.Builders;
-using Device.TestShared.Constants;
-using FluentAssertions;
 using MassTransit;
-using NSubstitute;
 
 namespace Device.Application.UnitTests.Features.Telemetry;
 

@@ -1,11 +1,4 @@
-using Contracts.Enums;
-using Contracts.Results;
 using Device.Application.Features.RelayCommands.Command.DeleteCompleted;
-using Device.Domain.Entities;
-using Device.Infrastructure.IntegrationTests.Infrastructure;
-using Device.TestShared.Builders;
-using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Device.Infrastructure.IntegrationTests.BackgroundJobs;
 

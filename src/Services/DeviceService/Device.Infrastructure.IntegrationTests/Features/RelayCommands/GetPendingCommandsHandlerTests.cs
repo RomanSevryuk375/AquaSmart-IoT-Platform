@@ -1,12 +1,5 @@
-using Contracts.Enums;
-using Contracts.Results;
 using Device.Application.Extesions;
 using Device.Application.Features.RelayCommands.Query.GetPending;
-using Device.Domain.Entities;
-using Device.Infrastructure.IntegrationTests.Infrastructure;
-using Device.TestShared.Builders;
-using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Device.Infrastructure.IntegrationTests.Features.RelayCommands;
 

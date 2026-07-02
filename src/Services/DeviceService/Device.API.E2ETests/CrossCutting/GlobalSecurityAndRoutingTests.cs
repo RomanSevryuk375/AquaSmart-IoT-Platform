@@ -1,11 +1,5 @@
-using System.Net;
-using System.Net.Http.Json;
-using Contracts.Constants;
-using Device.API.E2ETests.Infrastructure;
 using Device.Application.Features.Controllers.Command.AddController;
 using Device.Domain.Entities;
-using Device.TestShared.Builders;
-using FluentAssertions;
 
 namespace Device.API.E2ETests.CrossCutting;
 

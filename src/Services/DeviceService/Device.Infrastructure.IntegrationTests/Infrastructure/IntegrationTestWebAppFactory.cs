@@ -1,6 +1,4 @@
-using Device.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
 
 namespace Device.Infrastructure.IntegrationTests.Infrastructure;

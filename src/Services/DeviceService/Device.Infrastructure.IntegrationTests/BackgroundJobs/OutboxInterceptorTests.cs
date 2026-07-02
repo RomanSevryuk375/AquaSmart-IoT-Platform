@@ -1,10 +1,5 @@
-using Device.Domain.Entities;
 using Device.Domain.Events.ControllerEvents;
-using Device.Infrastructure.IntegrationTests.Infrastructure;
 using Device.Infrastructure.Persistence.Outbox;
-using Device.TestShared.Builders;
-using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Device.Infrastructure.IntegrationTests.BackgroundJobs;
 

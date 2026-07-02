@@ -1,12 +1,4 @@
-using Contracts.Enums;
-using Contracts.Results;
 using Device.Application.Features.Sensors.Command.UpdateSensor;
-using Device.Application.Interfaces;
-using Device.Domain.Entities.Sensors;
-using Device.Domain.Interfaces;
-using Device.TestShared.Builders;
-using FluentAssertions;
-using NSubstitute;
 
 namespace Device.Application.UnitTests.Features.Sensors;
 

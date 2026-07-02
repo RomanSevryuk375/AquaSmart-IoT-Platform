@@ -1,6 +1,4 @@
-using Device.Infrastructure.Persistence;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Respawn;
 

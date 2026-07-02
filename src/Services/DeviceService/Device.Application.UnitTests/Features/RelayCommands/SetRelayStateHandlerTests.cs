@@ -1,10 +1,4 @@
-using Contracts.Results;
 using Device.Application.Features.RelayCommands.Command.SetRelayState;
-using Device.Domain.Entities;
-using Device.Domain.Interfaces;
-using Device.TestShared.Builders;
-using FluentAssertions;
-using NSubstitute;
 
 namespace Device.Application.UnitTests.Features.RelayCommands;
 

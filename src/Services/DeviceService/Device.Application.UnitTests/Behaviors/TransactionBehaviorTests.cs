@@ -1,12 +1,7 @@
 // Ignore Spelling: Rethrows
 
 using Contracts.Abstractions;
-using Contracts.Results;
 using Device.Application.Behaviors;
-using Device.Domain.Interfaces;
-using FluentAssertions;
-using MediatR;
-using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 
 namespace Device.Application.UnitTests.Behaviors;

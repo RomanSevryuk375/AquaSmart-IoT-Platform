@@ -1,8 +1,3 @@
-using Contracts.Enums;
-using Contracts.Results;
-using Device.Domain.Entities;
-using Device.TestShared.Constants;
-
 namespace Device.TestShared.Builders;
 
 public class RelayBuilder

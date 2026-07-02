@@ -1,15 +1,8 @@
-using System.Net;
-using System.Net.Http.Json;
-using Contracts.Constants;
 using Contracts.Enums;
-using Device.API.E2ETests.Infrastructure;
 using Device.Application.Features.Relays.Command.AddRelay;
 using Device.Application.Features.Relays.Command.UpdateRelay;
 using Device.Application.Features.Relays.Query.Shared;
 using Device.Domain.Entities;
-using Device.TestShared.Builders;
-using Device.TestShared.Constants;
-using FluentAssertions;
 
 namespace Device.API.E2ETests.Controllers;
 

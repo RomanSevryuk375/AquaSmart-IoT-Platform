@@ -1,11 +1,4 @@
-using Contracts.Results;
 using Device.Application.Features.Controllers.Command.AddController;
-using Device.Application.Interfaces;
-using Device.Domain.Entities;
-using Device.Domain.Interfaces;
-using Device.TestShared.Constants;
-using FluentAssertions;
-using NSubstitute;
 
 namespace Device.Application.UnitTests.Features.Controllers;
 

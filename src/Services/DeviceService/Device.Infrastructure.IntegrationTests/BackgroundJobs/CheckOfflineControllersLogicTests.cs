@@ -1,10 +1,4 @@
-using Contracts.Results;
 using Device.Application.Interfaces;
-using Device.Domain.Entities;
-using Device.Infrastructure.IntegrationTests.Infrastructure;
-using Device.TestShared.Builders;
-using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Device.Infrastructure.IntegrationTests.BackgroundJobs;
 

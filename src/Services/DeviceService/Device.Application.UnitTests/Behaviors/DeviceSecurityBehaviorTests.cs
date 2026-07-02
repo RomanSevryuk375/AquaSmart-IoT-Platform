@@ -1,9 +1,4 @@
-using Contracts.Results;
 using Device.Application.Behaviors;
-using Device.Application.Interfaces;
-using FluentAssertions;
-using MediatR;
-using NSubstitute;
 
 namespace Device.Application.UnitTests.Behaviors;
 

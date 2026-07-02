@@ -1,9 +1,11 @@
-global using AutoMapper;
-global using Contracts.Constants;
 global using Contracts.Enums;
 global using Contracts.Results;
+global using Device.Application.Interfaces;
 global using Device.Domain.Entities;
 global using Device.Domain.Entities.Sensors;
 global using Device.Domain.Interfaces;
-global using FluentValidation;
+global using Device.TestShared.Builders;
+global using Device.TestShared.Constants;
+global using FluentAssertions;
 global using MediatR;
+global using NSubstitute;

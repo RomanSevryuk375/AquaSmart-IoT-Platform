@@ -1,5 +1,3 @@
-using Contracts.Enums;
-
 namespace Device.TestShared.Constants;
 
 public static class TestConstants

@@ -1,12 +1,6 @@
-using Contracts.Enums;
-using Contracts.Results;
 using Device.Application.Features.Sensors.Query.GetAllSensors;
 using Device.Application.Features.Sensors.Query.Shared;
-using Device.Domain.Entities;
 using Device.Domain.Entities.Sensors;
-using Device.Infrastructure.IntegrationTests.Infrastructure;
-using Device.TestShared.Builders;
-using FluentAssertions;
 
 namespace Device.Infrastructure.IntegrationTests.Features.Sensors;
 

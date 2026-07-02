@@ -1,10 +1,3 @@
-using Contracts.Enums;
-using Contracts.Results;
-using Device.Domain.Entities;
-using Device.TestShared.Builders;
-using Device.TestShared.Constants;
-using FluentAssertions;
-
 namespace Device.Domain.UnitTests.Entities;
 
 public class RelayCommandTests

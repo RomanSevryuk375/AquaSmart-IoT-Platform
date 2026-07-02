@@ -1,16 +1,9 @@
-using System.Net;
-using System.Net.Http.Json;
-using Contracts.Constants;
 using Contracts.Enums;
-using Device.API.E2ETests.Infrastructure;
 using Device.Application.Extesions;
 using Device.Application.Features.Sensors.Command.AddSensor;
 using Device.Application.Features.Telemetry.Command.TransmittTelemetry;
 using Device.Domain.Entities;
 using Device.Domain.Entities.Sensors;
-using Device.TestShared.Builders;
-using Device.TestShared.Constants;
-using FluentAssertions;
 
 namespace Device.API.E2ETests.Controllers;
 

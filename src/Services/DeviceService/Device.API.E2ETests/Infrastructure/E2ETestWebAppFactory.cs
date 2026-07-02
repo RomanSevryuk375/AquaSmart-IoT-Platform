@@ -1,5 +1,5 @@
 using Device.Infrastructure.IntegrationTests.Infrastructure;
-using MassTransit; // 🚀 НЕ ЗАБУДЬ USING
+using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;

@@ -1,9 +1,3 @@
-using Contracts.Enums;
-using Contracts.Results;
-using Device.Domain.Entities.Sensors;
-using Device.Domain.Factories;
-using Device.TestShared.Constants;
-
 namespace Device.TestShared.Builders;
 
 public class SensorBuilder
