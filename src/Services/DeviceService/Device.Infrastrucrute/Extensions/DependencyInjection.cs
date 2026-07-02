@@ -10,6 +10,7 @@ using Device.Infrastructure.Persistence.Outbox;
 using Device.Infrastructure.Persistence.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Quartz;
 
 namespace Device.Infrastructure.Extensions;
@@ -53,6 +54,8 @@ public static class DependencyInjection
         services.AddScoped<IUserContext, UserContext>();
 
         services.AddHttpContextAccessor();
+
+        services.AddHostedService<DatabaseMigrationService>();
 
         return services;
     }
@@ -131,4 +134,17 @@ public static class DependencyInjection
 
         return services;
     }
+}
+
+internal sealed class DatabaseMigrationService(IServiceProvider serviceProvider) : IHostedService
+{
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        using IServiceScope scope = serviceProvider.CreateScope();
+        SystemDbContext context = scope.ServiceProvider.GetRequiredService<SystemDbContext>();
+
+        await context.Database.MigrateAsync(cancellationToken);
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

@@ -1,4 +1,4 @@
-﻿using Device.Application.Interfaces;
+using Device.Application.Interfaces;
 using Device.Domain.Specifications;
 
 namespace Device.Application.Services;
@@ -7,7 +7,7 @@ public sealed class ControllerOfflineCheckerService(
     IControllerRepository repository,
     IUnitOfWork unitOfWork) : IControllerOfflineCheckerService
 {
-    public async Task<Result> CheckAndDisableControllerAsync(CancellationToken cancellationToken)
+    public async Task<Result<int>> CheckAndDisableControllerAsync(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -20,7 +20,7 @@ public sealed class ControllerOfflineCheckerService(
 
             if (!controllers.Any())
             {
-                return Result.Success();
+                return Result<int>.Success(0);
             }
 
             foreach (Controller controller in controllers)
@@ -30,11 +30,11 @@ public sealed class ControllerOfflineCheckerService(
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return Result.Success();
+            return Result<int>.Success(controllers.Count);
         }
         catch (Exception ex)
         {
-            return Result.Failure(Error.Failure(ErrorMessages.DatabaseError, ex.Message));
+            return Result<int>.Failure(Error.Failure(ErrorMessages.DatabaseError, ex.Message));
         }
     }
 }

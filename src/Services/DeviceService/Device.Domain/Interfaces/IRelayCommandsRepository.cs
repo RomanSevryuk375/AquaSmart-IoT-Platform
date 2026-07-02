@@ -2,7 +2,7 @@ namespace Device.Domain.Interfaces;
 
 public interface IRelayCommandsRepository : IRepository<RelayCommand>
 {
-    public Task DeleteCompletedAsync(
+    public Task<int> DeleteCompletedAsync(
         CancellationToken cancellationToken = default);
 
     public Task<IReadOnlyList<RelayCommand>> GetPendingByControllerIdAsync(

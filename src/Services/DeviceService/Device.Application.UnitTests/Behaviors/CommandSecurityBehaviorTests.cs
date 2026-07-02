@@ -54,7 +54,8 @@ public class CommandSecurityBehaviorTests
 
         _commandsRepoMock.GetByIdAsync(request.CommandId, Arg.Any<CancellationToken>()).Returns(command);
 
-        _securityServiceMock.EnsureDeviceAccessAsync(command.ControllerId, request.DeviceToken, Arg.Any<CancellationToken>())
+        _securityServiceMock.EnsureDeviceAccessAsync(
+            command.ControllerId, request.DeviceToken, Arg.Any<CancellationToken>())
             .Returns(Result.Failure(Error.Conflict("Access.Denied", "Invalid device token")));
 
         // Act
@@ -75,7 +76,8 @@ public class CommandSecurityBehaviorTests
         RelayCommand command = new RelayCommandBuilder().WithId(request.CommandId).Build();
 
         _commandsRepoMock.GetByIdAsync(request.CommandId, Arg.Any<CancellationToken>()).Returns(command);
-        _securityServiceMock.EnsureDeviceAccessAsync(command.ControllerId, request.DeviceToken, Arg.Any<CancellationToken>())
+        _securityServiceMock.EnsureDeviceAccessAsync(
+            command.ControllerId, request.DeviceToken, Arg.Any<CancellationToken>())
             .Returns(Result.Success());
 
         // Act

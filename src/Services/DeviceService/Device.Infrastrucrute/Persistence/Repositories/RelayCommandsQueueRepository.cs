@@ -25,10 +25,10 @@ public sealed class RelayCommandsQueueRepository(SystemDbContext dbContext)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task DeleteCompletedAsync(
+    public async Task<int> DeleteCompletedAsync(
         CancellationToken cancellationToken = default)
     {
-        await Context.RelayCommands
+        return await Context.RelayCommands
             .Where(x => x.Status == CommandStatus.Completed
                      || x.ExpireAt < DateTime.UtcNow)
             .ExecuteDeleteAsync(cancellationToken);

@@ -2,35 +2,48 @@ using Contracts.Middlewares;
 using Device.API.Extensions;
 using Device.Application.Extesions;
 using Device.Infrastructure.Extensions;
-using Device.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
+using Serilog;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-builder.Services.AddInfrastructure(builder.Configuration)
-                .AddApplication(builder.Configuration)
-                .AddApi(builder.Configuration);
-
-WebApplication app = builder.Build();
-
-app.UseGlobalExceptionHandler();
-
-using (IServiceScope scope = app.Services.CreateScope())
+try
 {
-    SystemDbContext context = scope.ServiceProvider.GetRequiredService<SystemDbContext>();
-    await context.Database.MigrateAsync();
+    Log.Information("Starting DeviceService application");
+
+    WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+    builder.AddElkLogging()
+        .Services
+            .AddInfrastructure(builder.Configuration)
+            .AddApplication(builder.Configuration)
+            .AddApi(builder.Configuration);
+
+    WebApplication app = builder.Build();
+
+    app.UseGlobalExceptionHandler();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.MapHealthChecks(ApiConstants.HealthRoute);
+    app.MapControllers();
+
+    await app.RunAsync();
 }
-
-app.UseSwagger();
-app.UseSwaggerUI();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapHealthChecks(ApiConstants.HealthRoute);
-app.MapControllers();
-
-await app.RunAsync();
+catch (Exception ex)
+{
+    Log.Fatal(ex, "DeviceService terminated unexpectedly");
+    throw;
+}
+finally
+{
+#pragma warning disable S6966 
+    Log.CloseAndFlush();
+#pragma warning restore S6966 
+}
 
 #pragma warning disable S1118 
 public partial class Program { }
