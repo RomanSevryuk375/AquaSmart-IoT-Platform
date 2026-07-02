@@ -4,7 +4,6 @@
     </PropertyGroup>
     <ItemGroup>
         <!-- Code Analyzers -->
-        <PackageVersion Include="NSubstitute" Version="5.3.0" />
         <PackageVersion Include="SonarAnalyzer.CSharp" Version="9.27.0.93347" />
         <!-- Microsoft / Entity Framework -->
         <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.25" />

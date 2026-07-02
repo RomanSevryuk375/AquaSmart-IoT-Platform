@@ -1,0 +1,83 @@
+name: Microservices CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build-and-test:
+    name: Test [${{ matrix.service }}]
+    runs-on: ubuntu-latest
+    
+    strategy:
+
+      fail-fast: false 
+      matrix:
+        service: 
+          - DeviceService
+          # - ControlService
+          # - TelemetryService
+          # - IdentityService
+          # - NotificationService
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8.0
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Build ${{ matrix.service }}
+      run: |
+        echo "Building all .csproj files in src/Services/${{ matrix.service }}..."
+        for project in $(find src/Services/${{ matrix.service }} -name "*.csproj"); do
+          echo "Building $project"
+          dotnet build "$project" --configuration Release
+        done
+
+    - name: Run Architecture Tests
+      run: |
+        for file in $(find src/Services/${{ matrix.service }} -name "*ArchitectureTests.csproj"); do
+          echo "Running $file"
+          dotnet test "$file" --configuration Release --no-build --logger "trx;LogFileName=$(basename $file).trx" /p:UseSlnx=true
+        done
+
+    - name: Run Unit Tests
+      run: |
+        for file in $(find src/Services/${{ matrix.service }} -name "*UnitTests.csproj"); do
+          echo "Running $file"
+          dotnet test "$file" --configuration Release --no-build --logger "trx;LogFileName=$(basename $file).trx" /p:UseSlnx=true
+        done
+
+    - name: Run Integration Tests
+      run: |
+        for file in $(find src/Services/${{ matrix.service }} -name "*IntegrationTests.csproj"); do
+          echo "Running $file"
+          dotnet test "$file" --configuration Release --no-build --logger "trx;LogFileName=$(basename $file).trx" /p:UseSlnx=true
+        done
+
+    - name: Run E2E Tests
+      run: |
+        for file in $(find src/Services/${{ matrix.service }} -name "*E2ETests.csproj"); do
+          echo "Running $file"
+          dotnet test "$file" --configuration Release --no-build --logger "trx;LogFileName=$(basename $file).trx" /p:UseSlnx=true
+        done
+
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: always() 
+      with:
+        name: test-results-${{ matrix.service }}
+        path: '**/*.trx'
