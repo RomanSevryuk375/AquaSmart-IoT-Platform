@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Device.Application.Features.Relays.Command.AddRelay;
 using Device.Application.Features.Relays.Command.DeleteRelay;
 using Device.Application.Features.Relays.Command.UpdateRelay;
@@ -73,7 +73,7 @@ public sealed class RelaysController(
 
         return CreatedAtRoute(
             NameGetById,
-            new { id = result.Value },
+            new { id = result.Value.Id },
             result.Value);
     }
 

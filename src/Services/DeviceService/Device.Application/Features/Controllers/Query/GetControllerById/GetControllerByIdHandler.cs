@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Dapper;
 using Device.Application.Features.Controllers.Query.Shared;
 
@@ -23,7 +23,7 @@ internal sealed class GetControllerByIdHandler(
             """;
 
         ControllerDto? controller = await connection.QueryFirstOrDefaultAsync<ControllerDto>(SQL,
-            new { request.ControllerId });
+            new { request.ControllerId, request.UserId });
 
         if (controller is null)
         {

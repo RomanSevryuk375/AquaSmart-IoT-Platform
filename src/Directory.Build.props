@@ -9,7 +9,9 @@
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
 
-    <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.IntegrationTests', System.StringComparison.OrdinalIgnoreCase)) Or $(MSBuildProjectName.EndsWith('.UnitTests', System.StringComparison.OrdinalIgnoreCase))">
+    <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.IntegrationTests', System.StringComparison.OrdinalIgnoreCase))
+                   Or $(MSBuildProjectName.EndsWith('.UnitTests', System.StringComparison.OrdinalIgnoreCase))
+                   Or $(MSBuildProjectName.EndsWith('.E2ETests', System.StringComparison.OrdinalIgnoreCase))">
         <IsTestProject>true</IsTestProject>
     </PropertyGroup>
 

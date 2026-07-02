@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Device.Application.Features.Sensors.Command.AddSensor;
 using Device.Application.Features.Sensors.Command.DeleteSensor;
 using Device.Application.Features.Sensors.Command.UpdateSensor;
@@ -75,7 +75,7 @@ public sealed class SensorsController(
 
         return CreatedAtRoute(
             NameGetById,
-            new { id = result.Value },
+            new { id = result.Value.Id },
             result.Value);
     }
 
