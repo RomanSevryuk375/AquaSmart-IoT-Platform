@@ -27,7 +27,7 @@ public sealed class RelayCommand : IEntity
     }
 
 #pragma warning disable CS8618
-    public RelayCommand() { }
+    private RelayCommand() { }
 #pragma warning restore CS8618 
 
     public Guid Id { get; private set; }

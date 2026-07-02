@@ -25,7 +25,7 @@ public sealed class Controller : AggregateRoot, IEntity
     }
 
 #pragma warning disable CS8618 
-    public Controller() { }
+    private Controller() { }
 #pragma warning restore CS8618 
 
     public Guid Id { get; init; }

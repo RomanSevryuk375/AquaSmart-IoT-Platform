@@ -10,9 +10,6 @@ internal sealed class AddRelayValidator
         RuleFor(x => x.ConnectionAddress)
             .NotEmpty();
 
-        RuleFor(x => x.PowerSensorId)
-            .NotEmpty();
-
         RuleFor(x => x.Name)
             .NotEmpty()
             .MaximumLength(CommonConstants.NameLength);
@@ -25,17 +22,8 @@ internal sealed class AddRelayValidator
             .NotEmpty()
             .MaximumLength(CommonConstants.ConnectionAddressLength);
 
-        RuleFor(x => x.IsNormallyOpen)
-            .NotEmpty();
-
         RuleFor(x => x.Purpose)
             .NotEmpty()
             .IsInEnum();
-
-        RuleFor(x => x.IsActive)
-            .NotEmpty();
-
-        RuleFor(x => x.IsManual)
-            .NotEmpty();
     }
 }

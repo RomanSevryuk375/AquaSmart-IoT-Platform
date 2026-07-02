@@ -16,7 +16,8 @@ public static class BehaviorHelpers
         {
             Type resultTypeArg = typeof(TResponse).GetGenericArguments()[0];
             Type genericResultType = typeof(Result<>).MakeGenericType(resultTypeArg);
-            MethodInfo? failureMethod = genericResultType.GetMethod("Failure");
+            MethodInfo? failureMethod = genericResultType.GetMethod("Failure",
+                BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
             if (failureMethod != null)
             {

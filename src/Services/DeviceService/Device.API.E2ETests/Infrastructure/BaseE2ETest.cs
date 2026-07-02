@@ -1,28 +1,31 @@
+using System.Net.Http.Headers;
 using Device.Infrastructure.Persistence;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Respawn;
 
-namespace Device.Infrastructure.IntegrationTests.Infrastructure;
+namespace Device.API.E2ETests.Infrastructure;
 
-[Collection("IntegrationTestCollection")]
-public abstract class BaseIntegrationTest : IAsyncLifetime
+[Collection("E2ETestCollection")]
+public abstract class BaseE2ETest : IAsyncLifetime
 {
-    private readonly IServiceScope _scope;
-    protected readonly ISender Sender;
+    protected readonly HttpClient Client;
     protected readonly SystemDbContext DbContext;
-    private readonly string _dbConnectionString;
+    protected readonly E2ETestWebAppFactory Factory;
 
+    private readonly IServiceScope _scope;
+    private readonly string _dbConnectionString;
     private Respawner _respawner = default!;
 
-    protected BaseIntegrationTest(IntegrationTestWebAppFactory factory)
+    protected BaseE2ETest(E2ETestWebAppFactory factory)
     {
+        Factory = factory;
+        Client = factory.CreateClient();
+        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Test");
+
         _scope = factory.Services.CreateScope();
-
-        Sender = _scope.ServiceProvider.GetRequiredService<ISender>();
         DbContext = _scope.ServiceProvider.GetRequiredService<SystemDbContext>();
-
         _dbConnectionString = DbContext.Database.GetConnectionString()!;
     }
 

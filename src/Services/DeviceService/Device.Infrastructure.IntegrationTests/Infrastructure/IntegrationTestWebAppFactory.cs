@@ -5,7 +5,7 @@ using Testcontainers.PostgreSql;
 
 namespace Device.Infrastructure.IntegrationTests.Infrastructure;
 
-public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsyncLifetime
+public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private const string PostgresImage = "postgres:16-alpine";
     private const string DatabaseName = "device_test_db";

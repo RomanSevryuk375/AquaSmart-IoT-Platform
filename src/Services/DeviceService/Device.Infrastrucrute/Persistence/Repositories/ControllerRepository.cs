@@ -1,3 +1,6 @@
+using Contracts.Results;
+using Device.Domain.ValueObjects;
+
 namespace Device.Infrastructure.Persistence.Repositories;
 
 public sealed class ControllerRepository(SystemDbContext dbContext)
@@ -7,8 +10,14 @@ public sealed class ControllerRepository(SystemDbContext dbContext)
         string macAddress,
         CancellationToken cancellationToken = default)
     {
+        Result<MacAddress> macResult = MacAddress.Create(macAddress);
+        if (macResult.IsFailure)
+        {
+            return null;
+        }
+
         return await Context.Controllers
-            .FirstOrDefaultAsync(x => x.MacAddress.Value == macAddress, cancellationToken);
+            .FirstOrDefaultAsync(x => x.MacAddress == macResult.Value, cancellationToken);
     }
 
     public async Task<Controller?> GetByDeviceTokenAsync(

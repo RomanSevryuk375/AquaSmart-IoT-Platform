@@ -31,7 +31,7 @@ public sealed class Relay : AggregateRoot, IEntity
     }
 
 #pragma warning disable CS8618
-    public Relay() { }
+    private Relay() { }
 #pragma warning restore CS8618
 
     public Guid Id { get; init; }

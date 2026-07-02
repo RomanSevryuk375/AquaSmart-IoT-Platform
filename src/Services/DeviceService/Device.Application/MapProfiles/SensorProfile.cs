@@ -1,6 +1,7 @@
 using Contracts.Events.RelayEvents;
 using Contracts.Events.SensorEvents;
 using Device.Application.Features.Controllers.Query.GetControllerConfig;
+using Device.Application.Features.Sensors.Command.AddSensor;
 using Device.Domain.Events.RelayEvents;
 using Device.Domain.Events.SensorEvents;
 
@@ -10,6 +11,10 @@ public sealed class SensorProfile : Profile
 {
     public SensorProfile()
     {
+        CreateMap<Sensor, SensorCreatedResponse>()
+            .ForMember(desc => desc.Id,
+                       opt => opt.MapFrom(src => src.Id));
+
         CreateMap<Sensor, SensorUpdatedEvent>()
             .ForMember(desc => desc.SensorId,
                        opt => opt.MapFrom(src => src.Id));
@@ -32,6 +37,6 @@ public sealed class SensorProfile : Profile
 
         CreateMap<SensorUpdatedDomainEvent, SensorUpdatedEvent>();
 
-        CreateMap<SetRelayPowerSensorDomainEvent, SetRelayPowerSensorEvent>(); 
+        CreateMap<SetRelayPowerSensorDomainEvent, SetRelayPowerSensorEvent>();
     }
 }
