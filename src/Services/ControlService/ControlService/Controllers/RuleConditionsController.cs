@@ -1,9 +1,9 @@
 ﻿using Contracts.Authorization;
 using Contracts.Results;
 using Control.Application.DTOs.AutomationRule;
-using Control.Application.Features.RuleCondition.Command.AddCondition;
-using Control.Application.Features.RuleCondition.Command.DeleteCondition;
-using Control.Application.Features.RuleCondition.Command.UpdateCondition;
+using Control.Application.Features.RuleConditions.Command.AddCondition;
+using Control.Application.Features.RuleConditions.Command.DeleteCondition;
+using Control.Application.Features.RuleConditions.Command.UpdateCondition;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

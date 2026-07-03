@@ -20,7 +20,7 @@ public sealed class SensorService(
         SensorStateChangedEvent @event,
         CancellationToken cancellationToken)
     {
-        SensorEntity? sensor = await sensorRepository.GetByIdAsync(
+        Sensor? sensor = await sensorRepository.GetByIdAsync(
             @event.SensorId, cancellationToken);
         if (sensor is null)
         {
@@ -59,7 +59,7 @@ public sealed class SensorService(
         SensorDeletedEvent @event,
         CancellationToken cancellationToken)
     {
-        SensorEntity? sensor = await sensorRepository.GetByIdAsync(
+        Sensor? sensor = await sensorRepository.GetByIdAsync(
             @event.SensorId, cancellationToken);
         if (sensor is null)
         {
@@ -76,7 +76,7 @@ public sealed class SensorService(
         SensorNoDataEvent @event,
         CancellationToken cancellationToken)
     {
-        SensorEntity? sensor = await sensorRepository.GetByIdAsync(
+        Sensor? sensor = await sensorRepository.GetByIdAsync(
             @event.SensorId, cancellationToken);
         if (sensor is null)
         {
@@ -84,7 +84,7 @@ public sealed class SensorService(
                 $"Sensor {@event.SensorId} not found.");
         }
 
-        EcosystemEntity? ecosystem = await ecosystemRepository.GetByIdAsync(
+        Ecosystem? ecosystem = await ecosystemRepository.GetByIdAsync(
             sensor.EcosystemId, cancellationToken);
         if (ecosystem is null)
         {
@@ -129,7 +129,7 @@ public sealed class SensorService(
         SensorUpdatedEvent @event,
         CancellationToken cancellationToken)
     {
-        SensorEntity? sensor = await sensorRepository.GetByIdAsync(@event.SensorId, cancellationToken);
+        Sensor? sensor = await sensorRepository.GetByIdAsync(@event.SensorId, cancellationToken);
 
         if (sensor is null)
         {
@@ -159,7 +159,7 @@ public sealed class SensorService(
         SensorRenamedEvent @event,
         CancellationToken cancellationToken)
     {
-        SensorEntity? existingSensor = await sensorRepository.GetByIdAsync(
+        Sensor? existingSensor = await sensorRepository.GetByIdAsync(
             @event.SensorId, cancellationToken);
         if (existingSensor is null)
         {
@@ -178,7 +178,7 @@ public sealed class SensorService(
         SensorForm form,
         CancellationToken cancellationToken)
     {
-        EcosystemEntity? ecosystem = await ecosystemRepository.GetByControllerIdAsync(
+        Ecosystem? ecosystem = await ecosystemRepository.GetByControllerIdAsync(
             form.ControllerId, cancellationToken);
         if (ecosystem is null)
         {
@@ -186,7 +186,7 @@ public sealed class SensorService(
                 $"Ecosystem with controller {form.ControllerId} not found.");
         }
 
-        Result<SensorEntity> result = SensorEntity.Create(
+        Result<Sensor> result = Sensor.Create(
             form.SensorId,
             form.ControllerId,
             ecosystem.Id,

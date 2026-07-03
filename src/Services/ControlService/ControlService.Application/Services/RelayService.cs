@@ -16,7 +16,7 @@ public sealed class RelayService(
         RelayModeChangedEvent relay,
         CancellationToken cancellationToken)
     {
-        RelayEntity? existingRelay = await relayRepository.GetByIdAsync(
+        Relay? existingRelay = await relayRepository.GetByIdAsync(
             relay.RelayId, cancellationToken);
         if (existingRelay is null)
         {
@@ -37,7 +37,7 @@ public sealed class RelayService(
     {
         DateTime expireAt = DateTime.UtcNow.AddMinutes(5);
 
-        RelayEntity? existingRelay = await relayRepository.GetByIdAsync(
+        Relay? existingRelay = await relayRepository.GetByIdAsync(
             relay.RelayId, cancellationToken);
         if (existingRelay is null)
         {
@@ -78,7 +78,7 @@ public sealed class RelayService(
         RelayDeletedEvent relayDeleted,
         CancellationToken cancellationToken)
     {
-        RelayEntity? existingRelay = await relayRepository
+        Relay? existingRelay = await relayRepository
             .GetByIdAsync(relayDeleted.RelayId, cancellationToken);
 
         if (existingRelay is null)
@@ -96,7 +96,7 @@ public sealed class RelayService(
         RelayUpdatedEvent relayUpdated,
         CancellationToken cancellationToken)
     {
-        RelayEntity? existingRelay = await relayRepository
+        Relay? existingRelay = await relayRepository
             .GetByIdAsync(relayUpdated.RelayId, cancellationToken);
 
         if (existingRelay is null)
@@ -136,7 +136,7 @@ public sealed class RelayService(
         RelayForm relayForm,
         CancellationToken cancellationToken)
     {
-        EcosystemEntity? ecosystem = await ecosystemRepository.GetByControllerIdAsync(
+        Ecosystem? ecosystem = await ecosystemRepository.GetByControllerIdAsync(
             relayForm.ControllerId, cancellationToken);
         if (ecosystem is null)
         {
@@ -144,7 +144,7 @@ public sealed class RelayService(
                 $"Ecosystem with controller {relayForm.ControllerId} not found. ");
         }
 
-        Result<RelayEntity> result = RelayEntity.Create(
+        Result<Relay> result = Relay.Create(
             relayForm.RelayId,
             ecosystem.Id,
             relayForm.ControllerId,

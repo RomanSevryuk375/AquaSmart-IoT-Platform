@@ -1,5 +1,5 @@
 using AutoMapper;
-using Control.Application.Features.AutomationRule.Queries;
+using Control.Application.Features.AutomationRules.Queries;
 using Control.Domain.Entities;
 
 namespace Control.Application.MapProfiles;

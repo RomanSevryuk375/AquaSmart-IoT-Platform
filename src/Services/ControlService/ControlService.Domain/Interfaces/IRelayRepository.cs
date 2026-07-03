@@ -3,17 +3,17 @@ using Control.Domain.Entities;
 
 namespace Control.Domain.Interfaces;
 
-public interface IRelayRepository : IRepository<RelayEntity>
+public interface IRelayRepository : IRepository<Relay>
 {
     public Task<bool> ExistsAsync(
         Guid relayId,
         CancellationToken cancellationToken);
 
-    public Task<RelayEntity?> GetByPowerSensorId(
+    public Task<Relay?> GetByPowerSensorId(
         Guid powerSensorId,
         CancellationToken cancellationToken);
 
-    public Task<IReadOnlyList<RelayEntity>> GetManyByIds(
+    public Task<IReadOnlyList<Relay>> GetManyByIds(
         IEnumerable<Guid> relayIds,
         CancellationToken cancellationToken);
 }

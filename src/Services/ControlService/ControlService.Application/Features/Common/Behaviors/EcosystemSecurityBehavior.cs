@@ -1,7 +1,6 @@
 using Contracts.Abstractions;
 using Contracts.Results;
 using Control.Application.Interfaces;
-using Control.Domain.Entities;
 using MediatR;
 
 namespace Control.Application.Features.Common.Behaviors;
@@ -14,7 +13,7 @@ public sealed class EcosystemSecurityBehavior<TRequest, TResponse>(ISecureServic
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        Result<EcosystemEntity> hasAccess = await secureService.EnsureUserOwnsEcosystemAsync(
+        Result<Domain.Entities.Ecosystem> hasAccess = await secureService.EnsureUserOwnsEcosystemAsync(
             request.EcosystemId, cancellationToken);
         if (hasAccess.IsFailure)
         {

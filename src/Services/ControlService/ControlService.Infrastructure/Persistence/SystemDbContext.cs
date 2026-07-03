@@ -7,13 +7,13 @@ namespace Control.Infrastructure.Persistence;
 public class SystemDbContext(DbContextOptions<SystemDbContext> options) : DbContext(options)
 {
     public DbSet<AutomationRule> Rules { get; set; }
-    public DbSet<EcosystemEntity> Aquariums { get; set; }
+    public DbSet<Ecosystem> Aquariums { get; set; }
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
-    public DbSet<RelayEntity> Relays { get; set; }
-    public DbSet<RuleConditionEntity> RuleConditions { get; set; }
-    public DbSet<ScheduleEntity> Schedules { get; set; }
-    public DbSet<SensorEntity> Sensors { get; set; }
-    public DbSet<VacationModeEntity> Vacations { get; set; }
+    public DbSet<Relay> Relays { get; set; }
+    public DbSet<RuleCondition> RuleConditions { get; set; }
+    public DbSet<Schedule> Schedules { get; set; }
+    public DbSet<Sensor> Sensors { get; set; }
+    public DbSet<VacationMode> Vacations { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

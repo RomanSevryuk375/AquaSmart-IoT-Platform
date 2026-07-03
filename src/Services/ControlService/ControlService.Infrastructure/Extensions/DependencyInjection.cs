@@ -8,6 +8,7 @@ using Control.Infrastructure.Persistence;
 using Control.Infrastructure.Persistence.Interceptors;
 using Control.Infrastructure.Persistence.Outbox;
 using Control.Infrastructure.Persistence.Repositories;
+using Control.Infrastructure.Services;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -28,6 +29,8 @@ public static class DependencyInjection
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
         services.AddScoped<ISensorRepository, SensorRepository>();
         services.AddScoped<IVacationModeRepository, VacationModeRepository>();
+
+        services.AddSingleton<ICronValidator, CronValidator>();
 
         string? connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
 

@@ -3,13 +3,13 @@ using Control.Domain.Entities;
 
 namespace Control.Domain.Interfaces;
 
-public interface ISensorRepository : IRepository<SensorEntity>
+public interface ISensorRepository : IRepository<Sensor>
 {
     public Task<bool> ExistsAsync(
         Guid id,
         CancellationToken cancellationToken);
 
-    public Task<IReadOnlyList<SensorEntity>> GetManyByIdsAsync(
+    public Task<IReadOnlyList<Sensor>> GetManyByIdsAsync(
         IEnumerable<Guid> sensorIds,
         CancellationToken cancellationToken);
 }

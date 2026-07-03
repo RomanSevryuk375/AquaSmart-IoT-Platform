@@ -10,27 +10,27 @@ public sealed class SecureService(
     IRelayRepository relayRepository,
     IUserContext userContext) : ISecureService
 {
-    public async Task<Result<EcosystemEntity>> EnsureUserOwnsEcosystemAsync(
+    public async Task<Result<Ecosystem>> EnsureUserOwnsEcosystemAsync(
         Guid ecosystemId,
         CancellationToken cancellationToken)
     {
-        EcosystemEntity? ecosystem = await ecosystemRepository.GetByIdAsync(
+        Ecosystem? ecosystem = await ecosystemRepository.GetByIdAsync(
             ecosystemId, cancellationToken);
         if (ecosystem is null)
         {
-            return Result<EcosystemEntity>.Failure(Error.NotFound(
+            return Result<Ecosystem>.Failure(Error.NotFound(
                     "Ecosystem.NotFound",
                     $"Ecosystem {ecosystemId} not found. "));
         }
 
         if (ecosystem.UserId != userContext.UserId)
         {
-            return Result<EcosystemEntity>.Failure(Error.Conflict(
+            return Result<Ecosystem>.Failure(Error.Conflict(
                     "Access.Denied",
                     "You are not the owner of this ecosystem"));
         }
 
-        return Result<EcosystemEntity>.Success(ecosystem);
+        return Result<Ecosystem>.Success(ecosystem);
     }
 
     public async Task<Result> EnsureEcosystemOwnsRelayAsync(
@@ -38,7 +38,7 @@ public sealed class SecureService(
         Guid relayId,
         CancellationToken cancellationToken)
     {
-        RelayEntity? existingRelay = await relayRepository.GetByIdAsync(
+        Relay? existingRelay = await relayRepository.GetByIdAsync(
             relayId, cancellationToken);
         if (existingRelay is null)
         {

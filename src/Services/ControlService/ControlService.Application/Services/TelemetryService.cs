@@ -2,7 +2,6 @@ using Contracts.Events.TelemetryEvents;
 using Contracts.Results;
 using Control.Application.Interfaces;
 using Control.Domain.Entities;
-using Control.Domain.Factories;
 using Control.Domain.Interfaces;
 
 namespace Control.Application.Services;
@@ -17,7 +16,7 @@ public sealed class TelemetryService(
         TelemetryReceivedEvent telemetry,
         CancellationToken cancellationToken)
     {
-        SensorEntity? triggerSensor = await sensorRepository.GetByIdAsync(
+        Sensor? triggerSensor = await sensorRepository.GetByIdAsync(
             telemetry.SensorId, cancellationToken);
         if (triggerSensor is null)
         {
@@ -29,24 +28,26 @@ public sealed class TelemetryService(
 
         IReadOnlyList<AutomationRule> rules = await ruleRepository.GetBySensorIdWithConditionsAsync(
             telemetry.SensorId, cancellationToken);
-        if (rules == null || !rules.Any())
+
+        if (rules.Count == 0)
         {
+            await unitOfWork.SaveChangesAsync(cancellationToken);
             return ConsumerResult.Success();
         }
 
-        Dictionary<Guid, SensorEntity> sensorsCache = await LoadRequiredSensorsAsync(rules, cancellationToken);
+        Dictionary<Guid, double> sensorValuesCache = await LoadSensorValuesAsync(
+            rules, telemetry, cancellationToken);
+
+        Dictionary<Guid, Relay> relaysCache = await LoadRequiredRelaysAsync(
+            rules, cancellationToken);
 
         foreach (AutomationRule rule in rules)
         {
-            List<bool?> matchConditions = EvaluateConditions(
-                rule.Conditions, sensorsCache, telemetry);
+            bool? targetState = rule.EvaluateTargetState(sensorValuesCache);
 
-            bool? targetState = RuleOperatorFactory.CalculateTargetState(
-                matchConditions, rule.Operator, rule.Action);
-
-            if (targetState.HasValue)
+            if (targetState.HasValue && relaysCache.TryGetValue(rule.RelayId, out Relay? relay))
             {
-                await ApplyRelayStateAsync(rule.RelayId, targetState.Value, cancellationToken);
+                ApplyRelayState(relay, targetState.Value);
             }
         }
 
@@ -55,8 +56,9 @@ public sealed class TelemetryService(
         return ConsumerResult.Success();
     }
 
-    private async Task<Dictionary<Guid, SensorEntity>> LoadRequiredSensorsAsync(
+    private async Task<Dictionary<Guid, double>> LoadSensorValuesAsync(
         IEnumerable<AutomationRule> rules,
+        TelemetryReceivedEvent telemetry,
         CancellationToken cancellationToken)
     {
         var neededSensorIds = rules
@@ -65,51 +67,43 @@ public sealed class TelemetryService(
             .Distinct()
             .ToList();
 
-        IReadOnlyList<SensorEntity> sensors = await sensorRepository.GetManyByIdsAsync(neededSensorIds, cancellationToken);
-        return sensors.ToDictionary(s => s.Id);
-    }
+        IReadOnlyList<Sensor> sensors = await sensorRepository.GetManyByIdsAsync(
+            neededSensorIds, cancellationToken);
 
-    private static List<bool?> EvaluateConditions(
-        ICollection<RuleConditionEntity> conditions,
-        Dictionary<Guid, SensorEntity> sensorsCache,
-        TelemetryReceivedEvent telemetry)
-    {
-        var matchConditions = new List<bool?>();
-
-        foreach (RuleConditionEntity condition in conditions)
+        var valuesCache = new Dictionary<Guid, double>();
+        foreach (Sensor sensor in sensors)
         {
-            if (!sensorsCache.TryGetValue(condition.SensorId, out SensorEntity? sensor))
-            {
-                continue;
-            }
-
-            double valueToEvaluate = condition.SensorId == telemetry.SensorId
+            valuesCache[sensor.Id] = sensor.Id == telemetry.SensorId
                 ? telemetry.Value
                 : sensor.LastValue;
-
-            IRuleEvaluator evaluator = RuleEvaluatorFactory.Create(condition.Condition);
-            bool? isMet = evaluator.Evaluate(valueToEvaluate, condition.Threshold, condition.Hysteresis);
-
-            matchConditions.Add(isMet);
         }
 
-        return matchConditions;
+        return valuesCache;
     }
 
-    private async Task ApplyRelayStateAsync(
-        Guid relayId,
-        bool targetState,
+    private async Task<Dictionary<Guid, Relay>> LoadRequiredRelaysAsync(
+        IEnumerable<AutomationRule> rules,
         CancellationToken cancellationToken)
     {
-        RelayEntity? relay = await relayRepository.GetByIdAsync(relayId, cancellationToken);
+        var neededRelayIds = rules
+            .Select(r => r.RelayId)
+            .Distinct()
+            .ToList();
 
-        if (relay is null || relay.IsManual || relay.IsActive == targetState)
+        IReadOnlyList<Relay> relays = await relayRepository.GetManyByIds(
+            neededRelayIds, cancellationToken);
+
+        return relays.ToDictionary(r => r.Id);
+    }
+
+    private static void ApplyRelayState(Relay relay, bool targetState)
+    {
+        if (relay.IsManual || relay.IsActive == targetState)
         {
             return;
         }
 
         DateTime actionExpireAt = DateTime.UtcNow.AddMinutes(5);
-
         relay.SetState(targetState, actionExpireAt);
     }
 }

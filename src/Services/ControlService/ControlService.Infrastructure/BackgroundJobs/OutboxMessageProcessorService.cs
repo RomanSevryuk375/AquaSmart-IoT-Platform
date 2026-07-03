@@ -1,6 +1,5 @@
 using Contracts.Abstractions;
 using Contracts.Results;
-using Control.Domain.Entities;
 using Control.Domain.Interfaces;
 using Control.Infrastructure.Persistence.Outbox;
 using MediatR;
@@ -40,7 +39,7 @@ public sealed class OutboxMessageProcessorService(
     {
         try
         {
-            Type type = Type.GetType(message.Type);
+            var type = Type.GetType(message.Type);
             if (type == null)
             {
                 MarkAsPoisonMessage(message, $"Type '{message.Type}' could not be resolved.");

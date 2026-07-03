@@ -1,7 +1,6 @@
 using Contracts.Abstractions;
 using Contracts.Results;
 using Control.Application.Interfaces;
-using Control.Domain.Entities;
 using Control.Domain.Interfaces;
 using MediatR;
 
@@ -23,7 +22,7 @@ public sealed class AutomationRuleSecurityBehavior<TRequest, TResponse>(
             return BehaviorHelpers.CreateFailedResult<TResponse>(notFoundError);
         }
 
-        Result<EcosystemEntity> hasAccess = await secureService.EnsureUserOwnsEcosystemAsync(
+        Result<Domain.Entities.Ecosystem> hasAccess = await secureService.EnsureUserOwnsEcosystemAsync(
             rule.EcosystemId, cancellationToken);
         if (hasAccess.IsFailure)
         {

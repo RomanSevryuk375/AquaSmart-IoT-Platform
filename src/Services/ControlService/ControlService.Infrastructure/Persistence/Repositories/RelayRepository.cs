@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Control.Infrastructure.Persistence.Repositories;
 
 public sealed class RelayRepository(SystemDbContext dbContext)
-    : BaseRepository<RelayEntity>(dbContext), IRelayRepository
+    : BaseRepository<Relay>(dbContext), IRelayRepository
 {
     public async Task<bool> ExistsAsync(
         Guid relayId,
@@ -16,7 +16,7 @@ public sealed class RelayRepository(SystemDbContext dbContext)
             .AnyAsync(x => x.Id == relayId, cancellationToken);
     }
 
-    public async Task<RelayEntity?> GetByPowerSensorId(
+    public async Task<Relay?> GetByPowerSensorId(
         Guid powerSensorId,
         CancellationToken cancellationToken)
     {
@@ -25,7 +25,7 @@ public sealed class RelayRepository(SystemDbContext dbContext)
             .FirstOrDefaultAsync(x => x.PowerSensorId == powerSensorId, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<RelayEntity>> GetManyByIds(
+    public async Task<IReadOnlyList<Relay>> GetManyByIds(
         IEnumerable<Guid> relayIds,
         CancellationToken cancellationToken)
     {

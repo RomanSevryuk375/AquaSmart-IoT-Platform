@@ -37,7 +37,6 @@ public sealed class Controller : AggregateRoot, IEntity
     public DateTime LastSeenAt { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-
     public static Result<Controller> Create(
         Guid id, Guid userId, string rawMacAddress, string deviceTokenHash, string rawName, bool isOnline)
     {

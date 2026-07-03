@@ -5,7 +5,7 @@ namespace Control.Application.Interfaces;
 
 public interface ISecureService
 {
-    public Task<Result<EcosystemEntity>> EnsureUserOwnsEcosystemAsync(
+    public Task<Result<Ecosystem>> EnsureUserOwnsEcosystemAsync(
         Guid ecosystemId,
         CancellationToken cancellationToken);
 

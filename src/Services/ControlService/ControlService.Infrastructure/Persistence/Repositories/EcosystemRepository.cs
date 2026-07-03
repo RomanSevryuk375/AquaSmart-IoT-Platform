@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Control.Infrastructure.Persistence.Repositories;
 
 public sealed class EcosystemRepository(SystemDbContext dbContext)
-    : BaseRepository<EcosystemEntity>(dbContext), IEcosystemRepository
+    : BaseRepository<Ecosystem>(dbContext), IEcosystemRepository
 {
     public async Task<bool> ExistsAsync(
         Guid ecosystemId,
@@ -16,7 +16,7 @@ public sealed class EcosystemRepository(SystemDbContext dbContext)
             .AnyAsync(x => x.Id == ecosystemId, cancellationToken);
     }
 
-    public async Task<EcosystemEntity?> GetByControllerIdAsync(
+    public async Task<Ecosystem?> GetByControllerIdAsync(
         Guid controllerId,
         CancellationToken cancellationToken)
     {

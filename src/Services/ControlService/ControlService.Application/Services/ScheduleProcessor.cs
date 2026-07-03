@@ -18,7 +18,7 @@ public sealed class ScheduleProcessor(
     public async Task<Result> ProcessAsync(CancellationToken cancellationToken)
     {
         var specification = new ActiveScheduleSpecification();
-        IReadOnlyList<ScheduleEntity> schedules = await scheduleRepository.GetAllAsync(
+        IReadOnlyList<Schedule> schedules = await scheduleRepository.GetAllAsync(
             specification, cancellationToken);
 
         if (schedules == null || !schedules.Any())
@@ -32,7 +32,7 @@ public sealed class ScheduleProcessor(
 
         var triggeredSchedules = schedules.Where(s =>
         {
-            var cron = CronExpression.Parse(s.CronExpression, CronFormat.Standard);
+            var cron = CronExpression.Parse(s.CronExpression.ToString(), CronFormat.Standard);
             DateTime? nextOccurrence = cron.GetNextOccurrence(roundedTime.AddTicks(-1));
             return nextOccurrence == roundedTime;
         }).ToList();
@@ -46,9 +46,9 @@ public sealed class ScheduleProcessor(
         var relaysCache = (await relayRepository.GetManyByIds(relayIds, cancellationToken)).ToDictionary(r => r.Id);
         DateTime actionExpireAt = DateTime.UtcNow.AddMinutes(5);
 
-        foreach (ScheduleEntity? schedule in triggeredSchedules)
+        foreach (Schedule? schedule in triggeredSchedules)
         {
-            if (!relaysCache.TryGetValue(schedule.RelayId, out RelayEntity? relay) || relay.IsManual)
+            if (!relaysCache.TryGetValue(schedule.RelayId, out Relay? relay) || relay.IsManual)
             {
                 continue;
             }

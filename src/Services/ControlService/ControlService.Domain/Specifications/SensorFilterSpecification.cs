@@ -5,7 +5,7 @@ using Control.Domain.SpecificationParams;
 namespace Control.Domain.Specifications;
 
 public sealed class SensorFilterSpecification
-    : BaseSpecification<SensorEntity>
+    : BaseSpecification<Sensor>
 {
     public SensorFilterSpecification(SensorFilterParams @params)
         : base(data =>

@@ -4,6 +4,6 @@ using Control.Domain.Interfaces;
 namespace Control.Infrastructure.Persistence.Repositories;
 
 public sealed class ScheduleRepository(SystemDbContext dbContext)
-    : BaseRepository<ScheduleEntity>(dbContext), IScheduleRepository
+    : BaseRepository<Schedule>(dbContext), IScheduleRepository
 {
 }

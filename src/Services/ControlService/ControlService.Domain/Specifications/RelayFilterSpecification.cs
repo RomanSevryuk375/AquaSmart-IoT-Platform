@@ -5,7 +5,7 @@ using Control.Domain.SpecificationParams;
 namespace Control.Domain.Specifications;
 
 public sealed class RelayFilterSpecification
-    : BaseSpecification<RelayEntity>
+    : BaseSpecification<Relay>
 {
     public RelayFilterSpecification(RelayFilterParams @params)
         : base(data =>

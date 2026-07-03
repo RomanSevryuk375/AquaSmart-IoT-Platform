@@ -1,16 +1,18 @@
 using Contracts.Abstractions;
 using Contracts.Enums;
 using Contracts.Results;
+using Control.Domain.Factories;
+using Control.Domain.ValueObjects;
 
 namespace Control.Domain.Entities;
 
-public class AutomationRule : IEntity
+public sealed class AutomationRule : IEntity
 {
     private AutomationRule(
         Guid id,
         Guid ecosystemId,
         Guid relayId,
-        string name,
+        Name name,
         Operator @operator,
         RuleAction action,
         bool isActive,
@@ -26,93 +28,55 @@ public class AutomationRule : IEntity
         CreatedAt = createdAt;
     }
 
+#pragma warning disable CS8618
+    private AutomationRule() { }
+#pragma warning restore CS8618
+
+    private readonly List<RuleCondition> _ruleConditions = [];
+
     public Guid Id { get; private set; }
     public Guid EcosystemId { get; private set; }
     public Guid RelayId { get; private set; }
-    public string Name { get; private set; }
+    public Name Name { get; private set; }
     public Operator Operator { get; private set; }
     public RuleAction Action { get; private set; }
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-#pragma warning disable CS8618 
-    private AutomationRule() { }
-#pragma warning restore CS8618
-
-    public virtual ICollection<RuleConditionEntity> Conditions { get; private set; } = [];
+    public IReadOnlyCollection<RuleCondition> Conditions => _ruleConditions.AsReadOnly();
 
     public static Result<AutomationRule> Create(
+        Guid ruleId,
         Guid ecosystemId,
-        string name,
+        string rawName,
         Guid relayId,
         Operator @operator,
         RuleAction action,
         bool isActive)
     {
-        var errors = new List<string>();
-
-        if (string.IsNullOrWhiteSpace(name))
+        Result<Name> nameResult = Name.Create(rawName);
+        if (nameResult.IsFailure)
         {
-            errors.Add("name must not be empty.");
-        }
-
-        if (ecosystemId == Guid.Empty)
-        {
-            errors.Add("ecosystemId must not be empty.");
-        }
-
-        if (relayId == Guid.Empty)
-        {
-            errors.Add("relayId must not be empty.");
-        }
-
-        if (errors.Count > 0)
-        {
-            return Result<AutomationRule>.Failure(
-                Error.Validation(
-                    "Rule.Invalid",
-                    string.Join("; ", errors)));
+            return Result<AutomationRule>.Failure(nameResult.Error);
         }
 
         var rule = new AutomationRule(
-            Guid.NewGuid(),
-            ecosystemId,
-            relayId,
-            name,
-            @operator,
-            action,
-            isActive,
-            DateTime.UtcNow);
+            ruleId, ecosystemId, relayId,
+            nameResult.Value, @operator, action, isActive,
+            createdAt: DateTime.UtcNow);
 
         return Result<AutomationRule>.Success(rule);
     }
 
-    public Result Update(
-        string name,
-        Guid relayId,
-        Operator @operator,
-        RuleAction action)
+    public Result Update(string rawName, Guid relayId, Operator @operator, RuleAction action)
     {
-        var errors = new List<string>();
-
-        if (string.IsNullOrWhiteSpace(name))
+        Result<Name> nameResult = Name.Create(rawName);
+        if (nameResult.IsFailure)
         {
-            errors.Add("name must not be empty.");
+            return Result.Failure(nameResult.Error);
         }
 
-        if (relayId == Guid.Empty)
-        {
-            errors.Add("relayId must not be empty.");
-        }
-
-        if (errors.Count > 0)
-        {
-            return Result.Failure(Error.Validation(
-                     "Rule.Invalid",
-                     string.Join("; ", errors)));
-        }
-
-        Name = name;
+        Name = nameResult.Value;
         RelayId = relayId;
         Operator = @operator;
         Action = action;
@@ -132,13 +96,59 @@ public class AutomationRule : IEntity
 
     public void SetIsActive(bool isActive) => IsActive = isActive;
 
-    public void AddCondition(RuleConditionEntity condition)
+    public Result AddCondition(RuleCondition condition)
     {
-        if (condition is null)
+        if (_ruleConditions.Exists(c => c.SensorId == condition.SensorId))
         {
-            return;
+            return Result.Failure(Error.Conflict<RuleCondition>(
+                $"A condition for Sensor {condition.SensorId} already exists."));
         }
 
-        Conditions.Add(condition);
+        _ruleConditions.Add(condition);
+        return Result.Success();
+    }
+
+    public Result RemoveCondition(RuleCondition condition)
+    {
+        if (!_ruleConditions.Exists(x => x.Id == condition.Id))
+        {
+            return Result.Failure(Error.NotFound<RuleCondition>(
+                "Condition not found."));
+        }
+
+        _ruleConditions.Remove(condition);
+        return Result.Success();
+    }
+
+    public bool? EvaluateTargetState(IReadOnlyDictionary<Guid, double> currentSensorData)
+    {
+        if (!IsActive || _ruleConditions.Count == 0)
+        {
+            return null;
+        }
+
+        var results = new List<bool?>();
+        foreach (RuleCondition condition in _ruleConditions)
+        {
+            if (currentSensorData.TryGetValue(condition.SensorId, out double sensorValue))
+            {
+                results.Add(condition.Evaluate(sensorValue));
+            }
+        }
+
+        if (results.Count == 0)
+        {
+            return null;
+        }
+
+        bool? isRuleTriggered = RuleOperatorFactory.CalculateTargetState(results, Operator, Action);
+        if (isRuleTriggered == null)
+        {
+            return null;
+        }
+
+        return isRuleTriggered.Value
+            ? Action == RuleAction.SwitchOn
+            : Action == RuleAction.SwitchOff;
     }
 }
