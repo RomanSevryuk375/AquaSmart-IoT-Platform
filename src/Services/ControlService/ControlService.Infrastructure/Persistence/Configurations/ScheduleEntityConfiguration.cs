@@ -1,10 +1,10 @@
-﻿using Control.Domain.Entities;
+using Control.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Control.Infrastructure.Persistence.Configurations;
 
-public sealed class ScheduleEntityConfiguration 
+public sealed class ScheduleEntityConfiguration
     : IEntityTypeConfiguration<ScheduleEntity>
 {
     public void Configure(EntityTypeBuilder<ScheduleEntity> builder)

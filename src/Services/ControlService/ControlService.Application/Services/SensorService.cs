@@ -20,7 +20,7 @@ public sealed class SensorService(
         SensorStateChangedEvent @event,
         CancellationToken cancellationToken)
     {
-        var sensor = await sensorRepository.GetByIdAsync(
+        SensorEntity? sensor = await sensorRepository.GetByIdAsync(
             @event.SensorId, cancellationToken);
         if (sensor is null)
         {
@@ -30,7 +30,6 @@ public sealed class SensorService(
 
         sensor.SetState(@event.State);
 
-        await sensorRepository.UpdateAsync(sensor, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ConsumerResult.Success();
@@ -60,7 +59,7 @@ public sealed class SensorService(
         SensorDeletedEvent @event,
         CancellationToken cancellationToken)
     {
-        var sensor = await sensorRepository.GetByIdAsync(
+        SensorEntity? sensor = await sensorRepository.GetByIdAsync(
             @event.SensorId, cancellationToken);
         if (sensor is null)
         {
@@ -77,7 +76,7 @@ public sealed class SensorService(
         SensorNoDataEvent @event,
         CancellationToken cancellationToken)
     {
-        var sensor = await sensorRepository.GetByIdAsync(
+        SensorEntity? sensor = await sensorRepository.GetByIdAsync(
             @event.SensorId, cancellationToken);
         if (sensor is null)
         {
@@ -85,7 +84,7 @@ public sealed class SensorService(
                 $"Sensor {@event.SensorId} not found.");
         }
 
-        var ecosystem = await ecosystemRepository.GetByIdAsync(
+        EcosystemEntity? ecosystem = await ecosystemRepository.GetByIdAsync(
             sensor.EcosystemId, cancellationToken);
         if (ecosystem is null)
         {
@@ -95,17 +94,16 @@ public sealed class SensorService(
 
         sensor.SetState(SensorState.Faulty);
 
-        await sensorRepository.UpdateAsync(sensor, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var affectedRules = await ruleRepository.GetBySensorIdWithConditionsAsync(
+        IReadOnlyList<AutomationRuleEntity>? affectedRules = await ruleRepository.GetBySensorIdWithConditionsAsync(
             sensor.Id, cancellationToken);
         if (affectedRules is null || !affectedRules.Any())
         {
             return ConsumerResult.Success();
         }
 
-        foreach (var rule in affectedRules)
+        foreach (AutomationRuleEntity rule in affectedRules)
         {
             await publishEndpoint.Publish(new ChangeRelayStateEvent
             {
@@ -131,7 +129,7 @@ public sealed class SensorService(
         SensorUpdatedEvent @event,
         CancellationToken cancellationToken)
     {
-        var sensor = await sensorRepository.GetByIdAsync(@event.SensorId, cancellationToken);
+        SensorEntity? sensor = await sensorRepository.GetByIdAsync(@event.SensorId, cancellationToken);
 
         if (sensor is null)
         {
@@ -143,7 +141,7 @@ public sealed class SensorService(
                 @event.State,
                 @event.CreatedAt);
 
-            var creationResult = await CreateValidSensorAsync(form, cancellationToken);
+            ConsumerResult creationResult = await CreateValidSensorAsync(form, cancellationToken);
 
             return creationResult;
         }
@@ -152,7 +150,6 @@ public sealed class SensorService(
         sensor.SetType(@event.Type);
         sensor.SetState(@event.State);
 
-        await sensorRepository.UpdateAsync(sensor, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ConsumerResult.Success();
@@ -162,7 +159,7 @@ public sealed class SensorService(
         SensorRenamedEvent @event,
         CancellationToken cancellationToken)
     {
-        var existingSensor = await sensorRepository.GetByIdAsync(
+        SensorEntity? existingSensor = await sensorRepository.GetByIdAsync(
             @event.SensorId, cancellationToken);
         if (existingSensor is null)
         {
@@ -172,17 +169,16 @@ public sealed class SensorService(
 
         existingSensor.SetName(@event.Name);
 
-        await sensorRepository.UpdateAsync(existingSensor, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ConsumerResult.Success();
     }
 
     private async Task<ConsumerResult> CreateValidSensorAsync(
-        SensorForm form, 
+        SensorForm form,
         CancellationToken cancellationToken)
     {
-        var ecosystem = await ecosystemRepository.GetByControllerIdAsync(
+        EcosystemEntity? ecosystem = await ecosystemRepository.GetByControllerIdAsync(
             form.ControllerId, cancellationToken);
         if (ecosystem is null)
         {
@@ -190,7 +186,7 @@ public sealed class SensorService(
                 $"Ecosystem with controller {form.ControllerId} not found.");
         }
 
-        var result = SensorEntity.Create(
+        Result<SensorEntity> result = SensorEntity.Create(
             form.SensorId,
             form.ControllerId,
             ecosystem.Id,

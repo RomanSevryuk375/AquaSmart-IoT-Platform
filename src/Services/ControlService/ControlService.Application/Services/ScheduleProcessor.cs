@@ -1,7 +1,7 @@
-using Contracts.Enums;
 using Contracts.Events.RelayEvents;
 using Contracts.Results;
 using Control.Application.Interfaces;
+using Control.Domain.Entities;
 using Control.Domain.Interfaces;
 using Control.Domain.Specifications;
 using Cronos;
@@ -18,8 +18,8 @@ public sealed class ScheduleProcessor(
     public async Task<Result> ProcessAsync(CancellationToken cancellationToken)
     {
         var specification = new ActiveScheduleSpecification();
-        var schedules = await scheduleRepository.GetAllAsync(
-            specification, null, null, cancellationToken);
+        IReadOnlyList<ScheduleEntity> schedules = await scheduleRepository.GetAllAsync(
+            specification, cancellationToken);
 
         if (schedules == null || !schedules.Any())
         {
@@ -33,7 +33,7 @@ public sealed class ScheduleProcessor(
         var triggeredSchedules = schedules.Where(s =>
         {
             var cron = CronExpression.Parse(s.CronExpression, CronFormat.Standard);
-            var nextOccurrence = cron.GetNextOccurrence(roundedTime.AddTicks(-1));
+            DateTime? nextOccurrence = cron.GetNextOccurrence(roundedTime.AddTicks(-1));
             return nextOccurrence == roundedTime;
         }).ToList();
 
@@ -44,11 +44,11 @@ public sealed class ScheduleProcessor(
 
         var relayIds = triggeredSchedules.Select(s => s.RelayId).Distinct().ToList();
         var relaysCache = (await relayRepository.GetManyByIds(relayIds, cancellationToken)).ToDictionary(r => r.Id);
-        var actionExpireAt = DateTime.UtcNow.AddMinutes(5);
+        DateTime actionExpireAt = DateTime.UtcNow.AddMinutes(5);
 
-        foreach (var schedule in triggeredSchedules)
+        foreach (ScheduleEntity? schedule in triggeredSchedules)
         {
-            if (!relaysCache.TryGetValue(schedule.RelayId, out var relay) || relay.IsManual)
+            if (!relaysCache.TryGetValue(schedule.RelayId, out RelayEntity? relay) || relay.IsManual)
             {
                 continue;
             }
@@ -56,10 +56,9 @@ public sealed class ScheduleProcessor(
             if (!relay.IsActive)
             {
                 relay.SetState(true, actionExpireAt);
-                await relayRepository.UpdateAsync(relay, cancellationToken);
             }
 
-            var turnOffTime = DateTime.UtcNow.AddMinutes(schedule.DurationMin);
+            DateTime turnOffTime = DateTime.UtcNow.AddMinutes(schedule.DurationMin);
 
             await messageScheduler.SchedulePublish(
                 turnOffTime,
@@ -68,7 +67,7 @@ public sealed class ScheduleProcessor(
                     ControllerId = relay.ControllerId,
                     RelayId = relay.Id,
                     TargetState = false,
-                    ExpireAt = turnOffTime.AddMinutes(5) 
+                    ExpireAt = turnOffTime.AddMinutes(5)
                 }, cancellationToken);
         }
 

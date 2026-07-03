@@ -6,7 +6,7 @@ namespace Control.Domain.Factories;
 
 public static class RuleEvaluatorFactory
 {
-    public static IRuleEvaluator Create (RuleCondition condition)
+    public static IRuleEvaluator Create(RuleCondition condition)
     {
         return condition switch
         {

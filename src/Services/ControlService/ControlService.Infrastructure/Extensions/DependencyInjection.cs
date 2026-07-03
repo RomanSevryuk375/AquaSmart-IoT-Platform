@@ -1,4 +1,4 @@
-﻿using Contracts.Options;
+using Contracts.Options;
 using Control.Domain.Interfaces;
 using Control.Infrastructure.BackgroundJobs;
 using Control.Infrastructure.Messaging.Relay;
@@ -18,7 +18,7 @@ namespace Control.Infrastructure.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddRepositories (this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IAutomationRuleRepository, AutomationRuleRepository>();
         services.AddScoped<IEcosystemRepository, EcosystemRepository>();
@@ -29,11 +29,11 @@ public static class DependencyInjection
         services.AddScoped<ISensorRepository, SensorRepository>();
         services.AddScoped<IVacationModeRepository, VacationModeRepository>();
 
-        var connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
+        string? connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
 
         services.AddDbContext<SystemDbContext>((sp, options) =>
         {
-            var interceptor = sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
+            ConvertDomainEventsToOutboxMessagesInterceptor interceptor = sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
 
             options.UseNpgsql(connectionString)
                    .UseSnakeCaseNamingConvention()
@@ -52,8 +52,8 @@ public static class DependencyInjection
 
     public static IServiceCollection AddRabbitMq(this IServiceCollection services, IConfiguration configuration)
     {
-        var rabbitSection = configuration.GetSection(RabbitMqOptions.SectionName);
-        var rabbitOgtions = rabbitSection.Get<RabbitMqOptions>()
+        IConfigurationSection rabbitSection = configuration.GetSection(RabbitMqOptions.SectionName);
+        RabbitMqOptions rabbitOgtions = rabbitSection.Get<RabbitMqOptions>()
             ?? throw new InvalidOperationException("RabbitMQ configuration is missing.");
 
         services.Configure<RabbitMqOptions>(rabbitSection);

@@ -3,7 +3,6 @@ using Contracts.Events.RelayEvents;
 using Contracts.Results;
 using Control.Application.Interfaces;
 using Control.Domain.Entities;
-using Control.Domain.Factories;
 using Control.Domain.Interfaces;
 
 namespace Control.Application.Services;
@@ -17,7 +16,7 @@ public sealed class RelayService(
         RelayModeChangedEvent relay,
         CancellationToken cancellationToken)
     {
-        var existingRelay = await relayRepository.GetByIdAsync(
+        RelayEntity? existingRelay = await relayRepository.GetByIdAsync(
             relay.RelayId, cancellationToken);
         if (existingRelay is null)
         {
@@ -27,7 +26,6 @@ public sealed class RelayService(
 
         existingRelay.SetMode(relay.IsManual);
 
-        await relayRepository.UpdateAsync(existingRelay, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ConsumerResult.Success();
@@ -37,9 +35,9 @@ public sealed class RelayService(
         ChangeRelayStateEvent relay,
         CancellationToken cancellationToken)
     {
-        var expireAt = DateTime.UtcNow.AddMinutes(5);
+        DateTime expireAt = DateTime.UtcNow.AddMinutes(5);
 
-        var existingRelay = await relayRepository.GetByIdAsync(
+        RelayEntity? existingRelay = await relayRepository.GetByIdAsync(
             relay.RelayId, cancellationToken);
         if (existingRelay is null)
         {
@@ -49,7 +47,6 @@ public sealed class RelayService(
 
         existingRelay.SetState(relay.TargetState, expireAt);
 
-        await relayRepository.UpdateAsync(existingRelay, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ConsumerResult.Success();
@@ -68,7 +65,7 @@ public sealed class RelayService(
             newRelay.PowerSensorId, newRelay.Name, newRelay.Purpose, newRelay.IsManual,
             newRelay.IsActive, newRelay.CreatedAt);
 
-        var creationResult = await CreateValidRealyAsync(relayForm, cancellationToken);
+        ConsumerResult creationResult = await CreateValidRealyAsync(relayForm, cancellationToken);
         if (!creationResult.IsSuccess)
         {
             return creationResult;
@@ -81,7 +78,7 @@ public sealed class RelayService(
         RelayDeletedEvent relayDeleted,
         CancellationToken cancellationToken)
     {
-        var existingRelay = await relayRepository
+        RelayEntity? existingRelay = await relayRepository
             .GetByIdAsync(relayDeleted.RelayId, cancellationToken);
 
         if (existingRelay is null)
@@ -99,7 +96,7 @@ public sealed class RelayService(
         RelayUpdatedEvent relayUpdated,
         CancellationToken cancellationToken)
     {
-        var existingRelay = await relayRepository
+        RelayEntity? existingRelay = await relayRepository
             .GetByIdAsync(relayUpdated.RelayId, cancellationToken);
 
         if (existingRelay is null)
@@ -114,7 +111,7 @@ public sealed class RelayService(
             relayUpdated.IsActive,
             relayUpdated.CreatedAt);
 
-            var creationResult = await CreateValidRealyAsync(relayForm, cancellationToken);
+            ConsumerResult creationResult = await CreateValidRealyAsync(relayForm, cancellationToken);
             if (!creationResult.IsSuccess)
             {
                 return creationResult;
@@ -123,14 +120,13 @@ public sealed class RelayService(
             return ConsumerResult.Success();
         }
 
-        var expireAt = DateTime.UtcNow.AddMinutes(5);
+        DateTime expireAt = DateTime.UtcNow.AddMinutes(5);
 
         existingRelay!.SetPurpose(relayUpdated.Purpose);
         existingRelay.SetMode(relayUpdated.IsManual);
         existingRelay.SetState(relayUpdated.IsActive, expireAt);
         existingRelay.SetName(relayUpdated.Name);
 
-        await relayRepository.UpdateAsync(existingRelay, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ConsumerResult.Success();
@@ -140,7 +136,7 @@ public sealed class RelayService(
         RelayForm relayForm,
         CancellationToken cancellationToken)
     {
-        var ecosystem = await ecosystemRepository.GetByControllerIdAsync(
+        EcosystemEntity? ecosystem = await ecosystemRepository.GetByControllerIdAsync(
             relayForm.ControllerId, cancellationToken);
         if (ecosystem is null)
         {
@@ -148,7 +144,7 @@ public sealed class RelayService(
                 $"Ecosystem with controller {relayForm.ControllerId} not found. ");
         }
 
-        var result = RelayEntity.Create(
+        Result<RelayEntity> result = RelayEntity.Create(
             relayForm.RelayId,
             ecosystem.Id,
             relayForm.ControllerId,

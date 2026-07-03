@@ -1,7 +1,7 @@
-﻿namespace Control.Domain.Interfaces;
+namespace Control.Domain.Interfaces;
 
 public interface IUserContext
 {
-    bool IsAuthenticated { get; }
-    Guid UserId { get; }
+    public bool IsAuthenticated { get; }
+    public Guid UserId { get; }
 }

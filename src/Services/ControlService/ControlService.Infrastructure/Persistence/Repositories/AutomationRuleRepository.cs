@@ -1,4 +1,4 @@
-﻿using Control.Domain.Entities;
+using Control.Domain.Entities;
 using Control.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,7 +12,7 @@ public sealed class AutomationRuleRepository(SystemDbContext dbContext)
         CancellationToken cancellationToken)
     {
         return await Context.Rules
-            .Include(x => x.Conditions) 
+            .Include(x => x.Conditions)
             .FirstOrDefaultAsync(x => x.Id == ruleId, cancellationToken);
     }
 
@@ -23,7 +23,7 @@ public sealed class AutomationRuleRepository(SystemDbContext dbContext)
         return await Context.Rules
             .Include(x => x.Conditions)
             .Where(rule => rule.Conditions.Any(c => c.SensorId == sensorId))
-            .Where(rule => rule.IsActive) 
+            .Where(rule => rule.IsActive)
             .ToListAsync(cancellationToken);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Control.Domain.Entities;
+using Control.Domain.Entities;
 using Control.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +8,7 @@ public sealed class EcosystemRepository(SystemDbContext dbContext)
     : BaseRepository<EcosystemEntity>(dbContext), IEcosystemRepository
 {
     public async Task<bool> ExistsAsync(
-        Guid ecosystemId, 
+        Guid ecosystemId,
         CancellationToken cancellationToken)
     {
         return await Context.Aquariums
@@ -17,7 +17,7 @@ public sealed class EcosystemRepository(SystemDbContext dbContext)
     }
 
     public async Task<EcosystemEntity?> GetByControllerIdAsync(
-        Guid controllerId, 
+        Guid controllerId,
         CancellationToken cancellationToken)
     {
         return await Context.Aquariums

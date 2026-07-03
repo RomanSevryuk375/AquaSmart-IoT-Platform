@@ -1,27 +1,27 @@
-﻿using Contracts.Events.RelayEvents;
+using Contracts.Events.RelayEvents;
 using Contracts.Results;
 
 namespace Control.Application.Interfaces;
 
 public interface IRelayService
 {
-    Task<ConsumerResult> ChangedModeAsync(
-        RelayModeChangedEvent relay, 
+    public Task<ConsumerResult> ChangedModeAsync(
+        RelayModeChangedEvent relay,
         CancellationToken cancellationToken);
 
-    Task<ConsumerResult> ChangedStateAsync(
-        ChangeRelayStateEvent relay, 
+    public Task<ConsumerResult> ChangedStateAsync(
+        ChangeRelayStateEvent relay,
         CancellationToken cancellationToken);
 
-    Task<ConsumerResult> CreateRelayAsync(
-        RelayCreatedEvent newRelay, 
+    public Task<ConsumerResult> CreateRelayAsync(
+        RelayCreatedEvent newRelay,
         CancellationToken cancellationToken);
 
-    Task<ConsumerResult> DeletedRelayAsync(
-        RelayDeletedEvent relayDeleted, 
+    public Task<ConsumerResult> DeletedRelayAsync(
+        RelayDeletedEvent relayDeleted,
         CancellationToken cancellationToken);
 
-    Task<ConsumerResult> UpdatedRelayAsync(
-        RelayUpdatedEvent relayUpdated, 
+    public Task<ConsumerResult> UpdatedRelayAsync(
+        RelayUpdatedEvent relayUpdated,
         CancellationToken cancellationToken);
 }

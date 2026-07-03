@@ -1,11 +1,11 @@
-﻿using Contracts.Constants;
+using Contracts.Constants;
 using Control.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Control.Infrastructure.Persistence.Configurations;
 
-public sealed class RelayEntityConfiguration 
+public sealed class RelayEntityConfiguration
     : IEntityTypeConfiguration<RelayEntity>
 {
     public void Configure(EntityTypeBuilder<RelayEntity> builder)

@@ -1,4 +1,5 @@
-﻿using Contracts.Events.SensorEvents;
+using Contracts.Events.SensorEvents;
+using Contracts.Results;
 using Control.Application.Interfaces;
 using MassTransit;
 
@@ -9,7 +10,7 @@ internal sealed class SensorDeletedEventConsume(ISensorService service)
 {
     public async Task Consume(ConsumeContext<SensorDeletedEvent> context)
     {
-        var result = await service.DeletedSensorAsync(
+        ConsumerResult result = await service.DeletedSensorAsync(
             context.Message, context.CancellationToken);
 
         if (!result.IsSuccess && result.IsRetryable)

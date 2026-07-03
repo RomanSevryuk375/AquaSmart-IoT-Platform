@@ -12,7 +12,7 @@ public class AutomationRuleEntity : IEntity
         Guid relayId,
         string name,
         Operator @operator,
-        RuleAction action, 
+        RuleAction action,
         bool isActive,
         DateTime createdAt)
     {
@@ -83,7 +83,7 @@ public class AutomationRuleEntity : IEntity
         return Result<AutomationRuleEntity>.Success(rule);
     }
 
-    public Result Update (
+    public Result Update(
         string name,
         Guid relayId,
         Operator @operator,
@@ -126,10 +126,7 @@ public class AutomationRuleEntity : IEntity
         Action = action;
     }
 
-    public void SetIsActive(bool isActive)
-    {
-        IsActive = isActive;
-    }
+    public void SetIsActive(bool isActive) => IsActive = isActive;
 
     public void AddCondition(RuleConditionEntity condition)
     {

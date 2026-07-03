@@ -8,12 +8,12 @@ namespace Control.Domain.Entities;
 public sealed class EcosystemEntity : AggregateRoot, IEntity
 {
     private EcosystemEntity(
-        Guid id, 
+        Guid id,
         Guid userId,
         EcosystemType type,
-        string name, 
+        string name,
         double? volume,
-        Guid controllerId, 
+        Guid controllerId,
         DateTime createdAt)
     {
         Id = id;
@@ -21,15 +21,15 @@ public sealed class EcosystemEntity : AggregateRoot, IEntity
         Type = type;
         Name = name;
         Volume = volume;
-        ControllerId = controllerId; 
+        ControllerId = controllerId;
         CreatedAt = createdAt;
     }
 
     public Guid Id { get; private set; }
     public Guid UserId { get; private set; }
     public EcosystemType Type { get; private set; }
-    public string Name { get; private set; } = string.Empty;
-    public double? Volume { get; private set; } 
+    public string Name { get; private set; }
+    public double? Volume { get; private set; }
     public Guid ControllerId { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
@@ -96,7 +96,7 @@ public sealed class EcosystemEntity : AggregateRoot, IEntity
 
         if (string.IsNullOrWhiteSpace(name))
         {
-           errors.Add("name must not be empty.");
+            errors.Add("name must not be empty.");
         }
 
         if (errors.Count != 0)

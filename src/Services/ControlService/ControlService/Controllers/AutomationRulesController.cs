@@ -1,12 +1,13 @@
 ﻿using Contracts.Authorization;
 using Contracts.Results;
-using Control.Application.CQRS.AutomationRule.Commands.CreateRule;
-using Control.Application.CQRS.AutomationRule.Commands.DeleteRule;
-using Control.Application.CQRS.AutomationRule.Commands.UpdateRule;
-using Control.Application.CQRS.AutomationRule.Queries;
-using Control.Application.CQRS.AutomationRule.Queries.GetRuleById;
-using Control.Application.CQRS.Ecosystem.Queries.GetAllEcosystems;
 using Control.Application.DTOs.AutomationRule;
+using Control.Application.Features.AutomationRule.Commands.CreateRule;
+using Control.Application.Features.AutomationRule.Commands.DeleteRule;
+using Control.Application.Features.AutomationRule.Commands.UpdateRule;
+using Control.Application.Features.AutomationRule.Queries;
+using Control.Application.Features.AutomationRule.Queries.GetRuleById;
+using Control.Application.Features.Ecosystem.Queries;
+using Control.Application.Features.Ecosystem.Queries.GetAllEcosystems;
 using Control.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -29,8 +30,8 @@ public class AutomationRulesController(
         [FromQuery] GetAllEcosystemsQuery query,
         CancellationToken cancellationToken = default)
     {
-        var enrichedQuery = query with { UserId = userContext.UserId };
-        var result = await sender.Send(enrichedQuery, cancellationToken);
+        GetAllEcosystemsQuery enrichedQuery = query with { UserId = userContext.UserId };
+        IReadOnlyList<EcosystemDto> result = await sender.Send(enrichedQuery, cancellationToken);
 
         return Ok(result);
     }
@@ -42,8 +43,8 @@ public class AutomationRulesController(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var query = new GetRuleByIdQuery { RuleId = id };
-        var result = await sender.Send(query, cancellationToken);
+        GetRuleByIdQuery query = new GetRuleByIdQuery { RuleId = id };
+        Result<AutomationRuleDto> result = await sender.Send(query, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -54,7 +55,7 @@ public class AutomationRulesController(
         [FromBody] CreateRuleCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await sender.Send(command, cancellationToken);
+        Result<Guid> result = await sender.Send(command, cancellationToken);
         if (result.IsFailure)
         {
             return this.ToActionResult(result);
@@ -73,7 +74,7 @@ public class AutomationRulesController(
         [FromBody] AutomationRuleUpdateRequestDto request,
         CancellationToken cancellationToken)
     {
-        var command = new UpdateRuleCommand
+        UpdateRuleCommand command = new UpdateRuleCommand
         {
             RuleId = id,
             Name = request.Name,
@@ -81,7 +82,7 @@ public class AutomationRulesController(
             Operator = request.Operator,
             Action = request.Action,
         };
-        var result = await sender.Send(command, cancellationToken);
+        Result result = await sender.Send(command, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -92,8 +93,8 @@ public class AutomationRulesController(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var command = new DeleteRuleCommand { RuleId = id };
-        var result = await sender.Send(command, cancellationToken);
+        DeleteRuleCommand command = new DeleteRuleCommand { RuleId = id };
+        Result result = await sender.Send(command, cancellationToken);
 
         return this.ToActionResult(result);
     }

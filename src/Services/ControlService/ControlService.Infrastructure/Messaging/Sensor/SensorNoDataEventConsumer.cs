@@ -1,4 +1,5 @@
-﻿using Contracts.Events.SensorEvents;
+using Contracts.Events.SensorEvents;
+using Contracts.Results;
 using Control.Application.Interfaces;
 using MassTransit;
 
@@ -9,7 +10,7 @@ internal sealed class SensorNoDataEventConsumer(ISensorService service)
 {
     public async Task Consume(ConsumeContext<SensorNoDataEvent> context)
     {
-        var result = await service.HandleSensorNoDataEventAsync(
+        ConsumerResult result = await service.HandleSensorNoDataEventAsync(
             context.Message, context.CancellationToken);
 
         if (!result.IsSuccess && result.IsRetryable)

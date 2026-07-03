@@ -1,4 +1,4 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Results;
 using Control.Application.Interfaces;
 using Control.Domain.Entities;
@@ -15,16 +15,16 @@ public sealed class OutboxMessageProcessorService(
 {
     public async Task<Result> ProcessAsync(CancellationToken cancellationToken)
     {
-        var batchSize = 50;
+        int batchSize = 50;
 
-        var messages = await outboxRepository.GetPendingMessagesAsync(batchSize, cancellationToken);
+        IReadOnlyList<OutboxMessage>? messages = await outboxRepository.GetPendingMessagesAsync(batchSize, cancellationToken);
         bool anyMessagesForPublish = messages is null || !messages.Any();
         if (anyMessagesForPublish)
         {
             return Result.Success();
         }
 
-        foreach (var message in messages!)
+        foreach (OutboxMessage message in messages!)
         {
             await PublishDomainEventAsync(message, cancellationToken);
         }
@@ -35,7 +35,7 @@ public sealed class OutboxMessageProcessorService(
     }
 
     private async Task PublishDomainEventAsync(
-        OutboxMessage message, 
+        OutboxMessage message,
         CancellationToken cancellationToken)
     {
         try

@@ -1,4 +1,4 @@
-﻿using Contracts.Events.TelemetryEvents;
+using Contracts.Events.TelemetryEvents;
 using Contracts.Results;
 using Control.Application.Interfaces;
 using Control.Domain.Entities;
@@ -14,10 +14,10 @@ public sealed class TelemetryService(
     IUnitOfWork unitOfWork) : ITelemetryService
 {
     public async Task<ConsumerResult> ProcessTelemetryAsync(
-        TelemetryReceivedEvent telemetry, 
+        TelemetryReceivedEvent telemetry,
         CancellationToken cancellationToken)
     {
-        var triggerSensor = await sensorRepository.GetByIdAsync(
+        SensorEntity? triggerSensor = await sensorRepository.GetByIdAsync(
             telemetry.SensorId, cancellationToken);
         if (triggerSensor is null)
         {
@@ -26,23 +26,22 @@ public sealed class TelemetryService(
         }
 
         triggerSensor.SetLastValue(telemetry.Value);
-        await sensorRepository.UpdateAsync(triggerSensor, cancellationToken);
 
-        var rules = await ruleRepository.GetBySensorIdWithConditionsAsync(
+        IReadOnlyList<AutomationRuleEntity> rules = await ruleRepository.GetBySensorIdWithConditionsAsync(
             telemetry.SensorId, cancellationToken);
         if (rules == null || !rules.Any())
         {
             return ConsumerResult.Success();
         }
 
-        var sensorsCache = await LoadRequiredSensorsAsync(rules, cancellationToken);
+        Dictionary<Guid, SensorEntity> sensorsCache = await LoadRequiredSensorsAsync(rules, cancellationToken);
 
-        foreach (var rule in rules)
+        foreach (AutomationRuleEntity rule in rules)
         {
-            var matchConditions = EvaluateConditions(
+            List<bool?> matchConditions = EvaluateConditions(
                 rule.Conditions, sensorsCache, telemetry);
 
-            var targetState = RuleOperatorFactory.CalculateTargetState(
+            bool? targetState = RuleOperatorFactory.CalculateTargetState(
                 matchConditions, rule.Operator, rule.Action);
 
             if (targetState.HasValue)
@@ -66,7 +65,7 @@ public sealed class TelemetryService(
             .Distinct()
             .ToList();
 
-        var sensors = await sensorRepository.GetManyByIdsAsync(neededSensorIds, cancellationToken);
+        IReadOnlyList<SensorEntity> sensors = await sensorRepository.GetManyByIdsAsync(neededSensorIds, cancellationToken);
         return sensors.ToDictionary(s => s.Id);
     }
 
@@ -77,24 +76,24 @@ public sealed class TelemetryService(
     {
         var matchConditions = new List<bool?>();
 
-        foreach (var condition in conditions)
+        foreach (RuleConditionEntity condition in conditions)
         {
-            if (!sensorsCache.TryGetValue(condition.SensorId, out var sensor))
+            if (!sensorsCache.TryGetValue(condition.SensorId, out SensorEntity? sensor))
             {
                 continue;
             }
 
-            var valueToEvaluate = condition.SensorId == telemetry.SensorId
+            double valueToEvaluate = condition.SensorId == telemetry.SensorId
                 ? telemetry.Value
                 : sensor.LastValue;
 
-            var evaluator = RuleEvaluatorFactory.Create(condition.Condition);
-            var isMet = evaluator.Evaluate(valueToEvaluate, condition.Threshold, condition.Hysteresis);
+            IRuleEvaluator evaluator = RuleEvaluatorFactory.Create(condition.Condition);
+            bool? isMet = evaluator.Evaluate(valueToEvaluate, condition.Threshold, condition.Hysteresis);
 
             matchConditions.Add(isMet);
         }
 
-        return matchConditions; 
+        return matchConditions;
     }
 
     private async Task ApplyRelayStateAsync(
@@ -102,17 +101,15 @@ public sealed class TelemetryService(
         bool targetState,
         CancellationToken cancellationToken)
     {
-        var relay = await relayRepository.GetByIdAsync(relayId, cancellationToken);
+        RelayEntity? relay = await relayRepository.GetByIdAsync(relayId, cancellationToken);
 
         if (relay is null || relay.IsManual || relay.IsActive == targetState)
         {
-            return; 
+            return;
         }
 
-        var actionExpireAt = DateTime.UtcNow.AddMinutes(5); 
+        DateTime actionExpireAt = DateTime.UtcNow.AddMinutes(5);
 
         relay.SetState(targetState, actionExpireAt);
-
-        await relayRepository.UpdateAsync(relay, cancellationToken);
     }
 }

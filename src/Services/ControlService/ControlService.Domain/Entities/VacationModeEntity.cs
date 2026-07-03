@@ -1,4 +1,4 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Results;
 
 namespace Control.Domain.Entities;
@@ -6,7 +6,7 @@ namespace Control.Domain.Entities;
 public sealed class VacationModeEntity : IEntity
 {
     private VacationModeEntity(
-        Guid id, 
+        Guid id,
         Guid ecosystemId,
         DateTime startDate,
         DateTime endDate,
@@ -108,10 +108,7 @@ public sealed class VacationModeEntity : IEntity
         return Result.Success();
     }
 
-    public void SetActive(bool status)
-    {
-        IsActive = status;
-    }
+    public void SetActive(bool status) => IsActive = status;
 
     public Result SetTiming(DateTime startDate, DateTime endDate)
     {

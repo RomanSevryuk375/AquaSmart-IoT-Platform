@@ -1,10 +1,10 @@
-﻿using Control.Domain.Entities;
+using Control.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Control.Infrastructure.Persistence.Configurations;
 
-public sealed class RuleConditionEntityConfiguration 
+public sealed class RuleConditionEntityConfiguration
     : IEntityTypeConfiguration<RuleConditionEntity>
 {
     public void Configure(EntityTypeBuilder<RuleConditionEntity> builder)

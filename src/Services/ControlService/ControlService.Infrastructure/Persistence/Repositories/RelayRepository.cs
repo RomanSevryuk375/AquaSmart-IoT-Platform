@@ -1,4 +1,4 @@
-﻿using Control.Domain.Entities;
+using Control.Domain.Entities;
 using Control.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +8,7 @@ public sealed class RelayRepository(SystemDbContext dbContext)
     : BaseRepository<RelayEntity>(dbContext), IRelayRepository
 {
     public async Task<bool> ExistsAsync(
-        Guid relayId, 
+        Guid relayId,
         CancellationToken cancellationToken)
     {
         return await Context.Relays
@@ -26,7 +26,7 @@ public sealed class RelayRepository(SystemDbContext dbContext)
     }
 
     public async Task<IReadOnlyList<RelayEntity>> GetManyByIds(
-        IEnumerable<Guid> relayIds, 
+        IEnumerable<Guid> relayIds,
         CancellationToken cancellationToken)
     {
         return await Context.Relays.AsNoTracking()

@@ -38,22 +38,22 @@ public static class RuleOperatorFactory
     {
         if (results.Any(r => r == false))
         {
-            return false; 
+            return false;
         }
 
         if (results.All(r => r == true))
         {
-            return true;  
+            return true;
         }
 
-        return null; 
+        return null;
     }
 
     private static bool? EvaluateOr(List<bool?> results)
     {
         if (results.Any(r => r == true))
         {
-            return true; 
+            return true;
         }
 
         if (results.All(r => r == false))
@@ -66,7 +66,7 @@ public static class RuleOperatorFactory
 
     private static bool? EvaluateNot(List<bool?> results)
     {
-        var baseValue = results.First();
+        bool? baseValue = results.First();
         if (baseValue == null)
         {
             return null;

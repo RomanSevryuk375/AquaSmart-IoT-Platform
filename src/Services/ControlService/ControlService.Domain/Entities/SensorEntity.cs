@@ -7,12 +7,12 @@ namespace Control.Domain.Entities;
 public sealed class SensorEntity : IEntity
 {
     private SensorEntity(
-        Guid id, 
+        Guid id,
         Guid controllerId,
-        Guid ecosystemId, 
+        Guid ecosystemId,
         string name,
         SensorState state,
-        SensorType type, 
+        SensorType type,
         double lastValue,
         DateTime createdAt)
     {
@@ -97,10 +97,7 @@ public sealed class SensorEntity : IEntity
         State = state;
     }
 
-    public void SetLastValue(double value)
-    {
-        LastValue = value;
-    }
+    public void SetLastValue(double value) => LastValue = value;
 
     public void SetType(SensorType type)
     {

@@ -1,4 +1,5 @@
-﻿using Contracts.Events.RelayEvents;
+using Contracts.Events.RelayEvents;
+using Contracts.Results;
 using Control.Application.Interfaces;
 using MassTransit;
 
@@ -9,7 +10,7 @@ internal sealed class RelayStateChangedComandConsumer(IRelayService service)
 {
     public async Task Consume(ConsumeContext<ChangeRelayStateEvent> context)
     {
-        var result = await service.ChangedStateAsync(
+        ConsumerResult result = await service.ChangedStateAsync(
             context.Message, context.CancellationToken);
 
         if (!result.IsSuccess && result.IsRetryable)

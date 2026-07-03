@@ -133,10 +133,7 @@ public sealed class RelayEntity : AggregateRoot, IEntity
         });
     }
 
-    public void SetPowerSensorId(Guid powerSensorId)
-    {
-        PowerSensorId = powerSensorId;
-    }
+    public void SetPowerSensorId(Guid powerSensorId) => PowerSensorId = powerSensorId;
 
     public Result SetName(string name)
     {

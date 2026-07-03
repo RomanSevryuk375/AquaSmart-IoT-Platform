@@ -1,5 +1,6 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Control.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Newtonsoft.Json;
 
@@ -12,7 +13,7 @@ public sealed class ConvertDomainEventsToOutboxMessagesInterceptor : SaveChanges
         InterceptionResult<int> result,
         CancellationToken cancellationToken = default)
     {
-        var dbContext = eventData.Context;
+        DbContext? dbContext = eventData.Context;
 
         if (dbContext is null)
         {

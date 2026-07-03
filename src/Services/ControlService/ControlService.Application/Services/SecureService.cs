@@ -1,4 +1,4 @@
-﻿using Contracts.Results;
+using Contracts.Results;
 using Control.Application.Interfaces;
 using Control.Domain.Entities;
 using Control.Domain.Interfaces;
@@ -14,7 +14,7 @@ public sealed class SecureService(
         Guid ecosystemId,
         CancellationToken cancellationToken)
     {
-        var ecosystem = await ecosystemRepository.GetByIdAsync(
+        EcosystemEntity? ecosystem = await ecosystemRepository.GetByIdAsync(
             ecosystemId, cancellationToken);
         if (ecosystem is null)
         {
@@ -38,7 +38,7 @@ public sealed class SecureService(
         Guid relayId,
         CancellationToken cancellationToken)
     {
-        var existingRelay = await relayRepository.GetByIdAsync(
+        RelayEntity? existingRelay = await relayRepository.GetByIdAsync(
             relayId, cancellationToken);
         if (existingRelay is null)
         {

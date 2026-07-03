@@ -1,4 +1,4 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Results;
 
 namespace Control.Domain.Entities;
@@ -6,7 +6,7 @@ namespace Control.Domain.Entities;
 public sealed class ScheduleEntity : IEntity
 {
     private ScheduleEntity(
-        Guid id, 
+        Guid id,
         Guid ecosystemId,
         Guid relayId,
         string cronExpression,

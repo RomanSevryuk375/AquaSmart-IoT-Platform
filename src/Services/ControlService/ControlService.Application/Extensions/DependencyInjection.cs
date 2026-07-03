@@ -1,4 +1,5 @@
-﻿using Control.Application.CQRS.Common.Behaviors;
+using System.Reflection;
+using Control.Application.Features.Common.Behaviors;
 using Control.Application.Interfaces;
 using Control.Application.Services;
 using FluentValidation;
@@ -11,15 +12,15 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        var assembly = typeof(DependencyInjection).Assembly;
+        Assembly assembly = typeof(DependencyInjection).Assembly;
 
         services.AddScoped<IRelayService, RelayService>();
         services.AddScoped<IScheduleProcessor, ScheduleProcessor>();
         services.AddScoped<ISensorService, SensorService>();
         services.AddScoped<ITelemetryService, TelemetryService>();
 
-        services.AddMediatR(cfg => 
-        { 
+        services.AddMediatR(cfg =>
+        {
             cfg.RegisterServicesFromAssembly(assembly);
 
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
@@ -30,7 +31,7 @@ public static class DependencyInjection
 
         services.AddValidatorsFromAssembly(assembly);
 
-        services.AddAutoMapper(config => 
+        services.AddAutoMapper(config =>
         config.AddMaps(assembly));
 
         return services;

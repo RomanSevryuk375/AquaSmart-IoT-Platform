@@ -107,10 +107,7 @@ public sealed class RuleConditionEntity : IEntity
         Condition = condition;
     }
 
-    public void SetThreshold(double threshold)
-    {
-        Threshold = threshold;
-    }
+    public void SetThreshold(double threshold) => Threshold = threshold;
 
     public Result SetHysteresis(double hysteresis)
     {

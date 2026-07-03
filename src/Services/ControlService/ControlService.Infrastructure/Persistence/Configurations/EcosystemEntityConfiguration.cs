@@ -1,11 +1,11 @@
-﻿using Contracts.Constants;
+using Contracts.Constants;
 using Control.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Control.Infrastructure.Persistence.Configurations;
 
-public sealed class EcosystemEntityConfiguration 
+public sealed class EcosystemEntityConfiguration
     : IEntityTypeConfiguration<EcosystemEntity>
 {
     public void Configure(EntityTypeBuilder<EcosystemEntity> builder)
@@ -25,7 +25,7 @@ public sealed class EcosystemEntityConfiguration
             .HasMaxLength(EcosystemConstants.NameLength)
             .IsRequired();
 
-        builder.Property(x => x.Volume).IsRequired(false); 
+        builder.Property(x => x.Volume).IsRequired(false);
 
         builder.Property(x => x.CreatedAt).IsRequired();
 
