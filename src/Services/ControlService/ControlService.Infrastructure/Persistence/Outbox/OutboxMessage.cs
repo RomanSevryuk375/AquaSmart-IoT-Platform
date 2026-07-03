@@ -1,6 +1,6 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 
-namespace Control.Domain.Entities;
+namespace Control.Infrastructure.Persistence.Outbox;
 
 public sealed class OutboxMessage : IEntity
 {

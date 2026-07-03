@@ -32,7 +32,7 @@ public sealed class EcosystemEntityConfiguration
         builder.HasIndex(x => x.UserId);
         builder.HasIndex(x => x.ControllerId).IsUnique();
 
-        builder.HasMany<AutomationRuleEntity>()
+        builder.HasMany<AutomationRule>()
             .WithOne()
             .HasForeignKey(a => a.EcosystemId)
             .OnDelete(DeleteBehavior.Cascade);

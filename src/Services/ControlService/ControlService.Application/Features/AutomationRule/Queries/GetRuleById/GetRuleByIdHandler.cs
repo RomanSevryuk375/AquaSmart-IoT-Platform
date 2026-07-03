@@ -14,7 +14,7 @@ public sealed class GetRuleByIdHandler(
         GetRuleByIdQuery request,
         CancellationToken cancellationToken)
     {
-        AutomationRuleEntity? rule = await ruleRepository.GetByIdAsync(request.RuleId, cancellationToken);
+        Domain.Entities.AutomationRule? rule = await ruleRepository.GetByIdAsync(request.RuleId, cancellationToken);
         if (rule is null)
         {
             return Result<AutomationRuleDto>.Failure(Error.NotFound(

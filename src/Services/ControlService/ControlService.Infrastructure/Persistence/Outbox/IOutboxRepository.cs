@@ -1,6 +1,4 @@
-using Control.Domain.Entities;
-
-namespace Control.Domain.Interfaces;
+namespace Control.Infrastructure.Persistence.Outbox;
 
 public interface IOutboxRepository
 {

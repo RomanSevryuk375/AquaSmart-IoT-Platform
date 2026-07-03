@@ -1,5 +1,3 @@
-﻿using Control.Domain.Entities;
-using Control.Domain.Interfaces;
 using Control.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 

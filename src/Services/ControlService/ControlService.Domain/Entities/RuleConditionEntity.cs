@@ -32,6 +32,10 @@ public sealed class RuleConditionEntity : IEntity
     public double Hysteresis { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
+#pragma warning disable CS8618
+    private RuleConditionEntity() { }
+#pragma warning restore CS8618
+
     public static Result<RuleConditionEntity> Create(
         Guid automationRuleId,
         Guid sensorId,

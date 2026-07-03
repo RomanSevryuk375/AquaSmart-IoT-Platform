@@ -25,7 +25,7 @@ public sealed class GetAllRulesHandler(
                 Operator = request.Operator,
             });
 
-        IReadOnlyList<AutomationRuleEntity> rules = await ruleRepository.GetAllAsync(
+        IReadOnlyList<Domain.Entities.AutomationRule> rules = await ruleRepository.GetAllAsync(
             specification, cancellationToken);
 
         return Result<IReadOnlyList<AutomationRuleDto>>.Success(

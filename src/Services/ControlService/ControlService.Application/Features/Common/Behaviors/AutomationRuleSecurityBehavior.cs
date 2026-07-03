@@ -16,7 +16,7 @@ public sealed class AutomationRuleSecurityBehavior<TRequest, TResponse>(
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        AutomationRuleEntity? rule = await ruleRepository.GetByIdAsync(request.RuleId, cancellationToken);
+        Domain.Entities.AutomationRule? rule = await ruleRepository.GetByIdAsync(request.RuleId, cancellationToken);
         if (rule is null)
         {
             var notFoundError = Error.NotFound("Rule.NotFound", $"Rule {request.RuleId} not found");

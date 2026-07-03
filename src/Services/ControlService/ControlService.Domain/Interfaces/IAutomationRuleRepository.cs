@@ -3,13 +3,13 @@ using Control.Domain.Entities;
 
 namespace Control.Domain.Interfaces;
 
-public interface IAutomationRuleRepository : IRepository<AutomationRuleEntity>
+public interface IAutomationRuleRepository : IRepository<AutomationRule>
 {
-    public Task<AutomationRuleEntity?> GetByIdWithConditionsAsync(
+    public Task<AutomationRule?> GetByIdWithConditionsAsync(
         Guid id,
         CancellationToken cancellationToken);
 
-    public Task<IReadOnlyList<AutomationRuleEntity>> GetBySensorIdWithConditionsAsync(
+    public Task<IReadOnlyList<AutomationRule>> GetBySensorIdWithConditionsAsync(
         Guid sensorId,
         CancellationToken cancellationToken);
 }

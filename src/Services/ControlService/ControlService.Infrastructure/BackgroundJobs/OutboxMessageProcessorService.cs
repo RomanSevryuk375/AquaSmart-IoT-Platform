@@ -1,17 +1,17 @@
 using Contracts.Abstractions;
 using Contracts.Results;
-using Control.Application.Interfaces;
 using Control.Domain.Entities;
 using Control.Domain.Interfaces;
+using Control.Infrastructure.Persistence.Outbox;
 using MediatR;
 using Newtonsoft.Json;
 
-namespace Control.Application.Services;
+namespace Control.Infrastructure.BackgroundJobs;
 
 public sealed class OutboxMessageProcessorService(
     IOutboxRepository outboxRepository,
     IPublisher publisher,
-    IUnitOfWork unitOfWork) : IOutboxMessageProcessorService
+    IUnitOfWork unitOfWork)
 {
     public async Task<Result> ProcessAsync(CancellationToken cancellationToken)
     {
@@ -40,7 +40,7 @@ public sealed class OutboxMessageProcessorService(
     {
         try
         {
-            var type = Type.GetType(message.Type);
+            Type type = Type.GetType(message.Type);
             if (type == null)
             {
                 MarkAsPoisonMessage(message, $"Type '{message.Type}' could not be resolved.");

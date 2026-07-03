@@ -4,9 +4,9 @@ using Contracts.Results;
 
 namespace Control.Domain.Entities;
 
-public class AutomationRuleEntity : IEntity
+public class AutomationRule : IEntity
 {
-    private AutomationRuleEntity(
+    private AutomationRule(
         Guid id,
         Guid ecosystemId,
         Guid relayId,
@@ -35,9 +35,13 @@ public class AutomationRuleEntity : IEntity
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
+#pragma warning disable CS8618 
+    private AutomationRule() { }
+#pragma warning restore CS8618
+
     public virtual ICollection<RuleConditionEntity> Conditions { get; private set; } = [];
 
-    public static Result<AutomationRuleEntity> Create(
+    public static Result<AutomationRule> Create(
         Guid ecosystemId,
         string name,
         Guid relayId,
@@ -64,13 +68,13 @@ public class AutomationRuleEntity : IEntity
 
         if (errors.Count > 0)
         {
-            return Result<AutomationRuleEntity>.Failure(
+            return Result<AutomationRule>.Failure(
                 Error.Validation(
                     "Rule.Invalid",
                     string.Join("; ", errors)));
         }
 
-        var rule = new AutomationRuleEntity(
+        var rule = new AutomationRule(
             Guid.NewGuid(),
             ecosystemId,
             relayId,
@@ -80,7 +84,7 @@ public class AutomationRuleEntity : IEntity
             isActive,
             DateTime.UtcNow);
 
-        return Result<AutomationRuleEntity>.Success(rule);
+        return Result<AutomationRule>.Success(rule);
     }
 
     public Result Update(

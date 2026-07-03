@@ -33,6 +33,10 @@ public sealed class EcosystemEntity : AggregateRoot, IEntity
     public Guid ControllerId { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
+#pragma warning disable CS8618
+    private EcosystemEntity() { }
+#pragma warning restore CS8618
+
     public static Result<EcosystemEntity> Create(
         Guid userId,
         EcosystemType type,

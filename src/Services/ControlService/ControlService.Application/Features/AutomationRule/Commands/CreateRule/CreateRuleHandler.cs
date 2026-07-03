@@ -22,7 +22,7 @@ public sealed class CreateRuleHandler(
             return Result<Guid>.Failure(relayOwnership.Error);
         }
 
-        Result<AutomationRuleEntity> createResult = AutomationRuleEntity.Create(
+        Result<Domain.Entities.AutomationRule> createResult = Domain.Entities.AutomationRule.Create(
             request.EcosystemId, request.Name, request.RelayId,
             request.Operator, request.Action, request.IsActive);
         if (createResult.IsFailure)

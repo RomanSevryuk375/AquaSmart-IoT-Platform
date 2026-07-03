@@ -1,11 +1,10 @@
 using Contracts.Results;
-using Control.Application.Interfaces;
 using Quartz;
 
 namespace Control.Infrastructure.BackgroundJobs;
 
 public sealed class OutboxMessageProcessorJob(
-    IOutboxMessageProcessorService service) : IJob
+    OutboxMessageProcessorService service) : IJob
 {
     public async Task Execute(IJobExecutionContext context)
     {

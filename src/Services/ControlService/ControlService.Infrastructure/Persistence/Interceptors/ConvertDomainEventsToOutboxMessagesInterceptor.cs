@@ -1,5 +1,5 @@
 using Contracts.Abstractions;
-using Control.Domain.Entities;
+using Control.Infrastructure.Persistence.Outbox;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Newtonsoft.Json;

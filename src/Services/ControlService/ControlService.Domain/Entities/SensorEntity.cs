@@ -35,6 +35,10 @@ public sealed class SensorEntity : IEntity
     public double LastValue { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
+#pragma warning disable CS8618
+    private SensorEntity() { }
+#pragma warning restore CS8618
+
     public static Result<SensorEntity> Create(
         Guid id,
         Guid controllerId,

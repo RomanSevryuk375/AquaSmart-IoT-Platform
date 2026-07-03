@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 namespace Control.Infrastructure.Persistence.Repositories;
 
 public sealed class AutomationRuleRepository(SystemDbContext dbContext)
-        : BaseRepository<AutomationRuleEntity>(dbContext), IAutomationRuleRepository
+        : BaseRepository<AutomationRule>(dbContext), IAutomationRuleRepository
 {
-    public async Task<AutomationRuleEntity?> GetByIdWithConditionsAsync(
+    public async Task<AutomationRule?> GetByIdWithConditionsAsync(
         Guid ruleId,
         CancellationToken cancellationToken)
     {
@@ -16,7 +16,7 @@ public sealed class AutomationRuleRepository(SystemDbContext dbContext)
             .FirstOrDefaultAsync(x => x.Id == ruleId, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<AutomationRuleEntity>> GetBySensorIdWithConditionsAsync(
+    public async Task<IReadOnlyList<AutomationRule>> GetBySensorIdWithConditionsAsync(
         Guid sensorId,
         CancellationToken cancellationToken)
     {

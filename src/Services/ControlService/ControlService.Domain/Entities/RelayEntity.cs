@@ -39,6 +39,10 @@ public sealed class RelayEntity : AggregateRoot, IEntity
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
+#pragma warning disable CS8618
+    private RelayEntity() { }
+#pragma warning restore CS8618
+
     public static Result<RelayEntity> Create(
         Guid id,
         Guid ecosystemId,

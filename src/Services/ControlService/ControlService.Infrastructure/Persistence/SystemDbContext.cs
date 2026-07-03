@@ -1,11 +1,12 @@
-﻿using Control.Domain.Entities;
+using Control.Domain.Entities;
+using Control.Infrastructure.Persistence.Outbox;
 using Microsoft.EntityFrameworkCore;
 
 namespace Control.Infrastructure.Persistence;
 
 public class SystemDbContext(DbContextOptions<SystemDbContext> options) : DbContext(options)
 {
-    public DbSet<AutomationRuleEntity> Rules { get; set; }
+    public DbSet<AutomationRule> Rules { get; set; }
     public DbSet<EcosystemEntity> Aquariums { get; set; }
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
     public DbSet<RelayEntity> Relays { get; set; }

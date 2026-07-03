@@ -5,7 +5,7 @@ using Control.Domain.SpecificationParams;
 namespace Control.Domain.Specifications;
 
 public sealed class AutomationRuleFilterSpecification
-    : BaseSpecification<AutomationRuleEntity>
+    : BaseSpecification<AutomationRule>
 {
     public AutomationRuleFilterSpecification(AutomationRuleFilterParams @params)
         : base(data =>

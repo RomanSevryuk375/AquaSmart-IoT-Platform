@@ -8,9 +8,9 @@ public sealed class AutomationRuleProfile : Profile
 {
     public AutomationRuleProfile()
     {
-        CreateMap<AutomationRuleEntity, AutomationRuleDto>();
+        CreateMap<AutomationRule, AutomationRuleDto>();
 
-        CreateMap<AutomationRuleEntity, AutomationRuleDto>()
+        CreateMap<AutomationRule, AutomationRuleDto>()
             .ForMember(dest => dest.Conditions,
             opt => opt.MapFrom(src => src.Conditions));
     }

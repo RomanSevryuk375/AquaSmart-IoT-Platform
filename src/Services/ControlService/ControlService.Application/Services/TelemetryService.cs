@@ -27,7 +27,7 @@ public sealed class TelemetryService(
 
         triggerSensor.SetLastValue(telemetry.Value);
 
-        IReadOnlyList<AutomationRuleEntity> rules = await ruleRepository.GetBySensorIdWithConditionsAsync(
+        IReadOnlyList<AutomationRule> rules = await ruleRepository.GetBySensorIdWithConditionsAsync(
             telemetry.SensorId, cancellationToken);
         if (rules == null || !rules.Any())
         {
@@ -36,7 +36,7 @@ public sealed class TelemetryService(
 
         Dictionary<Guid, SensorEntity> sensorsCache = await LoadRequiredSensorsAsync(rules, cancellationToken);
 
-        foreach (AutomationRuleEntity rule in rules)
+        foreach (AutomationRule rule in rules)
         {
             List<bool?> matchConditions = EvaluateConditions(
                 rule.Conditions, sensorsCache, telemetry);
@@ -56,7 +56,7 @@ public sealed class TelemetryService(
     }
 
     private async Task<Dictionary<Guid, SensorEntity>> LoadRequiredSensorsAsync(
-        IEnumerable<AutomationRuleEntity> rules,
+        IEnumerable<AutomationRule> rules,
         CancellationToken cancellationToken)
     {
         var neededSensorIds = rules

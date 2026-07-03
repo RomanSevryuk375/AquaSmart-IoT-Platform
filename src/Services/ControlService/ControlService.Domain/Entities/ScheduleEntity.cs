@@ -34,6 +34,10 @@ public sealed class ScheduleEntity : IEntity
     public bool IsEnable { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
+#pragma warning disable CS8618
+    private ScheduleEntity() { }
+#pragma warning restore CS8618
+
     public static Result<ScheduleEntity> Create(
         Guid ecosystemId,
         Guid relayId,

@@ -5,5 +5,8 @@
     <Project Path="../ControlService.Infrastructure/Control.Infrastructure.csproj" Id="3a0dff64-55a0-4d0e-8735-e304d2fe62a7" />
     <Project Path="Control.API.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="../Control.ArchitectureTests/Control.ArchitectureTests.csproj" Id="a1718d7e-0610-4cdb-86de-4a11fb569442" />
+  </Folder>
   <Project Path="../../../Contracts/Contracts/Contracts.csproj" />
 </Solution>

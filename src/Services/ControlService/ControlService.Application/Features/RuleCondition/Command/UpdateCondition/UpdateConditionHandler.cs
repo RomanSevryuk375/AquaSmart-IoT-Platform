@@ -14,7 +14,7 @@ public sealed class UpdateConditionHandler(
         UpdateConditionCommand request,
         CancellationToken cancellationToken)
     {
-        AutomationRuleEntity? rule = await ruleRepository.GetByIdWithConditionsAsync(
+        Domain.Entities.AutomationRule? rule = await ruleRepository.GetByIdWithConditionsAsync(
             request.RuleId, cancellationToken);
         if (rule is null)
         {
@@ -42,7 +42,7 @@ public sealed class UpdateConditionHandler(
     }
 
     private async Task<Result<RuleConditionEntity>> EnsureRuleOwnsConditionAsync(
-        AutomationRuleEntity rule,
+        Domain.Entities.AutomationRule rule,
         Guid conditionId,
         CancellationToken cancellationToken)
     {

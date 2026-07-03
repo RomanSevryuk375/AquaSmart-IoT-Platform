@@ -15,7 +15,7 @@ public sealed class AddConditionHandler(
         AddConditionCommand request,
         CancellationToken cancellationToken)
     {
-        AutomationRuleEntity? rule = await ruleRepository.GetByIdWithConditionsAsync(
+        Domain.Entities.AutomationRule? rule = await ruleRepository.GetByIdWithConditionsAsync(
             request.RuleId, cancellationToken);
         if (rule is null)
         {
@@ -46,7 +46,7 @@ public sealed class AddConditionHandler(
     }
 
     private async Task<Result> EnsureConditionOwnsSensorAsync(
-        AutomationRuleEntity rule,
+        Domain.Entities.AutomationRule rule,
         Guid sensorId,
         CancellationToken cancellationToken)
     {

@@ -13,10 +13,10 @@ public sealed class DeleteRuleHandler(
         DeleteRuleCommand request,
         CancellationToken cancellationToken)
     {
-        AutomationRuleEntity? rule = await ruleRepository.GetByIdAsync(request.RuleId, cancellationToken);
+        Domain.Entities.AutomationRule? rule = await ruleRepository.GetByIdAsync(request.RuleId, cancellationToken);
         if (rule is null)
         {
-            return Result<AutomationRuleEntity>.Failure(Error.NotFound(
+            return Result<Domain.Entities.AutomationRule>.Failure(Error.NotFound(
                 "Rule.NotFound", $"Rule {request.RuleId} not found"));
         }
 

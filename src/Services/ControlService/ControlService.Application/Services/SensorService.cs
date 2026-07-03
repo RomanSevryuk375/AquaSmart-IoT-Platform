@@ -96,14 +96,14 @@ public sealed class SensorService(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        IReadOnlyList<AutomationRuleEntity>? affectedRules = await ruleRepository.GetBySensorIdWithConditionsAsync(
+        IReadOnlyList<AutomationRule>? affectedRules = await ruleRepository.GetBySensorIdWithConditionsAsync(
             sensor.Id, cancellationToken);
         if (affectedRules is null || !affectedRules.Any())
         {
             return ConsumerResult.Success();
         }
 
-        foreach (AutomationRuleEntity rule in affectedRules)
+        foreach (AutomationRule rule in affectedRules)
         {
             await publishEndpoint.Publish(new ChangeRelayStateEvent
             {
