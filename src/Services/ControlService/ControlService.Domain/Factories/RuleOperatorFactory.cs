@@ -36,12 +36,12 @@ public static class RuleOperatorFactory
 
     private static bool? EvaluateAnd(List<bool?> results)
     {
-        if (results.Any(r => r == false))
+        if (results.Exists(r => r is false))
         {
             return false;
         }
 
-        if (results.All(r => r == true))
+        if (results.Exists(r => r is true))
         {
             return true;
         }
@@ -51,12 +51,12 @@ public static class RuleOperatorFactory
 
     private static bool? EvaluateOr(List<bool?> results)
     {
-        if (results.Any(r => r == true))
+        if (results.Exists(r => r is true))
         {
             return true;
         }
 
-        if (results.All(r => r == false))
+        if (results.Exists(r => r is false))
         {
             return false;
         }
@@ -66,8 +66,8 @@ public static class RuleOperatorFactory
 
     private static bool? EvaluateNot(List<bool?> results)
     {
-        bool? baseValue = results.First();
-        if (baseValue == null)
+        bool? baseValue = results[0];
+        if (baseValue is null)
         {
             return null;
         }
@@ -77,11 +77,11 @@ public static class RuleOperatorFactory
 
     private static bool? EvaluateXor(List<bool?> results)
     {
-        if (results.Any(r => r == null))
+        if (results.Exists(r => r is null))
         {
             return null;
         }
 
-        return results.Count(r => r == true) % 2 != 0;
+        return results.Count(r => r is true) % 2 != 0;
     }
 }

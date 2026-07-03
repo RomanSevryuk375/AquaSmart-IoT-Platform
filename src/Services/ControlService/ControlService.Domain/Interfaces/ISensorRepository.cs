@@ -6,10 +6,10 @@ namespace Control.Domain.Interfaces;
 public interface ISensorRepository : IRepository<Sensor>
 {
     public Task<bool> ExistsAsync(
-        Guid id,
-        CancellationToken cancellationToken);
+        Guid sensorId,
+        CancellationToken cancellationToken = default);
 
     public Task<IReadOnlyList<Sensor>> GetManyByIdsAsync(
         IEnumerable<Guid> sensorIds,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

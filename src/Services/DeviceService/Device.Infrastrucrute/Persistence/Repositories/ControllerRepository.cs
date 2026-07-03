@@ -27,4 +27,13 @@ public sealed class ControllerRepository(SystemDbContext dbContext)
         return await Context.Controllers
             .FirstOrDefaultAsync(x => x.DeviceTokenHash == deviceTokenHash, cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Controller>> GetOfflineControllersAsync(
+        DateTime offlineThreshold,
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.Controllers
+            .Where(x => x.IsOnline && x.LastSeenAt < offlineThreshold)
+            .ToListAsync(cancellationToken);
+    }
 }

@@ -7,13 +7,13 @@ public interface IRelayRepository : IRepository<Relay>
 {
     public Task<bool> ExistsAsync(
         Guid relayId,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 
     public Task<Relay?> GetByPowerSensorId(
         Guid powerSensorId,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 
     public Task<IReadOnlyList<Relay>> GetManyByIds(
         IEnumerable<Guid> relayIds,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

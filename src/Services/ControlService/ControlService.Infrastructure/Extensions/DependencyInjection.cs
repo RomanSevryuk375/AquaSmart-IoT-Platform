@@ -1,4 +1,5 @@
 using Contracts.Options;
+using Control.Application.Interfaces;
 using Control.Domain.Interfaces;
 using Control.Infrastructure.BackgroundJobs;
 using Control.Infrastructure.Messaging.Relay;

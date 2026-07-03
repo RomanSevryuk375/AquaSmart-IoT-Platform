@@ -2,7 +2,6 @@ using Contracts.Abstractions;
 using Contracts.Enums;
 using Contracts.Results;
 using Control.Domain.Events;
-using Control.Domain.Factories;
 using Control.Domain.ValueObjects;
 
 namespace Control.Domain.Entities;
@@ -99,7 +98,7 @@ public sealed class Relay : AggregateRoot, IEntity
         {
             ControllerId = ControllerId,
             RelayId = Id,
-            Action = StateEvaluatorFactory.EvaluateBool(state),
+            TargetState = IsActive,
             ExpireAt = expireAt,
         });
     }

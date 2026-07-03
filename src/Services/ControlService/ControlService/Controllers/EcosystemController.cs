@@ -7,7 +7,7 @@ using Control.Application.Features.Ecosystems.Commands.UpdateEcosystem;
 using Control.Application.Features.Ecosystems.Queries;
 using Control.Application.Features.Ecosystems.Queries.GetAllEcosystems;
 using Control.Application.Features.Ecosystems.Queries.GetEcosystemById;
-using Control.Domain.Interfaces;
+using Control.Application.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

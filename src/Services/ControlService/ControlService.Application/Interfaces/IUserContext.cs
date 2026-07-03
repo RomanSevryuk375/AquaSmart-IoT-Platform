@@ -1,4 +1,4 @@
-namespace Control.Domain.Interfaces;
+namespace Control.Application.Interfaces;
 
 public interface IUserContext
 {

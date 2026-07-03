@@ -16,23 +16,6 @@ public abstract class BaseRepository<T>(SystemDbContext dbContext)
         return entity.Id;
     }
 
-    public async Task<IReadOnlyList<T>> GetAllAsync(
-        BaseSpecification<T>? specification,
-        CancellationToken cancellationToken = default)
-    {
-        IQueryable<T> query = _set.AsQueryable();
-
-        if (specification is not null)
-        {
-            query = query.Where(specification.Criteria);
-
-            query = specification.Includes.Aggregate(
-                query, (current, include) => current.Include(include));
-        }
-
-        return await query.ToListAsync(cancellationToken);
-    }
-
     public async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
         await _set.FindAsync([id], cancellationToken: cancellationToken);
 

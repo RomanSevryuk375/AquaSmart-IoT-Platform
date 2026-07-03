@@ -3,7 +3,6 @@ using Contracts.Results;
 using Control.Application.Interfaces;
 using Control.Domain.Entities;
 using Control.Domain.Interfaces;
-using Control.Domain.Specifications;
 using Cronos;
 using MassTransit;
 
@@ -17,9 +16,7 @@ public sealed class ScheduleProcessor(
 {
     public async Task<Result> ProcessAsync(CancellationToken cancellationToken)
     {
-        var specification = new ActiveScheduleSpecification();
-        IReadOnlyList<Schedule> schedules = await scheduleRepository.GetAllAsync(
-            specification, cancellationToken);
+        IReadOnlyList<Schedule> schedules = await scheduleRepository.GetActiveSchedules(cancellationToken);
 
         if (schedules == null || !schedules.Any())
         {

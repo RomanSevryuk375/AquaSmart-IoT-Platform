@@ -96,7 +96,7 @@ public sealed class Ecosystem : AggregateRoot, IEntity
 
         Name = nameResult.Value;
 
-        RaiseEvent(new EcosystemUdatedDominEvent
+        RaiseEvent(new EcosystemUpdatedDomainEvent
         {
             EcosystemId = Id,
             UserId = UserId,

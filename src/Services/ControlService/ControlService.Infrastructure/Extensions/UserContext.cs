@@ -1,5 +1,5 @@
-﻿using Contracts.Extensions;
-using Control.Domain.Interfaces;
+using Contracts.Extensions;
+using Control.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace Control.Infrastructure.Extensions;

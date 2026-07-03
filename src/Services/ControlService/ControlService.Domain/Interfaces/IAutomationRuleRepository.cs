@@ -6,10 +6,10 @@ namespace Control.Domain.Interfaces;
 public interface IAutomationRuleRepository : IRepository<AutomationRule>
 {
     public Task<AutomationRule?> GetByIdWithConditionsAsync(
-        Guid id,
-        CancellationToken cancellationToken);
+        Guid automationRuleId,
+        CancellationToken cancellationToken = default);
 
     public Task<IReadOnlyList<AutomationRule>> GetBySensorIdWithConditionsAsync(
         Guid sensorId,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }
