@@ -37,5 +37,7 @@ public sealed class RelayConfiguration
         builder.HasIndex(x => x.EcosystemId);
         builder.HasIndex(x => x.PowerSensorId)
             .HasFilter("power_sensor_id IS NOT NULL");
+
+        builder.Property(x => x.Version).IsConcurrencyToken();
     }
 }

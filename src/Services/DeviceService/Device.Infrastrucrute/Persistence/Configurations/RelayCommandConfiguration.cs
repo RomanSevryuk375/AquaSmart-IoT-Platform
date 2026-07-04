@@ -27,5 +27,7 @@ public sealed class RelayCommandConfiguration
             x.ControllerId,
             x.Status
         });
+
+        builder.Property(x => x.Version).IsConcurrencyToken();
     }
 }

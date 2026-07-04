@@ -26,5 +26,7 @@ public sealed class ScheduleConfiguration : IEntityTypeConfiguration<Schedule>
         builder.Property(x => x.IsFadeMode).IsRequired();
         builder.Property(x => x.IsEnabled).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
+
+        builder.Property(x => x.Version).IsConcurrencyToken();
     }
 }

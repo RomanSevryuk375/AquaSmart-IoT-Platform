@@ -3,7 +3,7 @@ using Device.Domain.ValueObjects;
 
 namespace Device.Infrastructure.Persistence.Repositories;
 
-public sealed class ControllerRepository(SystemDbContext dbContext)
+public sealed class ControllerRepository(DeviceDbContext dbContext)
     : BaseRepository<Controller>(dbContext), IControllerRepository
 {
     public async Task<Controller?> GetByMacAddressAsync(

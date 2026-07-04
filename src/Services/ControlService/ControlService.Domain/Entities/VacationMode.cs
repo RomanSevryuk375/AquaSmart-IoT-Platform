@@ -4,7 +4,7 @@ using Control.Domain.ValueObjects;
 
 namespace Control.Domain.Entities;
 
-public sealed class VacationMode : IEntity
+public sealed class VacationMode : AggregateRoot, IEntity
 {
     private VacationMode(
         Guid id,
@@ -55,7 +55,17 @@ public sealed class VacationMode : IEntity
         return Result<VacationMode>.Success(vacation);
     }
 
-    public void SetActive(bool status) => IsActive = status;
+    public void SetActive(bool status)
+    {
+        if (IsActive == status)
+        {
+            return;
+        }
+
+        IsActive = status;
+
+        IncrementVersion();
+    }
 
     public Result SetTiming(DateTime startDate, DateTime endDate)
     {
@@ -66,6 +76,8 @@ public sealed class VacationMode : IEntity
         }
 
         DateRange = dateRangeResult.Value;
+
+        IncrementVersion();
 
         return Result.Success();
     }
@@ -79,6 +91,8 @@ public sealed class VacationMode : IEntity
         }
 
         CalculatedFeed = calculatedFeed;
+
+        IncrementVersion();
 
         return Result.Success();
     }

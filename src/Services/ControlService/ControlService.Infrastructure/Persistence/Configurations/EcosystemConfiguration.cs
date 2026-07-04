@@ -39,5 +39,7 @@ public sealed class EcosystemConfiguration : IEntityTypeConfiguration<Ecosystem>
 
         builder.HasIndex(x => x.UserId);
         builder.HasIndex(x => x.ControllerId).IsUnique();
+
+        builder.Property(x => x.Version).IsConcurrencyToken();
     }
 }

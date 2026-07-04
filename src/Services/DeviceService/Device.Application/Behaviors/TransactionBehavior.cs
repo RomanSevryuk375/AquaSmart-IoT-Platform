@@ -1,4 +1,5 @@
 using Contracts.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Device.Application.Behaviors;
 
@@ -29,6 +30,16 @@ public sealed class TransactionBehavior<TRequest, TResponse>(
 
             await unitOfWork.CommitTransactionAsync(cancellationToken);
             return response;
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            await unitOfWork.RollbackTransactionAsync(cancellationToken);
+
+            var error = Error.Conflict(
+                "Concurrency.Conflict",
+                "The record was modified by another process. Please retry your action.");
+
+            return BehaviorHelpers.CreateFailedResult<TResponse>(error);
         }
         catch (Exception)
         {

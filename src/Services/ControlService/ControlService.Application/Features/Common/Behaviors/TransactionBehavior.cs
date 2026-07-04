@@ -2,6 +2,7 @@ using Contracts.Abstractions;
 using Contracts.Results;
 using Control.Domain.Interfaces;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Control.Application.Features.Common.Behaviors;
 
@@ -32,6 +33,16 @@ public sealed class TransactionBehavior<TRequest, TResponse>(
 
             await unitOfWork.CommitTransactionAsync(cancellationToken);
             return response;
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            await unitOfWork.RollbackTransactionAsync(cancellationToken);
+
+            var error = Error.Conflict(
+                "Concurrency.Conflict",
+                "The record was modified by another process. Please retry your action.");
+
+            return BehaviorHelpers.CreateFailedResult<TResponse>(error);
         }
         catch (Exception)
         {

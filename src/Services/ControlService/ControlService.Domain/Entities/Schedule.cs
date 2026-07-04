@@ -43,6 +43,7 @@ public sealed class Schedule : AggregateRoot, IEntity
     public DateTime CreatedAt { get; private set; }
 
     public static Result<Schedule> Create(
+        Guid scheduleId,
         Guid ecosystemId,
         Guid relayId,
         string rawCronExpression,
@@ -58,14 +59,10 @@ public sealed class Schedule : AggregateRoot, IEntity
         }
 
         var schedule = new Schedule(
-            Guid.NewGuid(),
-            ecosystemId,
-            relayId,
-            cronResult.Value,
-            durationMin,
-            isFadeMode,
-            isEnabled,
-            DateTime.UtcNow);
+            scheduleId, ecosystemId, relayId,
+            cronResult.Value, durationMin,
+            isFadeMode, isEnabled,
+            createdAt: DateTime.UtcNow);
 
         return Result<Schedule>.Success(schedule);
     }
@@ -94,8 +91,20 @@ public sealed class Schedule : AggregateRoot, IEntity
         IsFadeMode = isFadeMode;
         IsEnabled = isEnabled;
 
+        IncrementVersion();
+
         return Result.Success();
     }
 
-    public void Toggle() => IsEnabled = !IsEnabled;
+    public void SetToggle(bool state)
+    {
+        if (IsEnabled == state)
+        {
+            return;
+        }
+
+        IsEnabled = state;
+
+        IncrementVersion();
+    }
 }

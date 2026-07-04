@@ -1,6 +1,6 @@
 namespace Device.Domain.Entities;
 
-public sealed class RelayCommand : IEntity
+public sealed class RelayCommand : AggregateRoot, IEntity
 {
     private RelayCommand(
         Guid id,
@@ -74,6 +74,8 @@ public sealed class RelayCommand : IEntity
         ProcessedAt = DateTime.UtcNow;
         AttemptCount++;
         Status = CommandStatus.Sent;
+
+        IncrementVersion();
     }
 
     public void MarkAsCompleted()
@@ -85,6 +87,8 @@ public sealed class RelayCommand : IEntity
 
         Status = CommandStatus.Completed;
         ProcessedAt = DateTime.UtcNow;
+
+        IncrementVersion();
     }
 
     public void MarkAsFailed(string errorMessage)
@@ -96,5 +100,7 @@ public sealed class RelayCommand : IEntity
 
         ErrorMessage = errorMessage;
         Status = CommandStatus.Failed;
+
+        IncrementVersion();
     }
 }

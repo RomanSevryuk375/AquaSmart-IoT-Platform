@@ -103,10 +103,17 @@ public sealed class Controller : AggregateRoot, IEntity
         MacAddress = macAddressResult.Value;
         Name = nameResut.Value;
 
+        IncrementVersion();
+
         return Result.Success();
     }
 
-    public void RecordPing() => LastSeenAt = DateTime.UtcNow;
+    public void RecordPing()
+    {
+        LastSeenAt = DateTime.UtcNow;
+
+        IncrementVersion();
+    }
 
     public void ToggleState()
     {
@@ -121,6 +128,8 @@ public sealed class Controller : AggregateRoot, IEntity
                 LastSeenAt = LastSeenAt,
             });
         }
+
+        IncrementVersion();
     }
 
     public void SetOffline()
@@ -133,5 +142,7 @@ public sealed class Controller : AggregateRoot, IEntity
             ControllerId = Id,
             LastSeenAt = LastSeenAt,
         });
+
+        IncrementVersion();
     }
 }

@@ -25,5 +25,7 @@ public sealed class VacationModeConfiguration : IEntityTypeConfiguration<Vacatio
             .HasColumnName("date_range")
             .HasMaxLength(128)
             .IsRequired();
+
+        builder.Property(x => x.Version).IsConcurrencyToken();
     }
 }

@@ -35,8 +35,8 @@ public static class DependencyInjection
         services.AddScoped<IRelayCommandsRepository, RelayCommandsQueueRepository>();
         services.AddScoped<ISensorRepository, SensorRepository>();
 
-        string? connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
-        services.AddDbContext<SystemDbContext>((sp, options) =>
+        string? connectionString = configuration.GetConnectionString(nameof(DeviceDbContext));
+        services.AddDbContext<DeviceDbContext>((sp, options) =>
         {
             ConvertDomainEventsToOutboxMessagesInterceptor interceptor =
             sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
@@ -141,7 +141,7 @@ internal sealed class DatabaseMigrationService(IServiceProvider serviceProvider)
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         using IServiceScope scope = serviceProvider.CreateScope();
-        SystemDbContext context = scope.ServiceProvider.GetRequiredService<SystemDbContext>();
+        DeviceDbContext context = scope.ServiceProvider.GetRequiredService<DeviceDbContext>();
 
         await context.Database.MigrateAsync(cancellationToken);
     }

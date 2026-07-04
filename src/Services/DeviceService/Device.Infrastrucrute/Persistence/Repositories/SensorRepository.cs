@@ -1,6 +1,6 @@
 namespace Device.Infrastructure.Persistence.Repositories;
 
-public sealed class SensorRepository(SystemDbContext dbContext)
+public sealed class SensorRepository(DeviceDbContext dbContext)
     : BaseRepository<Sensor>(dbContext), ISensorRepository
 {
     public async Task<bool> ExistsAsync(

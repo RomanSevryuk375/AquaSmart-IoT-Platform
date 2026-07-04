@@ -25,7 +25,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
     {
         builder.UseEnvironment("Testing");
 
-        builder.UseSetting("ConnectionStrings:SystemDbContext", _dbContainer.GetConnectionString());
+        builder.UseSetting("ConnectionStrings:DeviceDbContext", _dbContainer.GetConnectionString());
 
         builder.ConfigureServices(services =>
         {
@@ -45,7 +45,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
 
             ServiceProvider serviceProvider = services.BuildServiceProvider();
             using IServiceScope scope = serviceProvider.CreateScope();
-            SystemDbContext context = scope.ServiceProvider.GetRequiredService<SystemDbContext>();
+            DeviceDbContext context = scope.ServiceProvider.GetRequiredService<DeviceDbContext>();
             context.Database.Migrate();
         });
     }

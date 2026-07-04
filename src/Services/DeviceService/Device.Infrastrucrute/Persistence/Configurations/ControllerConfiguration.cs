@@ -50,5 +50,7 @@ public sealed class ControllerConfiguration
         builder.HasIndex(x => x.UserId);
         builder.HasIndex(x => x.MacAddress).IsUnique();
         builder.HasIndex(x => x.DeviceTokenHash).IsUnique();
+
+        builder.Property(x => x.Version).IsConcurrencyToken();
     }
 }

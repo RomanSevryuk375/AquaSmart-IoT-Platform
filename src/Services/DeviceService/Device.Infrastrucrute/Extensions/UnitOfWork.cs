@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Device.Infrastructure.Extensions;
 
-public sealed class UnitOfWork(SystemDbContext dbContext) : IUnitOfWork
+public sealed class UnitOfWork(DeviceDbContext dbContext) : IUnitOfWork
 {
     private IDbContextTransaction? _contextTransaction;
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)

@@ -80,17 +80,10 @@ public sealed class Relay : AggregateRoot, IEntity
         }
 
         var relay = new Relay(
-            id,
-            controllerId,
-            userId,
-            powerSensorId,
-            nameResut.Value,
-            addressResult.Value,
-            isNormallyOpen,
-            purpose,
-            isActive,
-            isManual,
-            DateTime.UtcNow);
+            id, controllerId, userId, powerSensorId,
+            nameResut.Value, addressResult.Value, isNormallyOpen, purpose,
+            isActive, isManual,
+            createdAt: DateTime.UtcNow);
 
         relay.RaiseEvent(new RelayCreatedDomainEvent
         {
@@ -138,6 +131,8 @@ public sealed class Relay : AggregateRoot, IEntity
             CreatedAt = CreatedAt
         });
 
+        IncrementVersion();
+
         return Result.Success();
     }
 
@@ -150,6 +145,8 @@ public sealed class Relay : AggregateRoot, IEntity
         }
 
         Name = nameResut.Value;
+
+        IncrementVersion();
 
         return Result.Success();
     }
@@ -170,6 +167,8 @@ public sealed class Relay : AggregateRoot, IEntity
             PowerSensorId = sensor.Id,
         });
 
+        IncrementVersion();
+
         return Result.Success();
     }
 
@@ -189,6 +188,8 @@ public sealed class Relay : AggregateRoot, IEntity
             TargetState = IsActive,
             ExpireAt = DateTime.UtcNow.AddMinutes(5)
         });
+
+        IncrementVersion();
     }
 
     public void SetMode(bool mode)
@@ -205,6 +206,8 @@ public sealed class Relay : AggregateRoot, IEntity
             RelayId = Id,
             IsManual = IsManual
         });
+
+        IncrementVersion();
     }
 
     public void MarkAsDeleted() => RaiseEvent(new RelayDeletedDomainEvent { RelayId = Id, });

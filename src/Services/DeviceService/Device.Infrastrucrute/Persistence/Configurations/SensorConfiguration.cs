@@ -55,5 +55,7 @@ public sealed class SensorConfiguration
             .HasValue<HumiditySensor>(SensorType.Humidity)
             .HasValue<PressureSensor>(SensorType.Pressure)
             .HasValue<VoltageSensor>(SensorType.Voltage);
+
+        builder.Property(x => x.Version).IsConcurrencyToken();
     }
 }

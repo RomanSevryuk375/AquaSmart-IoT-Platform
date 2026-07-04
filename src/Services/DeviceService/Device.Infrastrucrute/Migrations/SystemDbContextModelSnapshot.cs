@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Device.Infrastructure.Migrations
 {
-    [DbContext(typeof(SystemDbContext))]
+    [DbContext(typeof(DeviceDbContext))]
     partial class SystemDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -61,6 +61,11 @@ namespace Device.Infrastructure.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uuid")
+                        .HasColumnName("version");
 
                     b.HasKey("Id")
                         .HasName("pk_controllers");
@@ -130,6 +135,11 @@ namespace Device.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uuid")
+                        .HasColumnName("version");
+
                     b.HasKey("Id")
                         .HasName("pk_relays");
 
@@ -190,6 +200,11 @@ namespace Device.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("targe_state");
 
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uuid")
+                        .HasColumnName("version");
+
                     b.HasKey("Id")
                         .HasName("pk_relay_command_queues");
 
@@ -246,6 +261,11 @@ namespace Device.Infrastructure.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uuid")
+                        .HasColumnName("version");
 
                     b.HasKey("Id")
                         .HasName("pk_sensors");

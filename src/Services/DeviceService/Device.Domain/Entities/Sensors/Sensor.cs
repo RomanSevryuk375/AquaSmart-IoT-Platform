@@ -81,6 +81,8 @@ public abstract class Sensor : AggregateRoot, IEntity
             CreatedAt = CreatedAt
         });
 
+        IncrementVersion();
+
         return Result.Success();
     }
 
@@ -92,11 +94,14 @@ public abstract class Sensor : AggregateRoot, IEntity
         }
 
         State = state;
+
         RaiseEvent(new SensorStateChangedDomainEvent
         {
             SensorId = Id,
             State = State
         });
+
+        IncrementVersion();
     }
 
     internal void RaiseCreatedEvent()
@@ -111,8 +116,9 @@ public abstract class Sensor : AggregateRoot, IEntity
             Unit = Unit,
             CreatedAt = CreatedAt
         });
+
+        IncrementVersion();
     }
 
-    public void MarkAsDeleted() =>
-        RaiseEvent(new SensorDeletedDomainEvent { SensorId = Id });
+    public void MarkAsDeleted() => RaiseEvent(new SensorDeletedDomainEvent { SensorId = Id });
 }

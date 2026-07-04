@@ -60,5 +60,7 @@ public sealed class RelayConfiguration
             .WithOne()
             .HasForeignKey<Relay>(x => x.PowerSensorId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        builder.Property(x => x.Version).IsConcurrencyToken();
     }
 }

@@ -105,6 +105,8 @@ public sealed class Ecosystem : AggregateRoot, IEntity
             CreatedAt = CreatedAt,
         });
 
+        IncrementVersion();
+
         return Result.Success();
     }
 
@@ -122,6 +124,8 @@ public sealed class Ecosystem : AggregateRoot, IEntity
         }
 
         Volume = validVolume;
+
+        IncrementVersion();
 
         return Result.Success();
     }

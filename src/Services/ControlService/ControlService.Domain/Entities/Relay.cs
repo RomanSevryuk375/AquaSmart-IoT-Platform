@@ -77,10 +77,17 @@ public sealed class Relay : AggregateRoot, IEntity
         }
 
         Purpose = purpose;
+
+        IncrementVersion();
     }
 
     public void SetMode(bool mode)
     {
+        if (IsManual == mode)
+        {
+            return;
+        }
+
         IsManual = mode;
 
         RaiseEvent(new RelayModeChangedDomainEvent
@@ -88,10 +95,17 @@ public sealed class Relay : AggregateRoot, IEntity
             RelayId = Id,
             IsManual = IsManual,
         });
+
+        IncrementVersion();
     }
 
     public void SetState(bool state, DateTime expireAt)
     {
+        if (IsActive == state)
+        {
+            return;
+        }
+
         IsActive = state;
 
         RaiseEvent(new RelayStateChangedDomainEvent
@@ -101,9 +115,16 @@ public sealed class Relay : AggregateRoot, IEntity
             TargetState = IsActive,
             ExpireAt = expireAt,
         });
+
+        IncrementVersion();
     }
 
-    public void SetPowerSensorId(Guid powerSensorId) => PowerSensorId = powerSensorId;
+    public void SetPowerSensorId(Guid powerSensorId)
+    {
+        PowerSensorId = powerSensorId;
+
+        IncrementVersion();
+    }
 
     public Result SetName(string rawName)
     {
@@ -114,6 +135,8 @@ public sealed class Relay : AggregateRoot, IEntity
         }
 
         Name = nameResult.Value;
+
+        IncrementVersion();
 
         return Result.Success();
     }

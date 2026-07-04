@@ -39,5 +39,7 @@ public sealed class SensorConfiguration
             .IsRequired();
 
         builder.Property(x => x.CreatedAt).IsRequired();
+
+        builder.Property(x => x.Version).IsConcurrencyToken();
     }
 }

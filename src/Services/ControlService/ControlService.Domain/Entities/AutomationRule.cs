@@ -6,7 +6,7 @@ using Control.Domain.ValueObjects;
 
 namespace Control.Domain.Entities;
 
-public sealed class AutomationRule : IEntity
+public sealed class AutomationRule : AggregateRoot, IEntity
 {
     private AutomationRule(
         Guid id,
@@ -81,6 +81,8 @@ public sealed class AutomationRule : IEntity
         Operator = @operator;
         Action = action;
 
+        IncrementVersion();
+
         return Result.Success();
     }
 
@@ -92,9 +94,21 @@ public sealed class AutomationRule : IEntity
         }
 
         Action = action;
+
+        IncrementVersion();
     }
 
-    public void SetIsActive(bool isActive) => IsActive = isActive;
+    public void SetIsActive(bool isActive)
+    {
+        if (IsActive == isActive)
+        {
+            return;
+        }
+
+        IsActive = isActive;
+
+        IncrementVersion();
+    }
 
     public Result AddCondition(RuleCondition condition)
     {
@@ -105,6 +119,9 @@ public sealed class AutomationRule : IEntity
         }
 
         _ruleConditions.Add(condition);
+
+        IncrementVersion();
+
         return Result.Success();
     }
 
@@ -117,6 +134,9 @@ public sealed class AutomationRule : IEntity
         }
 
         _ruleConditions.Remove(condition);
+
+        IncrementVersion();
+
         return Result.Success();
     }
 

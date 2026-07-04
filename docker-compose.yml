@@ -218,7 +218,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
-      - ConnectionStrings__SystemDbContext=Host=device-db;Database=device_db;Username=postgres;Password=password
+      - ConnectionStrings__DeviceDbContext=Host=device-db;Database=device_db;Username=postgres;Password=password
       - ElasticConfiguration__Uri=http://elasticsearch:9200
       - RabbitMqOptions__Host=amqp://rabbitmq:5672
       - RabbitMqOptions__UserName=guest
@@ -250,7 +250,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
-      - ConnectionStrings__SystemDbContext=Host=control-db;Database=control_db;Username=postgres;Password=password
+      - ConnectionStrings__ControlDbContext=Host=control-db;Database=control_db;Username=postgres;Password=password
       - RabbitMqOptions__Host=amqp://rabbitmq:5672
       - RabbitMqOptions__UserName=guest
       - RabbitMqOptions__Password=guest

@@ -36,5 +36,7 @@ public sealed class AutomationRuleConfiguration : IEntityTypeConfiguration<Autom
 
         builder.HasIndex(x => x.EcosystemId);
         builder.HasIndex(x => x.IsActive);
+
+        builder.Property(x => x.Version).IsConcurrencyToken();
     }
 }

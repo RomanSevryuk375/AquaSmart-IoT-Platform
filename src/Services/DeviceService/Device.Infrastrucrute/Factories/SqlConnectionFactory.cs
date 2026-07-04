@@ -8,7 +8,7 @@ internal sealed class SqlConnectionFactory(IConfiguration configuration) : ISqlC
 {
     public IDbConnection CreateConnection()
     {
-        string? connectionString = configuration.GetConnectionString("SystemDbContext");
+        string? connectionString = configuration.GetConnectionString(nameof(DeviceDbContext));
         return new NpgsqlConnection(connectionString);
     }
 }

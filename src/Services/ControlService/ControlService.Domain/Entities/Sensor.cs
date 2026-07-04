@@ -5,7 +5,7 @@ using Control.Domain.ValueObjects;
 
 namespace Control.Domain.Entities;
 
-public sealed class Sensor : IEntity
+public sealed class Sensor : AggregateRoot, IEntity
 {
     private Sensor(
         Guid id,
@@ -71,9 +71,16 @@ public sealed class Sensor : IEntity
         }
 
         State = state;
+
+        IncrementVersion();
     }
 
-    public void SetLastValue(double value) => LastValue = value;
+    public void SetLastValue(double value)
+    {
+        LastValue = value;
+
+        IncrementVersion();
+    }
 
     public void SetType(SensorType type)
     {
@@ -83,6 +90,8 @@ public sealed class Sensor : IEntity
         }
 
         Type = type;
+
+        IncrementVersion();
     }
 
     public Result SetName(string rawName)
@@ -94,6 +103,8 @@ public sealed class Sensor : IEntity
         }
 
         Name = nameResult.Value;
+
+        IncrementVersion();
 
         return Result.Success();
     }

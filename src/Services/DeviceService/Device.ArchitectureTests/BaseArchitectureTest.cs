@@ -10,6 +10,6 @@ public abstract class BaseArchitectureTest
 {
     protected static readonly Assembly DomainAssembly = typeof(Controller).Assembly;
     protected static readonly Assembly ApplicationAssembly = typeof(IUnitOfWork).Assembly;
-    protected static readonly Assembly InfrastructureAssembly = typeof(SystemDbContext).Assembly;
+    protected static readonly Assembly InfrastructureAssembly = typeof(DeviceDbContext).Assembly;
     protected static readonly Assembly ApiAssembly = typeof(ControllersController).Assembly;
 }

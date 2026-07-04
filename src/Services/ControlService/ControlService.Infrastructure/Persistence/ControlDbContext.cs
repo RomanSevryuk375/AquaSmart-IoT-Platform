@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Control.Infrastructure.Persistence;
 
-public class SystemDbContext(DbContextOptions<SystemDbContext> options) : DbContext(options)
+public class ControlDbContext(DbContextOptions<ControlDbContext> options) : DbContext(options)
 {
     public DbSet<AutomationRule> Rules { get; set; }
     public DbSet<Ecosystem> Aquariums { get; set; }
@@ -17,6 +17,6 @@ public class SystemDbContext(DbContextOptions<SystemDbContext> options) : DbCont
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(SystemDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ControlDbContext).Assembly);
     }
 }

@@ -22,6 +22,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddSingleton<ConvertDomainEventsToOutboxMessagesInterceptor>();
+
         services.AddScoped<IAutomationRuleRepository, AutomationRuleRepository>();
         services.AddScoped<IEcosystemRepository, EcosystemRepository>();
         services.AddScoped<IOutboxRepository, OutboxRepository>();
@@ -33,9 +35,9 @@ public static class DependencyInjection
 
         services.AddSingleton<ICronValidator, CronValidator>();
 
-        string? connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
+        string? connectionString = configuration.GetConnectionString(nameof(ControlDbContext));
 
-        services.AddDbContext<SystemDbContext>((sp, options) =>
+        services.AddDbContext<ControlDbContext>((sp, options) =>
         {
             ConvertDomainEventsToOutboxMessagesInterceptor interceptor = sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
 

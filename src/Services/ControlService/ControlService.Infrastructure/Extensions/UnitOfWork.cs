@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Control.Infrastructure.Extensions;
 
-public sealed class UnitOfWork(SystemDbContext dbContext) : IUnitOfWork
+public sealed class UnitOfWork(ControlDbContext dbContext) : IUnitOfWork
 {
     private IDbContextTransaction? _contextTransaction;
     public async Task BeginTransactionAsync(CancellationToken cancellationToken)

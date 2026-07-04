@@ -11,7 +11,7 @@ namespace Device.API.E2ETests.Infrastructure;
 public abstract class BaseE2ETest : IAsyncLifetime
 {
     protected readonly HttpClient Client;
-    protected readonly SystemDbContext DbContext;
+    protected readonly DeviceDbContext DbContext;
     protected readonly E2ETestWebAppFactory Factory;
 
     private readonly IServiceScope _scope;
@@ -25,7 +25,7 @@ public abstract class BaseE2ETest : IAsyncLifetime
         Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Test");
 
         _scope = factory.Services.CreateScope();
-        DbContext = _scope.ServiceProvider.GetRequiredService<SystemDbContext>();
+        DbContext = _scope.ServiceProvider.GetRequiredService<DeviceDbContext>();
         _dbConnectionString = DbContext.Database.GetConnectionString()!;
     }
 
