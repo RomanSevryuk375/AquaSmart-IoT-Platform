@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Contracts\Contracts\Contracts.csproj" />
+        <ProjectReference Include="..\ControlService.Domain\Control.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="NSubstitute" />
+    </ItemGroup>
+</Project>

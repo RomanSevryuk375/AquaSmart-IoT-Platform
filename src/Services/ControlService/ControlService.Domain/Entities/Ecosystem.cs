@@ -61,7 +61,10 @@ public sealed class Ecosystem : AggregateRoot, IEntity
             {
                 errors.Add(volumeResult.Error);
             }
-            validVolume = volumeResult.Value;
+            else
+            {
+                validVolume = volumeResult.Value;
+            }
         }
 
         if (errors.Count > 0)

@@ -7,6 +7,8 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="../Control.ArchitectureTests/Control.ArchitectureTests.csproj" Id="a1718d7e-0610-4cdb-86de-4a11fb569442" />
+    <Project Path="../Control.Domain.UnitTests/Control.Domain.UnitTests.csproj" Id="57adec9f-a05a-4e58-a0de-8498d7713ecb" />
+    <Project Path="../Control.TestShared/Control.TestShared.csproj" Id="1abb8072-9e7f-48fe-b735-88101859c518" />
   </Folder>
   <Project Path="../../../Contracts/Contracts/Contracts.csproj" />
 </Solution>

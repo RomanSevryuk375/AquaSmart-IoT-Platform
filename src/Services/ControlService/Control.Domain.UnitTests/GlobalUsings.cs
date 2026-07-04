@@ -1,0 +1,10 @@
+global using Contracts.Constants;
+global using Contracts.Enums;
+global using Contracts.Results;
+global using Control.Domain.Entities;
+global using Control.Domain.Events;
+global using Control.Domain.Interfaces;
+global using Control.Domain.ValueObjects;
+global using Control.TestShared.Builders;
+global using FluentAssertions;
+global using NSubstitute;
