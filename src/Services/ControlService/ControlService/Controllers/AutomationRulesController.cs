@@ -1,10 +1,11 @@
-﻿using Contracts.Authorization;
+using Contracts.Authorization;
 using Contracts.Results;
 using Control.Application.DTOs.AutomationRule;
 using Control.Application.Features.AutomationRules.Commands.CreateRule;
 using Control.Application.Features.AutomationRules.Commands.DeleteRule;
 using Control.Application.Features.AutomationRules.Commands.UpdateRule;
 using Control.Application.Features.AutomationRules.Queries;
+using Control.Application.Features.AutomationRules.Queries.GetAllRules;
 using Control.Application.Features.AutomationRules.Queries.GetRuleById;
 using Control.Application.Features.Ecosystems.Queries;
 using Control.Application.Features.Ecosystems.Queries.GetAllEcosystems;
@@ -27,13 +28,13 @@ public class AutomationRulesController(
     [Authorize]
     [Authorize(Policy = SubPermissions.AutoRuleCreate)]
     public async Task<ActionResult<IReadOnlyList<AutomationRuleDto>>> GetAllRulesAsync(
-        [FromQuery] GetAllEcosystemsQuery query,
+        [FromQuery] GetAllRulesQuery query,
         CancellationToken cancellationToken = default)
     {
-        GetAllEcosystemsQuery enrichedQuery = query with { UserId = userContext.UserId };
-        IReadOnlyList<EcosystemDto> result = await sender.Send(enrichedQuery, cancellationToken);
+        GetAllRulesQuery enrichedQuery = query with { UserId = userContext.UserId };
+        Result<IReadOnlyList<AutomationRuleDto>> result = await sender.Send(enrichedQuery, cancellationToken);
 
-        return Ok(result);
+        return this.ToActionResult(result);
     }
 
     [HttpGet("{id:guid}", Name = GetRuleByIdRoute)]
@@ -43,7 +44,7 @@ public class AutomationRulesController(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        GetRuleByIdQuery query = new GetRuleByIdQuery { RuleId = id };
+        GetRuleByIdQuery query = new GetRuleByIdQuery { RuleId = id, UserId = userContext.UserId };
         Result<AutomationRuleDto> result = await sender.Send(query, cancellationToken);
 
         return this.ToActionResult(result);

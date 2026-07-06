@@ -8,4 +8,5 @@ public sealed record GetEcosystemByIdQuery
     : IQuery<Result<EcosystemDto>>, IEcosystemBoundRequest
 {
     public Guid EcosystemId { get; init; }
+    public Guid UserId { get; init; }
 }

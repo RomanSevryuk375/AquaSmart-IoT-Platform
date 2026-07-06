@@ -1,4 +1,4 @@
-﻿using Contracts.Authorization;
+using Contracts.Authorization;
 using Contracts.Results;
 using Control.Application.DTOs.Ecosystem;
 using Control.Application.Features.Ecosystems.Commands.CreateEcosystem;
@@ -29,9 +29,9 @@ public sealed class EcosystemController(
         CancellationToken cancellationToken = default)
     {
         GetAllEcosystemsQuery enrichedQuery = query with { UserId = userContext.UserId };
-        IReadOnlyList<EcosystemDto> result = await sender.Send(enrichedQuery, cancellationToken);
+        Result<IReadOnlyList<EcosystemDto>> result = await sender.Send(enrichedQuery, cancellationToken);
 
-        return Ok(result);
+        return this.ToActionResult(result);
     }
 
     [HttpGet("{id:guid}", Name = GetByIdRoute)]
@@ -40,7 +40,7 @@ public sealed class EcosystemController(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        GetEcosystemByIdQuery query = new GetEcosystemByIdQuery { EcosystemId = id };
+        GetEcosystemByIdQuery query = new GetEcosystemByIdQuery { EcosystemId = id, UserId = userContext.UserId };
         Result<EcosystemDto> result = await sender.Send(query, cancellationToken);
 
         return this.ToActionResult(result);

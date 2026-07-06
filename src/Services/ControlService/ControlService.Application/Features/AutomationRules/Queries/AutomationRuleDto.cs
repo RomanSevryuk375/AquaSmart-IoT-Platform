@@ -1,3 +1,5 @@
+// Ignore Spelling: Dto
+
 using Contracts.Enums;
 using Control.Application.DTOs.AutomationRule;
 
@@ -5,14 +7,14 @@ namespace Control.Application.Features.AutomationRules.Queries;
 
 public sealed record AutomationRuleDto
 {
-    public Guid Id { get; private set; }
-    public Guid EcosystemId { get; private set; }
-    public Guid RelayId { get; private set; }
-    public string Name { get; private set; } = string.Empty;
-    public Operator Operator { get; private set; }
-    public RuleAction Action { get; private set; }
-    public bool IsActive { get; private set; }
-    public DateTime CreatedAt { get; private set; }
+    public Guid Id { get; init; }
+    public Guid EcosystemId { get; init; }
+    public Guid RelayId { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public Operator Operator { get; init; }
+    public RuleAction Action { get; init; }
+    public bool IsActive { get; init; }
+    public DateTime CreatedAt { get; init; }
 
-    public IReadOnlyList<RuleConditionResponseDto> Conditions { get; private set; } = [];
+    public IReadOnlyList<RuleConditionResponseDto> Conditions { get; init; } = [];
 }

@@ -9,6 +9,7 @@ public sealed record GetAllRulesQuery
     : IQuery<Result<IReadOnlyList<AutomationRuleDto>>>, IEcosystemBoundRequest
 {
     public Guid EcosystemId { get; init; }
+    public Guid UserId { get; init; }
     public Guid? RelayId { get; init; }
     public RuleAction? Action { get; init; }
     public Operator? Operator { get; init; }
