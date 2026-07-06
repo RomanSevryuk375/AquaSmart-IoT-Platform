@@ -12,6 +12,7 @@ public sealed class RuleConditionConfiguration : IEntityTypeConfiguration<RuleCo
         builder.ToTable("rule_conditions");
 
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id).ValueGeneratedNever();
 
         builder.Property(x => x.AutomationRuleId).IsRequired();
         builder.Property(x => x.SensorId).IsRequired();

@@ -33,7 +33,7 @@ public sealed class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidat
             ValidationFailure firstFailure = failures[0];
             var error = Error.Validation("Validation.Error", firstFailure.ErrorMessage);
 
-            BehaviorHelpers.CreateFailedResult<TResponse>(error);
+            return BehaviorHelpers.CreateFailedResult<TResponse>(error);
         }
 
         return await next();

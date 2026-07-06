@@ -66,6 +66,8 @@ public sealed class AutomationRule : AggregateRoot, IEntity
             nameResult.Value, @operator, action, isActive,
             createdAt: DateTime.UtcNow);
 
+        rule.IncrementVersion();
+
         return Result<AutomationRule>.Success(rule);
     }
 

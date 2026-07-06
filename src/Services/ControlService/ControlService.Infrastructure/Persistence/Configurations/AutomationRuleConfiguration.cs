@@ -34,6 +34,9 @@ public sealed class AutomationRuleConfiguration : IEntityTypeConfiguration<Autom
             .HasForeignKey(x => x.AutomationRuleId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.Navigation(x => x.Conditions)
+            .HasField("_ruleConditions");
+
         builder.HasIndex(x => x.EcosystemId);
         builder.HasIndex(x => x.IsActive);
 

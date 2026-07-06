@@ -42,7 +42,7 @@ public static class DependencyInjection
         services.AddCommonAuthentication(configuration);
         services.AddControllers();
 
-        services.AddServices();
+        services.AddApplication();
         services.AddInfrastructure(configuration);
 
         services.AddAquaAuthorizationPolicies();

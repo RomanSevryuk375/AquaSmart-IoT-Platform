@@ -29,7 +29,7 @@ public sealed class RelayRepository(ControlDbContext dbContext)
         IEnumerable<Guid> relayIds,
         CancellationToken cancellationToken)
     {
-        return await Context.Relays.AsNoTracking()
+        return await Context.Relays
             .Where(x => relayIds.Contains(x.Id))
             .ToListAsync(cancellationToken);
     }

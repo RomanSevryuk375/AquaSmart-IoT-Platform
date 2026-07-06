@@ -7,8 +7,6 @@ using Control.Application.Features.AutomationRules.Commands.UpdateRule;
 using Control.Application.Features.AutomationRules.Queries;
 using Control.Application.Features.AutomationRules.Queries.GetAllRules;
 using Control.Application.Features.AutomationRules.Queries.GetRuleById;
-using Control.Application.Features.Ecosystems.Queries;
-using Control.Application.Features.Ecosystems.Queries.GetAllEcosystems;
 using Control.Application.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

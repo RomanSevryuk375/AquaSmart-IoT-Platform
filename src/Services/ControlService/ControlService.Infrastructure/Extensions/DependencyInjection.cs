@@ -10,6 +10,7 @@ using Control.Infrastructure.Messaging.Telemetry;
 using Control.Infrastructure.Persistence;
 using Control.Infrastructure.Persistence.Interceptors;
 using Control.Infrastructure.Persistence.Outbox;
+using Control.Infrastructure.Factories;
 using Control.Infrastructure.Persistence.Repositories;
 using Control.Infrastructure.Services;
 using MassTransit;
@@ -41,8 +42,10 @@ public static class DependencyInjection
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
         services.AddScoped<ISensorRepository, SensorRepository>();
         services.AddScoped<IVacationModeRepository, VacationModeRepository>();
+        services.AddScoped<OutboxMessageProcessorService>();
 
         services.AddSingleton<ICronValidator, CronValidator>();
+        services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
 
         Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
         string? connectionString = configuration.GetConnectionString(nameof(ControlDbContext));
