@@ -1,14 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <PackageReference Include="Cronos" />
-    <PackageReference Include="MassTransit" />
-    <PackageReference Include="Newtonsoft.Json" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Dapper" />
+        <PackageReference Include="Cronos" />
+        <PackageReference Include="MassTransit" />
+        <PackageReference Include="Newtonsoft.Json" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Contracts\Contracts\Contracts.csproj" />
-    <ProjectReference Include="..\ControlService.Domain\Control.Domain.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Contracts\Contracts\Contracts.csproj" />
+        <ProjectReference Include="..\ControlService.Domain\Control.Domain.csproj" />
+    </ItemGroup>
 
 </Project>

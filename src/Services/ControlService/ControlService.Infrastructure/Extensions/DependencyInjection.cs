@@ -1,3 +1,5 @@
+// Ignore Spelling: Mq
+
 using Contracts.Options;
 using Control.Application.Interfaces;
 using Control.Domain.Interfaces;
@@ -14,12 +16,20 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Quartz;
 
 namespace Control.Infrastructure.Extensions;
 
 public static class DependencyInjection
 {
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
+        return services.AddRepositories(configuration)
+                       .AddRabbitMq(configuration)
+                       .AddQuartzJobs();
+    }
+
     public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<ConvertDomainEventsToOutboxMessagesInterceptor>();
@@ -35,23 +45,24 @@ public static class DependencyInjection
 
         services.AddSingleton<ICronValidator, CronValidator>();
 
+        Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
         string? connectionString = configuration.GetConnectionString(nameof(ControlDbContext));
-
         services.AddDbContext<ControlDbContext>((sp, options) =>
         {
-            ConvertDomainEventsToOutboxMessagesInterceptor interceptor = sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
+            ConvertDomainEventsToOutboxMessagesInterceptor interceptor =
+            sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
 
             options.UseNpgsql(connectionString)
                    .UseSnakeCaseNamingConvention()
                    .AddInterceptors(interceptor);
         });
-
         services.AddHealthChecks().AddNpgSql(connectionString!);
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-        services.AddHttpContextAccessor();
         services.AddScoped<IUserContext, UserContext>();
+        services.AddHttpContextAccessor();
+
+        services.AddHostedService<DatabaseMigrationService>();
 
         return services;
     }
@@ -126,4 +137,17 @@ public static class DependencyInjection
 
         return services;
     }
+}
+
+internal sealed class DatabaseMigrationService(IServiceProvider serviceProvider) : IHostedService
+{
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        using IServiceScope scope = serviceProvider.CreateScope();
+        ControlDbContext context = scope.ServiceProvider.GetRequiredService<ControlDbContext>();
+
+        await context.Database.MigrateAsync(cancellationToken);
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }
