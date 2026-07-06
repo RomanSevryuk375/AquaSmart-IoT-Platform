@@ -1,4 +1,5 @@
 using Contracts.Abstractions;
+using Contracts.Constants;
 using Contracts.Enums;
 using Contracts.Results;
 using Control.Domain.Factories;
@@ -115,7 +116,7 @@ public sealed class AutomationRule : AggregateRoot, IEntity
         if (_ruleConditions.Exists(c => c.SensorId == condition.SensorId))
         {
             return Result.Failure(Error.Conflict<RuleCondition>(
-                $"A condition for Sensor {condition.SensorId} already exists."));
+                string.Format(ControlValidationMessages.ConditionForSensorAlreadyExistsFormat, condition.SensorId)));
         }
 
         _ruleConditions.Add(condition);
@@ -130,7 +131,7 @@ public sealed class AutomationRule : AggregateRoot, IEntity
         if (!_ruleConditions.Exists(x => x.Id == condition.Id))
         {
             return Result.Failure(Error.NotFound<RuleCondition>(
-                "Condition not found."));
+                ControlValidationMessages.ConditionNotFound));
         }
 
         _ruleConditions.Remove(condition);

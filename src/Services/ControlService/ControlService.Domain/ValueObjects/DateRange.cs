@@ -1,3 +1,4 @@
+using Contracts.Constants;
 using Contracts.Results;
 
 namespace Control.Domain.ValueObjects;
@@ -18,7 +19,7 @@ public sealed record DateRange
         if (start >= end)
         {
             return Result<DateRange>.Failure(Error.Validation<DateRange>(
-                "StartDate must be strictly before EndDate."));
+                ControlValidationMessages.StartDateMustBeBeforeEndDate));
         }
 
         return Result<DateRange>.Success(new DateRange(start, end));

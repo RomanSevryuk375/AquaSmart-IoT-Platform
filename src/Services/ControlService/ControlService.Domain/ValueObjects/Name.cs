@@ -17,13 +17,13 @@ public sealed record Name
         if (string.IsNullOrWhiteSpace(value))
         {
             return Result<Name>.Failure(Error.Validation<Name>(
-                "Name cannot be empty."));
+                ControlValidationMessages.NameCannotBeEmpty));
         }
 
         if (value.Length > CommonConstants.NameLength)
         {
             return Result<Name>.Failure(Error.Validation<Name>(
-                $"Name cannot exceed {CommonConstants.NameLength} characters."));
+                string.Format(ControlValidationMessages.NameCannotExceedLimitFormat, CommonConstants.NameLength)));
         }
 
         return Result<Name>.Success(new Name(value.Trim()));

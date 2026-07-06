@@ -1,5 +1,6 @@
 // Ignore Spelling: Cron Validator
 
+using Contracts.Constants;
 using Contracts.Results;
 using Control.Domain.Interfaces;
 
@@ -19,13 +20,13 @@ public sealed record CronSchedule
         if (string.IsNullOrWhiteSpace(value))
         {
             return Result<CronSchedule>.Failure(Error.Validation<CronSchedule>(
-                "Cron expression cannot be empty."));
+                ControlValidationMessages.CronExpressionCannotBeEmpty));
         }
 
         if (!cronValidator.IsValid(value))
         {
             return Result<CronSchedule>.Failure(Error.Validation<CronSchedule>(
-                $"Invalid cron expression: {value}"));
+                string.Format(ControlValidationMessages.InvalidCronExpressionFormat, value)));
         }
 
         return Result<CronSchedule>.Success(new CronSchedule(value));

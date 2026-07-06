@@ -1,12 +1,10 @@
+using Contracts.Constants;
 using Contracts.Results;
 
 namespace Control.Domain.ValueObjects;
 
 public sealed record Volume
 {
-    private const int MaxVolume = 10_000_000;
-    private const int MinVolume = 0;
-
     public double Value { get; }
 
     private Volume(double value)
@@ -16,16 +14,16 @@ public sealed record Volume
 
     public static Result<Volume> Create(double value)
     {
-        if (value <= MinVolume)
+        if (value <= ControlConstants.MinVolume)
         {
             return Result<Volume>.Failure(Error.Validation<Volume>(
-                "Volume must be strictly greater than zero."));
+                ControlValidationMessages.VolumeMustBeGreaterThanZero));
         }
 
-        if (value > MaxVolume)
+        if (value > ControlConstants.MaxVolume)
         {
             return Result<Volume>.Failure(Error.Validation<Volume>(
-                "Volume is unrealistically large."));
+                ControlValidationMessages.VolumeIsUnrealisticallyLarge));
         }
 
         return Result<Volume>.Success(new Volume(value));

@@ -1,6 +1,7 @@
 // Ignore Spelling: Cron Validator
 
 using Contracts.Abstractions;
+using Contracts.Constants;
 using Contracts.Results;
 using Control.Domain.Interfaces;
 using Control.Domain.ValueObjects;
@@ -74,10 +75,10 @@ public sealed class Schedule : AggregateRoot, IEntity
         bool isFadeMode,
         bool isEnabled)
     {
-        if (durationMin <= 0)
+        if (durationMin <= ControlConstants.MinDuration)
         {
             return Result.Failure(Error.Validation<Schedule>(
-                "DurationMin must be strictly greater than zero."));
+                ControlValidationMessages.DurationMinMustBeGreaterThanZero));
         }
 
         Result<CronSchedule> cronResult = CronSchedule.Create(rawCronExpression, cronValidator);

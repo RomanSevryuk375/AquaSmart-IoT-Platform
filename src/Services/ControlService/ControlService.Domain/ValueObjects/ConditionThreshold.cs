@@ -1,3 +1,4 @@
+using Contracts.Constants;
 using Contracts.Results;
 
 namespace Control.Domain.ValueObjects;
@@ -15,10 +16,10 @@ public sealed record ConditionThreshold
 
     public static Result<ConditionThreshold> Create(double threshold, double hysteresis)
     {
-        if (hysteresis < 0)
+        if (hysteresis < ControlConstants.MinHysteresis)
         {
             return Result<ConditionThreshold>.Failure(Error.Validation<ConditionThreshold>(
-                "Hysteresis cannot be negative."));
+                ControlValidationMessages.HysteresisCannotBeNegative));
         }
 
         return Result<ConditionThreshold>.Success(new ConditionThreshold(

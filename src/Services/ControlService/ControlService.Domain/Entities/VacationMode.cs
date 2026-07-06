@@ -1,4 +1,5 @@
 using Contracts.Abstractions;
+using Contracts.Constants;
 using Contracts.Results;
 using Control.Domain.ValueObjects;
 
@@ -84,10 +85,10 @@ public sealed class VacationMode : AggregateRoot, IEntity
 
     public Result SetFeedSize(double calculatedFeed)
     {
-        if (calculatedFeed < 0)
+        if (calculatedFeed < ControlConstants.MinCalculatedFeed)
         {
             return Result.Failure(Error.Validation<VacationMode>(
-                "CalculatedFeed cannot be negative."));
+                ControlValidationMessages.CalculatedFeedCannotBeNegative));
         }
 
         CalculatedFeed = calculatedFeed;
