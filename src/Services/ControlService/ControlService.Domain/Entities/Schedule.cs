@@ -97,7 +97,7 @@ public sealed class Schedule : AggregateRoot, IEntity
         return Result.Success();
     }
 
-    public void SetToggle(bool state)
+    public void SetIsActive(bool state)
     {
         if (IsEnabled == state)
         {

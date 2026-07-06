@@ -38,7 +38,6 @@ public static class DependencyInjection
         services.AddScoped<IEcosystemRepository, EcosystemRepository>();
         services.AddScoped<IOutboxRepository, OutboxRepository>();
         services.AddScoped<IRelayRepository, RelayRepository>();
-        services.AddScoped<IRuleConditionRepository, RuleConditionRepository>();
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
         services.AddScoped<ISensorRepository, SensorRepository>();
         services.AddScoped<IVacationModeRepository, VacationModeRepository>();

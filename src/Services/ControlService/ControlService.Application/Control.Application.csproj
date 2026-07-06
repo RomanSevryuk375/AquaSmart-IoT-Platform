@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
         <PackageReference Include="Dapper" />
@@ -10,6 +10,15 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\Contracts\Contracts\Contracts.csproj" />
         <ProjectReference Include="..\ControlService.Domain\Control.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Features\Schedules\Queries\GetAllSchedules\" />
+      <Folder Include="Features\Schedules\Queries\GetScheduleById\" />
+      <Folder Include="Features\Schedules\Queries\Shared\" />
+      <Folder Include="Features\VacationModes\Queries\GetAllVacationModes\" />
+      <Folder Include="Features\VacationModes\Queries\GetVacationModeById\" />
+      <Folder Include="Features\VacationModes\Queries\Shared\" />
     </ItemGroup>
 
 </Project>

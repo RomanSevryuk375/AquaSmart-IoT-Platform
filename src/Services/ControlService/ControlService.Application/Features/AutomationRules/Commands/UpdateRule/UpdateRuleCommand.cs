@@ -1,5 +1,6 @@
 using Contracts.Abstractions;
 using Contracts.Enums;
+using Control.Application.Interfaces;
 
 namespace Control.Application.Features.AutomationRules.Commands.UpdateRule;
 

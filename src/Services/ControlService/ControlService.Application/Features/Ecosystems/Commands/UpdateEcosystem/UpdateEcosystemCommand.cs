@@ -1,4 +1,5 @@
 using Contracts.Abstractions;
+using Control.Application.Interfaces;
 
 namespace Control.Application.Features.Ecosystems.Commands.UpdateEcosystem;
 

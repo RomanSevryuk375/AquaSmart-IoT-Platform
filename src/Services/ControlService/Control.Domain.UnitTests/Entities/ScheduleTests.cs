@@ -134,7 +134,7 @@ public class ScheduleTests
         Guid initialVersion = schedule.Version;
 
         // Act
-        schedule.SetToggle(false);
+        schedule.SetIsActive(false);
 
         // Assert
         schedule.IsEnabled.Should().BeFalse();
@@ -149,7 +149,7 @@ public class ScheduleTests
         Guid initialVersion = schedule.Version;
 
         // Act
-        schedule.SetToggle(true);
+        schedule.SetIsActive(true);
 
         // Assert
         schedule.IsEnabled.Should().Be(true);

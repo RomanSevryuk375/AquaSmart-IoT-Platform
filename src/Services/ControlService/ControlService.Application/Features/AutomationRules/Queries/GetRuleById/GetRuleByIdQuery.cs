@@ -1,5 +1,6 @@
 using Contracts.Abstractions;
 using Contracts.Results;
+using Control.Application.Interfaces;
 
 namespace Control.Application.Features.AutomationRules.Queries.GetRuleById;
 

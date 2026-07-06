@@ -1,22 +1,22 @@
 using Contracts.Results;
+using Control.Domain.Entities;
 using Control.Domain.Interfaces;
 using MediatR;
 
 namespace Control.Application.Features.AutomationRules.Commands.UpdateRule;
 
-public sealed class UpdateRuleHandler(
-    IAutomationRuleRepository ruleRepository,
-    IUnitOfWork unitOfWork) : IRequestHandler<UpdateRuleCommand, Result>
+public sealed class UpdateRuleHandler(IAutomationRuleRepository ruleRepository)
+    : IRequestHandler<UpdateRuleCommand, Result>
 {
     public async Task<Result> Handle(
         UpdateRuleCommand request,
         CancellationToken cancellationToken)
     {
-        Domain.Entities.AutomationRule? rule = await ruleRepository.GetByIdAsync(request.RuleId, cancellationToken);
+        AutomationRule? rule = await ruleRepository.GetByIdAsync(request.RuleId, cancellationToken);
         if (rule is null)
         {
-            return Result<Domain.Entities.AutomationRule>.Failure(Error.NotFound(
-                "Rule.NotFound", $"Rule {request.RuleId} not found"));
+            return Result<AutomationRule>.Failure(Error.NotFound<RuleCondition>(
+                $"Rule {request.RuleId} not found"));
         }
 
         Result validationResult = rule.Update(
@@ -25,8 +25,6 @@ public sealed class UpdateRuleHandler(
         {
             return Result.Failure(validationResult.Error);
         }
-
-        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

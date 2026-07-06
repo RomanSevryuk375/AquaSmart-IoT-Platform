@@ -1,3 +1,5 @@
+// Ignore Spelling: Validator
+
 using Contracts.Constants;
 using FluentValidation;
 

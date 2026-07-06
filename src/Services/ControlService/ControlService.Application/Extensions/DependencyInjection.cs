@@ -1,7 +1,5 @@
 using System.Reflection;
-using Control.Application.Features.Common.Behaviors;
-using Control.Application.Interfaces;
-using Control.Application.Services;
+using Control.Application.Behaviors;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,12 +11,6 @@ public static class DependencyInjection
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         Assembly assembly = typeof(DependencyInjection).Assembly;
-
-        services.AddScoped<ISecureService, SecureService>();
-        services.AddScoped<IRelayService, RelayService>();
-        services.AddScoped<IScheduleProcessor, ScheduleProcessor>();
-        services.AddScoped<ISensorService, SensorService>();
-        services.AddScoped<ITelemetryService, TelemetryService>();
 
         services.AddMediatR(cfg =>
         {

@@ -1,21 +1,23 @@
+using AutoMapper;
 using Contracts.Events.TelemetryEvents;
 using Contracts.Results;
-using Control.Application.Interfaces;
+using Control.Application.Features.Telemetry.Commands.ProcessTelemetry;
 using MassTransit;
+using MediatR;
 
 namespace Control.Infrastructure.Messaging.Telemetry;
 
-internal sealed class TelemetryReceivedEventConsumer(ITelemetryService service)
+internal sealed class TelemetryReceivedEventConsumer(ISender sender, IMapper mapper)
     : IConsumer<TelemetryReceivedEvent>
 {
     public async Task Consume(ConsumeContext<TelemetryReceivedEvent> context)
     {
-        ConsumerResult result = await service.ProcessTelemetryAsync(
-            context.Message, context.CancellationToken);
+        ProcessTelemetryCommand command = mapper.Map<ProcessTelemetryCommand>(context.Message);
 
-        if (!result.IsSuccess && result.IsRetryable)
+        Result result = await sender.Send(command, context.CancellationToken);
+        if (result.IsFailure)
         {
-            throw new Exception(result.Error);
+            throw new InvalidOperationException(result.Error.Message);
         }
     }
 }
