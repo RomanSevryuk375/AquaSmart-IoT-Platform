@@ -1,8 +1,12 @@
+// Ignore Spelling: Dto
+
+using Contracts.Enums;
 using Contracts.Results;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Interfaces;
 using IdentityService.Domain.Entities;
 using IdentityService.Domain.Interfaces;
+using IdentityService.Infrastructure.Repositories;
 using MassTransit;
 using Microsoft.AspNetCore.Identity;
 
@@ -34,7 +38,7 @@ public class AuthService(
             registerDto.Name,
             registerDto.Email,
             registerDto.PhoneNumber,
-            Guid.Parse(Contracts.Enums.Subscription.Free),
+            Guid.Parse(SubscriptionType.Free),
             registerDto.TimaZone);
         if (createdResult.IsFailure)
         {
@@ -147,8 +151,6 @@ public class AuthService(
         }
 
         tokenEntity!.MarkAsUsed();
-        await refreshTokenRepository
-            .UpdateTokenAsync(tokenEntity, cancellationToken);
 
         User? existingUser = await userManager
             .FindByIdAsync(tokenEntity.UserId.ToString());
@@ -161,7 +163,7 @@ public class AuthService(
                     $"{nameof(User)} with email {tokenEntity.UserId} not found."));
         }
 
-        Domain.Entities.Subscription? subscription = await subscriptionRepository
+        Subscription? subscription = await subscriptionRepository
             .GetByIdAsync(existingUser.SubscriptionId, cancellationToken);
         IReadOnlyList<string> permissions = subscription?.Permissions ?? [];
 
@@ -202,7 +204,7 @@ public class AuthService(
             myHasher.Generate(rawSecret)
         );
 
-        await refreshTokenRepository.AddTokenAsync(createdResult.Value, ct);
+        await refreshTokenRepository.AddAsync(createdResult.Value, ct);
 
         return Result<string>.Success($"{createdResult.Value.Id}.{rawSecret}");
     }

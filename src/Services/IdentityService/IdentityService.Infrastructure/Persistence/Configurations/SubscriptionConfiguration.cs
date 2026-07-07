@@ -5,7 +5,7 @@ using IdentityService.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace IdentityService.Infrastructure.Configurations;
+namespace IdentityService.Infrastructure.Persistence.Configurations;
 
 public sealed class SubscriptionConfiguration : IEntityTypeConfiguration<Domain.Entities.Subscription>
 {
@@ -47,10 +47,10 @@ public sealed class SubscriptionConfiguration : IEntityTypeConfiguration<Domain.
         builder.HasData(
             new
             {
-                Id = Guid.Parse(Contracts.Enums.Subscription.Free),
+                Id = Guid.Parse(Contracts.Enums.SubscriptionType.Free),
                 Name = Name.Create("Free").Value,
                 Price = Money.Create(0m).Value,
-                DurationDays = Contracts.Enums.Subscription.FreeDuration,
+                DurationDays = Contracts.Enums.SubscriptionType.FreeDuration,
                 Permissions = new List<string>
                 {
                     SubPermissions.TankRead,
@@ -73,10 +73,10 @@ public sealed class SubscriptionConfiguration : IEntityTypeConfiguration<Domain.
             },
             new
             {
-                Id = Guid.Parse(Contracts.Enums.Subscription.Professional),
+                Id = Guid.Parse(Contracts.Enums.SubscriptionType.Professional),
                 Name = Name.Create("Professional").Value,
                 Price = Money.Create(9.99m).Value,
-                DurationDays = Contracts.Enums.Subscription.ProfessionalDuration,
+                DurationDays = Contracts.Enums.SubscriptionType.ProfessionalDuration,
                 Permissions = new List<string>
                 {
                     SubPermissions.TankRead,
@@ -102,10 +102,10 @@ public sealed class SubscriptionConfiguration : IEntityTypeConfiguration<Domain.
             },
             new
             {
-                Id = Guid.Parse(Contracts.Enums.Subscription.Elite),
+                Id = Guid.Parse(Contracts.Enums.SubscriptionType.Elite),
                 Name = Name.Create("Elite").Value,
                 Price = Money.Create(19.99m).Value,
-                DurationDays = Contracts.Enums.Subscription.EliteDuration,
+                DurationDays = Contracts.Enums.SubscriptionType.EliteDuration,
                 Permissions = new List<string>
                 {
                     SubPermissions.TankRead,

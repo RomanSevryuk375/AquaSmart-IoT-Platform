@@ -1,13 +1,10 @@
+using Contracts.Abstractions;
 using IdentityService.Domain.Entities;
 
 namespace IdentityService.Domain.Interfaces;
 
-public interface IUserRepository
+public interface IUserRepository : IRepository<User>
 {
     public Task<IReadOnlyList<User>> GetWithExpiredSubscriptionAsync(
-        CancellationToken cancellationToken);
-
-    public Task UpdateAsync(
-        User user,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

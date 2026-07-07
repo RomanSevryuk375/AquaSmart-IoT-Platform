@@ -10,7 +10,7 @@ namespace IdentityService.API.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHttpContextAccessor();
         services.AddEndpointsApiExplorer();
@@ -53,13 +53,10 @@ public static class DependencyInjection
             options.Password.RequireUppercase = false;
             options.User.RequireUniqueEmail = true;
         })
-        .AddEntityFrameworkStores<IdentityDbContext>() 
+        .AddEntityFrameworkStores<IdentityDbContext>()
         .AddDefaultTokenProviders();
         services.AddCommonAuthentication(configuration);
-
-        services.AddQuartzJobs();
-        services.AddRabbitMq(configuration);
-        services.AddRepositories(configuration);
+        services.AddInfrastructure(configuration);
 
         return services;
     }
