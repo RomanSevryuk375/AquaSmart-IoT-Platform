@@ -3,6 +3,7 @@
 using Contracts.Options;
 using IdentityService.Domain.Interfaces;
 using IdentityService.Infrastructure.BackgroundJobs;
+using IdentityService.Infrastructure.Factories;
 using IdentityService.Infrastructure.Persistence.Interceptors;
 using IdentityService.Infrastructure.Repositories;
 using MassTransit;
@@ -26,6 +27,7 @@ public static class DependencyInjection
     public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<ConvertDomainEventsToOutboxMessagesInterceptor>();
+        services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
 
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();

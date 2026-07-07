@@ -6,8 +6,10 @@
     <Project Path="IdentityService.API.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="../Identity.Application.UnitTests/Identity.Application.UnitTests.csproj" />
     <Project Path="../Identity.ArchitectureTests/Identity.ArchitectureTests.csproj" Id="ac0fbd5e-594f-442e-96f3-a12b5f793fb7" />
     <Project Path="../Identity.Domain.UnitTests/Identity.Domain.UnitTests.csproj" Id="ed4f4fd0-f4d3-48b2-81b2-a77bd2d5c43e" />
+    <Project Path="../Identity.Infrastructure.IntegrationTests/Identity.Infrastructure.IntegrationTests.csproj" />
   </Folder>
   <Project Path="../../../Contracts/Contracts/Contracts.csproj" />
 </Solution>

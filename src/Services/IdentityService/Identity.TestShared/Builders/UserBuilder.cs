@@ -66,6 +66,7 @@ public class UserBuilder
         }
 
         User user = result.Value;
+        user.SecurityStamp = Guid.NewGuid().ToString();
         user.ClearDomainEvents();
         return user;
     }
