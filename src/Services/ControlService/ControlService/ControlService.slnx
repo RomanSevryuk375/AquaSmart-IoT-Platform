@@ -10,6 +10,7 @@
     <Project Path="../Control.Domain.UnitTests/Control.Domain.UnitTests.csproj" Id="57adec9f-a05a-4e58-a0de-8498d7713ecb" />
     <Project Path="../Control.Application.UnitTests/Control.Application.UnitTests.csproj" />
     <Project Path="../Control.Infrastructure.IntegrationTests/Control.Infrastructure.IntegrationTests.csproj" Id="eeb6c682-690e-4403-9442-fbe7742a58e1" />
+    <Project Path="../Control.API.E2ETests/Control.API.E2ETests.csproj" />
     <Project Path="../Control.TestShared/Control.TestShared.csproj" Id="1abb8072-9e7f-48fe-b735-88101859c518" />
   </Folder>
   <Project Path="../../../Contracts/Contracts/Contracts.csproj" />

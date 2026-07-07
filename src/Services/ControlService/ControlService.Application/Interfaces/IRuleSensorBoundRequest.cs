@@ -1,7 +1,6 @@
 namespace Control.Application.Interfaces;
 
-public interface IRuleSensorBoundRequest
+public interface IRuleSensorBoundRequest : IRuleBoundRequest
 {
-    public Guid RuleId { get; }
     public Guid SensorId { get; }
 }
