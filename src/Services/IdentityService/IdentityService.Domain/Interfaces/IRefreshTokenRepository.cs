@@ -1,25 +1,25 @@
-﻿using IdentityService.Domain.Entities;
+using IdentityService.Domain.Entities;
 
 namespace IdentityService.Domain.Interfaces;
 
 public interface IRefreshTokenRepository
 {
-    Task<string> AddTokenAsync(
-        RefreshTokenEntity refreshToken, 
+    public Task<string> AddTokenAsync(
+        RefreshToken refreshToken,
         CancellationToken cancellationToken);
 
-    Task DeleteIncorrectTokensAsync(
+    public Task DeleteIncorrectTokensAsync(
         CancellationToken cancellationToken);
 
-    Task<RefreshTokenEntity?> GetByIdAsync(
-        Guid tokenId, 
+    public Task<RefreshToken?> GetByIdAsync(
+        Guid tokenId,
         CancellationToken cancellationToken);
 
-    Task DeleteTokensByUserIdAsync(
+    public Task DeleteTokensByUserIdAsync(
         Guid userId,
         CancellationToken cancellationToken);
 
-    Task UpdateTokenAsync(
-        RefreshTokenEntity token, 
+    public Task UpdateTokenAsync(
+        RefreshToken token,
         CancellationToken cancellationToken);
 }

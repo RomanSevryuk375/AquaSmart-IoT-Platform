@@ -1,21 +1,35 @@
+using System.Text.Json;
 using Contracts.Authorization;
-using Contracts.Enums;
-using IdentityService.Domain.Entities;
+using Contracts.Constants;
+using IdentityService.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Text.Json;
 
 namespace IdentityService.Infrastructure.Configurations;
 
-public class SubscriptionEntityConfigurations 
-    : IEntityTypeConfiguration<SubscriptionEntity>
+public sealed class SubscriptionConfiguration : IEntityTypeConfiguration<Domain.Entities.Subscription>
 {
-    private const JsonSerializerOptions? Options = (JsonSerializerOptions)null;
+    private const JsonSerializerOptions? Options = null;
 
-    public void Configure(EntityTypeBuilder<SubscriptionEntity> builder)
+    public void Configure(EntityTypeBuilder<Domain.Entities.Subscription> builder)
     {
         builder.ToTable("subscriptions");
+
         builder.HasKey(x => x.Id);
+
+        builder.Property(x => x.Name)
+            .HasConversion(
+                name => name.Value,
+                dbValue => Name.Create(dbValue).Value)
+            .HasMaxLength(CommonConstants.NameLength)
+            .IsRequired();
+
+        builder.Property(x => x.Price)
+            .HasConversion(
+                money => money.Amount,
+                dbValue => Money.Create(dbValue).Value)
+            .HasPrecision(18, 2)
+            .IsRequired();
 
         builder.Property(x => x.Permissions)
             .HasColumnType("jsonb")
@@ -25,17 +39,18 @@ public class SubscriptionEntityConfigurations
             )
             .IsRequired();
 
-        builder.Property(x => x.Price)
-            .HasPrecision(18, 2)
-            .IsRequired();
+        builder.Property(x => x.DurationDays).IsRequired();
+        builder.Property(x => x.CreatedAt).IsRequired();
+
+        builder.Property(x => x.Version).IsConcurrencyToken();
 
         builder.HasData(
             new
             {
-                Id = Guid.Parse(Subscription.Free),
-                Name = "Free",
-                Price = 0m,
-                DurationDays = Subscription.FreeDuration,
+                Id = Guid.Parse(Contracts.Enums.Subscription.Free),
+                Name = Name.Create("Free").Value,
+                Price = Money.Create(0m).Value,
+                DurationDays = Contracts.Enums.Subscription.FreeDuration,
                 Permissions = new List<string>
                 {
                     SubPermissions.TankRead,
@@ -54,13 +69,14 @@ public class SubscriptionEntityConfigurations
                     SubPermissions.AccountView,
                 },
                 CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                Version = Guid.NewGuid()
             },
             new
             {
-                Id = Guid.Parse(Subscription.Professional),
-                Name = "Professional",
-                Price = 9.99m,
-                DurationDays = Subscription.ProfessionalDuration,
+                Id = Guid.Parse(Contracts.Enums.Subscription.Professional),
+                Name = Name.Create("Professional").Value,
+                Price = Money.Create(9.99m).Value,
+                DurationDays = Contracts.Enums.Subscription.ProfessionalDuration,
                 Permissions = new List<string>
                 {
                     SubPermissions.TankRead,
@@ -82,13 +98,14 @@ public class SubscriptionEntityConfigurations
                     SubPermissions.AccountView,
                 },
                 CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                Version = Guid.NewGuid()
             },
             new
             {
-                Id = Guid.Parse(Subscription.Elite),
-                Name = "Elite",
-                Price = 19.99m,
-                DurationDays = Subscription.EliteDuration,
+                Id = Guid.Parse(Contracts.Enums.Subscription.Elite),
+                Name = Name.Create("Elite").Value,
+                Price = Money.Create(19.99m).Value,
+                DurationDays = Contracts.Enums.Subscription.EliteDuration,
                 Permissions = new List<string>
                 {
                     SubPermissions.TankRead,
@@ -113,6 +130,7 @@ public class SubscriptionEntityConfigurations
                     SubPermissions.TelegramAlerts,
                 },
                 CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                Version = Guid.NewGuid()
             }
         );
     }

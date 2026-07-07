@@ -1,6 +1,6 @@
 namespace Contracts.Abstractions;
 
-public abstract class AggregateRoot
+public abstract class AggregateRoot : IHasDomainEvents, IHasVersion
 {
     public Guid Version { get; private set; }
 

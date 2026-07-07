@@ -1,6 +1,6 @@
-﻿namespace IdentityService.Domain.Interfaces;
+namespace IdentityService.Domain.Interfaces;
 
 public interface IUnitOfWork
 {
-    Task SaveChangesAsync(CancellationToken cancellationToken);
+    public Task SaveChangesAsync(CancellationToken cancellationToken);
 }

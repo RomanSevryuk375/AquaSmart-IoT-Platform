@@ -1,29 +1,26 @@
-﻿using Contracts.Events.UserEvents;
 using Contracts.Exceptions;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Interfaces;
 using IdentityService.Domain.Entities;
 using IdentityService.Domain.Interfaces;
-using MassTransit;
 using Microsoft.AspNetCore.Identity;
 
 namespace IdentityService.Application.Services;
 
 public class UserService(
-    UserManager<UserEntity> userManager,
-    IUserContext userContext,
-    IPublishEndpoint publishEndpoint) : IUserService
+    UserManager<User> userManager,
+    IUserContext userContext) : IUserService
 {
     public async Task<UserProfileResponseDto> GetProfileAsync()
     {
-        var user = await userManager.FindByIdAsync(userContext.UserId.ToString())
+        User user = await userManager.FindByIdAsync(userContext.UserId.ToString())
             ?? throw new NotFoundException($"User {userContext.UserId} not found.");
 
         return new UserProfileResponseDto
         {
             Id = user.Id,
             Email = user.Email!,
-            Name = user.Name,
+            Name = user.Name.Value,
             PhoneNumber = user.PhoneNumber,
             SubscriptionId = user.SubscriptionId,
             CreatedAt = user.CreatedAt
@@ -32,39 +29,31 @@ public class UserService(
 
     public async Task UpdateProfileAsync(UpdateProfileRequestDto request, CancellationToken ct)
     {
-        var user = await userManager.FindByIdAsync(userContext.UserId.ToString())
+        User user = await userManager.FindByIdAsync(userContext.UserId.ToString())
             ?? throw new NotFoundException($"User {userContext.UserId} not found.");
 
-        user.SetName(request.Name);
+        user.UpdateProfile(request.Name, request.PhoneNumber!);
         user.PhoneNumber = request.PhoneNumber;
 
-        var result = await userManager.UpdateAsync(user);
+        IdentityResult result = await userManager.UpdateAsync(user);
 
         if (!result.Succeeded)
         {
-            var errors = string.Join(", ", result.Errors.Select(x => x.Description));
+            string errors = string.Join(", ", result.Errors.Select(x => x.Description));
             throw new DomainValidationException($"Failed to update profile: {errors}");
         }
-
-        await publishEndpoint.Publish(new UserUpdatedEvent
-        {
-            UserId = user.Id,
-            Email = user.Email!,
-            Name = user.Name,
-            PhoneNumber = user.PhoneNumber!
-        }, ct);
     }
 
     public async Task ChangePasswordAsync(ChangePasswordRequestDto request)
     {
-        var user = await userManager.FindByIdAsync(userContext.UserId.ToString())
+        User user = await userManager.FindByIdAsync(userContext.UserId.ToString())
             ?? throw new NotFoundException($"User {userContext.UserId} not found.");
 
-        var result = await userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+        IdentityResult result = await userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
 
         if (!result.Succeeded)
         {
-            var errors = string.Join(", ", result.Errors.Select(x => x.Description));
+            string errors = string.Join(", ", result.Errors.Select(x => x.Description));
             throw new DomainValidationException($"Failed to change password: {errors}");
         }
     }

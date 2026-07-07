@@ -19,7 +19,7 @@ jobs:
           - DeviceService
           - ControlService
           # - TelemetryService
-          # - IdentityService
+          - IdentityService
           # - NotificationService
 
     steps:

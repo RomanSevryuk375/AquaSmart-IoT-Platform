@@ -1,13 +1,13 @@
-﻿using Contracts.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using Contracts.Authorization;
 using Contracts.Options;
 using IdentityService.Application.Interfaces;
 using IdentityService.Domain.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace IdentityService.Application.Extensions;
 
@@ -15,7 +15,7 @@ public class JwtProvider(IOptions<JwtOptions> options) : IJwtProvider
 {
     private readonly JwtOptions _options = options.Value;
 
-    public string GenerateToken(UserEntity user, List<string> permissions)
+    public string GenerateToken(User user, IReadOnlyList<string> permissions)
     {
         var claims = new List<Claim>
         {
@@ -23,7 +23,7 @@ public class JwtProvider(IOptions<JwtOptions> options) : IJwtProvider
             new (CustomClaims.SubscriptionLevel, user.SubscriptionId.ToString())
         };
 
-        foreach (var permission in permissions)
+        foreach (string permission in permissions)
         {
             claims.Add(new Claim(CustomClaims.Permissions, permission));
         }
@@ -40,13 +40,10 @@ public class JwtProvider(IOptions<JwtOptions> options) : IJwtProvider
             expires: DateTime.UtcNow.AddHours(_options.ExpiresHours)
             );
 
-        var tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
+        string tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
 
         return tokenValue;
     }
 
-    public string GenerateRefreshToken()
-    {
-        return Convert.ToBase64String(RandomNumberGenerator.GetBytes(128));
-    }
+    public string GenerateRefreshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(128));
 }

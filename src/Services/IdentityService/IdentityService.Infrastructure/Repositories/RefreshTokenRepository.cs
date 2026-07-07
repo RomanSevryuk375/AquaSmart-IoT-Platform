@@ -1,4 +1,4 @@
-﻿using IdentityService.Domain.Entities;
+using IdentityService.Domain.Entities;
 using IdentityService.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +8,7 @@ public class RefreshTokenRepository(IdentityDbContext dbContext)
     : IRefreshTokenRepository
 {
     public async Task<string> AddTokenAsync(
-        RefreshTokenEntity refreshToken,
+        RefreshToken refreshToken,
         CancellationToken cancellationToken)
     {
         await dbContext.RefreshTokens.AddAsync(refreshToken, cancellationToken);
@@ -16,7 +16,7 @@ public class RefreshTokenRepository(IdentityDbContext dbContext)
         return refreshToken.TokenHash;
     }
 
-    public async Task<RefreshTokenEntity?> GetByIdAsync(
+    public async Task<RefreshToken?> GetByIdAsync(
         Guid tokenId,
         CancellationToken cancellationToken)
     {
@@ -48,11 +48,11 @@ public class RefreshTokenRepository(IdentityDbContext dbContext)
     }
 
     public async Task UpdateTokenAsync(
-        RefreshTokenEntity token,
+        RefreshToken token,
         CancellationToken cancellationToken)
     {
         var trackedEntity = await dbContext.RefreshTokens.FindAsync(token.Id, cancellationToken)
-           ?? throw new KeyNotFoundException($"{nameof(RefreshTokenEntity)} with id {token.Id} not found.");
+           ?? throw new KeyNotFoundException($"{nameof(RefreshToken)} with id {token.Id} not found.");
 
         dbContext.Entry(trackedEntity).CurrentValues.SetValues(token);
     }

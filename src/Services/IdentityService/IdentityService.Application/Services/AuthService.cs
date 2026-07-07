@@ -1,5 +1,3 @@
-using Contracts.Enums;
-using Contracts.Events.UserEvents;
 using Contracts.Results;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Interfaces;
@@ -11,10 +9,9 @@ using Microsoft.AspNetCore.Identity;
 namespace IdentityService.Application.Services;
 
 public class AuthService(
-    UserManager<UserEntity> userManager,
+    UserManager<User> userManager,
     ISubscriptionRepository subscriptionRepository,
     IRefreshTokenRepository refreshTokenRepository,
-    IPublishEndpoint publishEndpoint,
     IJwtProvider jwtProvider,
     IUnitOfWork unitOfWork,
     IMyHasher myHasher,
@@ -24,57 +21,44 @@ public class AuthService(
         RegisterUserRequestDto registerDto,
         CancellationToken cancellationToken)
     {
-        var existingUser = await userManager.FindByEmailAsync(registerDto.Email);
+        User? existingUser = await userManager.FindByEmailAsync(registerDto.Email);
 
         if (existingUser is not null)
         {
-            return Result<LoginResponseDto>
-                .Failure(Error.Conflict("Email.Busy", "{registerDto.Email} is busy."));
+            return Result<LoginResponseDto>.Failure(Error.Conflict("Email.Busy",
+                "{registerDto.Email} is busy."));
         }
 
-        var (user, errors) = UserEntity.Create(
+        Result<User> createdResult = User.Create(
+            NewId.NextGuid(),
             registerDto.Name,
             registerDto.Email,
             registerDto.PhoneNumber,
-            Guid.Parse(Subscription.Free),
+            Guid.Parse(Contracts.Enums.Subscription.Free),
             registerDto.TimaZone);
-
-        if (user is null)
+        if (createdResult.IsFailure)
         {
-            return Result<LoginResponseDto>
-                .Failure(Error.Conflict(
-                    "User.Invalid",
-                   $"Failed to create {nameof(UserEntity)}: {string.Join(", ", errors)}"));
+            return Result<LoginResponseDto>.Failure(createdResult.Error);
         }
+        User user = createdResult.Value;
 
-        var subscription = await subscriptionRepository
+        Subscription? subscription = await subscriptionRepository
             .GetByIdAsync(user.SubscriptionId, cancellationToken);
 
-        var permissions = subscription?.Permissions ?? [];
+        IReadOnlyList<string> permissions = subscription?.Permissions ?? [];
 
-        var result = await userManager.CreateAsync(user, registerDto.Password);
+        IdentityResult result = await userManager.CreateAsync(user, registerDto.Password);
 
         if (!result.Succeeded)
         {
-            var error = string.Join(", ", result.Errors.Select(x => x.Description));
-            return Result<LoginResponseDto>
-                .Failure(Error.Conflict(
-                    "Login.Failure",
-                    $"Failed to register user {user.Id}: " +
+            string error = string.Join(", ", result.Errors.Select(x => x.Description));
+            return Result<LoginResponseDto>.Failure(Error.Conflict("Login.Failure",
+                    $"Failed to register user {createdResult.Value.Id}: " +
                     $"{string.Join(", ", result.Errors.Select(x => x.Description))}"));
         }
 
-        await publishEndpoint.Publish(new UserCreatedEvent
-        {
-            UserId = user.Id,
-            Email = user.Email!,
-            PhoneNumber = user.PhoneNumber!,
-            CreatedAt = user.CreatedAt,
-            TimeZone = user.TimeZone,
-        }, cancellationToken);
-
-        var accessToken = jwtProvider.GenerateToken(user, permissions);
-        var refreshToken = await CreateAndPersistRefreshTokenAsync(user.Id, cancellationToken);
+        string accessToken = jwtProvider.GenerateToken(user, permissions);
+        Result<string> refreshToken = await CreateAndPersistRefreshTokenAsync(user.Id, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -90,20 +74,20 @@ public class AuthService(
         LoginUserRequestDto loginUser,
         CancellationToken cancellationToken)
     {
-        var existingUser = await userManager.FindByEmailAsync(loginUser.Email);
+        User? existingUser = await userManager.FindByEmailAsync(loginUser.Email);
 
         if (existingUser is null)
         {
             return Result<LoginResponseDto>
                 .Failure(Error.NotFound(
                     "User.NotFound",
-                    $"{nameof(UserEntity)} with email {loginUser.Email} not found."));
+                    $"{nameof(User)} with email {loginUser.Email} not found."));
         }
 
-        var subscription = await subscriptionRepository
+        Subscription? subscription = await subscriptionRepository
             .GetByIdAsync(existingUser!.SubscriptionId, cancellationToken);
 
-        var permissions = subscription?.Permissions ?? [];
+        IReadOnlyList<string> permissions = subscription?.Permissions ?? [];
 
         bool isPasswordCorrect = await userManager
             .CheckPasswordAsync(existingUser, loginUser.Password);
@@ -116,8 +100,8 @@ public class AuthService(
                     "Invalid password."));
         }
 
-        var accessToken = jwtProvider.GenerateToken(existingUser, permissions);
-        var refreshToken = await CreateAndPersistRefreshTokenAsync(existingUser.Id, cancellationToken);
+        string accessToken = jwtProvider.GenerateToken(existingUser, permissions);
+        Result<string> refreshToken = await CreateAndPersistRefreshTokenAsync(existingUser.Id, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -133,8 +117,8 @@ public class AuthService(
         RefreshTokenRequestDto request,
         CancellationToken cancellationToken)
     {
-        var parts = request.RefreshToken.Split('.');
-        if (parts.Length != 2 || !Guid.TryParse(parts[0], out var tokenId))
+        string[] parts = request.RefreshToken.Split('.');
+        if (parts.Length != 2 || !Guid.TryParse(parts[0], out Guid tokenId))
         {
             return Result<LoginResponseDto>
                 .Failure(Error.Validation(
@@ -142,7 +126,7 @@ public class AuthService(
                     "Invalid format"));
         }
 
-        var tokenEntity = await refreshTokenRepository.GetByIdAsync(tokenId, cancellationToken);
+        RefreshToken? tokenEntity = await refreshTokenRepository.GetByIdAsync(tokenId, cancellationToken);
 
         if (tokenEntity is not null && tokenEntity.IsUsed)
         {
@@ -166,7 +150,7 @@ public class AuthService(
         await refreshTokenRepository
             .UpdateTokenAsync(tokenEntity, cancellationToken);
 
-        var existingUser = await userManager
+        User? existingUser = await userManager
             .FindByIdAsync(tokenEntity.UserId.ToString());
 
         if (existingUser is null)
@@ -174,17 +158,17 @@ public class AuthService(
             return Result<LoginResponseDto>
                 .Failure(Error.NotFound(
                     "User.NotFound",
-                    $"{nameof(UserEntity)} with email {tokenEntity.UserId} not found."));
+                    $"{nameof(User)} with email {tokenEntity.UserId} not found."));
         }
 
-        var subscription = await subscriptionRepository
+        Domain.Entities.Subscription? subscription = await subscriptionRepository
             .GetByIdAsync(existingUser.SubscriptionId, cancellationToken);
-        var permissions = subscription?.Permissions ?? [];
+        IReadOnlyList<string> permissions = subscription?.Permissions ?? [];
 
-        var accessToken = jwtProvider
+        string accessToken = jwtProvider
             .GenerateToken(existingUser, permissions);
 
-        var newRefreshToken = await
+        Result<string> newRefreshToken = await
             CreateAndPersistRefreshTokenAsync(existingUser.Id, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -211,21 +195,19 @@ public class AuthService(
         Guid userId,
         CancellationToken ct)
     {
-        var rawSecret = jwtProvider.GenerateRefreshToken();
+        string rawSecret = jwtProvider.GenerateRefreshToken();
 
-        var refreshTokenEntity = RefreshTokenEntity.Create(
+        Result<RefreshToken> createdResult = RefreshToken.Create(
             userId,
             myHasher.Generate(rawSecret)
         );
 
-        await refreshTokenRepository
-            .AddTokenAsync(refreshTokenEntity, ct);
+        await refreshTokenRepository.AddTokenAsync(createdResult.Value, ct);
 
-        return Result<string>
-            .Success($"{refreshTokenEntity.Id}.{rawSecret}");
+        return Result<string>.Success($"{createdResult.Value.Id}.{rawSecret}");
     }
 
-    private bool InvalidRefreshToken(RefreshTokenEntity tokenEntity, string[] parts)
+    private bool InvalidRefreshToken(RefreshToken tokenEntity, string[] parts)
     {
         return tokenEntity is null ||
             !myHasher.Verify(parts[1], tokenEntity.TokenHash) ||

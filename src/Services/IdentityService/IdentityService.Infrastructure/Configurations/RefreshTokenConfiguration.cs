@@ -1,13 +1,12 @@
-﻿using IdentityService.Domain.Entities;
+using IdentityService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace IdentityService.Infrastructure.Configurations;
 
-public class RefreshTokenEntityConfiguration 
-    : IEntityTypeConfiguration<RefreshTokenEntity>
+public sealed class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
 {
-    public void Configure(EntityTypeBuilder<RefreshTokenEntity> builder)
+    public void Configure(EntityTypeBuilder<RefreshToken> builder)
     {
         builder.ToTable("refresh_tokens");
 
@@ -26,7 +25,9 @@ public class RefreshTokenEntityConfiguration
         builder.Property(x => x.ExpiredAt).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
 
-        builder.HasOne<UserEntity>()
+        builder.Property(x => x.Version).IsConcurrencyToken();
+
+        builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.Cascade);

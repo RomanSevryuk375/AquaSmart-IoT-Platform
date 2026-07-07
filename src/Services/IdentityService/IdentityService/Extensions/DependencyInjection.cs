@@ -1,4 +1,4 @@
-﻿using Contracts.Authorization;
+using Contracts.Authorization;
 using IdentityService.Application.Extensions;
 using IdentityService.Domain.Entities;
 using IdentityService.Infrastructure;
@@ -46,7 +46,7 @@ public static class DependencyInjection
 
         services.AddServices(configuration);
 
-        services.AddIdentity<UserEntity, IdentityRole<Guid>>(options =>
+        services.AddIdentity<User, IdentityRole<Guid>>(options =>
         {
             options.Password.RequiredLength = 8;
             options.Password.RequireDigit = true;

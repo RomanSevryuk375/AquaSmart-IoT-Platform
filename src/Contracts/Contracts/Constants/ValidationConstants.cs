@@ -13,6 +13,12 @@ public static class CommonConstants
     public const int ConnectionAddressLength = 32;
 }
 
+public static class IdentityConstants
+{
+    public const string PhoneNumberRegex = @"^(\+375|80)(29|44|33|25)\d{7}$";
+    public const string EmailNumberRegex = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+}
+
 public static class SensorConstants
 {
     public const int UnitLength = 32;
