@@ -1,4 +1,6 @@
-﻿namespace IdentityService.Application.DTOs;
+// Ignore Spelling: Dto
+
+namespace IdentityService.Application.DTOs;
 
 public class LoginUserRequestDto
 {

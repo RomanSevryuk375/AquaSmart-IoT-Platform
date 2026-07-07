@@ -1,6 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
+        <PackageReference Include="Dapper" />
         <PackageReference Include="BCrypt.Net-Next" />
         <PackageReference Include="MassTransit" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />

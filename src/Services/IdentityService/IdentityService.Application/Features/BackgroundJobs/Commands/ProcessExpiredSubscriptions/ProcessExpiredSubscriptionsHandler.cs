@@ -1,22 +1,20 @@
 using Contracts.Enums;
 using Contracts.Events.UserEvents;
-using IdentityService.Application.Interfaces;
+using Contracts.Results;
 using IdentityService.Domain.Entities;
 using IdentityService.Domain.Interfaces;
 using MassTransit;
+using MediatR;
 
-namespace IdentityService.Application.Services;
+namespace IdentityService.Application.Features.BackgroundJobs.Commands.ProcessExpiredSubscriptions;
 
-public class SubscriptionExpiredChecker(
+internal class ProcessExpiredSubscriptionsHandler(
     IUserRepository userRepository,
-    IUnitOfWork unitOfWork,
-    IPublishEndpoint publishEndpoint) : ISubscriptionExpiredChecker
+    IPublishEndpoint publishEndpoint) : IRequestHandler<ProcessExpiredSubscriptionsCommand, Result>
 {
-    public async Task CheckAsync(CancellationToken cancellationToken)
+    public async Task<Result> Handle(ProcessExpiredSubscriptionsCommand request, CancellationToken cancellationToken)
     {
-        IReadOnlyList<User> users = await userRepository
-            .GetWithExpiredSubscriptionAsync(cancellationToken);
-
+        IReadOnlyList<User> users = await userRepository.GetWithExpiredSubscriptionAsync(cancellationToken);
         var eventsToPublish = new List<SubscriptionDowngradedEvent>();
 
         foreach (User user in users)
@@ -32,11 +30,11 @@ public class SubscriptionExpiredChecker(
             });
         }
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
         foreach (SubscriptionDowngradedEvent @event in eventsToPublish)
         {
             await publishEndpoint.Publish(@event, cancellationToken);
         }
+
+        return Result.Success();
     }
 }

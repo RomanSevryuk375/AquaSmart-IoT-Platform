@@ -3,7 +3,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
 
-namespace Control.Application.Behaviors;
+namespace IdentityService.Application.Behaviors;
 
 public sealed class ValidationBehavior<TRequest, TResponse>(
     IEnumerable<IValidator<TRequest>> validators)

@@ -14,6 +14,8 @@ public static class ApiConstants
         public const string Ecosystems = "api/control/v1/ecosystems";
         public const string Schedules = "api/control/v1/schedules";
         public const string VacationModes = "api/control/v1/vacation-modes";
+        public const string Profiles = "api/identity/v1/profile";
+        public const string Auth = "api/identity/v1/auth";
     }
 
     public static class Headers

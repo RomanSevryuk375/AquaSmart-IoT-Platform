@@ -1,8 +1,9 @@
-// Ignore Spelling: Dto
+using Contracts.Abstractions;
+using IdentityService.Application.DTOs;
 
-namespace IdentityService.Application.DTOs;
+namespace IdentityService.Application.Features.Auth.Commands.Register;
 
-public class RegisterUserRequestDto
+public sealed record RegisterCommand : ICommand<LoginResponseDto>
 {
     public string Email { get; init; } = string.Empty;
     public string PhoneNumber { get; init; } = string.Empty;
