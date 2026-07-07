@@ -1,6 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.Elasticsearch" />
+    <PackageReference Include="Serilog.Exceptions" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ControlService.Application\Control.Application.csproj" />
     <ProjectReference Include="..\ControlService.Infrastructure\Control.Infrastructure.csproj" />
   </ItemGroup>
