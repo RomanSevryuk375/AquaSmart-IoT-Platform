@@ -1,5 +1,3 @@
-using Contracts.Authorization;
-using Contracts.Results;
 using Control.Application.DTOs.Ecosystem;
 using Control.Application.Features.Ecosystems.Commands.CreateEcosystem;
 using Control.Application.Features.Ecosystems.Commands.DeleteEcosystem;
@@ -7,15 +5,11 @@ using Control.Application.Features.Ecosystems.Commands.UpdateEcosystem;
 using Control.Application.Features.Ecosystems.Queries;
 using Control.Application.Features.Ecosystems.Queries.GetAllEcosystems;
 using Control.Application.Features.Ecosystems.Queries.GetEcosystemById;
-using Control.Application.Interfaces;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Control.API.Controllers;
 
 [ApiController]
-[Route("api/control/v1/ecosystems")]
+[Route(ApiConstants.Routes.Ecosystems)]
 public sealed class EcosystemController(
     IUserContext userContext,
     ISender sender) : ControllerBase

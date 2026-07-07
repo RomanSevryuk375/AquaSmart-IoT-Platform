@@ -1,21 +1,18 @@
-using Contracts.Authorization;
-using Contracts.Results;
 using Control.Application.DTOs.AutomationRule;
+using Control.Application.Features.AutomationRules.Commands.AddCondition;
 using Control.Application.Features.AutomationRules.Commands.CreateRule;
+using Control.Application.Features.AutomationRules.Commands.DeleteCondition;
 using Control.Application.Features.AutomationRules.Commands.DeleteRule;
+using Control.Application.Features.AutomationRules.Commands.UpdateCondition;
 using Control.Application.Features.AutomationRules.Commands.UpdateRule;
 using Control.Application.Features.AutomationRules.Queries;
 using Control.Application.Features.AutomationRules.Queries.GetAllRules;
 using Control.Application.Features.AutomationRules.Queries.GetRuleById;
-using Control.Application.Interfaces;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Control.API.Controllers;
 
 [ApiController]
-[Route("api/control/v1/automation-rules")]
+[Route(ApiConstants.Routes.AutomationRules)]
 public class AutomationRulesController(
     IUserContext userContext,
     ISender sender) : ControllerBase
@@ -23,7 +20,6 @@ public class AutomationRulesController(
     private const string GetRuleByIdRoute = "GetRuleById";
 
     [HttpGet]
-    [Authorize]
     [Authorize(Policy = SubPermissions.AutoRuleCreate)]
     public async Task<ActionResult<IReadOnlyList<AutomationRuleDto>>> GetAllRulesAsync(
         [FromQuery] GetAllRulesQuery query,
@@ -36,7 +32,6 @@ public class AutomationRulesController(
     }
 
     [HttpGet("{id:guid}", Name = GetRuleByIdRoute)]
-    [Authorize]
     [Authorize(Policy = SubPermissions.AutoRuleCreate)]
     public async Task<ActionResult<AutomationRuleDto>> GetRuleByIdAsync(
         [FromRoute] Guid id,
@@ -93,6 +88,66 @@ public class AutomationRulesController(
         CancellationToken cancellationToken)
     {
         DeleteRuleCommand command = new DeleteRuleCommand { RuleId = id };
+        Result result = await sender.Send(command, cancellationToken);
+
+        return this.ToActionResult(result);
+    }
+
+
+    [HttpPost("{ruleId:guid}/conditions")]
+    [Authorize(Policy = SubPermissions.AutoRuleCreate)]
+    public async Task<ActionResult<Guid>> AddConditionAsync(
+        [FromRoute] Guid ruleId,
+        [FromBody] RuleConditionRequestDto request,
+        CancellationToken cancellationToken)
+    {
+        AddConditionCommand command = new AddConditionCommand
+        {
+            RuleId = ruleId,
+            SensorId = request.SensorId,
+            Condition = request.Condition,
+            Threshold = request.Threshold,
+            Hysteresis = request.Hysteresis,
+        };
+        Result<Guid> result = await sender.Send(command, cancellationToken);
+
+        return this.ToActionResult(result);
+    }
+
+    [HttpPut("{ruleId:guid}/conditions/{conditionId:guid}")]
+    [Authorize(Policy = SubPermissions.AutoRuleCreate)]
+    public async Task<IActionResult> UpdateConditionAsync(
+        [FromRoute] Guid ruleId,
+        [FromRoute] Guid conditionId,
+        [FromBody] RuleConditionRequestDto request,
+        CancellationToken cancellationToken)
+    {
+        UpdateConditionCommand command = new UpdateConditionCommand
+        {
+            RuleId = ruleId,
+            ConditionId = conditionId,
+            SensorId = request.SensorId,
+            Condition = request.Condition,
+            Threshold = request.Threshold,
+            Hysteresis = request.Hysteresis,
+        };
+        Result result = await sender.Send(command, cancellationToken);
+
+        return this.ToActionResult(result);
+    }
+
+    [HttpDelete("{ruleId:guid}/conditions/{conditionId:guid}")]
+    [Authorize(Policy = SubPermissions.AutoRuleCreate)]
+    public async Task<IActionResult> DeleteConditionAsync(
+        [FromRoute] Guid ruleId,
+        [FromRoute] Guid conditionId,
+        CancellationToken cancellationToken)
+    {
+        DeleteConditionCommand command = new DeleteConditionCommand
+        {
+            ConditionId = conditionId,
+            RuleId = ruleId,
+        };
         Result result = await sender.Send(command, cancellationToken);
 
         return this.ToActionResult(result);
