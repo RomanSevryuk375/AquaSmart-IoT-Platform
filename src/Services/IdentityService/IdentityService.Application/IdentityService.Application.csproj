@@ -1,21 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="BCrypt.Net-Next" />
+        <PackageReference Include="MassTransit" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+        <PackageReference Include="Microsoft.Extensions.Identity.Core" />
+        <PackageReference Include="Microsoft.Extensions.Identity.Stores" />
+    </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="BCrypt.Net-Next" />
-		<PackageReference Include="MassTransit" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
-		<PackageReference Include="Microsoft.Extensions.Identity.Core" />
-		<PackageReference Include="Microsoft.Extensions.Identity.Stores" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="..\..\..\Contracts\Contracts\Contracts.csproj" />
-	  <ProjectReference Include="..\IdentityService.Domain\IdentityService.Domain.csproj" />
-	</ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Contracts\Contracts\Contracts.csproj" />
+        <ProjectReference Include="..\IdentityService.Domain\IdentityService.Domain.csproj" />
+    </ItemGroup>
 </Project>

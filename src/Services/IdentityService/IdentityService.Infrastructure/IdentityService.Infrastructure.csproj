@@ -1,28 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" />
+        <PackageReference Include="MassTransit.RabbitMQ" />
+        <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
+        <PackageReference Include="EFCore.NamingConventions" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Quartz.Extensions.Hosting" />
+    </ItemGroup>
 
-  <ItemGroup>
-	<PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" />
-	<PackageReference Include="MassTransit.RabbitMQ" />
-	<PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
-	<PackageReference Include="EFCore.NamingConventions" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Quartz.Extensions.Hosting" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Contracts\Contracts\Contracts.csproj" />
-    <ProjectReference Include="..\IdentityService.Application\IdentityService.Application.csproj" />
-    <ProjectReference Include="..\IdentityService.Domain\IdentityService.Domain.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Contracts\Contracts\Contracts.csproj" />
+        <ProjectReference Include="..\IdentityService.Application\IdentityService.Application.csproj" />
+        <ProjectReference Include="..\IdentityService.Domain\IdentityService.Domain.csproj" />
+    </ItemGroup>
 
 </Project>
