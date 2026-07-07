@@ -1,29 +1,19 @@
+using Contracts.Enums;
 using IdentityService.Domain.Entities;
 using IdentityService.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace IdentityService.Infrastructure.Repositories;
 
-public class UserRepository(IdentityDbContext dbContext)
-    : IUserRepository
+public sealed class UserRepository(IdentityDbContext dbContext)
+    : BaseRepository<User>(dbContext), IUserRepository
 {
     public async Task<IReadOnlyList<User>> GetWithExpiredSubscriptionAsync(
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
-        return await dbContext.Users
-            .AsNoTracking()
+        return await Context.Users
             .Where(x => (x.SubscriptionEndDate < DateTime.UtcNow)
-                     && (x.SubscriptionId != Guid.Parse(Contracts.Enums.Subscription.Free)))
+                     && (x.SubscriptionId != Guid.Parse(SubscriptionType.Free)))
             .ToListAsync(cancellationToken);
-    }
-
-    public async Task UpdateAsync(
-        User user,
-        CancellationToken cancellationToken)
-    {
-        User trackedEntity = await dbContext.Users.FindAsync(user.Id, cancellationToken)
-           ?? throw new KeyNotFoundException($"{nameof(User)} with id {user.Id} not found.");
-
-        dbContext.Entry(trackedEntity).CurrentValues.SetValues(user);
     }
 }

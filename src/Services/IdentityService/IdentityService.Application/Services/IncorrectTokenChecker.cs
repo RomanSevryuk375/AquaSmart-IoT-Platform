@@ -1,5 +1,6 @@
-﻿using IdentityService.Application.Interfaces;
+using IdentityService.Application.Interfaces;
 using IdentityService.Domain.Interfaces;
+using IdentityService.Infrastructure.Repositories;
 
 namespace IdentityService.Application.Services;
 
@@ -9,8 +10,7 @@ public class IncorrectTokenChecker(
 {
     public async Task CheckAndDeleteAsync(CancellationToken cancellationToken)
     {
-        await tokenRepository
-            .DeleteIncorrectTokensAsync(cancellationToken);
+        await tokenRepository.DeleteIncorrectTokensAsync(cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
     }

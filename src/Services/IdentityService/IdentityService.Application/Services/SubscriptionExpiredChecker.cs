@@ -1,6 +1,7 @@
 using Contracts.Enums;
 using Contracts.Events.UserEvents;
 using IdentityService.Application.Interfaces;
+using IdentityService.Domain.Entities;
 using IdentityService.Domain.Interfaces;
 using MassTransit;
 
@@ -13,18 +14,15 @@ public class SubscriptionExpiredChecker(
 {
     public async Task CheckAsync(CancellationToken cancellationToken)
     {
-        var users = await userRepository
+        IReadOnlyList<User> users = await userRepository
             .GetWithExpiredSubscriptionAsync(cancellationToken);
 
         var eventsToPublish = new List<SubscriptionDowngradedEvent>();
 
-        foreach (var user in users)
+        foreach (User user in users)
         {
             user.SetSubscription(Guid
-                .Parse(Subscription.Free), Subscription.FreeDuration);
-
-            await userRepository
-                .UpdateAsync(user, cancellationToken);
+                .Parse(SubscriptionType.Free), SubscriptionType.FreeDuration);
 
             eventsToPublish.Add(new SubscriptionDowngradedEvent
             {
@@ -36,7 +34,7 @@ public class SubscriptionExpiredChecker(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        foreach(var @event in eventsToPublish)
+        foreach (SubscriptionDowngradedEvent @event in eventsToPublish)
         {
             await publishEndpoint.Publish(@event, cancellationToken);
         }

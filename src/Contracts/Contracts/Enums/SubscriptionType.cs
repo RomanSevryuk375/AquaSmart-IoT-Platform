@@ -1,6 +1,6 @@
 namespace Contracts.Enums;
 
-public static class Subscription
+public static class SubscriptionType
 {
     public const string Free = "00000000-0000-0000-0000-000000000001";
     public const int FreeDuration = 36500;
