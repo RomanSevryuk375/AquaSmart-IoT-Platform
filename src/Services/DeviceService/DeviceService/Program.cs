@@ -33,11 +33,13 @@ try
 
     await app.RunAsync();
 }
-catch (Exception ex)
+#pragma warning disable S2139
+catch (Exception ex) when (ex is not HostAbortedException)
 {
-    Log.Fatal(ex, "DeviceService terminated unexpectedly");
+    Log.Fatal(ex, "ControlService terminated unexpectedly");
     throw;
 }
+#pragma warning restore S2139
 finally
 {
 #pragma warning disable S6966 
