@@ -55,6 +55,8 @@ public static class DependencyInjection
         })
         .AddEntityFrameworkStores<IdentityDbContext>()
         .AddDefaultTokenProviders();
+
+        services.AddAquaAuthorizationPolicies();
         services.AddCommonAuthentication(configuration);
         services.AddInfrastructure(configuration);
 
