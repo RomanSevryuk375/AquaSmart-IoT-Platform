@@ -15,6 +15,6 @@ public sealed class EcosystemUpdatedHandler(
         CancellationToken cancellationToken)
     {
         await publishEndpoint.Publish(
-            mapper.Map<EcosystemUdatedEvent>(notification), cancellationToken);
+            mapper.Map<EcosystemUpdatedEvent>(notification), cancellationToken);
     }
 }

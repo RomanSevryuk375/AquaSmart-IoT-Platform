@@ -16,13 +16,13 @@ public sealed class EcosystemProfile : Profile
             .ForMember(desc => desc.EcosystemId,
             opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<Ecosystem, EcosystemUdatedEvent>()
+        CreateMap<Ecosystem, EcosystemUpdatedEvent>()
            .ForMember(desc => desc.EcosystemId,
            opt => opt.MapFrom(src => src.Id));
 
         CreateMap<EcosystemCreatedDomainEvent, EcosystemCreatedEvent>();
 
-        CreateMap<EcosystemUpdatedDomainEvent, EcosystemUdatedEvent>();
+        CreateMap<EcosystemUpdatedDomainEvent, EcosystemUpdatedEvent>();
 
         CreateMap<EcosystemDeletedDomainEvent, EcosystemDeletedEvent>();
     }

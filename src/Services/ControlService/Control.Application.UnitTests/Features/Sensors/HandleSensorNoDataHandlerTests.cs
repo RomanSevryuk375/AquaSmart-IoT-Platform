@@ -138,7 +138,7 @@ public class HandleSensorNoDataHandlerTests
         await _publishEndpointMock.Received(1).Publish(
             Arg.Is<SensorNoDataAlertEvent>(e =>
                 e.UserId == ecosystem.UserId &&
-                e.EcosytemId == rule.EcosystemId &&
+                e.EcosystemId == rule.EcosystemId &&
                 e.SensorId == sensor.Id &&
                 e.LastSeenAt == command.LastSeenAt),
             Arg.Any<CancellationToken>());

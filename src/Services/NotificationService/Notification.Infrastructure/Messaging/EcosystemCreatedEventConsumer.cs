@@ -1,20 +1,23 @@
-﻿using Contracts.Events.EcosystemEvents;
+using AutoMapper;
+using Contracts.Events.EcosystemEvents;
+using Contracts.Results;
 using MassTransit;
-using Notification.Application.Interfaces;
+using MediatR;
+using Notification.Application.Features.Ecosystems.Commands.SyncEcosystemCreated;
 
 namespace Notification.Infrastructure.Messaging;
 
-public sealed class EcosystemCreatedEventConsumer(
-    IEcosystemService service) : IConsumer<EcosystemCreatedEvent>
+public sealed class EcosystemCreatedEventConsumer(ISender sender, IMapper mapper)
+    : IConsumer<EcosystemCreatedEvent>
 {
     public async Task Consume(ConsumeContext<EcosystemCreatedEvent> context)
     {
-        var result = await service.CreateAquariumFromEventAsync(
-            context.Message, context.CancellationToken);
+        SyncEcosystemCreatedCommand command = mapper.Map<SyncEcosystemCreatedCommand>(context.Message);
 
-        if (!result.IsSuccess && result.IsRetryable)
+        Result result = await sender.Send(command, context.CancellationToken);
+        if (result.IsFailure)
         {
-            throw new Exception(result.Error);
+            throw new InvalidOperationException(result.Error.Message);
         }
     }
 }

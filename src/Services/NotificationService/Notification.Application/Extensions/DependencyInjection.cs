@@ -1,7 +1,8 @@
-﻿using FluentValidation;
+using System.Reflection;
+using FluentValidation;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Notification.Application.Interfaces;
-using Notification.Application.Services;
+using Notification.Application.Behaviors;
 
 namespace Notification.Application.Extensions;
 
@@ -9,22 +10,21 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddScoped<IControllerAlertSender, ControllerAlertSender>();
-        services.AddScoped<IEcosystemService, EcosystemService>();
-        services.AddScoped<IMaintenanceLogService, MaintenanceLogService>();
-        services.AddScoped<INotificationSender, NotificationSender>();
-        services.AddScoped<INotificationService, NotificationService>();
-        services.AddScoped<IReminderProcessor, ReminderProcessor>();
-        services.AddScoped<IReminderService, ReminderService>();
-        services.AddScoped<ISensorAlertSender, SensorAlertSender>();
-        services.AddScoped<ITelemetryAlertSender, TelemetryAlertSender>();
-        services.AddScoped<IUnpublishedNoticeProcessor, UnpublishedNoticeProcessor>();
-        services.AddScoped<IUserService, UserService>();
+        Assembly assembly = typeof(DependencyInjection).Assembly;
 
-        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+        services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssembly(assembly);
 
-        services.AddAutoMapper(config =>
-            config.AddMaps(typeof(DependencyInjection).Assembly));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(EcosystemSecurityBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
+        });
+
+        services.AddValidatorsFromAssembly(assembly);
+
+        services.AddAutoMapper(cfg => cfg.AddMaps(assembly));
 
         return services;
     }

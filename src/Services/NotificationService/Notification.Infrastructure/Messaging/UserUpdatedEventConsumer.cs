@@ -1,20 +1,23 @@
-﻿using Contracts.Events.UserEvents;
+using AutoMapper;
+using Contracts.Events.UserEvents;
+using Contracts.Results;
 using MassTransit;
-using Notification.Application.Interfaces;
+using MediatR;
+using Notification.Application.Features.Users.Commands.SyncUserCreated;
 
 namespace Notification.Infrastructure.Messaging;
 
-public sealed class UserUpdatedEventConsumer(
-    IUserService userService) : IConsumer<UserUpdatedEvent>
+public sealed class UserUpdatedEventConsumer(ISender sender, IMapper mapper)
+    : IConsumer<UserUpdatedEvent>
 {
     public async Task Consume(ConsumeContext<UserUpdatedEvent> context)
     {
-        var result = await userService.UpdateUserAsync(
-            context.Message, context.CancellationToken);
+        SyncUserUpdateCommand command = mapper.Map<SyncUserUpdateCommand>(context.Message);
 
-        if (!result.IsSuccess && result.IsRetryable)
+        Result result = await sender.Send(command, context.CancellationToken);
+        if (result.IsFailure)
         {
-            throw new Exception(result.Error);
+            throw new InvalidOperationException(result.Error.Message);
         }
     }
 }

@@ -52,7 +52,7 @@ public sealed class HandleSensorNoDataHandler(
                 await publishEndpoint.Publish(new SensorNoDataAlertEvent
                 {
                     UserId = ecosystem.UserId,
-                    EcosytemId = rule.EcosystemId,
+                    EcosystemId = rule.EcosystemId,
                     SensorId = sensor.Id,
                     LastSeenAt = request.LastSeenAt
                 }, cancellationToken);
