@@ -41,7 +41,7 @@ public sealed class Ecosystem : AggregateRoot, IEntity
         var ecosystem = new Ecosystem(
             ecosystemId, userId,
             nameResult.Value,
-            createdAt: DateTime.Now);
+            createdAt: DateTime.UtcNow);
 
         return Result<Ecosystem>.Success(ecosystem);
     }

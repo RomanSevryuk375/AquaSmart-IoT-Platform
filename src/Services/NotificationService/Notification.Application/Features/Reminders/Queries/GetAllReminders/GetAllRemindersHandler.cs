@@ -29,12 +29,12 @@ public sealed class GetAllRemindersHandler(ISqlConnectionFactory sqlConnectionFa
                 created_at AS CreatedAt
             FROM reminders
             WHERE user_id = @UserId
-              AND (@EcosystemId IS NULL OR ecosystem_id = @EcosystemId)
-              AND (@SearchTerm IS NULL OR @SearchTerm = '' OR task_name ILIKE '%' || @SearchTerm || '%')
-              AND (@LastDoneAtFrom IS NULL OR last_done_at >= @LastDoneAtFrom)
-              AND (@LastDoneAtTo IS NULL OR last_done_at <= @LastDoneAtTo)
-              AND (@NextDueAtFrom IS NULL OR next_due_at >= @NextDueAtFrom)
-              AND (@NextDueAtTo IS NULL OR next_due_at <= @NextDueAtTo)
+              AND (cast(@EcosystemId as uuid) IS NULL OR ecosystem_id = @EcosystemId)
+              AND (cast(@SearchTerm as text) IS NULL OR cast(@SearchTerm as text) = '' OR task_name ILIKE '%' || @SearchTerm || '%')
+              AND (cast(@LastDoneAtFrom as timestamptz) IS NULL OR last_done_at >= @LastDoneAtFrom)
+              AND (cast(@LastDoneAtTo as timestamptz) IS NULL OR last_done_at <= @LastDoneAtTo)
+              AND (cast(@NextDueAtFrom as timestamptz) IS NULL OR next_due_at >= @NextDueAtFrom)
+              AND (cast(@NextDueAtTo as timestamptz) IS NULL OR next_due_at <= @NextDueAtTo)
             ORDER BY next_due_at ASC
             LIMIT @Take OFFSET @Skip
             """;

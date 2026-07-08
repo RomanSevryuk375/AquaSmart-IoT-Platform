@@ -27,10 +27,10 @@ public sealed class GetAllNotificationsHandler(ISqlConnectionFactory sqlConnecti
                 created_at AS CreatedAt
             FROM notifications
             WHERE user_id = @UserId
-              AND (@EcosystemId IS NULL OR ecosystem_id = @EcosystemId)
-              AND (@Level IS NULL OR level = @Level)
-              AND (@IsRead IS NULL OR is_read = @IsRead)
-              AND (@SearchTerm IS NULL OR @SearchTerm = '' OR message ILIKE '%' || @SearchTerm || '%')
+              AND (cast(@EcosystemId as uuid) IS NULL OR ecosystem_id = @EcosystemId)
+              AND (cast(@Level as integer) IS NULL OR level = @Level)
+              AND (cast(@IsRead as boolean) IS NULL OR is_read = @IsRead)
+              AND (cast(@SearchTerm as text) IS NULL OR cast(@SearchTerm as text) = '' OR message ILIKE '%' || @SearchTerm || '%')
             ORDER BY created_at DESC
             LIMIT @Take OFFSET @Skip
             """;

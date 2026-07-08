@@ -10,7 +10,6 @@ public sealed class NotificationRepository(NotificationDbContext dbContext)
         CancellationToken cancellationToken = default)
     {
         return await Context.Notifications
-            .AsNoTracking()
             .Where(x => !x.IsPublished)
             .Where(x => x.RetryCount < 5)
             .OrderBy(x => x.CreatedAt)

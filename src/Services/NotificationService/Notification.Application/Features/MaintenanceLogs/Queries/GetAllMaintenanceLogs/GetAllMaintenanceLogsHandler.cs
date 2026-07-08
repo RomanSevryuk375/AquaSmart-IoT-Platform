@@ -30,9 +30,9 @@ public sealed class GetAllMaintenanceLogsHandler(ISqlConnectionFactory sqlConnec
                 created_at AS CreatedAt
             FROM maintenance_logs
             WHERE user_id = @UserId
-              AND (@EcosystemId IS NULL OR ecosystem_id = @EcosystemId)
-              AND (@ActionDateFrom IS NULL OR action_date >= @ActionDateFrom)
-              AND (@ActionDateTo IS NULL OR action_date <= @ActionDateTo)
+              AND (cast(@EcosystemId as uuid) IS NULL OR ecosystem_id = @EcosystemId)
+              AND (cast(@ActionDateFrom as timestamptz) IS NULL OR action_date >= @ActionDateFrom)
+              AND (cast(@ActionDateTo as timestamptz) IS NULL OR action_date <= @ActionDateTo)
             ORDER BY action_date DESC
             LIMIT @Take OFFSET @Skip
             """;

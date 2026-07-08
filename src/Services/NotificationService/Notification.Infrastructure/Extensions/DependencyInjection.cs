@@ -2,12 +2,17 @@
 
 using Contracts.Options;
 using MassTransit;
+// Ignore Spelling: Mq
+
+using Contracts.Options;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Notification.Domain.Interfaces;
 using Notification.Infrastructure.BackgroundJob;
+using Notification.Infrastructure.Factories;
 using Notification.Infrastructure.Messaging;
 using Notification.Infrastructure.Persistence;
 using Notification.Infrastructure.Persistence.Repositories;
@@ -42,6 +47,8 @@ public static class DependencyInjection
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IReminderRepository, ReminderRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+
+        services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IUserContext, UserContext>();

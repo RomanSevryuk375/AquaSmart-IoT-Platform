@@ -23,7 +23,7 @@ public class EcosystemTests
         result.Value.Id.Should().Be(id);
         result.Value.UserId.Should().Be(userId);
         result.Value.EcosystemName.Value.Should().Be(name);
-        result.Value.CreatedAt.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(5));
+        result.Value.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
         result.Value.Version.Should().Be(Guid.Empty);
     }
 
