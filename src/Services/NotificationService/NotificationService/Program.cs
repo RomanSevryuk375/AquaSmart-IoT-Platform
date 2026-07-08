@@ -1,23 +1,49 @@
 using Contracts.Constants;
 using Contracts.Middlewares;
 using Notification.API.Extensions;
+using Serilog;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-builder.Services.AddConfiguration(builder.Configuration);
+try
+{
+    Log.Information("Starting NotificationService application");
 
-WebApplication app = builder.Build();
+    WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-app.UseGlobalExceptionHandler();
+    builder.AddElkLogging();
 
-app.UseSwagger();
-app.UseSwaggerUI();
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapHealthChecks(ApiConstants.HealthRoute);
-app.MapControllers();
+    builder.Services.AddConfiguration(builder.Configuration);
 
-await app.RunAsync();
+    WebApplication app = builder.Build();
 
+    app.UseGlobalExceptionHandler();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.MapHealthChecks(ApiConstants.HealthRoute);
+    app.MapControllers();
+
+    await app.RunAsync();
+}
+#pragma warning disable S2139
+catch (Exception ex) when (ex is not HostAbortedException)
+{
+    Log.Fatal(ex, "NotificationService terminated unexpectedly");
+    throw;
+}
+#pragma warning restore S2139
+finally
+{
+#pragma warning disable S6966 
+    Log.CloseAndFlush();
+#pragma warning restore S6966 
+}
+
+#pragma warning disable S1118 
 public partial class Program { }
+#pragma warning restore S1118
 

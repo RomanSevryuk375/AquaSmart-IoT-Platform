@@ -8,10 +8,7 @@ public sealed class LoggingBehavior<TRequest, TResponse>(
     ILogger<LoggingBehavior<TRequest, TResponse>> logger)
     : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
 {
-    public async Task<TResponse> Handle(
-        TRequest request,
-        RequestHandlerDelegate<TResponse> next,
-        CancellationToken cancellationToken)
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         string requestName = typeof(TRequest).Name;
 
@@ -25,13 +22,11 @@ public sealed class LoggingBehavior<TRequest, TResponse>(
 
         long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
-        logger.LogInformation("Handled {RequestName} in {ElapsedMilliseconds} ms",
-            requestName, elapsedMilliseconds);
+        logger.LogInformation("Handled {RequestName} in {ElapsedMilliseconds} ms", requestName, elapsedMilliseconds);
 
         if (elapsedMilliseconds > 500)
         {
-            logger.LogWarning("Long running request: {RequestName} ({ElapsedMilliseconds} ms)",
-                requestName, elapsedMilliseconds);
+            logger.LogWarning("Long running request: {RequestName} ({ElapsedMilliseconds} ms)", requestName, elapsedMilliseconds);
         }
 
         return response;
