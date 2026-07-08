@@ -11,6 +11,7 @@
     <Project Path="../Notification.Domain.UnitTests/Notification.Domain.UnitTests.csproj" Id="a33adc3f-1bc9-42f9-82ea-b9fe98f6537d" />
     <Project Path="../Notification.Infrastructure.IntegrationTests/Notification.Infrastructure.IntegrationTests.csproj" />
     <Project Path="../Notification.TestShared/Notification.TestShared.csproj" Id="978b1049-3267-44f1-a5f6-63c82351622d" />
+    <Project Path="../Notification.API.E2ETests/Notification.API.E2ETests.csproj" />
   </Folder>
   <Project Path="../../../Contracts/Contracts/Contracts.csproj" />
 </Solution>

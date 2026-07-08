@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Notification.Infrastructure.IntegrationTests\Notification.Infrastructure.IntegrationTests.csproj" />
+    <ProjectReference Include="..\Notification.TestShared\Notification.TestShared.csproj" />
+    <ProjectReference Include="..\NotificationService\Notification.API.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>
