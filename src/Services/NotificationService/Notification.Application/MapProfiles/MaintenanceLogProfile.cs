@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Notification.Application.DTOs.MaintenanceLog;
 using Notification.Domain.Entities;
 
@@ -8,6 +8,6 @@ public class MaintenanceLogProfile : Profile
 {
     public MaintenanceLogProfile()
     {
-        CreateMap<MaintenanceLogEntity, MaintenanceLogResponseDto>();
+        CreateMap<MaintenanceLog, MaintenanceLogResponseDto>();
     }
 }

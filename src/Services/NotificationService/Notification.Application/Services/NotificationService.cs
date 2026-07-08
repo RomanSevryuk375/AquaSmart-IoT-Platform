@@ -1,10 +1,8 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Contracts.Results;
 using Notification.Application.DTOs.Notification;
 using Notification.Application.Interfaces;
 using Notification.Domain.Interfaces;
-using Notification.Domain.SpecificationParams;
-using Notification.Domain.Specifications;
 
 namespace Notification.Application.Services;
 
@@ -14,37 +12,11 @@ public class NotificationService(
     IUserContext userContext,
     IMapper mapper) : INotificationService
 {
-    public async Task<Result<IReadOnlyList<NotificationResponseDto>>> GetAllNotificationsAsync(
-        NotificationFilterDto filter,
-        int? skip,
-        int? take,
-        CancellationToken cancellationToken)
-    {
-        var specification = new NotificationFilterSpecification(
-            new NotificationSpecificationParams
-            {
-                UserId = userContext.UserId,
-                EcosystemId = filter.EcosystemId,
-                Level = filter.Level,
-                IsRead = filter.IsRead,
-                SearchTerm = filter.SearchTerm,
-            });
-
-        var notifications = await notificationRepository.GetAllAsync(
-            specification,
-            skip,
-            take,
-            cancellationToken);
-
-        return Result<IReadOnlyList<NotificationResponseDto>>.Success(
-            mapper.Map<IReadOnlyList<NotificationResponseDto>>(notifications));
-    }
-
     public async Task<Result<NotificationResponseDto>> GetNotificationByIdAsync(
         Guid notificationId,
         CancellationToken cancellationToken)
     {
-        var notification = await notificationRepository
+        Domain.Entities.Notification? notification = await notificationRepository
             .GetByIdAsync(notificationId, cancellationToken);
 
 
@@ -72,7 +44,7 @@ public class NotificationService(
         Guid notificationId,
         CancellationToken cancellationToken)
     {
-        var notification = await notificationRepository
+        Domain.Entities.Notification? notification = await notificationRepository
             .GetByIdAsync(notificationId, cancellationToken);
 
         if (notification is null ||
@@ -90,7 +62,6 @@ public class NotificationService(
 
         notification.MarkAsRead();
 
-        await notificationRepository.UpdateAsync(notification, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();

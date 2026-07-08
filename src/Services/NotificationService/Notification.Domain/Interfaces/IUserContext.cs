@@ -1,7 +1,7 @@
-﻿namespace Notification.Domain.Interfaces;
+namespace Notification.Domain.Interfaces;
 
 public interface IUserContext
 {
-    bool IsAuthenticated { get; }
-    Guid UserId { get; }
+    public bool IsAuthenticated { get; }
+    public Guid UserId { get; }
 }

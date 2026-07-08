@@ -1,4 +1,4 @@
-﻿using Contracts.Authorization;
+using Contracts.Authorization;
 using Contracts.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,25 +14,12 @@ public class RemindersController(IReminderService reminderService) : ControllerB
 {
     private const string GetByIdRouteName = "GetReminderById";
 
-    [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<ReminderResponseDto>>> GetAllAsync(
-        [FromQuery] ReminderFilterDto filter,
-        [FromQuery] int? skip = 0,
-        [FromQuery] int? take = 10,
-        CancellationToken cancellationToken = default)
-    {
-        var result = await reminderService
-            .GetAllRemindersAsync(filter, skip, take, cancellationToken);
-
-        return this.ToActionResult(result);
-    }
-
     [HttpGet("{id:guid}", Name = GetByIdRouteName)]
     public async Task<ActionResult<ReminderResponseDto>> GetByIdAsync(
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        var result = await reminderService.GetReminderByIdAsync(id, cancellationToken);
+        Result<ReminderResponseDto> result = await reminderService.GetReminderByIdAsync(id, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -42,7 +29,7 @@ public class RemindersController(IReminderService reminderService) : ControllerB
         [FromBody] ReminderRequestDto request,
         CancellationToken cancellationToken = default)
     {
-        var result = await reminderService.AddReminderAsync(request, cancellationToken);
+        Result<Guid> result = await reminderService.AddReminderAsync(request, cancellationToken);
 
         if (result.IsFailure)
         {
@@ -61,7 +48,7 @@ public class RemindersController(IReminderService reminderService) : ControllerB
         [FromBody] ReminderUpdateRequestDto request,
         CancellationToken cancellationToken = default)
     {
-        var result = await reminderService.UpdateReminderAsync(id, request, cancellationToken);
+        Result result = await reminderService.UpdateReminderAsync(id, request, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -71,7 +58,7 @@ public class RemindersController(IReminderService reminderService) : ControllerB
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        var result = await reminderService.ReminderCompleteTaskAsync(id, cancellationToken);
+        Result result = await reminderService.ReminderCompleteTaskAsync(id, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -81,7 +68,7 @@ public class RemindersController(IReminderService reminderService) : ControllerB
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        var result = await reminderService.DeleteReminderAsync(id, cancellationToken);
+        Result result = await reminderService.DeleteReminderAsync(id, cancellationToken);
 
         return this.ToActionResult(result);
     }

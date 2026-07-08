@@ -1,26 +1,37 @@
-﻿using Contracts.Constants;
+using Contracts.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notification.Domain.Entities;
+using Notification.Domain.ValueObjects;
 
 namespace Notification.Infrastructure.Configurations;
 
-public sealed class UserEntityConfiguration
-    : IEntityTypeConfiguration<UserEntity>
+public sealed class UserConfiguration : IEntityTypeConfiguration<User>
 {
-    public void Configure(EntityTypeBuilder<UserEntity> builder)
+    public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.ToTable("users");
 
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.TimeZone).IsRequired();
-
         builder.Property(x => x.Email)
+            .HasConversion(
+                email => email.Value,
+                dbValue => EmailAddress.Create(dbValue).Value)
             .HasMaxLength(UserConstants.EmailLength)
             .IsRequired();
 
+        builder.Property(x => x.TimeZone)
+            .HasConversion(
+                tz => tz.Value,
+                dbValue => TimeZoneId.Create(dbValue).Value)
+            .HasColumnName("time_zone")
+            .IsRequired();
+
         builder.Property(x => x.PhoneNumber)
+            .HasConversion(
+                phone => phone.Value,
+                dbValue => PhoneNumber.Create(dbValue).Value)
             .HasMaxLength(UserConstants.PhoneNumberLength)
             .IsRequired();
 
@@ -30,25 +41,27 @@ public sealed class UserEntityConfiguration
         builder.Property(x => x.IsNotifyEnabled).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
 
+        builder.Property(x => x.Version).IsConcurrencyToken();
+
         builder.HasIndex(x => x.Email).IsUnique();
         builder.HasIndex(x => x.PhoneNumber).IsUnique();
 
-        builder.HasMany<EcosystemEntity>()
+        builder.HasMany<Ecosystem>()
             .WithOne()
             .HasForeignKey(n => n.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany<NotificationEntity>()
+        builder.HasMany<Domain.Entities.Notification>()
             .WithOne()
             .HasForeignKey(n => n.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany<ReminderEntity>()
+        builder.HasMany<Reminder>()
             .WithOne()
             .HasForeignKey(n => n.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany<MaintenanceLogEntity>()
+        builder.HasMany<MaintenanceLog>()
             .WithOne()
             .HasForeignKey(n => n.UserId)
             .OnDelete(DeleteBehavior.Cascade);

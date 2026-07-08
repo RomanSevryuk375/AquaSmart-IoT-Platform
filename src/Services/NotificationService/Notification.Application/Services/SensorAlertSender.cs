@@ -1,6 +1,7 @@
 using Contracts.Enums;
 using Contracts.Events.SensorEvents;
 using Contracts.Results;
+using MassTransit;
 using Notification.Application.Interfaces;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
@@ -17,7 +18,7 @@ public class SensorAlertSender(
         SensorNoDataAlertEvent alertEvent,
         CancellationToken cancellationToken)
     {
-        var existingUser = await userRepository
+        bool existingUser = await userRepository
             .ExistsAsync(alertEvent.UserId, cancellationToken);
 
         if (!existingUser)
@@ -26,7 +27,7 @@ public class SensorAlertSender(
                 .RetryableError($"User {alertEvent.UserId} not found");
         }
 
-        var existingEcosystem = await ecosystemRepository
+        Ecosystem? existingEcosystem = await ecosystemRepository
             .GetByIdAsync(alertEvent.EcosytemId, cancellationToken);
 
         if (existingEcosystem is null)
@@ -35,21 +36,21 @@ public class SensorAlertSender(
                 .RetryableError($"Ecosystem {alertEvent.EcosytemId} not found");
         }
 
-        var (notification, errors) = NotificationEntity.Create(
+        Result<Domain.Entities.Notification>? notificationResult = Domain.Entities.Notification.Create(
+            NewId.NextGuid(),
             alertEvent.UserId,
             alertEvent.EcosytemId,
             NotificationLevel.Critical,
             $"Sensor {alertEvent.SensorId} " +
-            $"from aquarium {existingEcosystem.Name} did not send data " +
+            $"from aquarium {existingEcosystem.EcosystemName} did not send data " +
             $"at time {alertEvent.LastSeenAt:HH:mm:ss}");
 
-        if (notification is null)
+        if (notificationResult.IsFailure)
         {
-            return ConsumerResult
-                .FatalError($"Failed to create {nameof(NotificationEntity)}: {string.Join(", ", errors)}");
+            return ConsumerResult.FatalError(notificationResult.Error.Message);
         }
 
-        await notificationRepository.AddAsync(notification, cancellationToken);
+        await notificationRepository.AddAsync(notificationResult.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ConsumerResult.Success();

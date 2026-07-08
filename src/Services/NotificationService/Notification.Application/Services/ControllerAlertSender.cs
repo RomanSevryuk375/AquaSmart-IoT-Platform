@@ -1,6 +1,7 @@
 using Contracts.Enums;
 using Contracts.Events.ControllerEvents;
 using Contracts.Results;
+using MassTransit;
 using Notification.Application.Interfaces;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
@@ -17,7 +18,7 @@ public sealed class ControllerAlertSender(
         ControllerNotOnlineEvent controllerEvent,
         CancellationToken cancellationToken)
     {
-        var existingUser = await userRepository
+        User? existingUser = await userRepository
             .GetByIdAsync(controllerEvent.UserId, cancellationToken);
 
         if (existingUser is null)
@@ -26,7 +27,7 @@ public sealed class ControllerAlertSender(
                 .RetryableError($"User {controllerEvent.UserId} not found");
         }
 
-        var existingEcosystem = await ecosystemRepository
+        Ecosystem? existingEcosystem = await ecosystemRepository
             .GetByUserIdAsync(existingUser.Id, cancellationToken);
 
         if (existingEcosystem is null)
@@ -35,20 +36,20 @@ public sealed class ControllerAlertSender(
                 .RetryableError($"Ecosystem {existingUser.Id} not found");
         }
 
-        var (notification, errors) = NotificationEntity.Create(
+        Result<Domain.Entities.Notification>? notificationResult = Domain.Entities.Notification.Create(
+            NewId.NextGuid(),
             controllerEvent.UserId,
             existingEcosystem.Id,
             NotificationLevel.Critical,
             $"Controller {controllerEvent.ControllerId} " +
             $"was last online at {controllerEvent.LastSeenAt:HH:mm:ss}");
 
-        if (notification is null)
+        if (notificationResult.IsFailure)
         {
-            return ConsumerResult
-                .FatalError($"Failed to create {nameof(NotificationEntity)}: {string.Join(", ", errors)}");
+            return ConsumerResult.FatalError(notificationResult.Error.Message);
         }
 
-        await notificationRepository.AddAsync(notification, cancellationToken);
+        await notificationRepository.AddAsync(notificationResult.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ConsumerResult.Success();

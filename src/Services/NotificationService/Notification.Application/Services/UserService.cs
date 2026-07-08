@@ -1,4 +1,4 @@
-﻿using Contracts.Events.UserEvents;
+using Contracts.Events.UserEvents;
 using Contracts.Results;
 using Notification.Application.Interfaces;
 using Notification.Domain.Entities;
@@ -14,7 +14,7 @@ public sealed class UserService(
         UserCreatedEvent userCreated,
         CancellationToken cancellationToken)
     {
-        var existingUser = await userRepository
+        User? existingUser = await userRepository
             .GetByIdAsync(userCreated.UserId, cancellationToken);
 
         if (existingUser is not null)
@@ -22,7 +22,7 @@ public sealed class UserService(
             return ConsumerResult.Success();
         }
 
-        var (user, errors) = UserEntity.Create(
+        Result<User>? userResult = User.Create(
             userCreated.UserId,
             userCreated.Email,
             userCreated.TimeZone,
@@ -33,13 +33,12 @@ public sealed class UserService(
             false,
             userCreated.CreatedAt);
 
-        if (user is null)
+        if (userResult.IsFailure)
         {
-            return ConsumerResult
-                .FatalError($"Failed to create {nameof(UserEntity)}: {string.Join(", ", errors)}");
+            return ConsumerResult.FatalError(userResult.Error.Message);
         }
 
-        await userRepository.AddAsync(user, cancellationToken);
+        await userRepository.AddAsync(userResult.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ConsumerResult.Success();
@@ -49,7 +48,7 @@ public sealed class UserService(
         UserUpdatedEvent user,
         CancellationToken cancellationToken)
     {
-        var currentUser = await userRepository
+        User? currentUser = await userRepository
             .GetByIdAsync(user.UserId, cancellationToken);
 
         if (currentUser is null)
@@ -58,15 +57,14 @@ public sealed class UserService(
                 .RetryableError($"User {user.UserId} not found");
         }
 
-        var errors = currentUser.UpdateContacts(user.Email, user.PhoneNumber);
+        Result? errors = currentUser.UpdateContacts(user.Email, user.PhoneNumber);
 
         if (errors is not null)
         {
             return ConsumerResult
-                .FatalError($"Failed to update {nameof(UserEntity)}: {string.Join(", ", errors)}");
+                .FatalError($"Failed to update {nameof(User)}: {string.Join(", ", errors)}");
         }
 
-        await userRepository.UpdateAsync(currentUser, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ConsumerResult.Success();

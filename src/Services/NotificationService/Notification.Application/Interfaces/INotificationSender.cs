@@ -1,9 +1,9 @@
-﻿using Notification.Domain.Entities;
+using Notification.Domain.Entities;
 
 namespace Notification.Application.Interfaces;
 
 public interface INotificationSender
 {
     Task ProcessSingleNotificationAsync(
-        NotificationEntity notification, CancellationToken cancellationToken);
+        Domain.Entities.Notification notification, CancellationToken cancellationToken);
 }

@@ -1,16 +1,15 @@
-﻿using Contracts.Constants;
+using System.Text.Json;
+using Contracts.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notification.Domain.Entities;
-using System.Text.Json;
 
 namespace Notification.Infrastructure.Configurations;
 
-public sealed class MaintenanceLogEntityConfiguration
-    : IEntityTypeConfiguration<MaintenanceLogEntity>
+public sealed class MaintenanceLogConfiguration : IEntityTypeConfiguration<MaintenanceLog>
 {
-    public void Configure(EntityTypeBuilder<MaintenanceLogEntity> builder)
+    public void Configure(EntityTypeBuilder<MaintenanceLog> builder)
     {
         var serializerOptions = new JsonSerializerOptions { WriteIndented = false };
 

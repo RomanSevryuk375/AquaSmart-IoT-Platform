@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Notification.Application.DTOs.Reminder;
 using Notification.Domain.Entities;
 
@@ -8,6 +8,6 @@ public sealed class ReminderProfile : Profile
 {
     public ReminderProfile()
     {
-        CreateMap<ReminderEntity, ReminderResponseDto>();
+        CreateMap<Reminder, ReminderResponseDto>();
     }
 }

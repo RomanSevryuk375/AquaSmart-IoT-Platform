@@ -4,26 +4,22 @@ namespace Notification.Domain.Factories;
 
 public static class ReminderImportanceFactory
 {
-    public static NotificationLevel Evaluate (DateTime nextDueAt)
+    private const int InfoThreshold = 24;
+    private const int WarningThreshold = 0;
+    private const int CriticalThreshold = -24;
+
+    public static NotificationLevel Evaluate(DateTime nextDueAt)
     {
-        var now = DateTime.UtcNow;
-        var timeDiff = nextDueAt - now;
+        DateTime now = DateTime.UtcNow;
+        TimeSpan timeDiff = nextDueAt - now;
 
-        if (timeDiff.Hours < 24)
+        return timeDiff.TotalHours switch
         {
-            return NotificationLevel.Info;
-        }
+            <= CriticalThreshold => NotificationLevel.Critical,
+            <= WarningThreshold => NotificationLevel.Warning,
+            < InfoThreshold => NotificationLevel.Info,
 
-        if (timeDiff.Hours <= 0)
-        {
-            return NotificationLevel.Warning;
-        }
-
-        if (timeDiff.Hours <= -24)
-        {
-            return NotificationLevel.Critical;
-        }
-
-        return NotificationLevel.Info;
+            _ => NotificationLevel.Info
+        };
     }
 }

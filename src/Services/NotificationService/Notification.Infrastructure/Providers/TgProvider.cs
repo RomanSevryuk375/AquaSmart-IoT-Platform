@@ -1,4 +1,4 @@
-﻿using Contracts.Options;
+using Contracts.Options;
 using Microsoft.Extensions.Options;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
@@ -10,7 +10,7 @@ public class TgProvider(
     IOptions<TelegramOptions> options) : INotificationProvider
 {
     private readonly TelegramOptions _settings = options.Value;
-    public bool IsEnabled(UserEntity user)
+    public bool IsEnabled(User user)
     {
         if (user.TgEnable && user.TelegramChatId.HasValue)
         {
@@ -21,7 +21,7 @@ public class TgProvider(
     }
 
     public async Task<(bool Success, string Error)> SendAsync(
-        UserEntity user, 
+        User user, 
         string message, 
         CancellationToken cancellationToken)
     {

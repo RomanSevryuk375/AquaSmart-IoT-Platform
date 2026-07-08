@@ -1,4 +1,4 @@
-﻿using Notification.Application.Interfaces;
+using Notification.Application.Interfaces;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
 
@@ -11,10 +11,10 @@ public class NotificationSender(
     IUnitOfWork unitOfWork) : INotificationSender
 {
     public async Task ProcessSingleNotificationAsync(
-        NotificationEntity notification,
+        Domain.Entities.Notification notification,
         CancellationToken cancellationToken)
     {
-        var user = await userRepository
+        User? user = await userRepository
             .GetByIdAsync(notification.UserId, cancellationToken);
 
         bool overallSuccess = false;
@@ -25,12 +25,12 @@ public class NotificationSender(
             return;
         }
 
-        foreach (var provider in providers)
+        foreach (INotificationProvider provider in providers)
         {
             if (provider.IsEnabled(user))
             {
-                var (success, error) = await provider
-                    .SendAsync(user, notification.Message, cancellationToken);
+                (bool success, string? error) = await provider
+                    .SendAsync(user, notification.Message.Value, cancellationToken);
 
                 if (success)
                 {
@@ -52,7 +52,6 @@ public class NotificationSender(
             notification.MarkAsFailure(string.Join(" | ", errors));
         }
 
-        await notificationRepository.UpdateAsync(notification, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
     }

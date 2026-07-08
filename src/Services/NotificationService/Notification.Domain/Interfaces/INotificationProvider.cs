@@ -1,10 +1,10 @@
-﻿using Notification.Domain.Entities;
+using Notification.Domain.Entities;
 
 namespace Notification.Domain.Interfaces;
 
 public interface INotificationProvider
 {
-    bool IsEnabled(UserEntity user);
-    Task<(bool Success, string Error)> SendAsync(
-        UserEntity user, string message, CancellationToken cancellationToken);
+    public bool IsEnabled(User user);
+    public Task<(bool Success, string Error)> SendAsync(
+        User user, string message, CancellationToken cancellationToken);
 }

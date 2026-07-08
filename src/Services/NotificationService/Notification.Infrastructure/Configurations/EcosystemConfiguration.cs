@@ -1,38 +1,44 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notification.Domain.Entities;
+using Notification.Domain.ValueObjects;
 
 namespace Notification.Infrastructure.Configurations;
 
-public sealed class EcosystemEntityConfiguration
-    : IEntityTypeConfiguration<EcosystemEntity>
+public sealed class EcosystemConfiguration : IEntityTypeConfiguration<Ecosystem>
 {
-    public void Configure(EntityTypeBuilder<EcosystemEntity> builder)
+    public void Configure(EntityTypeBuilder<Ecosystem> builder)
     {
         builder.ToTable("ecosystems");
 
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.UserId).IsRequired();
-        builder.HasIndex(x => x.UserId);
 
-        builder.Property(x => x.Name)
+        builder.Property(x => x.EcosystemName)
+            .HasConversion(
+                name => name.Value,
+                dbValue => Name.Create(dbValue).Value)
+            .HasColumnName("name")
             .HasMaxLength(128)
             .IsRequired();
 
         builder.Property(x => x.CreatedAt).IsRequired();
 
-        builder.HasMany<NotificationEntity>()
+        builder.Property(x => x.Version).IsConcurrencyToken();
+        builder.HasIndex(x => x.UserId);
+
+        builder.HasMany<Domain.Entities.Notification>()
             .WithOne()
             .HasForeignKey(n => n.EcosystemId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany<ReminderEntity>()
+        builder.HasMany<Reminder>()
             .WithOne()
             .HasForeignKey(n => n.EcosystemId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany<MaintenanceLogEntity>()
+        builder.HasMany<MaintenanceLog>()
             .WithOne()
             .HasForeignKey(n => n.EcosystemId)
             .OnDelete(DeleteBehavior.Cascade);

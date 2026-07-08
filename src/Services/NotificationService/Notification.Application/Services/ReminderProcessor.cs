@@ -1,4 +1,6 @@
-﻿using Notification.Application.Interfaces;
+using Contracts.Results;
+using MassTransit;
+using Notification.Application.Interfaces;
 using Notification.Domain.Entities;
 using Notification.Domain.Factories;
 using Notification.Domain.Interfaces;
@@ -14,7 +16,7 @@ public class ReminderProcessor(
 {
     public async Task CheckAsync(CancellationToken cancellationToken)
     {
-        var pendingReminders = await reminderRepository
+        IReadOnlyList<Reminder>? pendingReminders = await reminderRepository
             .GetPendingRemindersAsync(DateTime.UtcNow, cancellationToken);
 
         if (pendingReminders is null)
@@ -26,9 +28,9 @@ public class ReminderProcessor(
         var users = (await userRepository.GetAllUsersByIdAsync(userIds, cancellationToken))
             .ToDictionary(u => u.Id);
 
-        foreach (var reminder in pendingReminders)
+        foreach (Reminder reminder in pendingReminders)
         {
-            if (!users.TryGetValue(reminder.UserId, out var user))
+            if (!users.TryGetValue(reminder.UserId, out User? user))
             {
                 continue;
             }
@@ -36,43 +38,43 @@ public class ReminderProcessor(
             TimeZoneInfo tzInfo;
             try
             {
-                tzInfo = TimeZoneInfo.FindSystemTimeZoneById(user.TimeZone ?? "UTC");
+                tzInfo = TimeZoneInfo.FindSystemTimeZoneById(user.TimeZone.Value ?? "UTC");
             }
             catch (TimeZoneNotFoundException)
             {
                 tzInfo = TimeZoneInfo.Utc;
             }
 
-            var userLocalTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tzInfo);
+            DateTime userLocalTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tzInfo);
 
             if (reminder.LastNotifiedAt.HasValue)
             {
-                var lastNotifiedLocal = TimeZoneInfo.ConvertTimeFromUtc(reminder.LastNotifiedAt.Value, tzInfo);
+                DateTime lastNotifiedLocal = TimeZoneInfo.ConvertTimeFromUtc(reminder.LastNotifiedAt.Value, tzInfo);
                 if (lastNotifiedLocal.Date == userLocalTime.Date)
                 {
-                    continue; 
+                    continue;
                 }
             }
 
             if (userLocalTime.Hour >= 9 && userLocalTime.Hour <= 21)
             {
-                var (notification, errors) = NotificationEntity.Create(
-                reminder.UserId,
-                reminder.EcosystemId,
-                ReminderImportanceFactory.Evaluate(reminder.NextDueAt),
-                $"{reminder.TaskName} should be done at {reminder.NextDueAt:dd.MM.yyyy}");
+                Result<Domain.Entities.Notification>? notificationResult = Domain.Entities.Notification.Create(
+                    NewId.NextGuid(),
+                    reminder.UserId,
+                    reminder.EcosystemId,
+                    ReminderImportanceFactory.Evaluate(reminder.NextDueAt),
+                    $"{reminder.TaskName} should be done at {reminder.NextDueAt:dd.MM.yyyy}");
 
-                if (notification is null)
+                if (notificationResult is null)
                 {
                     continue;
                 }
 
-                await notificationSender.ProcessSingleNotificationAsync(notification, cancellationToken);
+                await notificationSender.ProcessSingleNotificationAsync(notificationResult.Value, cancellationToken);
 
                 reminder.MarkAsNotified();
 
-                await reminderRepository.UpdateAsync(reminder, cancellationToken);
-                await notificationRepository.AddAsync(notification, cancellationToken);
+                await notificationRepository.AddAsync(notificationResult.Value, cancellationToken);
             }
         }
 

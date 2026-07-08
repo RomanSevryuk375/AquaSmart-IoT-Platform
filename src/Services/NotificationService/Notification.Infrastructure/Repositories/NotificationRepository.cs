@@ -1,13 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
 
 namespace Notification.Infrastructure.Repositories;
 
 public sealed class NotificationRepository(SystemDbContext dbContext)
-    : BaseRepository<NotificationEntity>(dbContext), INotificationRepository
+    : BaseRepository<Domain.Entities.Notification>(dbContext), INotificationRepository
 {
-    public async Task<IReadOnlyList<NotificationEntity>> GetUnpublishedNotificationsAsync(
+    public async Task<IReadOnlyList<Domain.Entities.Notification>> GetUnpublishedNotificationsAsync(
         CancellationToken cancellationToken)
     {
         return await Context.Notifications

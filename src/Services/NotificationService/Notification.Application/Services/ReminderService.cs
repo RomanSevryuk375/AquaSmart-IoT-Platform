@@ -1,12 +1,11 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Contracts.Results;
 using FluentValidation;
+using MassTransit;
 using Notification.Application.DTOs.Reminder;
 using Notification.Application.Interfaces;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
-using Notification.Domain.SpecificationParams;
-using Notification.Domain.Specifications;
 
 namespace Notification.Application.Services;
 
@@ -24,7 +23,7 @@ public class ReminderService(
     {
         validator.ValidateAndThrow(request);
 
-        var ecosystem = await ecosystemRepository
+        Ecosystem? ecosystem = await ecosystemRepository
             .GetByIdAsync(request.EcosystemId, cancellationToken);
 
         if (ecosystem is null || ecosystem.UserId != userContext.UserId)
@@ -34,58 +33,29 @@ public class ReminderService(
                 $"Ecosystem {request.EcosystemId} not found"));
         }
 
-        var (reminder, errors) = ReminderEntity.Create(
+        Result<Reminder> reminderResult = Reminder.Create(
+            NewId.NextGuid(),
             userContext.UserId,
             request.EcosystemId,
             request.TaskName,
             request.IntervalDays);
 
-        if (reminder is null)
+        if (reminderResult.IsFailure)
         {
-            return Result<Guid>.Failure(Error.Validation(
-                "Reminder.Invalid",
-                $"Failed to create {nameof(ReminderEntity)}: {string.Join(", ", errors)}"));
+            return Result<Guid>.Failure(reminderResult.Error);
         }
 
-        var result = await reminderRepository.AddAsync(reminder, cancellationToken);
+        Guid result = await reminderRepository.AddAsync(reminderResult.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<Guid>.Success(result);
-    }
-
-    public async Task<Result<IReadOnlyList<ReminderResponseDto>>> GetAllRemindersAsync(
-        ReminderFilterDto filter,
-        int? skip,
-        int? take,
-        CancellationToken cancellationToken)
-    {
-        var specification = new ReminderFilterSpecification(
-            new ReminderSpecificationParams
-            {
-                UserId = userContext.UserId,
-                EcosystemId = filter.EcosystemId,
-                SearchTerm = filter.SearchTerm,
-                LastDoneAtFrom = filter.LastDoneAtFrom,
-                LastDoneAtTo = filter.LastDoneAtTo,
-                NextDueAtFrom = filter.NextDueAtFrom,
-                NextDueAtTo = filter.NextDueAtTo,
-            });
-
-        var reminders = await reminderRepository.GetAllAsync(
-            specification,
-            skip,
-            take,
-            cancellationToken);
-
-        return Result<IReadOnlyList<ReminderResponseDto>>.Success(
-            mapper.Map<IReadOnlyList<ReminderResponseDto>>(reminders));
     }
 
     public async Task<Result<ReminderResponseDto>> GetReminderByIdAsync(
         Guid reminderId,
         CancellationToken cancellationToken)
     {
-        var reminder = await reminderRepository.GetByIdAsync(reminderId, cancellationToken);
+        Reminder? reminder = await reminderRepository.GetByIdAsync(reminderId, cancellationToken);
 
         if (reminder is null ||
             reminder.UserId != userContext.UserId)
@@ -104,7 +74,7 @@ public class ReminderService(
         ReminderUpdateRequestDto request,
         CancellationToken cancellationToken)
     {
-        var reminder = await reminderRepository
+        Reminder? reminder = await reminderRepository
             .GetByIdAsync(reminderId, cancellationToken);
 
         if (reminder is null ||
@@ -117,7 +87,6 @@ public class ReminderService(
 
         reminder.UpdateSchedule(request.TaskName, request.IntervalDays);
 
-        await reminderRepository.UpdateAsync(reminder, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
@@ -127,7 +96,7 @@ public class ReminderService(
         Guid reminderId,
         CancellationToken cancellationToken)
     {
-        var reminder = await reminderRepository
+        Reminder? reminder = await reminderRepository
             .GetByIdAsync(reminderId, cancellationToken);
 
         if (reminder is null ||
@@ -140,7 +109,6 @@ public class ReminderService(
 
         reminder.CompleteTask();
 
-        await reminderRepository.UpdateAsync(reminder, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
@@ -150,7 +118,7 @@ public class ReminderService(
         Guid reminderId,
         CancellationToken cancellationToken)
     {
-        var reminder = await reminderRepository
+        Reminder? reminder = await reminderRepository
             .GetByIdAsync(reminderId, cancellationToken);
 
         if (reminder is null ||

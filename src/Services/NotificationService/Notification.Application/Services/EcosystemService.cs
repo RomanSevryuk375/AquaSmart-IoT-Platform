@@ -1,4 +1,4 @@
-﻿using Contracts.Events.EcosystemEvents;
+using Contracts.Events.EcosystemEvents;
 using Contracts.Results;
 using Notification.Application.Interfaces;
 using Notification.Domain.Entities;
@@ -15,7 +15,7 @@ public sealed class EcosystemService(
         EcosystemCreatedEvent ecosystemCreated,
         CancellationToken cancellationToken)
     {
-        var existingEcosystem = await ecosystemRepository
+        Ecosystem? existingEcosystem = await ecosystemRepository
             .GetByIdAsync(ecosystemCreated.EcosystemId, cancellationToken);
 
         if (existingEcosystem is not null)
@@ -23,7 +23,7 @@ public sealed class EcosystemService(
             return ConsumerResult.Success();
         }
 
-        var existingUser = await userRepository
+        bool existingUser = await userRepository
             .ExistsAsync(ecosystemCreated.UserId, cancellationToken);
 
         if (!existingUser)
@@ -32,19 +32,16 @@ public sealed class EcosystemService(
                 .RetryableError($"User {ecosystemCreated.UserId} not found. ");
         }
 
-        var (ecosystem, errors) = EcosystemEntity.Create(
+        Result<Ecosystem> ecosystemResult = Ecosystem.Create(
             ecosystemCreated.EcosystemId,
             ecosystemCreated.UserId,
-            ecosystemCreated.Name,
-            ecosystemCreated.OccurredOn);
-
-        if (ecosystem is null)
+            ecosystemCreated.Name);
+        if (ecosystemResult.IsFailure)
         {
-            return ConsumerResult
-                .FatalError($"Failed to create {nameof(EcosystemEntity)}: {string.Join(", ", errors)}");
+            return ConsumerResult.FatalError(ecosystemResult.Error.Message);
         }
 
-        await ecosystemRepository.AddAsync(ecosystem, cancellationToken);
+        await ecosystemRepository.AddAsync(ecosystemResult.Value, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ConsumerResult.Success();
@@ -54,12 +51,12 @@ public sealed class EcosystemService(
         EcosystemUdatedEvent ecosystemUpdated,
         CancellationToken cancellationToken)
     {
-        var existingEcosystem = await ecosystemRepository
+        Ecosystem? existingEcosystem = await ecosystemRepository
             .GetByIdAsync(ecosystemUpdated.EcosystemId, cancellationToken);
 
         if (existingEcosystem is null)
         {
-            var existingUser = await userRepository
+            bool existingUser = await userRepository
             .ExistsAsync(ecosystemUpdated.UserId, cancellationToken);
 
             if (!existingUser)
@@ -68,26 +65,22 @@ public sealed class EcosystemService(
                     .RetryableError($"User {ecosystemUpdated.UserId} not found. ");
             }
 
-            var (ecosystem, errors) = EcosystemEntity.Create(
+            Result<Ecosystem> ecosystemResult = Ecosystem.Create(
                 ecosystemUpdated.EcosystemId,
                 ecosystemUpdated.UserId,
-                ecosystemUpdated.Name,
-                ecosystemUpdated.CreatedAt);
-
-            if (ecosystem is null)
+                ecosystemUpdated.Name);
+            if (ecosystemResult.IsFailure)
             {
-                return ConsumerResult
-                    .FatalError($"Failed to create {nameof(EcosystemEntity)}: {string.Join(", ", errors)}");
+                return ConsumerResult.FatalError(ecosystemResult.Error.Message);
             }
 
-            await ecosystemRepository.AddAsync(ecosystem, cancellationToken);
+            await ecosystemRepository.AddAsync(ecosystemResult.Value, cancellationToken);
 
             return ConsumerResult.Success();
         }
 
         existingEcosystem.SetName(ecosystemUpdated.Name);
 
-        await ecosystemRepository.UpdateAsync(existingEcosystem, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ConsumerResult.Success();

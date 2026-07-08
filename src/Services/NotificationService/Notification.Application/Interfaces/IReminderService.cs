@@ -1,34 +1,28 @@
-﻿using Contracts.Results;
+using Contracts.Results;
 using Notification.Application.DTOs.Reminder;
 
 namespace Notification.Application.Interfaces;
 
 public interface IReminderService
 {
-    Task<Result<Guid>> AddReminderAsync(
-        ReminderRequestDto request, 
+    public Task<Result<Guid>> AddReminderAsync(
+        ReminderRequestDto request,
         CancellationToken cancellationToken);
 
-    Task<Result> DeleteReminderAsync(
+    public Task<Result> DeleteReminderAsync(
         Guid reminderId,
         CancellationToken cancellationToken);
 
-    Task<Result<IReadOnlyList<ReminderResponseDto>>> GetAllRemindersAsync(
-        ReminderFilterDto filter, 
-        int? skip, 
-        int? take, 
+    public Task<Result<ReminderResponseDto>> GetReminderByIdAsync(
+        Guid reminderId,
         CancellationToken cancellationToken);
 
-    Task<Result<ReminderResponseDto>> GetReminderByIdAsync(
-        Guid reminderId, 
+    public Task<Result> ReminderCompleteTaskAsync(
+        Guid reminderId,
         CancellationToken cancellationToken);
 
-    Task<Result> ReminderCompleteTaskAsync(
-        Guid reminderId, 
-        CancellationToken cancellationToken);
-
-    Task<Result> UpdateReminderAsync(
-        Guid reminderId, 
-        ReminderUpdateRequestDto request, 
+    public Task<Result> UpdateReminderAsync(
+        Guid reminderId,
+        ReminderUpdateRequestDto request,
         CancellationToken cancellationToken);
 }

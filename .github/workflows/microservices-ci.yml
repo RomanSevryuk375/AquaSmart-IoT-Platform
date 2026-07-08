@@ -20,7 +20,7 @@ jobs:
           - ControlService
           # - TelemetryService
           - IdentityService
-          # - NotificationService
+          - NotificationService
 
     steps:
     - name: Checkout code

@@ -1,11 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
 
 namespace Notification.Infrastructure.Repositories;
 
 public sealed class UserRepository(SystemDbContext dbContext)
-    : BaseRepository<UserEntity>(dbContext), IUserRepository
+    : BaseRepository<User>(dbContext), IUserRepository
 {
     public async Task<bool> ExistsAsync(
         Guid userId, 
@@ -16,7 +16,7 @@ public sealed class UserRepository(SystemDbContext dbContext)
             .AnyAsync(x => x.Id == userId, cancellationToken);
     }
 
-    public async Task<List<UserEntity>> GetAllUsersByIdAsync(
+    public async Task<List<User>> GetAllUsersByIdAsync(
         List<Guid> userIds,
         CancellationToken cancellationToken)
     {

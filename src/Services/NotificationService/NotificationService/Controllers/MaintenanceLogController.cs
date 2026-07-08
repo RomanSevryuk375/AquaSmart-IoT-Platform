@@ -1,4 +1,4 @@
-﻿using Contracts.Authorization;
+using Contracts.Authorization;
 using Contracts.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,26 +13,13 @@ public class MaintenanceLogsController(IMaintenanceLogService logService) : Cont
 {
     private const string GetByIdRouteName = "GetLogById";
 
-    [HttpGet]
-    [Authorize(Policy = SubPermissions.MaintenanceLogRead)]
-    public async Task<ActionResult<IReadOnlyList<MaintenanceLogResponseDto>>> GetAllLogsAsync(
-        [FromQuery] MaintenanceLogFilterDto filter,
-        [FromQuery] int? skip = 0,
-        [FromQuery] int? take = 10,
-        CancellationToken cancellationToken = default)
-    {
-        var result = await logService.GetAllLogs(filter, skip, take, cancellationToken);
-
-        return this.ToActionResult(result);
-    }
-
     [HttpGet("{id:guid}", Name = GetByIdRouteName)]
     [Authorize(Policy = SubPermissions.MaintenanceLogRead)]
     public async Task<ActionResult<MaintenanceLogResponseDto>> GetLogByIdAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
-        var result = await logService.GetLogById(id, cancellationToken);
+        Result<MaintenanceLogResponseDto> result = await logService.GetLogById(id, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -43,7 +30,7 @@ public class MaintenanceLogsController(IMaintenanceLogService logService) : Cont
         [FromBody] MaintenanceLogRequestDto request,
         CancellationToken cancellationToken = default)
     {
-        var result = await logService.AddLogAsync(request, cancellationToken);
+        Result<Guid> result = await logService.AddLogAsync(request, cancellationToken);
 
         if (result.IsFailure)
         {
