@@ -7,5 +7,5 @@ public interface IReminderRepository : IRepository<Reminder>
 {
     public Task<IReadOnlyList<Reminder>> GetPendingRemindersAsync(
         DateTime now,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

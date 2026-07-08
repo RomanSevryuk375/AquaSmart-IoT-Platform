@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Notification.Domain.Entities;
 
-namespace Notification.Infrastructure;
+namespace Notification.Infrastructure.Persistence;
 
-public class SystemDbContext(DbContextOptions<SystemDbContext> options) : DbContext(options)
+public sealed class NotificationDbContext(DbContextOptions<NotificationDbContext> options) : DbContext(options)
 {
     public DbSet<Ecosystem> Aquariums { get; set; }
     public DbSet<MaintenanceLog> MaintenanceLogs { get; set; }
@@ -12,6 +12,7 @@ public class SystemDbContext(DbContextOptions<SystemDbContext> options) : DbCont
     public DbSet<User> Users { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(SystemDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(NotificationDbContext).Assembly);
     }
 }

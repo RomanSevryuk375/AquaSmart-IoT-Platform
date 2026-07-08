@@ -2,14 +2,14 @@ using Microsoft.EntityFrameworkCore;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
 
-namespace Notification.Infrastructure.Repositories;
+namespace Notification.Infrastructure.Persistence.Repositories;
 
-public sealed class EcosystemRepository(SystemDbContext dbContext)
+public sealed class EcosystemRepository(NotificationDbContext dbContext)
     : BaseRepository<Ecosystem>(dbContext), IEcosystemRepository
 {
     public async Task<bool> ExistsAsync
         (Guid ecosystemId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         return await Context.Aquariums
             .AsNoTracking()
@@ -17,8 +17,8 @@ public sealed class EcosystemRepository(SystemDbContext dbContext)
     }
 
     public async Task<Ecosystem?> GetByUserIdAsync(
-        Guid userId, 
-        CancellationToken cancellationToken)
+        Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await Context.Aquariums
             .AsNoTracking()

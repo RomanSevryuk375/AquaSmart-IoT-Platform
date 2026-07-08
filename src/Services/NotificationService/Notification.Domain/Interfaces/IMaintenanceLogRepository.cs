@@ -3,6 +3,4 @@ using Notification.Domain.Entities;
 
 namespace Notification.Domain.Interfaces;
 
-public interface IMaintenanceLogRepository : IRepository<MaintenanceLog>
-{
-}
+public interface IMaintenanceLogRepository : IRepository<MaintenanceLog>;

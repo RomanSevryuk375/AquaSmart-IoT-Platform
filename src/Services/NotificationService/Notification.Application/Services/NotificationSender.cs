@@ -1,3 +1,4 @@
+using Contracts.Results;
 using Notification.Application.Interfaces;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
@@ -7,7 +8,6 @@ namespace Notification.Application.Services;
 public class NotificationSender(
     IEnumerable<INotificationProvider> providers,
     IUserRepository userRepository,
-    INotificationRepository notificationRepository,
     IUnitOfWork unitOfWork) : INotificationSender
 {
     public async Task ProcessSingleNotificationAsync(
@@ -29,16 +29,16 @@ public class NotificationSender(
         {
             if (provider.IsEnabled(user))
             {
-                (bool success, string? error) = await provider
+                Result result = await provider
                     .SendAsync(user, notification.Message.Value, cancellationToken);
 
-                if (success)
+                if (result.IsSuccess)
                 {
                     overallSuccess = true;
                 }
                 else
                 {
-                    errors.Add(error);
+                    errors.Add(result.Error.Message);
                 }
             }
         }

@@ -7,9 +7,9 @@ public interface IUserRepository : IRepository<User>
 {
     public Task<bool> ExistsAsync(
         Guid userId,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 
     public Task<List<User>> GetAllUsersByIdAsync(
         List<Guid> userIds,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

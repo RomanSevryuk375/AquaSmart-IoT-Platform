@@ -7,9 +7,8 @@ namespace Notification.API.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddHttpContextAccessor();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options =>
         {
@@ -39,15 +38,10 @@ public static class DependencyInjection
             });
         });
         services.AddControllers();
-
-        services.AddCommonAuthentication(configuration);
-        services.AddServices();
-
-        services.AddRepositories(configuration);
-        services.AddQuartzJobs();
-        services.AddRabbitMq(configuration);
-
         services.AddAquaAuthorizationPolicies();
+        services.AddCommonAuthentication(configuration);
+        services.AddServices()
+                .AddInfrastructure(configuration);
 
         return services;
     }

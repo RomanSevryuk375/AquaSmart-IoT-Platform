@@ -2,13 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
 
-namespace Notification.Infrastructure.Repositories;
+namespace Notification.Infrastructure.Persistence.Repositories;
 
-public sealed class UserRepository(SystemDbContext dbContext)
+public sealed class UserRepository(NotificationDbContext dbContext)
     : BaseRepository<User>(dbContext), IUserRepository
 {
     public async Task<bool> ExistsAsync(
-        Guid userId, 
+        Guid userId,
         CancellationToken cancellationToken)
     {
         return await Context.Users

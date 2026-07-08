@@ -48,5 +48,6 @@ public sealed class UnitOfWork(ControlDbContext dbContext) : IUnitOfWork
         }
     }
 
-    public async Task SaveChangesAsync(CancellationToken cancellationToken) => await dbContext.SaveChangesAsync(cancellationToken);
+    public async Task SaveChangesAsync(CancellationToken cancellationToken) =>
+        await dbContext.SaveChangesAsync(cancellationToken);
 }

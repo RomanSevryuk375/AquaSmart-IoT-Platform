@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notification.Domain.Entities;
 using Notification.Domain.ValueObjects;
 
-namespace Notification.Infrastructure.Configurations;
+namespace Notification.Infrastructure.Persistence.Configurations;
 
 public sealed class EcosystemConfiguration : IEntityTypeConfiguration<Ecosystem>
 {

@@ -310,7 +310,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 
-      - ConnectionStrings__SystemDbContext=Host=notification-db;Database=notification_db;Username=postgres;Password=password
+      - ConnectionStrings__NotificationDbContext=Host=notification-db;Database=notification_db;Username=postgres;Password=password
       - RabbitMqOptions__Host=amqp://rabbitmq:5672
       - RabbitMqOptions__UserName=guest
       - RabbitMqOptions__Password=guest

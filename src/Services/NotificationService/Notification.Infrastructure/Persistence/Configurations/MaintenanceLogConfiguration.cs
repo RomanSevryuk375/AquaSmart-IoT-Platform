@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notification.Domain.Entities;
 
-namespace Notification.Infrastructure.Configurations;
+namespace Notification.Infrastructure.Persistence.Configurations;
 
 public sealed class MaintenanceLogConfiguration : IEntityTypeConfiguration<MaintenanceLog>
 {

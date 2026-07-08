@@ -7,9 +7,9 @@ public interface IEcosystemRepository : IRepository<Ecosystem>
 {
     public Task<bool> ExistsAsync(
         Guid ecosystemId,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 
     public Task<Ecosystem?> GetByUserIdAsync(
         Guid userId,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

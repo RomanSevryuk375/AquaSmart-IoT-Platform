@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notification.Domain.ValueObjects;
 
-namespace Notification.Infrastructure.Configurations;
+namespace Notification.Infrastructure.Persistence.Configurations;
 
 public sealed class NotificationConfiguration : IEntityTypeConfiguration<Domain.Entities.Notification>
 {
