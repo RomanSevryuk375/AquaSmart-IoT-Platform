@@ -1,14 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-  </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="MassTransit" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MassTransit" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Notification.Domain\Notification.Domain.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Notification.Domain\Notification.Domain.csproj" />
+    </ItemGroup>
 
 </Project>
