@@ -11,4 +11,8 @@
         <ProjectReference Include="..\Telemetry.Domain\Telemetry.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="Telemetry.Application.UnitTests" />
+    </ItemGroup>
+
 </Project>

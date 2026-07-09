@@ -21,3 +21,6 @@ app.MapControllers();
 app.MapHub<TelemetryHub>(SignalRRoutes.RawTelemetry);
 
 await app.RunAsync();
+
+public partial class Program { }
+
