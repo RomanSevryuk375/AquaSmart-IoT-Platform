@@ -1,19 +1,19 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Control.Domain.Entities;
 
 namespace Control.Domain.Interfaces;
 
-public interface IRelayRepository : IRepository<RelayEntity>
+public interface IRelayRepository : IRepository<Relay>
 {
-    Task<bool> ExistsAsync(
-        Guid relayId, 
-        CancellationToken cancellationToken);
+    public Task<bool> ExistsAsync(
+        Guid relayId,
+        CancellationToken cancellationToken = default);
 
-    Task<RelayEntity?> GetByPowerSensorId(
+    public Task<Relay?> GetByPowerSensorId(
         Guid powerSensorId,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<RelayEntity>> GetManyByIds(
+    public Task<IReadOnlyList<Relay>> GetManyByIds(
         IEnumerable<Guid> relayIds,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

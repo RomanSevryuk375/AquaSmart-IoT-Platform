@@ -1,29 +1,25 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 
 namespace Notification.Domain.Factories;
 
 public static class ReminderImportanceFactory
 {
-    public static NotificationLevelEnum Evaluate (DateTime nextDueAt)
+    private const int InfoThreshold = 24;
+    private const int WarningThreshold = 0;
+    private const int CriticalThreshold = -24;
+
+    public static NotificationLevel Evaluate(DateTime nextDueAt)
     {
-        var now = DateTime.UtcNow;
-        var timeDiff = nextDueAt - now;
+        DateTime now = DateTime.UtcNow;
+        TimeSpan timeDiff = nextDueAt - now;
 
-        if (timeDiff.Hours < 24)
+        return timeDiff.TotalHours switch
         {
-            return NotificationLevelEnum.Info;
-        }
+            <= CriticalThreshold => NotificationLevel.Critical,
+            <= WarningThreshold => NotificationLevel.Warning,
+            < InfoThreshold => NotificationLevel.Info,
 
-        if (timeDiff.Hours <= 0)
-        {
-            return NotificationLevelEnum.Warning;
-        }
-
-        if (timeDiff.Hours <= -24)
-        {
-            return NotificationLevelEnum.Critical;
-        }
-
-        return NotificationLevelEnum.Info;
+            _ => NotificationLevel.Info
+        };
     }
 }

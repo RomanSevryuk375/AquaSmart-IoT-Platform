@@ -1,6 +1,4 @@
-﻿using Contracts.Abstractions;
-
-namespace Device.Domain.DomainEvents.SensorEvents;
+namespace Device.Domain.Events.SensorEvents;
 
 public sealed record SensorDeletedDomainEvent : IDomainEvent
 {

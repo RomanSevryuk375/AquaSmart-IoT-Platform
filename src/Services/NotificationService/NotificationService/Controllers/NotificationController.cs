@@ -1,47 +1,76 @@
-﻿using Contracts.Results;
+using Contracts.Constants;
+using Contracts.Enums;
+using Contracts.Results;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Notification.Application.DTOs.Notification;
-using Notification.Application.Interfaces;
+using Notification.Application.Features.Notifications.Commands.MarkNotificationAsRead;
+using Notification.Application.Features.Notifications.Queries.GetAllNotifications;
+using Notification.Application.Features.Notifications.Queries.GetNotificationById;
+using Notification.Application.Features.Notifications.Queries.Shared;
+using Notification.Domain.Interfaces;
 
 namespace Notification.API.Controllers;
 
 [ApiController]
-[Authorize] 
-[Route("api/notification/v1/notifications")]
+[Authorize]
+[Route(ApiConstants.Routes.Notifications)]
 public class NotificationController(
-    INotificationService notificationService) : ControllerBase
+    ISender sender,
+    IUserContext userContext) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<NotificationResponseDto>>> GetAllNotificationsAsync(
-        [FromQuery] NotificationFilterDto filter,
-        [FromQuery] int? skip = 0,
-        [FromQuery] int? take = 10,
+    public async Task<ActionResult<IReadOnlyList<NotificationDto>>> GetAllNotificationsAsync(
+        [FromQuery] Guid? ecosystemId,
+        [FromQuery] NotificationLevel? level,
+        [FromQuery] bool? isRead,
+        [FromQuery] string? searchTerm,
+        [FromQuery] int skip = 0,
+        [FromQuery] int take = 10,
         CancellationToken cancellationToken = default)
     {
-        var result = await notificationService
-            .GetAllNotificationsAsync(filter, skip, take, cancellationToken);
+        var query = new GetAllNotificationsQuery
+        {
+            UserId = userContext.UserId,
+            EcosystemId = ecosystemId,
+            Level = level,
+            IsRead = isRead,
+            SearchTerm = searchTerm,
+            Skip = skip,
+            Take = take
+        };
 
+        Result<IReadOnlyList<NotificationDto>> result = await sender.Send(query, cancellationToken);
         return this.ToActionResult(result);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<NotificationResponseDto>> GetNotificationByIdAsync(
+    public async Task<ActionResult<NotificationDto>> GetNotificationByIdAsync(
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        var result = await notificationService.GetNotificationByIdAsync(id, cancellationToken);
+        var query = new GetNotificationByIdQuery
+        {
+            NotificationId = id,
+            UserId = userContext.UserId
+        };
 
+        Result<NotificationDto> result = await sender.Send(query, cancellationToken);
         return this.ToActionResult(result);
     }
 
-    [HttpPut("{id:guid}/read")] 
+    [HttpPut("{id:guid}/read")]
     public async Task<IActionResult> MarkNotificationAsReadAsync(
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        var result = await notificationService.MarkNotificationAsReadAsync(id, cancellationToken);
+        var command = new MarkNotificationAsReadCommand
+        {
+            NotificationId = id,
+            UserId = userContext.UserId
+        };
 
+        Result result = await sender.Send(command, cancellationToken);
         return this.ToActionResult(result);
     }
 }

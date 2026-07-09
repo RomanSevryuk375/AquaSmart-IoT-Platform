@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Telemetry.Infrastructure.IntegrationTests\Telemetry.Infrastructure.IntegrationTests.csproj" />
+    <ProjectReference Include="..\Telemetry.TestShared\Telemetry.TestShared.csproj" />
+    <ProjectReference Include="..\TelemetryService\Telemetry.API.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\Notification.Application\Notification.Application.csproj" />
+        <ProjectReference Include="..\Notification.Domain\Notification.Domain.csproj" />
+        <ProjectReference Include="..\Notification.Infrastructure\Notification.Infrastructure.csproj" />
+        <ProjectReference Include="..\NotificationService\Notification.API.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit" />
+    </ItemGroup>
+
+</Project>

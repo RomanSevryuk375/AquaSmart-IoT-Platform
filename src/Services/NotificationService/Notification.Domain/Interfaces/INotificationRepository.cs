@@ -1,10 +1,9 @@
-﻿using Contracts.Abstractions;
-using Notification.Domain.Entities;
+using Contracts.Abstractions;
 
 namespace Notification.Domain.Interfaces;
 
-public interface INotificationRepository : IRepository<NotificationEntity>
+public interface INotificationRepository : IRepository<Entities.Notification>
 {
-    Task<IReadOnlyList<NotificationEntity>> GetUnpublishedNotificationsAsync(
-        CancellationToken cancellationToken);
+    public Task<IReadOnlyList<Entities.Notification>> GetUnpublishedNotificationsAsync(
+        CancellationToken cancellationToken = default);
 }

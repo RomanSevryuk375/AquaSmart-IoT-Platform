@@ -1,25 +1,26 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Enums;
 using Telemetry.Domain.Entities;
+using Telemetry.Domain.ValueObjects;
 
 namespace Telemetry.Domain.Interfaces;
 
-public interface ITelemetryAggregateDataRepository : IRepository<TelemetryAggregateEntity>
+public interface ITelemetryAggregateDataRepository : IRepository<AggregateTelemetry>
 {
-    Task DeleteOldRawDataAsync(
-        PeriodTypeEnum period,
+    public Task DeleteOldRawDataAsync(
+        PeriodType period,
         DateTime olderThan,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<TelemetrySummary>> GetSummaryForPeriodAsync(
-        PeriodTypeEnum sourcePeriod,
+    public Task<IReadOnlyDictionary<Guid, TelemetrySummary>> GetSummaryForPeriodAsync(
+        PeriodType sourcePeriod,
         DateTime from,
         DateTime to,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 
-    Task MarkAsAggregatedAsync(
+    public Task MarkAsAggregatedAsync(
         List<Guid> sensorIds,
         DateTime from,
         DateTime to,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

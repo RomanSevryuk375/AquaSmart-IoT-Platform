@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Device.Infrastructure.IntegrationTests\Device.Infrastructure.IntegrationTests.csproj" />
+    <ProjectReference Include="..\Device.TestShared\Device.TestShared.csproj" />
+    <ProjectReference Include="..\DeviceService\Device.API.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

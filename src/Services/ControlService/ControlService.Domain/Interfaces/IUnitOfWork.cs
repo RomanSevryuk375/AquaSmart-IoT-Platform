@@ -1,12 +1,12 @@
-﻿namespace Control.Domain.Interfaces;
+namespace Control.Domain.Interfaces;
 
 public interface IUnitOfWork
 {
-    Task SaveChangesAsync(CancellationToken cancellationToken);
+    public Task SaveChangesAsync(CancellationToken cancellationToken = default);
 
-    Task BeginTransactionAsync(CancellationToken cancellationToken);
+    public Task BeginTransactionAsync(CancellationToken cancellationToken = default);
 
-    Task CommitTransactionAsync(CancellationToken cancellationToken);
+    public Task CommitTransactionAsync(CancellationToken cancellationToken = default);
 
-    Task RollbackTransactionAsync(CancellationToken cancellationToken);
+    public Task RollbackTransactionAsync(CancellationToken cancellationToken = default);
 }

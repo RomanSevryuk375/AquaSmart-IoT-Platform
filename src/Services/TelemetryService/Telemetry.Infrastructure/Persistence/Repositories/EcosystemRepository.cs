@@ -1,18 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Telemetry.Domain.Entities;
 using Telemetry.Domain.Interfaces;
 
 namespace Telemetry.Infrastructure.Persistence.Repositories;
 
-public sealed class EcosystemRepository(SystemDbContext dbContext) 
-    : BaseRepository<EcosystemEntity>(dbContext), IEcosystemRepository
+public sealed class EcosystemRepository(TelemetryDbContext dbContext)
+    : BaseRepository<Ecosystem>(dbContext), IEcosystemRepository
 {
-    public async Task<EcosystemEntity?> GetByControllerIdAsync(
+    public async Task<Ecosystem?> GetByControllerIdAsync(
         Guid controllerId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         return await Context.Ecosystems
-            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.ControllerId == controllerId, cancellationToken);
     }
 }

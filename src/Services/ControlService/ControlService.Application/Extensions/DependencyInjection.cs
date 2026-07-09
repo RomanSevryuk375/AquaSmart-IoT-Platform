@@ -1,6 +1,5 @@
-﻿using Control.Application.CQRS.Common.Behaviors;
-using Control.Application.Interfaces;
-using Control.Application.Services;
+using System.Reflection;
+using Control.Application.Behaviors;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,20 +8,19 @@ namespace Control.Application.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddServices(this IServiceCollection services)
+    public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        var assembly = typeof(DependencyInjection).Assembly;
+        Assembly assembly = typeof(DependencyInjection).Assembly;
 
-        services.AddScoped<IRelayService, RelayService>();
-        services.AddScoped<IScheduleProcessor, ScheduleProcessor>();
-        services.AddScoped<ISensorService, SensorService>();
-        services.AddScoped<ITelemetryService, TelemetryService>();
-
-        services.AddMediatR(cfg => 
-        { 
+        services.AddMediatR(cfg =>
+        {
             cfg.RegisterServicesFromAssembly(assembly);
 
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ConditionOwnsSensorBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(VacationModeSecurityBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ScheduleSecurityBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(EcosystemSecurityBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(AutomationRuleSecurityBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
@@ -30,8 +28,7 @@ public static class DependencyInjection
 
         services.AddValidatorsFromAssembly(assembly);
 
-        services.AddAutoMapper(config => 
-        config.AddMaps(assembly));
+        services.AddAutoMapper(cfg => cfg.AddMaps(assembly));
 
         return services;
     }

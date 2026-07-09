@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Control.TestShared\Control.TestShared.csproj" />
+    <ProjectReference Include="..\ControlService.Infrastructure\Control.Infrastructure.csproj" />
+    <ProjectReference Include="..\ControlService\Control.API.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

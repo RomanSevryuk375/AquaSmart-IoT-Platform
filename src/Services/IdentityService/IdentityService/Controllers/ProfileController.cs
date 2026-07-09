@@ -1,43 +1,62 @@
-﻿using Contracts.Authorization;
+using Contracts.Authorization;
+using Contracts.Constants;
+using Contracts.Results;
 using IdentityService.Application.DTOs;
-using IdentityService.Application.Interfaces;
+using IdentityService.Application.Features.Profile.Commands.ChangePassword;
+using IdentityService.Application.Features.Profile.Commands.UpdateProfile;
+using IdentityService.Application.Features.Profile.Queries.GetMyProfile;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityService.API.Controllers;
 
-[Authorize] 
+[Authorize]
 [ApiController]
-[Route("api/identity/v1/profile")] 
-public class ProfileController(IUserService userService) : ControllerBase
+[Route(ApiConstants.Routes.Profiles)]
+public class ProfileController(ISender sender) : ControllerBase
 {
     [HttpGet]
     [Authorize(Policy = SubPermissions.AccountView)]
-    public async Task<ActionResult<UserProfileResponseDto>> GetMyProfileAsync()
+    public async Task<ActionResult<UserProfileResponseDto>> GetMyProfileAsync(CancellationToken cancellationToken)
     {
-        var profile = await userService.GetProfileAsync();
+        var query = new GetMyProfileQuery();
+        Result<UserProfileResponseDto> result = await sender.Send(query, cancellationToken);
 
-        return Ok(profile);
+        return this.ToActionResult(result);
     }
 
     [HttpPut("me")]
     [Authorize(Policy = SubPermissions.AccountUpdate)]
     public async Task<ActionResult> UpdateMyProfileAsync(
         [FromBody] UpdateProfileRequestDto request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
-        await userService.UpdateProfileAsync(request, cancellationToken);
+        var command = new UpdateProfileCommand
+        {
+            Name = request.Name,
+            PhoneNumber = request.PhoneNumber ?? string.Empty
+        };
 
-        return NoContent();
+        Result result = await sender.Send(command, cancellationToken);
+
+        return this.ToActionResult(result);
     }
 
     [HttpPost("password")]
     [Authorize(Policy = SubPermissions.AccountUpdate)]
     public async Task<ActionResult> ChangePasswordAsync(
-        [FromBody] ChangePasswordRequestDto request)
+        [FromBody] ChangePasswordRequestDto request,
+        CancellationToken cancellationToken)
     {
-        await userService.ChangePasswordAsync(request);
+        var command = new ChangePasswordCommand
+        {
+            CurrentPassword = request.CurrentPassword,
+            NewPassword = request.NewPassword
+        };
 
-        return NoContent();
+        Result result = await sender.Send(command, cancellationToken);
+
+        return this.ToActionResult(result);
     }
 }

@@ -1,26 +1,27 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Telemetry.Domain.Entities;
+using Telemetry.Domain.ValueObjects;
 
 namespace Telemetry.Domain.Interfaces;
 
-public interface ITelemetryRawDataRepository : IRepository<TelemetryRawEntity>
+public interface ITelemetryRawDataRepository : IRepository<RawTelemetry>
 {
-    Task<TelemetryRawEntity?> GetByExternalMessageIdAsync(
-        string externalMessageId, 
-        CancellationToken cancellationToken);
+    public Task<RawTelemetry?> GetByExternalMessageIdAsync(
+        string externalMessageId,
+        CancellationToken cancellationToken = default);
 
-    Task DeleteOldRawDataAsync(
+    public Task DeleteOldRawDataAsync(
         DateTime olderThan,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<TelemetrySummary>> GetSummaryForPeriodAsync(
-        DateTime from,
-        DateTime to,
-        CancellationToken cancellationToken);
+    public Task<IReadOnlyDictionary<Guid, TelemetrySummary>> GetSummaryForPeriodAsync(
+            DateTime from,
+            DateTime to,
+            CancellationToken cancellationToken = default);
 
-    Task MarkAsAggregatedAsync(
+    public Task MarkAsAggregatedAsync(
         List<Guid> sensorIds,
         DateTime from,
         DateTime to,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

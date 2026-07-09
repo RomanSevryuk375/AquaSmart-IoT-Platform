@@ -1,20 +1,23 @@
-﻿using Contracts.Events.RelayEvents;
-using Control.Application.Interfaces;
+using AutoMapper;
+using Contracts.Events.RelayEvents;
+using Contracts.Results;
+using Control.Application.Features.Relays.Commands.SyncRelayDeleted;
 using MassTransit;
+using MediatR;
 
 namespace Control.Infrastructure.Messaging.Relay;
 
-internal sealed class RelayDeletedEventConsumer(IRelayService service) 
+internal sealed class RelayDeletedEventConsumer(ISender sender, IMapper mapper)
     : IConsumer<RelayDeletedEvent>
 {
     public async Task Consume(ConsumeContext<RelayDeletedEvent> context)
     {
-        var result = await service.DeletedRelayAsync(
-            context.Message, context.CancellationToken);
+        SyncRelayDeletedCommand command = mapper.Map<SyncRelayDeletedCommand>(context.Message);
 
-        if (!result.IsSuccess && result.IsRetryable)
+        Result result = await sender.Send(command, context.CancellationToken);
+        if (result.IsFailure)
         {
-            throw new Exception(result.Error);
+            throw new InvalidOperationException(result.Error.Message);
         }
     }
 }

@@ -1,6 +1,11 @@
+using Contracts.Constants;
 using Contracts.Results;
 using IdentityService.Application.DTOs;
-using IdentityService.Application.Interfaces;
+using IdentityService.Application.Features.Auth.Commands.Login;
+using IdentityService.Application.Features.Auth.Commands.Logout;
+using IdentityService.Application.Features.Auth.Commands.Refresh;
+using IdentityService.Application.Features.Auth.Commands.Register;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -8,16 +13,24 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 namespace IdentityService.API.Controllers;
 
 [ApiController]
-[Route("api/identity/v1/auth")]
-public class AuthController(IAuthService authService) : ControllerBase
+[Route(ApiConstants.Routes.Auth)]
+public class AuthController(ISender sender) : ControllerBase
 {
     [HttpPost("register")]
     public async Task<ActionResult<LoginResponseDto>> RegisterAsync(
         [FromBody] RegisterUserRequestDto request,
         CancellationToken cancellationToken)
     {
-        var result = await authService
-            .RegisterUserAsync(request, cancellationToken);
+        var command = new RegisterCommand
+        {
+            Email = request.Email,
+            PhoneNumber = request.PhoneNumber,
+            Name = request.Name,
+            Password = request.Password,
+            TimeZone = request.TimeZone
+        };
+
+        Result<LoginResponseDto> result = await sender.Send(command, cancellationToken);
 
         if (result.IsSuccess)
         {
@@ -32,8 +45,13 @@ public class AuthController(IAuthService authService) : ControllerBase
         [FromBody] LoginUserRequestDto request,
         CancellationToken cancellationToken)
     {
-        var result = await authService
-            .LoginAsync(request, cancellationToken);
+        var command = new LoginCommand
+        {
+            Email = request.Email,
+            Password = request.Password
+        };
+
+        Result<LoginResponseDto> result = await sender.Send(command, cancellationToken);
 
         if (result.IsSuccess)
         {
@@ -48,7 +66,8 @@ public class AuthController(IAuthService authService) : ControllerBase
         [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] RefreshTokenRequestDto? request,
         CancellationToken cancellationToken)
     {
-        var refreshToken = request?.RefreshToken;
+        string? refreshToken = request?.RefreshToken;
+
         if (string.IsNullOrWhiteSpace(refreshToken))
         {
             Request.Cookies.TryGetValue(
@@ -56,11 +75,12 @@ public class AuthController(IAuthService authService) : ControllerBase
                 out refreshToken);
         }
 
-        var result = await authService
-            .LoginWithRefreshTokenAsync(new RefreshTokenRequestDto
-            {
-                RefreshToken = refreshToken ?? string.Empty
-            }, cancellationToken);
+        var command = new RefreshCommand
+        {
+            RefreshToken = refreshToken ?? string.Empty
+        };
+
+        Result<LoginResponseDto> result = await sender.Send(command, cancellationToken);
 
         if (result.IsSuccess)
         {
@@ -74,16 +94,19 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("logout")]
     public async Task<ActionResult> LogoutAsync(CancellationToken cancellationToken)
     {
-        await authService.LogoutAsync(cancellationToken);
+        var command = new LogoutCommand();
+
+        Result result = await sender.Send(command, cancellationToken);
 
         Response.Cookies.Delete(
             Contracts.Authorization.Extensions.AccessTokenCookieName,
             CreateAccessTokenCookieOptions());
+
         Response.Cookies.Delete(
             Contracts.Authorization.Extensions.RefreshTokenCookieName,
             CreateRefreshTokenCookieOptions());
 
-        return NoContent();
+        return this.ToActionResult(result);
     }
 
     private void AppendAuthCookies(LoginResponseDto token)

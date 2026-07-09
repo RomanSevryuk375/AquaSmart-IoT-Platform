@@ -1,17 +1,25 @@
-using Contracts.Authorization;
-using Device.Application.Extesions;
-using Device.Infrastructure.Extensions;
 using Microsoft.OpenApi.Models;
 
 namespace Device.API.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddApi(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHttpContextAccessor();
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(options =>
+        services.AddMySwaggerGen();
+
+        services.AddCommonAuthentication(configuration);
+        services.AddAquaAuthorizationPolicies();
+        services.AddControllers();
+
+        return services;
+    }
+
+    public static IServiceCollection AddMySwaggerGen(this IServiceCollection services)
+    {
+        return services.AddSwaggerGen(options =>
         {
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
@@ -38,17 +46,5 @@ public static class DependencyInjection
                 }
             });
         });
-
-        services.AddCommonAuthentication(configuration);
-        services.AddControllers();
-
-        services.AddServices(configuration);
-        services.AddRepositories(configuration);
-        services.AddQuartzJobs();
-        services.AddRabbitMq(configuration);
-
-        services.AddAquaAuthorizationPolicies();
-
-        return services;
     }
 }

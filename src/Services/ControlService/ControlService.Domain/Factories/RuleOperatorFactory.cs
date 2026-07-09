@@ -1,4 +1,4 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 
 namespace Control.Domain.Factories;
 
@@ -6,8 +6,8 @@ public static class RuleOperatorFactory
 {
     public static bool? CalculateTargetState(
         List<bool?> results,
-        OperatorEnum @operator,
-        RuleActionEnum action)
+        Operator @operator,
+        RuleAction action)
     {
         if (results.Count == 0)
         {
@@ -16,10 +16,10 @@ public static class RuleOperatorFactory
 
         bool? isRuleTriggered = @operator switch
         {
-            OperatorEnum.AND => EvaluateAnd(results),
-            OperatorEnum.OR => EvaluateOr(results),
-            OperatorEnum.NOT => EvaluateNot(results),
-            OperatorEnum.XOR => EvaluateXor(results),
+            Operator.AND => EvaluateAnd(results),
+            Operator.OR => EvaluateOr(results),
+            Operator.NOT => EvaluateNot(results),
+            Operator.XOR => EvaluateXor(results),
 
             _ => throw new ArgumentOutOfRangeException(nameof(@operator))
         };
@@ -30,33 +30,33 @@ public static class RuleOperatorFactory
         }
 
         return isRuleTriggered.Value
-            ? (action == RuleActionEnum.SwitchOn)
-            : (action == RuleActionEnum.SwitchOff);
+            ? (action == RuleAction.SwitchOn)
+            : (action == RuleAction.SwitchOff);
     }
 
     private static bool? EvaluateAnd(List<bool?> results)
     {
-        if (results.Any(r => r == false))
+        if (results.Exists(r => r is false))
         {
-            return false; 
+            return false;
         }
 
-        if (results.All(r => r == true))
+        if (results.Exists(r => r is true))
         {
-            return true;  
+            return true;
         }
 
-        return null; 
+        return null;
     }
 
     private static bool? EvaluateOr(List<bool?> results)
     {
-        if (results.Any(r => r == true))
+        if (results.Exists(r => r is true))
         {
-            return true; 
+            return true;
         }
 
-        if (results.All(r => r == false))
+        if (results.Exists(r => r is false))
         {
             return false;
         }
@@ -66,8 +66,8 @@ public static class RuleOperatorFactory
 
     private static bool? EvaluateNot(List<bool?> results)
     {
-        var baseValue = results.First();
-        if (baseValue == null)
+        bool? baseValue = results[0];
+        if (baseValue is null)
         {
             return null;
         }
@@ -77,11 +77,11 @@ public static class RuleOperatorFactory
 
     private static bool? EvaluateXor(List<bool?> results)
     {
-        if (results.Any(r => r == null))
+        if (results.Exists(r => r is null))
         {
             return null;
         }
 
-        return results.Count(r => r == true) % 2 != 0;
+        return results.Count(r => r is true) % 2 != 0;
     }
 }

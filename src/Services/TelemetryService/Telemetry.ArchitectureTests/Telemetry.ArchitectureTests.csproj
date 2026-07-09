@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Telemetry.Application\Telemetry.Application.csproj" />
+    <ProjectReference Include="..\Telemetry.Domain\Telemetry.Domain.csproj" />
+    <ProjectReference Include="..\Telemetry.Infrastructure\Telemetry.Infrastructure.csproj" />
+    <ProjectReference Include="..\TelemetryService\Telemetry.API.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

@@ -1,11 +1,9 @@
-﻿using Control.Domain.Entities;
-using Control.Domain.Interfaces;
 using Control.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Control.Infrastructure.Persistence.Outbox;
 
-public sealed class OutboxRepository(SystemDbContext dbContext)
+public sealed class OutboxRepository(ControlDbContext dbContext)
     : BaseRepository<OutboxMessage>(dbContext), IOutboxRepository
 {
     public async Task<IReadOnlyList<OutboxMessage>> GetPendingMessagesAsync(

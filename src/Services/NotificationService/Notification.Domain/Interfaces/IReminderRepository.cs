@@ -1,11 +1,11 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Notification.Domain.Entities;
 
 namespace Notification.Domain.Interfaces;
 
-public interface IReminderRepository : IRepository<ReminderEntity>
+public interface IReminderRepository : IRepository<Reminder>
 {
-    Task<IReadOnlyList<ReminderEntity>> GetPendingRemindersAsync(
-        DateTime now, 
-        CancellationToken cancellationToken);
+    public Task<IReadOnlyList<Reminder>> GetPendingRemindersAsync(
+        DateTime now,
+        CancellationToken cancellationToken = default);
 }

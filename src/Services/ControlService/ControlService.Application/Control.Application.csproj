@@ -1,19 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-  </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Dapper" />
+        <PackageReference Include="Cronos" />
+        <PackageReference Include="MassTransit" />
+        <PackageReference Include="Newtonsoft.Json" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="16.1.1" />
-    <PackageReference Include="Cronos" Version="0.12.0" />
-    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
-    <PackageReference Include="MassTransit" Version="8.2.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Contracts\Contracts\Contracts.csproj" />
+        <ProjectReference Include="..\ControlService.Domain\Control.Domain.csproj" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Contracts\Contracts\Contracts.csproj" />
-    <ProjectReference Include="..\ControlService.Domain\Control.Domain.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Features\Schedules\Queries\GetAllSchedules\" />
+      <Folder Include="Features\Schedules\Queries\GetScheduleById\" />
+      <Folder Include="Features\Schedules\Queries\Shared\" />
+      <Folder Include="Features\VacationModes\Queries\GetAllVacationModes\" />
+      <Folder Include="Features\VacationModes\Queries\GetVacationModeById\" />
+      <Folder Include="Features\VacationModes\Queries\Shared\" />
+    </ItemGroup>
 
 </Project>

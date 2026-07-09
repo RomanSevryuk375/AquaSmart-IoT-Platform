@@ -1,4 +1,7 @@
-﻿using Contracts.Options;
+// Ignore Spelling: Mq
+
+using Contracts.Options;
+using Control.Application.Interfaces;
 using Control.Domain.Interfaces;
 using Control.Infrastructure.BackgroundJobs;
 using Control.Infrastructure.Messaging.Relay;
@@ -7,53 +10,69 @@ using Control.Infrastructure.Messaging.Telemetry;
 using Control.Infrastructure.Persistence;
 using Control.Infrastructure.Persistence.Interceptors;
 using Control.Infrastructure.Persistence.Outbox;
+using Control.Infrastructure.Factories;
 using Control.Infrastructure.Persistence.Repositories;
+using Control.Infrastructure.Services;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Quartz;
 
 namespace Control.Infrastructure.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddRepositories (this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        return services.AddRepositories(configuration)
+                       .AddRabbitMq(configuration)
+                       .AddQuartzJobs();
+    }
+
+    public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddSingleton<ConvertDomainEventsToOutboxMessagesInterceptor>();
+
         services.AddScoped<IAutomationRuleRepository, AutomationRuleRepository>();
         services.AddScoped<IEcosystemRepository, EcosystemRepository>();
         services.AddScoped<IOutboxRepository, OutboxRepository>();
         services.AddScoped<IRelayRepository, RelayRepository>();
-        services.AddScoped<IRuleConditionRepository, RuleConditionRepository>();
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
         services.AddScoped<ISensorRepository, SensorRepository>();
         services.AddScoped<IVacationModeRepository, VacationModeRepository>();
+        services.AddScoped<OutboxMessageProcessorService>();
 
-        var connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
+        services.AddSingleton<ICronValidator, CronValidator>();
+        services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
 
-        services.AddDbContext<SystemDbContext>((sp, options) =>
+        Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+        string? connectionString = configuration.GetConnectionString(nameof(ControlDbContext));
+        services.AddDbContext<ControlDbContext>((sp, options) =>
         {
-            var interceptor = sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
+            ConvertDomainEventsToOutboxMessagesInterceptor interceptor =
+            sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
 
             options.UseNpgsql(connectionString)
                    .UseSnakeCaseNamingConvention()
                    .AddInterceptors(interceptor);
         });
-
         services.AddHealthChecks().AddNpgSql(connectionString!);
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-        services.AddHttpContextAccessor();
         services.AddScoped<IUserContext, UserContext>();
+        services.AddHttpContextAccessor();
+
+        services.AddHostedService<DatabaseMigrationService>();
 
         return services;
     }
 
     public static IServiceCollection AddRabbitMq(this IServiceCollection services, IConfiguration configuration)
     {
-        var rabbitSection = configuration.GetSection(RabbitMqOptions.SectionName);
-        var rabbitOgtions = rabbitSection.Get<RabbitMqOptions>()
+        IConfigurationSection rabbitSection = configuration.GetSection(RabbitMqOptions.SectionName);
+        RabbitMqOptions rabbitOgtions = rabbitSection.Get<RabbitMqOptions>()
             ?? throw new InvalidOperationException("RabbitMQ configuration is missing.");
 
         services.Configure<RabbitMqOptions>(rabbitSection);
@@ -120,4 +139,17 @@ public static class DependencyInjection
 
         return services;
     }
+}
+
+internal sealed class DatabaseMigrationService(IServiceProvider serviceProvider) : IHostedService
+{
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        using IServiceScope scope = serviceProvider.CreateScope();
+        ControlDbContext context = scope.ServiceProvider.GetRequiredService<ControlDbContext>();
+
+        await context.Database.MigrateAsync(cancellationToken);
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

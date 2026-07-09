@@ -1,20 +1,23 @@
-﻿using Contracts.Events.RelayEvents;
-using Control.Application.Interfaces;
+using AutoMapper;
+using Contracts.Events.RelayEvents;
+using Contracts.Results;
+using Control.Application.Features.Relays.Commands.SyncRelayState;
 using MassTransit;
+using MediatR;
 
 namespace Control.Infrastructure.Messaging.Relay;
 
-internal sealed class RelayStateChangedComandConsumer(IRelayService service)
+internal sealed class RelayStateChangedComandConsumer(ISender sender, IMapper mapper)
     : IConsumer<ChangeRelayStateEvent>
 {
     public async Task Consume(ConsumeContext<ChangeRelayStateEvent> context)
     {
-        var result = await service.ChangedStateAsync(
-            context.Message, context.CancellationToken);
+        SyncRelayStateCommand command = mapper.Map<SyncRelayStateCommand>(context.Message);
 
-        if (!result.IsSuccess && result.IsRetryable)
+        Result result = await sender.Send(command, context.CancellationToken);
+        if (result.IsFailure)
         {
-            throw new Exception(result.Error);
+            throw new InvalidOperationException(result.Error.Message);
         }
     }
 }

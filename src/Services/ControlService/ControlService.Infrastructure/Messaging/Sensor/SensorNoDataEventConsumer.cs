@@ -1,20 +1,23 @@
-﻿using Contracts.Events.SensorEvents;
-using Control.Application.Interfaces;
+using AutoMapper;
+using Contracts.Events.SensorEvents;
+using Contracts.Results;
+using Control.Application.Features.Sensors.Commands.HandleSensorNoData;
 using MassTransit;
+using MediatR;
 
 namespace Control.Infrastructure.Messaging.Sensor;
 
-internal sealed class SensorNoDataEventConsumer(ISensorService service)
+internal sealed class SensorNoDataEventConsumer(ISender sender, IMapper mapper)
     : IConsumer<SensorNoDataEvent>
 {
     public async Task Consume(ConsumeContext<SensorNoDataEvent> context)
     {
-        var result = await service.HandleSensorNoDataEventAsync(
-            context.Message, context.CancellationToken);
+        HandleSensorNoDataCommand command = mapper.Map<HandleSensorNoDataCommand>(context.Message);
 
-        if (!result.IsSuccess && result.IsRetryable)
+        Result result = await sender.Send(command, context.CancellationToken);
+        if (result.IsFailure)
         {
-            throw new Exception(result.Error);
+            throw new InvalidOperationException(result.Error.Message);
         }
     }
 }

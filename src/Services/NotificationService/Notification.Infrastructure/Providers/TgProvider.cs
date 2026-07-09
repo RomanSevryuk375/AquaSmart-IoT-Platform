@@ -1,44 +1,49 @@
-﻿using Contracts.Options;
+// Ignore Spelling: Tg
+
+using Contracts.Options;
+using Contracts.Results;
 using Microsoft.Extensions.Options;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
 
 namespace Notification.Infrastructure.Providers;
 
-public class TgProvider(
+public sealed class TgProvider(
     HttpClient httpClient,
     IOptions<TelegramOptions> options) : INotificationProvider
 {
     private readonly TelegramOptions _settings = options.Value;
-    public bool IsEnabled(UserEntity user)
+
+    public bool IsEnabled(User user) => user.TgEnable && user.TelegramChatId.HasValue;
+
+    public async Task<Result> SendAsync(
+        User user,
+        string message,
+        CancellationToken cancellationToken = default)
     {
-        if (user.TgEnable && user.TelegramChatId.HasValue)
-        {
-            return true;
-        }
+        string token = _settings.BotToken;
+        string chatId = user.TelegramChatId!.Value.ToString();
 
-        return false;
-    }
-
-    public async Task<(bool Success, string Error)> SendAsync(
-        UserEntity user, 
-        string message, 
-        CancellationToken cancellationToken)
-    {
-        var token = _settings.BotToken;
-        var chatId = user.TelegramChatId!.Value.ToString();
-
-        var url = $"https://api.telegram.org/bot{token}/sendMessage" +
-                  $"?chat_id={chatId}&text={Uri.EscapeDataString(message)}";
+        string url = $"https://api.telegram.org/bot{token}/sendMessage" +
+                     $"?chat_id={chatId}&text={Uri.EscapeDataString(message)}";
 
         try
         {
-            var response = await httpClient.GetAsync(url, cancellationToken);
-            return (response.IsSuccessStatusCode, "Ok");
+            using HttpResponseMessage response = await httpClient.GetAsync(url, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                string errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                return Result.Failure(Error.Failure<TgProvider>(
+                    $"Telegram API Error: {response.StatusCode}. Details: {errorContent}"));
+            }
+
+            return Result.Success();
         }
         catch (Exception ex)
         {
-            return (false, $"{ex.Message} {ex.StackTrace}");
+            return Result.Failure(Error.Failure<TgProvider>(
+                $"{ex.Message} {ex.StackTrace}"));
         }
     }
 }

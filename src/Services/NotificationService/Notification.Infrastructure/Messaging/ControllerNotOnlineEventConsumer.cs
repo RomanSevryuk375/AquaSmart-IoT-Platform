@@ -1,20 +1,23 @@
-﻿using Contracts.Events.ControllerEvents;
+using AutoMapper;
+using Contracts.Events.ControllerEvents;
+using Contracts.Results;
 using MassTransit;
-using Notification.Application.Interfaces;
+using MediatR;
+using Notification.Application.Features.Alerts.Commands.SendControllerOfflineAlert;
 
 namespace Notification.Infrastructure.Messaging;
 
-public sealed class ControllerNotOnlineEventConsumer(
-    IControllerAlertSender alertSender) : IConsumer<ControllerNotOnlineEvent>
+public sealed class ControllerNotOnlineEventConsumer(ISender sender, IMapper mapper)
+    : IConsumer<ControllerNotOnlineEvent>
 {
     public async Task Consume(ConsumeContext<ControllerNotOnlineEvent> context)
     {
-        var result = await alertSender.SendControllerNotOnlineAlert(
-            context.Message, context.CancellationToken);
+        SendControllerOfflineAlertCommand command = mapper.Map<SendControllerOfflineAlertCommand>(context.Message);
 
-        if (!result.IsSuccess && result.IsRetryable)
+        Result result = await sender.Send(command, context.CancellationToken);
+        if (result.IsFailure)
         {
-            throw new Exception(result.Error);
+            throw new InvalidOperationException(result.Error.Message);
         }
     }
 }

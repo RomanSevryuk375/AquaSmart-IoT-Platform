@@ -1,7 +1,7 @@
-﻿namespace Contracts.Abstractions;
+namespace Contracts.Abstractions;
 
 public interface IEntity
 {
-    Guid Id { get; }
-    DateTime CreatedAt { get; }
+    public Guid Id { get; }
+    public DateTime CreatedAt { get; }
 }

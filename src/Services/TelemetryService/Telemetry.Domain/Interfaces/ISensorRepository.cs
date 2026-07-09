@@ -1,19 +1,23 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Telemetry.Domain.Entities;
 
 namespace Telemetry.Domain.Interfaces;
 
-public interface ISensorRepository : IRepository<SensorEntity>
+public interface ISensorRepository : IRepository<Sensor>
 {
-    Task<bool> ExistsAsync(
-        Guid sensorId, 
-        CancellationToken cancellationToken);
+    public Task<bool> ExistsAsync(
+        Guid sensorId,
+        CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<SensorEntity>> GetAllByEcosystemId(
+    public Task<IReadOnlyList<Sensor>> GetAllByEcosystemId(
         Guid ecosystemId,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<SensorEntity>> GetManyByIdsAsync(
+    public Task<IReadOnlyList<Sensor>> GetManyByIdsAsync(
         List<Guid> sensorIds,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
+
+    public Task<IReadOnlyList<Sensor>> GetDelayedSensors(
+        DateTime offlineThreshold,
+        CancellationToken cancellationToken = default);
 }

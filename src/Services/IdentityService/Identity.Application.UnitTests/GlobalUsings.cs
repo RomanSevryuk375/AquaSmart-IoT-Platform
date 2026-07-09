@@ -1,0 +1,9 @@
+global using Contracts.Results;
+global using FluentAssertions;
+global using Identity.TestShared.Builders;
+global using IdentityService.Application.Interfaces;
+global using IdentityService.Domain.Entities;
+global using IdentityService.Domain.Interfaces;
+global using IdentityService.Infrastructure.Repositories;
+global using MediatR;
+global using NSubstitute;

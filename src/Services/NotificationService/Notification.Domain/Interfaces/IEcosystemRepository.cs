@@ -1,15 +1,15 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Notification.Domain.Entities;
 
 namespace Notification.Domain.Interfaces;
 
-public interface IEcosystemRepository : IRepository<EcosystemEntity>
+public interface IEcosystemRepository : IRepository<Ecosystem>
 {
-    Task<bool> ExistsAsync(
-        Guid ecosystemId, 
-        CancellationToken cancellationToken);
+    public Task<bool> ExistsAsync(
+        Guid ecosystemId,
+        CancellationToken cancellationToken = default);
 
-    Task<EcosystemEntity?> GetByUserIdAsync(
-        Guid userId, 
-        CancellationToken cancellationToken);
+    public Task<Ecosystem?> GetByUserIdAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default);
 }

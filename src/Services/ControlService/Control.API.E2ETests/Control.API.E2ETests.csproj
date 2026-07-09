@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Control.Infrastructure.IntegrationTests\Control.Infrastructure.IntegrationTests.csproj" />
+    <ProjectReference Include="..\Control.TestShared\Control.TestShared.csproj" />
+    <ProjectReference Include="..\ControlService\Control.API.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

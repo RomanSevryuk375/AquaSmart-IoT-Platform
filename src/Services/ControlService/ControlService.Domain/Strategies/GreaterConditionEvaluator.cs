@@ -1,4 +1,4 @@
-﻿using Control.Domain.Interfaces;
+using Control.Domain.Interfaces;
 
 namespace Control.Domain.Strategies;
 

@@ -1,7 +1,8 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Newtonsoft.Json;
-using Telemetry.Domain.Entities;
+using Telemetry.Infrastructure.Persistence.Outbox;
 
 namespace Telemetry.Infrastructure.Persistence.Interceptors;
 
@@ -12,7 +13,7 @@ public sealed class ConvertDomainEventsToOutboxMessagesInterceptor : SaveChanges
         InterceptionResult<int> result,
         CancellationToken cancellationToken = default)
     {
-        var dbContext = eventData.Context;
+        DbContext? dbContext = eventData.Context;
 
         if (dbContext is null)
         {

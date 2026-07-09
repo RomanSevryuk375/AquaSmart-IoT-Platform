@@ -1,15 +1,15 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Control.Domain.Entities;
 
 namespace Control.Domain.Interfaces;
 
-public interface ISensorRepository : IRepository<SensorEntity>
+public interface ISensorRepository : IRepository<Sensor>
 {
-    Task<bool> ExistsAsync(
-        Guid id, 
-        CancellationToken cancellationToken);
+    public Task<bool> ExistsAsync(
+        Guid sensorId,
+        CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<SensorEntity>> GetManyByIdsAsync(
+    public Task<IReadOnlyList<Sensor>> GetManyByIdsAsync(
         IEnumerable<Guid> sensorIds,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

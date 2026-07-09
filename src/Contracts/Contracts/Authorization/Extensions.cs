@@ -1,9 +1,10 @@
-﻿using Contracts.Options;
+using System.Text;
+using Contracts.Constants;
+using Contracts.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 namespace Contracts.Authorization;
 
@@ -119,20 +120,17 @@ public static class Extensions
         return services;
     }
 
-    public static IServiceCollection AddCommonAuthentication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddCommonAuthentication(
+        this IServiceCollection services, IConfiguration configuration)
     {
-        var jwtOptions = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
-
+        JwtOptions? jwtOptions = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
         if (jwtOptions is null || string.IsNullOrWhiteSpace(jwtOptions.SecretKey))
         {
-            throw new InvalidOperationException("JWT configuration missing or invalid.");
+            throw new InvalidOperationException(DiErrors.JwtConfiguration);
         }
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                ConfigureJwtBearer(options, jwtOptions);
-            });
+            .AddJwtBearer(options => { ConfigureJwtBearer(options, jwtOptions); });
 
         return services;
     }
@@ -156,7 +154,7 @@ public static class Extensions
             OnMessageReceived = context =>
             {
                 if (string.IsNullOrWhiteSpace(context.Token) &&
-                    context.Request.Cookies.TryGetValue(AccessTokenCookieName, out var token))
+                    context.Request.Cookies.TryGetValue(AccessTokenCookieName, out string? token))
                 {
                     context.Token = token;
                 }

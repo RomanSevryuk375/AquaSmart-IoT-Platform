@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Contracts.Events.TelemetryEvents;
 using Telemetry.Application.DTOs;
 using Telemetry.Domain.Entities;
@@ -9,7 +9,7 @@ public sealed class TelemetryRawProfile : Profile
 {
     public TelemetryRawProfile()
     {
-        CreateMap<TelemetryRawEntity, TelemetryRawChartPointDto>();
+        CreateMap<RawTelemetry, TelemetryRawChartPointDto>();
 
         CreateMap<TelemetryBatchEventItem, TelemetryReceivedEvent>();
 

@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using Control.Application.CQRS.AutomationRule.Queries;
+using AutoMapper;
+using Control.Application.Features.AutomationRules.Queries;
 using Control.Domain.Entities;
 
 namespace Control.Application.MapProfiles;
@@ -8,10 +8,10 @@ public sealed class AutomationRuleProfile : Profile
 {
     public AutomationRuleProfile()
     {
-        CreateMap<AutomationRuleEntity, AutomationRuleDto>();
+        CreateMap<AutomationRule, AutomationRuleDto>();
 
-        CreateMap<AutomationRuleEntity, AutomationRuleDto>()
-            .ForMember(dest => dest.Conditions, 
+        CreateMap<AutomationRule, AutomationRuleDto>()
+            .ForMember(dest => dest.Conditions,
             opt => opt.MapFrom(src => src.Conditions));
     }
 }

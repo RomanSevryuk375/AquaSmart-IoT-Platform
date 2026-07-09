@@ -1,0 +1,13 @@
+global using Contracts.Constants;
+global using Contracts.Enums;
+global using Contracts.Results;
+global using Device.Domain.Entities;
+global using Device.Domain.Entities.Sensors;
+global using Device.Domain.Events.ControllerEvents;
+global using Device.Domain.Events.RelayEvents;
+global using Device.Domain.Events.SensorEvents;
+global using Device.Domain.Factories;
+global using Device.Domain.ValueObjects;
+global using Device.TestShared.Builders;
+global using Device.TestShared.Constants;
+global using FluentAssertions;

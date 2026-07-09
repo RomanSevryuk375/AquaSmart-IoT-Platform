@@ -1,19 +1,23 @@
-﻿using MassTransit;
-using Telemetry.Application.Interfaces;
+using AutoMapper;
+using Contracts.Events.EcosystemEvents;
+using Contracts.Results;
+using MassTransit;
+using MediatR;
+using Telemetry.Application.Features.Ecosystems.Commands.SyncEcosystemCreated;
 
 namespace Telemetry.Infrastructure.Messaging.EcosystemConsumers;
 
-public sealed class EcosystemCreatedConsumer(
-    IEcosystemService service) : IConsumer<Contracts.Events.EcosystemEvents.EcosystemCreatedEvent>
+public sealed class EcosystemCreatedConsumer(ISender sender, IMapper mapper)
+    : IConsumer<EcosystemCreatedEvent>
 {
-    public async Task Consume(ConsumeContext<Contracts.Events.EcosystemEvents.EcosystemCreatedEvent> context)
+    public async Task Consume(ConsumeContext<EcosystemCreatedEvent> context)
     {
-        var result = await service.CreateEcosystemAsync(
-            context.Message, context.CancellationToken);
+        SyncEcosystemCreatedCommand command = mapper.Map<SyncEcosystemCreatedCommand>(context.Message);
 
-        if (!result.IsSuccess && result.IsRetryable) 
+        Result result = await sender.Send(command, context.CancellationToken);
+        if (result.IsFailure)
         {
-            throw new Exception(result.Error);
+            throw new InvalidOperationException(result.Error.Message);
         }
     }
 }

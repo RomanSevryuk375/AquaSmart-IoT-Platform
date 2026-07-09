@@ -1,27 +1,21 @@
-﻿using Device.Domain.Entities;
-using Device.Domain.Interfaces;
-using Microsoft.EntityFrameworkCore;
-
 namespace Device.Infrastructure.Persistence.Repositories;
 
-public sealed class SensorRepository(SystemDbContext dbContext)
-    : BaseRepository<SensorEntity>(dbContext), ISensorRepository
+public sealed class SensorRepository(DeviceDbContext dbContext)
+    : BaseRepository<Sensor>(dbContext), ISensorRepository
 {
     public async Task<bool> ExistsAsync(
-        Guid sensorId, 
-        CancellationToken cancellationToken)
+        Guid sensorId,
+        CancellationToken cancellationToken = default)
     {
         return await Context.Sensors
-            .AsNoTracking()
             .AnyAsync(x => x.Id == sensorId, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<SensorEntity>> GetAllSensorsAsync(
+    public async Task<IReadOnlyList<Sensor>> GetAllSensorsAsync(
         Guid controllerId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         return await Context.Sensors
-            .AsNoTracking()
             .Where(x => x.ControllerId == controllerId)
             .ToListAsync(cancellationToken);
     }

@@ -1,4 +1,4 @@
-﻿namespace Contracts.Authorization;
+namespace Contracts.Authorization;
 
 public static class SubPermissions
 {
@@ -9,7 +9,7 @@ public static class SubPermissions
     public const string TankDelete = "tank:delete";
 
     // Лимиты (для проверки в ControlService)
-    public const string TankLimit1 = "tank:limit:1";   
+    public const string TankLimit1 = "tank:limit:1";
     public const string TankLimit10 = "tank:limit:10";
     public const string TankLimitUnlimited = "tank:limit:unlim";
 

@@ -1,30 +1,52 @@
 using Contracts.Middlewares;
 using Device.API.Extensions;
-using Device.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
+using Device.Application.Extesions;
+using Device.Infrastructure.Extensions;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-builder.Services.AddInfrastructure(builder.Configuration);
-
-
-var app = builder.Build();
-
-app.UseGlobalExceptionHandler();
-
-using (var scope = app.Services.CreateScope())
+try
 {
-    var context = scope.ServiceProvider.GetRequiredService<SystemDbContext>();
-    context.Database.Migrate();
+    Log.Information("Starting DeviceService application");
+
+    WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+    builder.AddElkLogging()
+        .Services
+            .AddInfrastructure(builder.Configuration)
+            .AddApplication(builder.Configuration)
+            .AddApi(builder.Configuration);
+
+    WebApplication app = builder.Build();
+
+    app.UseGlobalExceptionHandler();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.MapHealthChecks(ApiConstants.HealthRoute);
+    app.MapControllers();
+
+    await app.RunAsync();
+}
+#pragma warning disable S2139
+catch (Exception ex) when (ex is not HostAbortedException)
+{
+    Log.Fatal(ex, "ControlService terminated unexpectedly");
+    throw;
+}
+#pragma warning restore S2139
+finally
+{
+#pragma warning disable S6966 
+    Log.CloseAndFlush();
+#pragma warning restore S6966 
 }
 
-app.UseSwagger();
-app.UseSwaggerUI();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapHealthChecks("/health");
-app.MapControllers();
-
-app.Run();
+#pragma warning disable S1118 
+public partial class Program { }
+#pragma warning restore S1118 

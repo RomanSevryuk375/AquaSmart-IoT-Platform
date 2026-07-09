@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Identity.Infrastructure.IntegrationTests\Identity.Infrastructure.IntegrationTests.csproj" />
+    <ProjectReference Include="..\Identity.TestShared\Identity.TestShared.csproj" />
+    <ProjectReference Include="..\IdentityService\IdentityService.API.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

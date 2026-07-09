@@ -1,77 +1,100 @@
-﻿using Contracts.Authorization;
-using Contracts.Results;
-using Device.Application.DTOs.RelayCommands;
-using Device.Application.Interfaces;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Device.Application.Features.RelayCommands.Command.MarkAsCompleted;
+using Device.Application.Features.RelayCommands.Command.MarkAsFailed;
+using Device.Application.Features.RelayCommands.Command.ToggleRelayMode;
+using Device.Application.Features.RelayCommands.Command.ToggleRelayState;
+using Device.Application.Features.RelayCommands.Query.GetPending;
+using MediatR;
 
 namespace Device.API.Controllers;
 
 [ApiController]
-[Route("api/device/v1/commands")]
-public sealed class RelayCommandsController(
-    IRelayCommandQueueService commandService) : ControllerBase
+[Route(ApiConstants.Routes.Commands)]
+public sealed class RelayCommandsController(ISender sender) : ControllerBase
 {
     [HttpGet("pending/{controllerId:guid}")]
     [AllowAnonymous]
-    public async Task<ActionResult<IReadOnlyList<RelayCommandResponseDto>>> GetPendingCommands(
+    public async Task<ActionResult<IReadOnlyList<RelayCommandDto>>> GetPendingCommandsAsync(
         [FromRoute] Guid controllerId,
-        [FromHeader(Name = "X-Device-Token")] string deviceToken,
-        CancellationToken cancellationToken)
+        [FromHeader(Name = ApiConstants.Headers.DeviceToken)] string deviceToken,
+        CancellationToken cancellationToken = default)
     {
-        var result = await commandService
-            .GetPendingCommands(controllerId, deviceToken, cancellationToken);
+        var query = new GetPendingCommandsQuery
+        {
+            ControllerId = controllerId,
+            DeviceToken = deviceToken
+        };
+
+        Result<IReadOnlyList<RelayCommandDto>> result = await sender.Send(query, cancellationToken);
 
         return this.ToActionResult(result);
     }
 
     [HttpPost("{commandId:guid}/complete")]
     [AllowAnonymous]
-    public async Task<IActionResult> MarkAsCompleted(
+    public async Task<IActionResult> MarkAsCompletedAsync(
         [FromRoute] Guid commandId,
-        [FromHeader(Name = "X-Device-Token")] string deviceToken,
-        CancellationToken cancellationToken)
+        [FromHeader(Name = ApiConstants.Headers.DeviceToken)] string deviceToken,
+        CancellationToken cancellationToken = default)
     {
-        var result = await commandService
-            .MarkAsCompletedByIdAsync(commandId, deviceToken, cancellationToken);
+        var command = new MarkAsCompletedCommand
+        {
+            CommandId = commandId,
+            DeviceToken = deviceToken
+        };
+
+        Result result = await sender.Send(command, cancellationToken);
 
         return this.ToActionResult(result);
     }
 
     [HttpPost("{commandId:guid}/fail")]
     [AllowAnonymous]
-    public async Task<IActionResult> MarkAsFailed(
+    public async Task<IActionResult> MarkAsFailedAsync(
         [FromRoute] Guid commandId,
         [FromBody] string errorMessage,
-        [FromHeader(Name = "X-Device-Token")] string deviceToken,
-        CancellationToken cancellationToken)
+        [FromHeader(Name = ApiConstants.Headers.DeviceToken)] string deviceToken,
+        CancellationToken cancellationToken = default)
     {
-        var result = await commandService
-            .MarkAsFailedByIdAsync(commandId, deviceToken, errorMessage, cancellationToken);
+        var command = new MarkAsFailedCommand
+        {
+            CommandId = commandId,
+            DeviceToken = deviceToken,
+            ErrorMessage = errorMessage
+        };
+
+        Result result = await sender.Send(command, cancellationToken);
 
         return this.ToActionResult(result);
     }
 
     [HttpPost("toggle-state/{relayId:guid}")]
     [Authorize(Policy = SubPermissions.DeviceControl)]
-    public async Task<ActionResult<bool>> ToggleRelayState(
-        Guid relayId,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<bool>> ToggleRelayStateAsync(
+        [FromRoute] Guid relayId,
+        CancellationToken cancellationToken = default)
     {
-        var result = await commandService
-            .ToggleRelayStateAsync(relayId, cancellationToken);
+        var command = new ToggleRelayStateCommand
+        {
+            RelayId = relayId
+        };
+
+        Result<bool> result = await sender.Send(command, cancellationToken);
 
         return this.ToActionResult(result);
     }
 
     [HttpPost("toggle-mode/{relayId:guid}")]
     [Authorize(Policy = SubPermissions.DeviceControl)]
-    public async Task<ActionResult<bool>> ToggleRelayMode(
-        Guid relayId,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<bool>> ToggleRelayModeAsync(
+        [FromRoute] Guid relayId,
+        CancellationToken cancellationToken = default)
     {
-        var result = await commandService
-            .ToggleRelayModeAsync(relayId, cancellationToken);
+        var command = new ToggleRelayModeCommand
+        {
+            RelayId = relayId
+        };
+
+        Result<bool> result = await sender.Send(command, cancellationToken);
 
         return this.ToActionResult(result);
     }

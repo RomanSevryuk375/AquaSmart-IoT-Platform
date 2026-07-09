@@ -22,7 +22,7 @@ namespace IdentityService.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("IdentityService.Domain.Entities.RefreshTokenEntity", b =>
+            modelBuilder.Entity("IdentityService.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -55,6 +55,11 @@ namespace IdentityService.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uuid")
+                        .HasColumnName("version");
+
                     b.HasKey("Id")
                         .HasName("pk_refresh_tokens");
 
@@ -68,7 +73,7 @@ namespace IdentityService.Infrastructure.Migrations
                     b.ToTable("refresh_tokens", (string)null);
                 });
 
-            modelBuilder.Entity("IdentityService.Domain.Entities.SubscriptionEntity", b =>
+            modelBuilder.Entity("IdentityService.Domain.Entities.Subscription", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -85,7 +90,8 @@ namespace IdentityService.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
                         .HasColumnName("name");
 
                     b.Property<string>("Permissions")
@@ -97,6 +103,11 @@ namespace IdentityService.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)")
                         .HasColumnName("price");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uuid")
+                        .HasColumnName("version");
 
                     b.HasKey("Id")
                         .HasName("pk_subscriptions");
@@ -111,7 +122,8 @@ namespace IdentityService.Infrastructure.Migrations
                             DurationDays = 36500,
                             Name = "Free",
                             Permissions = "[\"tank:read\",\"tank:create\",\"tank:update\",\"tank:delete\",\"tank:limit:1\",\"device:control\",\"auto:rule:create\",\"auto:rule:limit:5\",\"auto:schedule:create\",\"data:view\",\"notify:log:read\",\"notify:log:write\",\"account:update\",\"account:view\"]",
-                            Price = 0m
+                            Price = 0m,
+                            Version = new Guid("b9875e1e-44bf-4d8a-aa4a-7ac5ada42a28")
                         },
                         new
                         {
@@ -120,7 +132,8 @@ namespace IdentityService.Infrastructure.Migrations
                             DurationDays = 31,
                             Name = "Professional",
                             Permissions = "[\"tank:read\",\"tank:create\",\"tank:update\",\"tank:delete\",\"tank:limit:10\",\"device:control\",\"auto:rule:create\",\"auto:rule:limit:10\",\"auto:schedule:create\",\"data:view\",\"data:history\",\"notify:tg\",\"notify:log:read\",\"notify:log:write\",\"notify:reminder\",\"account:update\",\"account:view\"]",
-                            Price = 9.99m
+                            Price = 9.99m,
+                            Version = new Guid("78de41de-286a-4762-b88c-ed659975076a")
                         },
                         new
                         {
@@ -129,11 +142,12 @@ namespace IdentityService.Infrastructure.Migrations
                             DurationDays = 31,
                             Name = "Elite",
                             Permissions = "[\"tank:read\",\"tank:create\",\"tank:update\",\"tank:delete\",\"tank:limit:unlim\",\"device:control\",\"device:manual\",\"auto:rule:create\",\"auto:rule:limit:unlim\",\"auto:schedule:create\",\"auto:vacation\",\"data:view\",\"data:history\",\"data:diag\",\"data:rt\",\"notify:log:read\",\"notify:log:write\",\"notify:reminder\",\"notify:email\",\"notify:tg\"]",
-                            Price = 19.99m
+                            Price = 19.99m,
+                            Version = new Guid("1f8c20bc-c96f-4731-8157-f270dcc20c92")
                         });
                 });
 
-            modelBuilder.Entity("IdentityService.Domain.Entities.UserEntity", b =>
+            modelBuilder.Entity("IdentityService.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -172,7 +186,8 @@ namespace IdentityService.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
                         .HasColumnName("name");
 
                     b.Property<string>("NormalizedEmail")
@@ -212,7 +227,8 @@ namespace IdentityService.Infrastructure.Migrations
 
                     b.Property<string>("TimeZone")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
                         .HasColumnName("time_zone");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -238,6 +254,48 @@ namespace IdentityService.Infrastructure.Migrations
                         .HasDatabaseName("ix_users_subscription_id");
 
                     b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("IdentityService.Infrastructure.Persistence.Outbox.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("content");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("text")
+                        .HasColumnName("error");
+
+                    b.Property<DateTime>("OccurredOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_on_utc");
+
+                    b.Property<DateTime?>("ProcessedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("processed_on_utc");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_outbox_messages");
+
+                    b.HasIndex("OccurredOnUtc")
+                        .HasDatabaseName("ix_outbox_messages_occurred_on_utc");
+
+                    b.ToTable("outbox_messages", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
@@ -402,9 +460,9 @@ namespace IdentityService.Infrastructure.Migrations
                     b.ToTable("usertokens", (string)null);
                 });
 
-            modelBuilder.Entity("IdentityService.Domain.Entities.RefreshTokenEntity", b =>
+            modelBuilder.Entity("IdentityService.Domain.Entities.RefreshToken", b =>
                 {
-                    b.HasOne("IdentityService.Domain.Entities.UserEntity", null)
+                    b.HasOne("IdentityService.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -412,9 +470,9 @@ namespace IdentityService.Infrastructure.Migrations
                         .HasConstraintName("fk_refresh_tokens_asp_net_users_user_id");
                 });
 
-            modelBuilder.Entity("IdentityService.Domain.Entities.UserEntity", b =>
+            modelBuilder.Entity("IdentityService.Domain.Entities.User", b =>
                 {
-                    b.HasOne("IdentityService.Domain.Entities.SubscriptionEntity", null)
+                    b.HasOne("IdentityService.Domain.Entities.Subscription", null)
                         .WithMany()
                         .HasForeignKey("SubscriptionId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -434,7 +492,7 @@ namespace IdentityService.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("IdentityService.Domain.Entities.UserEntity", null)
+                    b.HasOne("IdentityService.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -444,7 +502,7 @@ namespace IdentityService.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("IdentityService.Domain.Entities.UserEntity", null)
+                    b.HasOne("IdentityService.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -461,7 +519,7 @@ namespace IdentityService.Infrastructure.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_userroles_roles_role_id");
 
-                    b.HasOne("IdentityService.Domain.Entities.UserEntity", null)
+                    b.HasOne("IdentityService.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -471,7 +529,7 @@ namespace IdentityService.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("IdentityService.Domain.Entities.UserEntity", null)
+                    b.HasOne("IdentityService.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

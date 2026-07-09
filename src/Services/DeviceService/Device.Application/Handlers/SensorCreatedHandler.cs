@@ -1,26 +1,18 @@
-﻿using Contracts.Events.SensorEvents;
-using Device.Domain.DomainEvents.SensorEvents;
+using Contracts.Events.SensorEvents;
+using Device.Domain.Events.SensorEvents;
 using MassTransit;
-using MediatR;
 
 namespace Device.Application.Handlers;
 
-public sealed class SensorCreatedHandler(IPublishEndpoint publishEndpoint)
-    : INotificationHandler<SensorCreatedDomainEvent>
+public sealed class SensorCreatedHandler(
+    IPublishEndpoint publishEndpoint,
+    IMapper mapper) : INotificationHandler<SensorCreatedDomainEvent>
 {
     public async Task Handle(
-        SensorCreatedDomainEvent notification, 
+        SensorCreatedDomainEvent notification,
         CancellationToken cancellationToken)
     {
-        await publishEndpoint.Publish(new SensorCreatedEvent
-        {
-            SensorId = notification.SensorId,
-            ControllerId = notification.ControllerId,
-            Name = notification.Name,
-            Type = notification.Type,
-            State = notification.State,
-            Unit = notification.Unit,
-            CreatedAt = notification.CreatedAt,
-        }, cancellationToken);
+        await publishEndpoint.Publish(
+            mapper.Map<SensorCreatedEvent>(notification), cancellationToken);
     }
 }

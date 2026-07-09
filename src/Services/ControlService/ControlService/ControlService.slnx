@@ -1,7 +1,17 @@
 <Solution>
+  <Folder Name="/src/">
+    <Project Path="../ControlService.Application/Control.Application.csproj" Id="55bf3021-7f00-4ad3-b420-43fddb58a25c" />
+    <Project Path="../ControlService.Domain/Control.Domain.csproj" Id="6c91cdab-7d18-4f5e-8303-4a13ae18c3d8" />
+    <Project Path="../ControlService.Infrastructure/Control.Infrastructure.csproj" Id="3a0dff64-55a0-4d0e-8735-e304d2fe62a7" />
+    <Project Path="Control.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="../Control.ArchitectureTests/Control.ArchitectureTests.csproj" Id="a1718d7e-0610-4cdb-86de-4a11fb569442" />
+    <Project Path="../Control.Domain.UnitTests/Control.Domain.UnitTests.csproj" Id="57adec9f-a05a-4e58-a0de-8498d7713ecb" />
+    <Project Path="../Control.Application.UnitTests/Control.Application.UnitTests.csproj" />
+    <Project Path="../Control.Infrastructure.IntegrationTests/Control.Infrastructure.IntegrationTests.csproj" Id="eeb6c682-690e-4403-9442-fbe7742a58e1" />
+    <Project Path="../Control.API.E2ETests/Control.API.E2ETests.csproj" />
+    <Project Path="../Control.TestShared/Control.TestShared.csproj" Id="1abb8072-9e7f-48fe-b735-88101859c518" />
+  </Folder>
   <Project Path="../../../Contracts/Contracts/Contracts.csproj" />
-  <Project Path="../ControlService.Application/Control.Application.csproj" Id="55bf3021-7f00-4ad3-b420-43fddb58a25c" />
-  <Project Path="../ControlService.Domain/Control.Domain.csproj" Id="6c91cdab-7d18-4f5e-8303-4a13ae18c3d8" />
-  <Project Path="../ControlService.Infrastructure/Control.Infrastructure.csproj" Id="3a0dff64-55a0-4d0e-8735-e304d2fe62a7" />
-  <Project Path="Control.API.csproj" />
 </Solution>

@@ -1,11 +1,11 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Telemetry.Domain.Entities;
 
 namespace Telemetry.Domain.Interfaces;
 
-public interface IEcosystemRepository : IRepository<EcosystemEntity>
+public interface IEcosystemRepository : IRepository<Ecosystem>
 {
-    Task<EcosystemEntity?> GetByControllerIdAsync(
+    public Task<Ecosystem?> GetByControllerIdAsync(
         Guid controllerId,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

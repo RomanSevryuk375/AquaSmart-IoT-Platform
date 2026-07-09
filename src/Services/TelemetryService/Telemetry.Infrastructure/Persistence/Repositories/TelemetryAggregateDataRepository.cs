@@ -1,43 +1,48 @@
-﻿using Contracts.Enums;
+using Contracts.Enums;
 using Microsoft.EntityFrameworkCore;
 using Telemetry.Domain.Entities;
 using Telemetry.Domain.Interfaces;
+using Telemetry.Domain.ValueObjects;
 
 namespace Telemetry.Infrastructure.Persistence.Repositories;
 
-public sealed class TelemetryAggregateDataRepository(SystemDbContext dbContext) 
-    : BaseRepository<TelemetryAggregateEntity>(dbContext), ITelemetryAggregateDataRepository
+public sealed class TelemetryAggregateDataRepository(TelemetryDbContext dbContext)
+    : BaseRepository<AggregateTelemetry>(dbContext), ITelemetryAggregateDataRepository
 {
-    public async Task<IReadOnlyList<TelemetrySummary>> GetSummaryForPeriodAsync(
-        PeriodTypeEnum sourcePeriod, 
-        DateTime from, 
-        DateTime to, 
-        CancellationToken cancellationToken)
+    public async Task<IReadOnlyDictionary<Guid, TelemetrySummary>> GetSummaryForPeriodAsync(
+        PeriodType sourcePeriod,
+        DateTime from,
+        DateTime to,
+        CancellationToken cancellationToken = default)
     {
-        return await Context.TelemetryAggregateData
-            .AsNoTracking()
+        var rawData = await Context.TelemetryAggregateData
             .Where(x => x.Period == sourcePeriod &&
                         x.PeriodStart >= from &&
                         x.PeriodStart < to)
             .GroupBy(x => x.SensorId)
-            .Select(g => new TelemetrySummary
+            .Select(g => new
             {
                 SensorId = g.Key,
-                MinValue = g.Min(x => x.MinValue),
-                MaxValue = g.Max(x => x.MaxValue),
-                AvgValue = g.Sum(x => x.AvgValue * x.DataPointsCount) / g.Sum(x => x.DataPointsCount),
-                Count = g.Sum(x => x.DataPointsCount)
-            }).ToListAsync(cancellationToken);
+                MinValue = g.Min(x => x.Summary.MinValue),
+                AvgValue = g.Sum(x => x.Summary.AvgValue * x.Summary.Count) / g.Sum(x => x.Summary.Count),
+                MaxValue = g.Max(x => x.Summary.MaxValue),
+                Count = g.Sum(x => x.Summary.Count)
+            })
+            .ToListAsync(cancellationToken);
+
+        return rawData.ToDictionary(
+            x => x.SensorId,
+            x => TelemetrySummary.Create(x.MinValue, x.AvgValue, x.MaxValue, x.Count).Value);
     }
 
     public async Task DeleteOldRawDataAsync(
-        PeriodTypeEnum period,
+        PeriodType period,
         DateTime olderThan,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         await Context.TelemetryAggregateData
-            .Where(x => x.CreatedAt < olderThan 
-                     && x.IsAggregated == false
+            .Where(x => x.CreatedAt < olderThan
+                     && !x.IsAggregated
                      && x.Period == period)
             .ExecuteDeleteAsync(cancellationToken);
     }
@@ -46,10 +51,11 @@ public sealed class TelemetryAggregateDataRepository(SystemDbContext dbContext)
         List<Guid> sensorIds,
         DateTime from,
         DateTime to,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         await Context.TelemetryAggregateData
-            .Where(x => sensorIds.Contains(x.SensorId) &&
+            .Where(x => sensorIds.Contains(
+                        x.SensorId) &&
                         x.CreatedAt >= from &&
                         x.CreatedAt < to)
             .ExecuteUpdateAsync(x => x.SetProperty(p => p.IsAggregated, true), cancellationToken);

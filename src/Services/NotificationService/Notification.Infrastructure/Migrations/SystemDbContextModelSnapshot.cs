@@ -3,14 +3,14 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Notification.Infrastructure;
+using Notification.Infrastructure.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace Notification.Infrastructure.Migrations
 {
-    [DbContext(typeof(SystemDbContext))]
+    [DbContext(typeof(NotificationDbContext))]
     partial class SystemDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -22,7 +22,7 @@ namespace Notification.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Notification.Domain.Entities.EcosystemEntity", b =>
+            modelBuilder.Entity("Notification.Domain.Entities.Ecosystem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,7 +33,7 @@ namespace Notification.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("EcosystemName")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)")
@@ -42,6 +42,11 @@ namespace Notification.Infrastructure.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uuid")
+                        .HasColumnName("version");
 
                     b.HasKey("Id")
                         .HasName("pk_ecosystems");
@@ -52,7 +57,7 @@ namespace Notification.Infrastructure.Migrations
                     b.ToTable("ecosystems", (string)null);
                 });
 
-            modelBuilder.Entity("Notification.Domain.Entities.MaintenanceLogEntity", b =>
+            modelBuilder.Entity("Notification.Domain.Entities.MaintenanceLog", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -86,6 +91,10 @@ namespace Notification.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
+                    b.Property<Guid>("Version")
+                        .HasColumnType("uuid")
+                        .HasColumnName("version");
+
                     b.HasKey("Id")
                         .HasName("pk_maintenance_logs");
 
@@ -98,7 +107,7 @@ namespace Notification.Infrastructure.Migrations
                     b.ToTable("maintenance_logs", (string)null);
                 });
 
-            modelBuilder.Entity("Notification.Domain.Entities.NotificationEntity", b =>
+            modelBuilder.Entity("Notification.Domain.Entities.Notification", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -147,6 +156,11 @@ namespace Notification.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uuid")
+                        .HasColumnName("version");
+
                     b.HasKey("Id")
                         .HasName("pk_notifications");
 
@@ -165,7 +179,7 @@ namespace Notification.Infrastructure.Migrations
                     b.ToTable("notifications", (string)null);
                 });
 
-            modelBuilder.Entity("Notification.Domain.Entities.ReminderEntity", b =>
+            modelBuilder.Entity("Notification.Domain.Entities.Reminder", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -206,6 +220,11 @@ namespace Notification.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uuid")
+                        .HasColumnName("version");
+
                     b.HasKey("Id")
                         .HasName("pk_reminders");
 
@@ -221,7 +240,7 @@ namespace Notification.Infrastructure.Migrations
                     b.ToTable("reminders", (string)null);
                 });
 
-            modelBuilder.Entity("Notification.Domain.Entities.UserEntity", b =>
+            modelBuilder.Entity("Notification.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -265,6 +284,11 @@ namespace Notification.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("time_zone");
 
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uuid")
+                        .HasColumnName("version");
+
                     b.HasKey("Id")
                         .HasName("pk_users");
 
@@ -279,9 +303,9 @@ namespace Notification.Infrastructure.Migrations
                     b.ToTable("users", (string)null);
                 });
 
-            modelBuilder.Entity("Notification.Domain.Entities.EcosystemEntity", b =>
+            modelBuilder.Entity("Notification.Domain.Entities.Ecosystem", b =>
                 {
-                    b.HasOne("Notification.Domain.Entities.UserEntity", null)
+                    b.HasOne("Notification.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -289,16 +313,16 @@ namespace Notification.Infrastructure.Migrations
                         .HasConstraintName("fk_ecosystems_users_user_id");
                 });
 
-            modelBuilder.Entity("Notification.Domain.Entities.MaintenanceLogEntity", b =>
+            modelBuilder.Entity("Notification.Domain.Entities.MaintenanceLog", b =>
                 {
-                    b.HasOne("Notification.Domain.Entities.EcosystemEntity", null)
+                    b.HasOne("Notification.Domain.Entities.Ecosystem", null)
                         .WithMany()
                         .HasForeignKey("EcosystemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_maintenance_logs_ecosystems_ecosystem_id");
 
-                    b.HasOne("Notification.Domain.Entities.UserEntity", null)
+                    b.HasOne("Notification.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -306,15 +330,15 @@ namespace Notification.Infrastructure.Migrations
                         .HasConstraintName("fk_maintenance_logs_users_user_id");
                 });
 
-            modelBuilder.Entity("Notification.Domain.Entities.NotificationEntity", b =>
+            modelBuilder.Entity("Notification.Domain.Entities.Notification", b =>
                 {
-                    b.HasOne("Notification.Domain.Entities.EcosystemEntity", null)
+                    b.HasOne("Notification.Domain.Entities.Ecosystem", null)
                         .WithMany()
                         .HasForeignKey("EcosystemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("fk_notifications_ecosystems_ecosystem_id");
 
-                    b.HasOne("Notification.Domain.Entities.UserEntity", null)
+                    b.HasOne("Notification.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -322,16 +346,16 @@ namespace Notification.Infrastructure.Migrations
                         .HasConstraintName("fk_notifications_users_user_id");
                 });
 
-            modelBuilder.Entity("Notification.Domain.Entities.ReminderEntity", b =>
+            modelBuilder.Entity("Notification.Domain.Entities.Reminder", b =>
                 {
-                    b.HasOne("Notification.Domain.Entities.EcosystemEntity", null)
+                    b.HasOne("Notification.Domain.Entities.Ecosystem", null)
                         .WithMany()
                         .HasForeignKey("EcosystemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_reminders_ecosystems_ecosystem_id");
 
-                    b.HasOne("Notification.Domain.Entities.UserEntity", null)
+                    b.HasOne("Notification.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

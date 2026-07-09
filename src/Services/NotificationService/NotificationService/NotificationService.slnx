@@ -1,7 +1,17 @@
 <Solution>
+  <Folder Name="/src/">
+    <Project Path="../Notification.Application/Notification.Application.csproj" Id="7c966259-f5a5-4c6a-804e-2ab7945d4472" />
+    <Project Path="../Notification.Domain/Notification.Domain.csproj" Id="37fe3279-b0d5-4e11-9e07-7693f0d692e5" />
+    <Project Path="../Notification.Infrastructure/Notification.Infrastructure.csproj" Id="9a2921bf-59d5-4a5e-bce9-64bc7e69605e" />
+    <Project Path="Notification.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="../Notification.Application.UnitTests/Notification.Application.UnitTests.csproj" />
+    <Project Path="../Notification.ArchitectureTests/Notification.ArchitectureTests.csproj" Id="a8cbc5e1-ceef-456a-9945-7daa47ee24a4" />
+    <Project Path="../Notification.Domain.UnitTests/Notification.Domain.UnitTests.csproj" Id="a33adc3f-1bc9-42f9-82ea-b9fe98f6537d" />
+    <Project Path="../Notification.Infrastructure.IntegrationTests/Notification.Infrastructure.IntegrationTests.csproj" />
+    <Project Path="../Notification.TestShared/Notification.TestShared.csproj" Id="978b1049-3267-44f1-a5f6-63c82351622d" />
+    <Project Path="../Notification.API.E2ETests/Notification.API.E2ETests.csproj" />
+  </Folder>
   <Project Path="../../../Contracts/Contracts/Contracts.csproj" />
-  <Project Path="../Notification.Application/Notification.Application.csproj" Id="7c966259-f5a5-4c6a-804e-2ab7945d4472" />
-  <Project Path="../Notification.Domain/Notification.Domain.csproj" Id="37fe3279-b0d5-4e11-9e07-7693f0d692e5" />
-  <Project Path="../Notification.Infrastructure/Notification.Infrastructure.csproj" Id="9a2921bf-59d5-4a5e-bce9-64bc7e69605e" />
-  <Project Path="Notification.API.csproj" />
 </Solution>

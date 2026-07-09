@@ -1,7 +1,20 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="../Telemetry.Application/Telemetry.Application.csproj" />
+    <Project Path="../Telemetry.Domain/Telemetry.Domain.csproj" />
+    <Project Path="../Telemetry.Infrastructure/Telemetry.Infrastructure.csproj" />
+    <Project Path="Telemetry.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="../Telemetry.Application.UnitTests/Telemetry.Application.UnitTests.csproj" />
+    <Project Path="../Telemetry.Domain.UnitTests/Telemetry.Domain.UnitTests.csproj" Id="a33adc3f-1bc9-42f9-82ea-b9fe98f6537d" />
+    <Project Path="../Telemetry.ArchitectureTests/Telemetry.ArchitectureTests.csproj" Id="56f71b65-690d-4c02-9be3-d95dd5b8befc" />
+    <Project Path="../Telemetry.TestShared/Telemetry.TestShared.csproj" Id="b90d06ec-8bd2-48ee-b77d-920ef53d70ba" />
+    <Project Path="../Telemetry.Infrastructure.IntegrationTests/Telemetry.Infrastructure.IntegrationTests.csproj" />
+    <Project Path="../Telemetry.API.E2ETests/Telemetry.API.E2ETests.csproj" />
+  </Folder>
   <Project Path="../../../Contracts/Contracts/Contracts.csproj" />
-  <Project Path="../Telemetry.Application/Telemetry.Application.csproj" />
-  <Project Path="../Telemetry.Domain/Telemetry.Domain.csproj" />
-  <Project Path="../Telemetry.Infrastructure/Telemetry.Infrastructure.csproj" />
-  <Project Path="Telemetry.API.csproj" />
 </Solution>

@@ -1,15 +1,15 @@
-﻿using Control.Domain.Interfaces;
+using Control.Domain.Interfaces;
 using Control.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Control.Infrastructure.Extensions;
 
-public sealed class UnitOfWork(SystemDbContext dbContext) : IUnitOfWork
+public sealed class UnitOfWork(ControlDbContext dbContext) : IUnitOfWork
 {
     private IDbContextTransaction? _contextTransaction;
     public async Task BeginTransactionAsync(CancellationToken cancellationToken)
     {
-        _contextTransaction = 
+        _contextTransaction =
             await dbContext.Database.BeginTransactionAsync(cancellationToken);
     }
 
@@ -48,8 +48,6 @@ public sealed class UnitOfWork(SystemDbContext dbContext) : IUnitOfWork
         }
     }
 
-    public async Task SaveChangesAsync(CancellationToken cancellationToken)
-    {
+    public async Task SaveChangesAsync(CancellationToken cancellationToken) =>
         await dbContext.SaveChangesAsync(cancellationToken);
-    }
 }

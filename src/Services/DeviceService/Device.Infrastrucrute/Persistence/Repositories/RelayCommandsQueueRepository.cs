@@ -1,40 +1,35 @@
-﻿using Contracts.Enums;
-using Device.Domain.Entities;
-using Device.Domain.Interfaces;
-using Microsoft.EntityFrameworkCore;
-
 namespace Device.Infrastructure.Persistence.Repositories;
 
-public sealed class RelayCommandsQueueRepository(SystemDbContext dbContext)
-    : BaseRepository<RelayCommandsQueueEntity>(dbContext), IRelayCommandsQueueRepository
+public sealed class RelayCommandsQueueRepository(DeviceDbContext dbContext)
+    : BaseRepository<RelayCommand>(dbContext), IRelayCommandsRepository
 {
     private const int MaxAttemptCount = 3;
     private const int RetryCooldownMinutes = 1;
 
-    public async Task<IReadOnlyList<RelayCommandsQueueEntity>> GetPendingByControllerIdAsync(
+    public async Task<IReadOnlyList<RelayCommand>> GetPendingByControllerIdAsync(
         Guid controllerId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
-        var now = DateTime.UtcNow;
-        var retryThreshold = now.AddMinutes(-RetryCooldownMinutes);
+        DateTime now = DateTime.UtcNow;
+        DateTime retryThreshold = now.AddMinutes(-RetryCooldownMinutes);
 
         return await Context.RelayCommands
             .Where(x => x.ControllerId == controllerId)
             .Where(x => x.ExpireAt == null || x.ExpireAt > now)
-            .Where(x => 
-                x.Status == CommandStatusEnum.Pending ||
-                (x.Status == CommandStatusEnum.Sent &&
+            .Where(x =>
+                x.Status == CommandStatus.Pending ||
+                (x.Status == CommandStatus.Sent &&
                 x.AttemptCount < MaxAttemptCount &&
                 x.ProcessedAt < retryThreshold))
             .OrderBy(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task DeleteCompletedAsync(
-        CancellationToken cancellationToken)
+    public async Task<int> DeleteCompletedAsync(
+        CancellationToken cancellationToken = default)
     {
-        await Context.RelayCommands
-            .Where(x => x.Status == CommandStatusEnum.Completed 
+        return await Context.RelayCommands
+            .Where(x => x.Status == CommandStatus.Completed
                      || x.ExpireAt < DateTime.UtcNow)
             .ExecuteDeleteAsync(cancellationToken);
     }

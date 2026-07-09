@@ -1,5 +1,5 @@
-﻿using Contracts.Abstractions;
-using Device.Domain.Entities;
+using Contracts.Abstractions;
+using Device.Infrastructure.Persistence.Outbox;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Newtonsoft.Json;
 
@@ -12,8 +12,8 @@ public sealed class ConvertDomainEventsToOutboxMessagesInterceptor : SaveChanges
         InterceptionResult<int> result,
         CancellationToken cancellationToken = default)
     {
-        var dbContext = eventData.Context;
-        
+        DbContext? dbContext = eventData.Context;
+
         if (dbContext is null)
         {
             return base.SavingChangesAsync(eventData, result, cancellationToken);

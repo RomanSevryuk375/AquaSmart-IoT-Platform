@@ -1,15 +1,15 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Notification.Domain.Entities;
 
 namespace Notification.Domain.Interfaces;
 
-public interface IUserRepository : IRepository<UserEntity>
+public interface IUserRepository : IRepository<User>
 {
-    Task<bool> ExistsAsync(
-        Guid userId, 
-        CancellationToken cancellationToken);
+    public Task<bool> ExistsAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default);
 
-    Task<List<UserEntity>> GetAllUsersByIdAsync(
+    public Task<List<User>> GetAllUsersByIdAsync(
         List<Guid> userIds,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

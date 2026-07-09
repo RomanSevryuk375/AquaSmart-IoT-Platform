@@ -1,4 +1,6 @@
-﻿using IdentityService.Application.Interfaces;
+// Ignore Spelling: Hasher
+
+using IdentityService.Application.Interfaces;
 
 namespace IdentityService.Application.Extensions;
 

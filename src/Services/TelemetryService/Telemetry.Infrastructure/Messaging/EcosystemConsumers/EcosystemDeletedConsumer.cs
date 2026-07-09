@@ -1,20 +1,23 @@
-﻿using Contracts.Events.EcosystemEvents;
+using AutoMapper;
+using Contracts.Events.EcosystemEvents;
+using Contracts.Results;
 using MassTransit;
-using Telemetry.Application.Interfaces;
+using MediatR;
+using Telemetry.Application.Features.Ecosystems.Commands.SyncEcosystemDeleted;
 
 namespace Telemetry.Infrastructure.Messaging.EcosystemConsumers;
 
-public sealed class EcosystemDeletedConsumer(
-    IEcosystemService service) : IConsumer<EcosystemDeletedEvent>
+public sealed class EcosystemDeletedConsumer(ISender sender, IMapper mapper)
+    : IConsumer<EcosystemDeletedEvent>
 {
     public async Task Consume(ConsumeContext<EcosystemDeletedEvent> context)
     {
-        var result = await service.DeleteEcosystemAsync(
-            context.Message, context.CancellationToken);
+        SyncEcosystemDeletedCommand command = mapper.Map<SyncEcosystemDeletedCommand>(context.Message);
 
-        if (!result.IsSuccess && result.IsRetryable)
+        Result result = await sender.Send(command, context.CancellationToken);
+        if (result.IsFailure)
         {
-            throw new Exception(result.Error);
+            throw new InvalidOperationException(result.Error.Message);
         }
     }
 }

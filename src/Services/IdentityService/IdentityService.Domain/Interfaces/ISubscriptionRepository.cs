@@ -1,8 +1,8 @@
-﻿using IdentityService.Domain.Entities;
+using Contracts.Abstractions;
+using IdentityService.Domain.Entities;
 
 namespace IdentityService.Domain.Interfaces;
 
-public interface ISubscriptionRepository
+public interface ISubscriptionRepository : IRepository<Subscription>
 {
-    Task<SubscriptionEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 }

@@ -1,27 +1,39 @@
-﻿using Device.Domain.Entities;
-using Device.Domain.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using Contracts.Results;
+using Device.Domain.ValueObjects;
 
 namespace Device.Infrastructure.Persistence.Repositories;
 
-public sealed class ControllerRepository(SystemDbContext dbContext) 
-    : BaseRepository<ControllerEntity>(dbContext), IControllerRepository
+public sealed class ControllerRepository(DeviceDbContext dbContext)
+    : BaseRepository<Controller>(dbContext), IControllerRepository
 {
-    public async Task<ControllerEntity?> GetByMacAddressAsync(
-        string macAddress, 
-        CancellationToken cancellationToken)
+    public async Task<Controller?> GetByMacAddressAsync(
+        string macAddress,
+        CancellationToken cancellationToken = default)
     {
+        Result<MacAddress> macResult = MacAddress.Create(macAddress);
+        if (macResult.IsFailure)
+        {
+            return null;
+        }
+
         return await Context.Controllers
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.MacAddress == macAddress, cancellationToken);
+            .FirstOrDefaultAsync(x => x.MacAddress == macResult.Value, cancellationToken);
     }
 
-    public async Task<ControllerEntity?> GetByDeviceTokenAsync(
-        string deviceTokenHash, 
-        CancellationToken cancellationToken)
+    public async Task<Controller?> GetByDeviceTokenAsync(
+        string deviceTokenHash,
+        CancellationToken cancellationToken = default)
     {
         return await Context.Controllers
-            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.DeviceTokenHash == deviceTokenHash, cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Controller>> GetOfflineControllersAsync(
+        DateTime offlineThreshold,
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.Controllers
+            .Where(x => x.IsOnline && x.LastSeenAt < offlineThreshold)
+            .ToListAsync(cancellationToken);
     }
 }

@@ -1,14 +1,11 @@
-﻿using Contracts.Constants;
-using Device.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Device.Domain.ValueObjects;
 
 namespace Device.Infrastructure.Persistence.Configurations;
 
-public sealed class SensorConfiguration 
-    : IEntityTypeConfiguration<SensorEntity>
+public sealed class SensorConfiguration
+    : IEntityTypeConfiguration<Sensor>
 {
-    public void Configure(EntityTypeBuilder<SensorEntity> builder)
+    public void Configure(EntityTypeBuilder<Sensor> builder)
     {
         builder.ToTable("sensors");
 
@@ -17,16 +14,19 @@ public sealed class SensorConfiguration
         builder.Property(x => x.ControllerId).IsRequired();
         builder.Property(x => x.UserId).IsRequired();
         builder.Property(x => x.Name)
-            .HasMaxLength(SensorConstants.NameLength)
-            .IsRequired();
-
-        builder.Property(x => x.ConnectionProtocol)
-            .HasConversion<int>()
+            .HasConversion(
+                vo => vo.Value,
+                dbVal => DeviceName.Create(dbVal).Value)
+            .HasMaxLength(CommonConstants.NameLength)
             .IsRequired();
 
         builder.Property(x => x.ConnectionAddress)
-           .HasMaxLength(SensorConstants.ConnectionAddressLength)
-           .IsRequired();
+            .HasConversion(
+                vo => vo.ToString(),
+                dbVal => ConnectionAddress.Parse(dbVal))
+            .HasColumnName("connection_address")
+            .HasMaxLength(64)
+            .IsRequired();
 
         builder.Property(x => x.Type)
             .HasConversion<int>()
@@ -43,10 +43,19 @@ public sealed class SensorConfiguration
         builder.Property(x => x.CreatedAt).IsRequired();
 
         builder.HasIndex(x => x.UserId);
+
         builder.HasIndex(x => new
         {
             x.ControllerId,
             x.ConnectionAddress
         }).IsUnique();
+
+        builder.HasDiscriminator(x => x.Type)
+            .HasValue<TemperatureSensor>(SensorType.Temperature)
+            .HasValue<HumiditySensor>(SensorType.Humidity)
+            .HasValue<PressureSensor>(SensorType.Pressure)
+            .HasValue<VoltageSensor>(SensorType.Voltage);
+
+        builder.Property(x => x.Version).IsConcurrencyToken();
     }
 }

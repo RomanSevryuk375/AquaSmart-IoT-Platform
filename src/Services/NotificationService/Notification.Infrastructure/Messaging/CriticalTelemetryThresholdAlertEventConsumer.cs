@@ -1,20 +1,23 @@
-﻿using Contracts.Events.TelemetryEvents;
+using AutoMapper;
+using Contracts.Events.TelemetryEvents;
+using Contracts.Results;
 using MassTransit;
-using Notification.Application.Interfaces;
+using MediatR;
+using Notification.Application.Features.Alerts.Commands.SendTelemetryAlert;
 
 namespace Notification.Infrastructure.Messaging;
 
-public sealed class CriticalTelemetryThresholdAlertEventConsumer(
-    ITelemetryAlertSender alertSender) : IConsumer<CriticalTelemetryThresholdAlertEvent>
+public sealed class CriticalTelemetryThresholdAlertEventConsumer(ISender sender, IMapper mapper)
+    : IConsumer<CriticalTelemetryThresholdAlertEvent>
 {
     public async Task Consume(ConsumeContext<CriticalTelemetryThresholdAlertEvent> context)
     {
-        var result = await alertSender.SendTelemetryAlertAsync(
-            context.Message, context.CancellationToken);
+        SendTelemetryAlertCommand command = mapper.Map<SendTelemetryAlertCommand>(context.Message);
 
-        if (!result.IsSuccess && result.IsRetryable)
+        Result result = await sender.Send(command, context.CancellationToken);
+        if (result.IsFailure)
         {
-            throw new Exception(result.Error);
+            throw new InvalidOperationException(result.Error.Message);
         }
     }
 }

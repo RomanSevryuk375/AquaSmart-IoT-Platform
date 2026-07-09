@@ -101,6 +101,30 @@ services:
       networks:
         - aqua-network
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false 
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" 
+    ports:
+      - "9200:9200"
+    networks:
+      - aqua-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.4
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - aqua-network
+
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: rabbitmq
@@ -161,7 +185,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080  
-      - ConnectionStrings__SystemDbContext=Host=telemetry-db;Database=telemetry_db;Username=postgres;Password=password
+      - ConnectionStrings__TelemetryDbContext=Host=telemetry-db;Database=telemetry_db;Username=postgres;Password=password
+      - ElasticConfiguration__Uri=http://elasticsearch:9200
       - RabbitMqOptions__Host=amqp://rabbitmq:5672
       - RabbitMqOptions__UserName=guest
       - RabbitMqOptions__Password=guest
@@ -194,7 +219,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
-      - ConnectionStrings__SystemDbContext=Host=device-db;Database=device_db;Username=postgres;Password=password
+      - ConnectionStrings__DeviceDbContext=Host=device-db;Database=device_db;Username=postgres;Password=password
+      - ElasticConfiguration__Uri=http://elasticsearch:9200
       - RabbitMqOptions__Host=amqp://rabbitmq:5672
       - RabbitMqOptions__UserName=guest
       - RabbitMqOptions__Password=guest
@@ -225,7 +251,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
-      - ConnectionStrings__SystemDbContext=Host=control-db;Database=control_db;Username=postgres;Password=password
+      - ConnectionStrings__ControlDbContext=Host=control-db;Database=control_db;Username=postgres;Password=password
       - RabbitMqOptions__Host=amqp://rabbitmq:5672
       - RabbitMqOptions__UserName=guest
       - RabbitMqOptions__Password=guest
@@ -284,7 +310,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 
-      - ConnectionStrings__SystemDbContext=Host=notification-db;Database=notification_db;Username=postgres;Password=password
+      - ConnectionStrings__NotificationDbContext=Host=notification-db;Database=notification_db;Username=postgres;Password=password
       - RabbitMqOptions__Host=amqp://rabbitmq:5672
       - RabbitMqOptions__UserName=guest
       - RabbitMqOptions__Password=guest

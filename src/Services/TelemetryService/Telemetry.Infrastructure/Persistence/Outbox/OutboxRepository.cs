@@ -1,11 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Telemetry.Domain.Entities;
-using Telemetry.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Telemetry.Infrastructure.Persistence.Repositories;
 
 namespace Telemetry.Infrastructure.Persistence.Outbox;
 
-public sealed class OutboxRepository(SystemDbContext dbContext)
+public sealed class OutboxRepository(TelemetryDbContext dbContext)
     : BaseRepository<OutboxMessage>(dbContext), IOutboxRepository
 {
     public async Task<IReadOnlyList<OutboxMessage>> GetPendingMessagesAsync(

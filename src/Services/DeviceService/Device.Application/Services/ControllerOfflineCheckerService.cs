@@ -1,7 +1,4 @@
-﻿using Contracts.Results;
 using Device.Application.Interfaces;
-using Device.Domain.Interfaces;
-using Device.Domain.Specifications;
 
 namespace Device.Application.Services;
 
@@ -9,37 +6,31 @@ public sealed class ControllerOfflineCheckerService(
     IControllerRepository repository,
     IUnitOfWork unitOfWork) : IControllerOfflineCheckerService
 {
-    public async Task<Result> CheckAndDisableController(CancellationToken cancellationToken)
+    public async Task<Result<int>> CheckAndDisableControllerAsync(CancellationToken cancellationToken = default)
     {
         try
         {
-            var offlineThreshold = DateTime.UtcNow.AddMinutes(-5);
-            var specification = new OfflineControllersSpecification(offlineThreshold);
+            DateTime offlineThreshold = DateTime.UtcNow.AddMinutes(-5);
 
-            var controllers = await repository.GetAllAsync(
-                specification,
-                null,
-                null,
-                cancellationToken);
-
+            IReadOnlyList<Controller> controllers = await repository.GetOfflineControllersAsync(
+                offlineThreshold, cancellationToken);
             if (!controllers.Any())
             {
-                return Result.Success();
+                return Result<int>.Success(0);
             }
 
-            foreach (var controller in controllers)
+            foreach (Controller controller in controllers)
             {
                 controller.SetOffline();
-                await repository.UpdateAsync(controller, cancellationToken);
             }
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return Result.Success();
+            return Result<int>.Success(controllers.Count);
         }
         catch (Exception ex)
         {
-            return Result.Failure(Error.Failure("Job.DatabaseError", ex.Message));
+            return Result<int>.Failure(Error.Failure(ErrorMessages.DatabaseError, ex.Message));
         }
     }
 }

@@ -1,15 +1,12 @@
-﻿using Contracts.Abstractions;
-using Device.Domain.Entities;
-
 namespace Device.Domain.Interfaces;
 
-public interface IRelayRepository : IRepository<RelayEntity>
+public interface IRelayRepository : IRepository<Relay>
 {
-    Task<bool> ExistsAsync(
-        Guid relayId, 
-        CancellationToken cancellationToken);
+    public Task<bool> ExistsAsync(
+        Guid relayId,
+        CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<RelayEntity>> GetAllByControllerId(
+    public Task<IReadOnlyList<Relay>> GetAllByControllerId(
         Guid controllerId,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

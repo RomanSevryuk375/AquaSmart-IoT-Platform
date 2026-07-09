@@ -1,33 +1,42 @@
-﻿using Contracts.Options;
+// Ignore Spelling: Mq
+
+using Contracts.Options;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Notification.Domain.Interfaces;
 using Notification.Infrastructure.BackgroundJob;
+using Notification.Infrastructure.Factories;
 using Notification.Infrastructure.Messaging;
+using Notification.Infrastructure.Persistence;
+using Notification.Infrastructure.Persistence.Repositories;
 using Notification.Infrastructure.Providers;
-using Notification.Infrastructure.Repositories;
 using Quartz;
 
 namespace Notification.Infrastructure.Extensions;
 
 public static class DependencyInjection
 {
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
+        return services.AddRepositories(configuration)
+                .AddMessageProviders(configuration)
+                .AddRabbitMq(configuration)
+                .AddQuartzJobs();
+    }
+
     public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<TelegramOptions>(configuration.GetSection(TelegramOptions.SectionName));
-        services.Configure<EmailOptions>(configuration.GetSection(EmailOptions.SectionName));
-
-        var connectionSting = configuration.GetConnectionString(nameof(SystemDbContext));
-        services.AddDbContext<SystemDbContext>(options =>
+        Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+        string? connectionSting = configuration.GetConnectionString(nameof(NotificationDbContext));
+        services.AddDbContext<NotificationDbContext>(options =>
         {
-            options.UseNpgsql(connectionSting).UseSnakeCaseNamingConvention();
+            options.UseNpgsql(connectionSting)
+                   .UseSnakeCaseNamingConvention();
         });
         services.AddHealthChecks().AddNpgSql(connectionSting!);
-
-        services.AddHttpClient<INotificationProvider, TgProvider>();
-        services.AddSingleton<INotificationProvider, EmailProvider>();
 
         services.AddScoped<IEcosystemRepository, EcosystemRepository>();
         services.AddScoped<IMaintenanceLogRepository, MaintenanceLogRepository>();
@@ -35,16 +44,32 @@ public static class DependencyInjection
         services.AddScoped<IReminderRepository, ReminderRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
 
+        services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
+
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IUserContext, UserContext>();
+        services.AddHttpContextAccessor();
+
+        services.AddHostedService<DatabaseMigrationService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddMessageProviders(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<TelegramOptions>(configuration.GetSection(TelegramOptions.SectionName));
+        services.Configure<EmailOptions>(configuration.GetSection(EmailOptions.SectionName));
+
+        services.AddHttpClient<INotificationProvider, TgProvider>();
+        services.AddSingleton<INotificationProvider, EmailProvider>();
 
         return services;
     }
 
     public static IServiceCollection AddRabbitMq(this IServiceCollection services, IConfiguration configuration)
     {
-        var rabbitSection = configuration.GetSection(RabbitMqOptions.SectionName);
-        var rabbitOgtions = rabbitSection.Get<RabbitMqOptions>()
+        IConfigurationSection rabbitSection = configuration.GetSection(RabbitMqOptions.SectionName);
+        RabbitMqOptions rabbitOgtions = rabbitSection.Get<RabbitMqOptions>()
             ?? throw new InvalidOperationException("RabbitMQ configuration is missing.");
 
         services.Configure<RabbitMqOptions>(rabbitSection);
@@ -59,6 +84,7 @@ public static class DependencyInjection
 
             busConfigurator.AddConsumer<UserCreatedEventConsumer>();
             busConfigurator.AddConsumer<UserUpdatedEventConsumer>();
+            busConfigurator.AddConsumer<SubscriptionDowngradedEventConsumer>();
 
             busConfigurator.AddConsumer<CriticalTelemetryThresholdAlertEventConsumer>();
 
@@ -85,24 +111,20 @@ public static class DependencyInjection
 
     public static IServiceCollection AddQuartzJobs(this IServiceCollection services)
     {
-        services.AddQuartz(options =>
+        services.AddQuartz(opts =>
         {
             var reminderJobKey = new JobKey(nameof(ReminderCheckerJob));
-
-            var unpublishedNoticeJobKey = new JobKey(nameof(UnpublishedNoticeProcessorJob));
-
-            options.AddJob<ReminderCheckerJob>(jobOptions =>
-                jobOptions.WithIdentity(reminderJobKey));
-
-            options.AddJob<UnpublishedNoticeProcessorJob>(jobOptions =>
-                jobOptions.WithIdentity(unpublishedNoticeJobKey));
-
-            options.AddTrigger(triggerOptions => triggerOptions
+            opts.AddJob<ReminderCheckerJob>(jobOpts =>
+                jobOpts.WithIdentity(reminderJobKey));
+            opts.AddTrigger(triggerOpts => triggerOpts
                 .ForJob(reminderJobKey)
                 .WithIdentity($"{reminderJobKey}-trigger")
                 .WithSimpleSchedule(x => x.WithIntervalInHours(24).RepeatForever()));
 
-            options.AddTrigger(triggerOptions => triggerOptions
+            var unpublishedNoticeJobKey = new JobKey(nameof(UnpublishedNoticeProcessorJob));
+            opts.AddJob<UnpublishedNoticeProcessorJob>(jobOptions =>
+                jobOptions.WithIdentity(unpublishedNoticeJobKey));
+            opts.AddTrigger(triggerOptions => triggerOptions
                 .ForJob(unpublishedNoticeJobKey)
                 .WithIdentity($"{unpublishedNoticeJobKey}-trigger")
                 .WithSimpleSchedule(x => x.WithIntervalInSeconds(30).RepeatForever()));
@@ -113,4 +135,17 @@ public static class DependencyInjection
 
         return services;
     }
+}
+
+internal sealed class DatabaseMigrationService(IServiceProvider serviceProvider) : IHostedService
+{
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        using IServiceScope scope = serviceProvider.CreateScope();
+        NotificationDbContext context = scope.ServiceProvider.GetRequiredService<NotificationDbContext>();
+
+        await context.Database.MigrateAsync(cancellationToken);
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

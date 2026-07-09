@@ -1,13 +1,18 @@
-﻿using Notification.Application.Interfaces;
+using Contracts.Results;
+using MediatR;
+using Notification.Application.Features.BackgroundJobs.Commands.ProcessReminders;
 using Quartz;
 
 namespace Notification.Infrastructure.BackgroundJob;
 
-public class ReminderCheckerJob(
-    IReminderProcessor processor) : IJob
+public sealed class ReminderCheckerJob(ISender sender) : IJob
 {
     public async Task Execute(IJobExecutionContext context)
     {
-        await processor.CheckAsync(context.CancellationToken);
+        Result result = await sender.Send(new ProcessRemindersCommand(), context.CancellationToken);
+        if (result.IsFailure)
+        {
+            throw new JobExecutionException(result.Error.Message);
+        }
     }
 }

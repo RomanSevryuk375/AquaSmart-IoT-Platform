@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Contracts.Results;
 
@@ -20,7 +20,7 @@ public static class ResultExtensions
     {
         if (result.IsSuccess)
         {
-            return controller.NoContent(); 
+            return controller.NoContent();
         }
 
         return MapError(controller, result.Error);
@@ -29,10 +29,10 @@ public static class ResultExtensions
     private static ObjectResult MapError(
         ControllerBase controller, Error error)
     {
-        var response = new 
-        { 
-            error = error.Code, 
-            message = error.Message 
+        var response = new
+        {
+            error = error.Code,
+            message = error.Message
         };
 
         return error.Type switch

@@ -1,8 +1,9 @@
-﻿using AutoMapper;
+using Contracts.Events.RelayEvents;
 using Contracts.Events.SensorEvents;
-using Device.Application.DTOs.Configurations;
-using Device.Application.DTOs.Sensor;
-using Device.Domain.Entities;
+using Device.Application.Features.Controllers.Query.GetControllerConfig;
+using Device.Application.Features.Sensors.Command.AddSensor;
+using Device.Domain.Events.RelayEvents;
+using Device.Domain.Events.SensorEvents;
 
 namespace Device.Application.MapProfiles;
 
@@ -10,22 +11,32 @@ public sealed class SensorProfile : Profile
 {
     public SensorProfile()
     {
-        CreateMap<SensorEntity, SensorResponseDto>();
+        CreateMap<Sensor, SensorCreatedResponse>()
+            .ForMember(desc => desc.Id,
+                       opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<SensorEntity, SensorUpdatedEvent>()
+        CreateMap<Sensor, SensorUpdatedEvent>()
             .ForMember(desc => desc.SensorId,
                        opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<SensorEntity, SensorStateChangedEvent>()
+        CreateMap<Sensor, SensorStateChangedEvent>()
             .ForMember(desc => desc.SensorId,
                        opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<SensorEntity, SensorCreatedEvent>()
+        CreateMap<Sensor, SensorCreatedEvent>()
             .ForMember(desc => desc.SensorId,
                        opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<SensorEntity, SensorConfigDto>()
+        CreateMap<Sensor, SensorConfig>()
             .ForMember(desc => desc.SensorId,
                        opt => opt.MapFrom(src => src.Id));
+
+        CreateMap<SensorCreatedDomainEvent, SensorCreatedEvent>();
+
+        CreateMap<SensorStateChangedDomainEvent, SensorStateChangedEvent>();
+
+        CreateMap<SensorUpdatedDomainEvent, SensorUpdatedEvent>();
+
+        CreateMap<SetRelayPowerSensorDomainEvent, SetRelayPowerSensorEvent>();
     }
 }

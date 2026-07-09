@@ -1,12 +1,16 @@
-﻿using Contracts.Options;
+// Ignore Spelling: Mq
+
+using Contracts.Options;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Quartz;
 using Telemetry.Application.Interfaces;
 using Telemetry.Domain.Interfaces;
 using Telemetry.Infrastructure.BackgroundJobs;
+using Telemetry.Infrastructure.Factories;
 using Telemetry.Infrastructure.Messaging;
 using Telemetry.Infrastructure.Messaging.EcosystemConsumers;
 using Telemetry.Infrastructure.Messaging.SensorConsumers;
@@ -21,31 +25,41 @@ namespace Telemetry.Infrastructure.Extensions;
 
 public static class DependencyInjection
 {
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
+        return services.AddRepositories(configuration)
+                       .AddQuartzJob()
+                       .AddRabbitMq(configuration)
+                       .AddMySignalR();
+    }
+
     public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddSingleton<ConvertDomainEventsToOutboxMessagesInterceptor>();
+
         services.AddScoped<IEcosystemRepository, EcosystemRepository>();
         services.AddScoped<ISensorRepository, SensorRepository>();
         services.AddScoped<ITelemetryRawDataRepository, TelemetryRawDataRepository>();
         services.AddScoped<ITelemetryAggregateDataRepository, TelemetryAggregateDataRepository>();
         services.AddScoped<IOutboxRepository, OutboxRepository>();
 
-        var connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
-        services.AddDbContext<SystemDbContext>((sp, options) =>
+        services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
+
+        string? connectionString = configuration.GetConnectionString(nameof(TelemetryDbContext));
+        services.AddDbContext<TelemetryDbContext>((sp, options) =>
         {
-            var interceptor = sp.GetService<ConvertDomainEventsToOutboxMessagesInterceptor>();
+            ConvertDomainEventsToOutboxMessagesInterceptor interceptor =
+            sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
 
             options.UseNpgsql(connectionString)
-                   .UseSnakeCaseNamingConvention();
-
-            if (interceptor != null)
-            {
-                options.AddInterceptors(interceptor);
-            }
+                   .UseSnakeCaseNamingConvention()
+                   .AddInterceptors(interceptor);
         });
-
         services.AddHealthChecks().AddNpgSql(connectionString!);
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        services.AddHostedService<DatabaseMigrationService>();
 
         return services;
     }
@@ -97,7 +111,7 @@ public static class DependencyInjection
                 .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever()));
         });
 
-        services.AddQuartzHostedService(hostOptions 
+        services.AddQuartzHostedService(hostOptions
             => hostOptions.WaitForJobsToComplete = true);
 
         return services;
@@ -105,8 +119,8 @@ public static class DependencyInjection
 
     public static IServiceCollection AddRabbitMq(this IServiceCollection services, IConfiguration configuration)
     {
-        var rabbitSection = configuration.GetSection(RabbitMqOptions.SectionName);
-        var rabbitOptions = rabbitSection.Get<RabbitMqOptions>()
+        IConfigurationSection rabbitSection = configuration.GetSection(RabbitMqOptions.SectionName);
+        RabbitMqOptions rabbitOptions = rabbitSection.Get<RabbitMqOptions>()
             ?? throw new InvalidOperationException("RabbitMQ configuration is missing.");
 
         services.Configure<RabbitMqOptions>(rabbitSection);
@@ -138,8 +152,7 @@ public static class DependencyInjection
             });
         });
 
-        services.AddHealthChecks()
-            .AddRabbitMQ(new Uri(rabbitOptions.Host));
+        services.AddHealthChecks().AddRabbitMQ(new Uri(rabbitOptions.Host));
 
         return services;
     }
@@ -152,4 +165,17 @@ public static class DependencyInjection
 
         return services;
     }
+}
+
+internal sealed class DatabaseMigrationService(IServiceProvider serviceProvider) : IHostedService
+{
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        using IServiceScope scope = serviceProvider.CreateScope();
+        TelemetryDbContext context = scope.ServiceProvider.GetRequiredService<TelemetryDbContext>();
+
+        await context.Database.MigrateAsync(cancellationToken);
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

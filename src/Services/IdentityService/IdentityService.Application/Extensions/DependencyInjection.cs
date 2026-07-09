@@ -1,6 +1,9 @@
-﻿using Contracts.Options;
+using System.Reflection;
+using Contracts.Options;
+using FluentValidation;
+using IdentityService.Application.Behaviors;
 using IdentityService.Application.Interfaces;
-using IdentityService.Application.Services;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,11 +15,22 @@ public static class DependencyInjection
     {
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
         services.AddScoped<IJwtProvider, JwtProvider>();
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<ISubscriptionExpiredChecker, SubscriptionExpiredChecker>();
-        services.AddScoped<IIncorrectTokenChecker, IncorrectTokenChecker>();
-        services.AddScoped<IUserService, UserService>();
         services.AddSingleton<IMyHasher, MyHasher>();
+
+        Assembly assembly = typeof(DependencyInjection).Assembly;
+
+        services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssembly(assembly);
+
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
+        });
+
+        services.AddValidatorsFromAssembly(assembly);
+
+        services.AddAutoMapper(cfg => cfg.AddMaps(assembly));
 
         return services;
     }

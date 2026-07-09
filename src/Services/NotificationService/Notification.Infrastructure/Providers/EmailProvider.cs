@@ -1,52 +1,46 @@
-﻿using Contracts.Options;
+using System.Net;
+using System.Net.Mail;
+using Contracts.Options;
+using Contracts.Results;
 using Microsoft.Extensions.Options;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
-using System.Net;
-using System.Net.Mail;
 
 namespace Notification.Infrastructure.Providers;
 
-public class EmailProvider(IOptions<EmailOptions> options) : INotificationProvider
+public sealed class EmailProvider(IOptions<EmailOptions> options) : INotificationProvider
 {
     private readonly EmailOptions _settings = options.Value;
-    public bool IsEnabled(UserEntity user)
-    {
-        if (user.EmailEnable)
-        {
-            return true;
-        }
 
-        return false;
-    }
+    public bool IsEnabled(User user) => user.EmailEnable;
 
-    public async Task<(bool Success, string Error)> SendAsync(
-        UserEntity user, 
-        string message, 
-        CancellationToken cancellationToken)
+    public async Task<Result> SendAsync(
+        User user,
+        string message,
+        CancellationToken cancellationToken = default)
     {
         try
         {
-            var email = user.Email;
-
             using var client = new SmtpClient(_settings.Host, _settings.Port)
             {
                 Credentials = new NetworkCredential(_settings.UserName, _settings.Password),
                 EnableSsl = true
             };
 
-            var mailMessage = new MailMessage(_settings.FromEmail, user.Email)
+            using var mailMessage = new MailMessage(_settings.FromEmail, user.Email.Value)
             {
                 Subject = "AquaAPI Notification",
                 Body = message
             };
 
             await client.SendMailAsync(mailMessage, cancellationToken);
-            return (true, "Ok");
+
+            return Result.Success();
         }
         catch (Exception ex)
         {
-            return (false, $"{ex.Message} {ex.StackTrace}");
+            return Result.Failure(Error.Failure<EmailProvider>(
+                $"{ex.Message} {ex.StackTrace}"));
         }
     }
 }

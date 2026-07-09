@@ -1,20 +1,23 @@
-﻿using Contracts.Events.TelemetryEvents;
+using AutoMapper;
+using Contracts.Events.TelemetryEvents;
+using Contracts.Results;
 using MassTransit;
-using Telemetry.Application.Interfaces;
+using MediatR;
+using Telemetry.Application.Features.Telemetry.Commands.AddTelemetryBatch;
 
 namespace Telemetry.Infrastructure.Messaging;
 
-public class TelemetryBatchConsumer(
-    ITelemetryDataService dataService) : IConsumer<TelemetryBatchEvent>
+public sealed class TelemetryBatchConsumer(ISender sender, IMapper mapper)
+    : IConsumer<TelemetryBatchEvent>
 {
     public async Task Consume(ConsumeContext<TelemetryBatchEvent> context)
     {
-        var result = await dataService.AddDataAsync(
-            context.Message, context.CancellationToken);
+        AddTelemetryBatchCommand command = mapper.Map<AddTelemetryBatchCommand>(context.Message);
 
-        if (!result.IsSuccess && result.IsRetryable)
+        Result result = await sender.Send(command, context.CancellationToken);
+        if (result.IsFailure)
         {
-            throw new Exception(result.Error);
+            throw new InvalidOperationException(result.Error.Message);
         }
     }
 }

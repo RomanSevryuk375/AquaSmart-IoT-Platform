@@ -1,45 +1,61 @@
-﻿using Contracts.Authorization;
-using Contracts.Results;
-using Device.Application.DTOs.Sensor;
-using Device.Application.DTOs.Telemetry;
-using Device.Application.Interfaces;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using Contracts.Enums;
+using Device.Application.Features.Sensors.Command.AddSensor;
+using Device.Application.Features.Sensors.Command.DeleteSensor;
+using Device.Application.Features.Sensors.Command.UpdateSensor;
+using Device.Application.Features.Sensors.Query.GetAllSensors;
+using Device.Application.Features.Sensors.Query.GetSensorById;
+using Device.Application.Features.Sensors.Query.Shared;
+using Device.Application.Features.Telemetry.Command.TransmittTelemetry;
+using MediatR;
 
 namespace Device.API.Controllers;
 
 [ApiController]
-[Route("api/device/v1/sensors")]
-public class SensorsController(
-    ISensorService sensorService,
-    ITelemtryBatchService batchService) : ControllerBase
+[Route(ApiConstants.Routes.Sensors)]
+public sealed class SensorsController(
+    ISender sender,
+    IUserContext userContext) : ControllerBase
 {
-    private const string NameGetById = "GetSensorByIdAsync";
+    private const string NameGetById = "GetSensorById";
 
     [HttpGet]
     [Authorize(Policy = SubPermissions.DeviceControl)]
-    public async Task<ActionResult<IReadOnlyList<SensorResponseDto>>> GetAllSensorsAsync(
-        [FromQuery] SensorFilterDto filter,
+    public async Task<ActionResult<IReadOnlyList<SensorDto>>> GetAllSensorsAsync(
+        [FromQuery] Guid? controllerId,
+        [FromQuery] SensorType? type,
+        [FromQuery] SensorState? state,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 10,
         CancellationToken cancellationToken = default)
     {
-        var result = await sensorService.GetAllSensorsAsync(
-            filter,
-            skip, 
-            take, 
-            cancellationToken);
+        var query = new GetAllSensorsQuery
+        {
+            UserId = userContext.UserId,
+            ControllerId = controllerId,
+            Type = type,
+            State = state,
+            Skip = skip,
+            Take = take
+        };
+
+        Result<IReadOnlyList<SensorDto>> result = await sender.Send(query, cancellationToken);
 
         return this.ToActionResult(result);
     }
 
     [HttpGet("{id:guid}", Name = NameGetById)]
     [Authorize(Policy = SubPermissions.DeviceControl)]
-    public async Task<ActionResult<SensorResponseDto>> GetSensorByIdAsync(
+    public async Task<ActionResult<SensorDto>> GetSensorByIdAsync(
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        var result = await sensorService.GetSensorByIdAsync(id, cancellationToken);
+        var query = new GetSensorByIdQuery
+        {
+            UserId = userContext.UserId,
+            SensorId = id
+        };
+
+        Result<SensorDto> result = await sender.Send(query, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -47,10 +63,10 @@ public class SensorsController(
     [HttpPost]
     [Authorize(Policy = SubPermissions.DeviceControl)]
     public async Task<ActionResult> AddSensorAsync(
-        [FromBody] SensorRequestDto request,
+        [FromBody] AddSensorCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await sensorService.AddSensorAsync(request, cancellationToken);
+        Result<SensorCreatedResponse> result = await sender.Send(command, cancellationToken);
 
         if (result.IsFailure)
         {
@@ -66,34 +82,31 @@ public class SensorsController(
     [HttpPost("telemetry")]
     [AllowAnonymous]
     public async Task<ActionResult> ReceiveBatchTelemetryAsync(
-    [FromBody] TelemetryBatchRequest request,
-    [FromHeader(Name = "X-Device-Token")] string deviceToken,
-    CancellationToken cancellationToken)
+        [FromBody] TransmitTelemetryCommand command,
+        [FromHeader(Name = ApiConstants.Headers.DeviceToken)] string deviceToken,
+        CancellationToken cancellationToken = default)
     {
-        var result = await batchService
-            .ProcessTelemetryBatchAsync(request, deviceToken, cancellationToken);
+        TransmitTelemetryCommand enrichedCommand = command with { DeviceToken = deviceToken };
 
+        Result<TelemetryTransmittedResponse> result = await sender.Send(enrichedCommand, cancellationToken);
         if (result.IsFailure)
         {
             return this.ToActionResult(result);
         }
 
-        return Accepted(new
-        {
-            result.Value.AcceptedCount,
-            result.Value.ValidationErrors,
-            result.Value.SkippedCount
-        });
+        return Accepted(result.Value);
     }
 
     [HttpPut("{id:guid}")]
     [Authorize(Policy = SubPermissions.DeviceControl)]
     public async Task<ActionResult> UpdateSensorAsync(
         [FromRoute] Guid id,
-        [FromBody] SensorUpdateRequestDto reuqest,
+        [FromBody] UpdateSensorCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await sensorService.UpdateSensorAsync(id, reuqest, cancellationToken);
+        UpdateSensorCommand enrichedCommand = command with { SensorId = id };
+
+        Result result = await sender.Send(enrichedCommand, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -104,7 +117,9 @@ public class SensorsController(
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        var result = await sensorService.DeleteSensorAsync(id, cancellationToken);
+        var command = new DeleteSensorCommand { SensorId = id };
+
+        Result result = await sender.Send(command, cancellationToken);
 
         return this.ToActionResult(result);
     }

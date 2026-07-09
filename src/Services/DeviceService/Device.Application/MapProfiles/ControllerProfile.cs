@@ -1,6 +1,5 @@
-﻿using AutoMapper;
-using Device.Application.DTOs.Controller;
-using Device.Domain.Entities;
+using Contracts.Events.ControllerEvents;
+using Device.Domain.Events.ControllerEvents;
 
 namespace Device.Application.MapProfiles;
 
@@ -8,6 +7,6 @@ public sealed class ControllerProfile : Profile
 {
     public ControllerProfile()
     {
-        CreateMap<ControllerEntity, ControllerResponseDto>();
+        CreateMap<ControllerNotOnlineDomainEvent, ControllerNotOnlineEvent>();
     }
 }

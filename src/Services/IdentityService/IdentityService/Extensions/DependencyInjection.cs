@@ -1,4 +1,4 @@
-﻿using Contracts.Authorization;
+using Contracts.Authorization;
 using IdentityService.Application.Extensions;
 using IdentityService.Domain.Entities;
 using IdentityService.Infrastructure;
@@ -10,7 +10,7 @@ namespace IdentityService.API.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHttpContextAccessor();
         services.AddEndpointsApiExplorer();
@@ -46,20 +46,19 @@ public static class DependencyInjection
 
         services.AddServices(configuration);
 
-        services.AddIdentity<UserEntity, IdentityRole<Guid>>(options =>
+        services.AddIdentity<User, IdentityRole<Guid>>(options =>
         {
             options.Password.RequiredLength = 8;
             options.Password.RequireDigit = true;
             options.Password.RequireUppercase = false;
             options.User.RequireUniqueEmail = true;
         })
-        .AddEntityFrameworkStores<IdentityDbContext>() 
+        .AddEntityFrameworkStores<IdentityDbContext>()
         .AddDefaultTokenProviders();
-        services.AddCommonAuthentication(configuration);
 
-        services.AddQuartzJobs();
-        services.AddRabbitMq(configuration);
-        services.AddRepositories(configuration);
+        services.AddAquaAuthorizationPolicies();
+        services.AddCommonAuthentication(configuration);
+        services.AddInfrastructure(configuration);
 
         return services;
     }

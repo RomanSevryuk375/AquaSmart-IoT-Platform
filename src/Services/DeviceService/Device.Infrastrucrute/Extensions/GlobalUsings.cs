@@ -1,0 +1,9 @@
+global using Contracts.Constants;
+global using Contracts.Enums;
+global using Device.Domain.Entities;
+global using Device.Domain.Entities.Sensors;
+global using Device.Domain.Interfaces;
+global using Device.Infrastructure.Persistence;
+global using MassTransit;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;

@@ -1,29 +1,49 @@
+using Contracts.Constants;
 using Contracts.Middlewares;
-using Microsoft.EntityFrameworkCore;
 using Notification.API.Extensions;
-using Notification.Infrastructure;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-builder.Services.AddInfrastructure(builder.Configuration);
-
-var app = builder.Build();
-
-app.UseGlobalExceptionHandler();
-
-using (var scope = app.Services.CreateScope())
+try
 {
-    var context = scope.ServiceProvider.GetRequiredService<SystemDbContext>();
-    context.Database.Migrate();
+    Log.Information("Starting NotificationService application");
+
+    WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+    builder.AddElkLogging();
+
+    builder.Services.AddConfiguration(builder.Configuration);
+
+    WebApplication app = builder.Build();
+
+    app.UseGlobalExceptionHandler();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.MapHealthChecks(ApiConstants.HealthRoute);
+    app.MapControllers();
+
+    await app.RunAsync();
+}
+#pragma warning disable S2139
+catch (Exception ex) when (ex is not HostAbortedException)
+{
+    Log.Fatal(ex, "NotificationService terminated unexpectedly");
+    throw;
+}
+#pragma warning restore S2139
+finally
+{
+#pragma warning disable S6966 
+    Log.CloseAndFlush();
+#pragma warning restore S6966 
 }
 
-app.UseSwagger();
-app.UseSwaggerUI();
+#pragma warning disable S1118 
+public partial class Program { }
+#pragma warning restore S1118
 
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapHealthChecks("/health");
-app.MapControllers();
-
-app.Run();

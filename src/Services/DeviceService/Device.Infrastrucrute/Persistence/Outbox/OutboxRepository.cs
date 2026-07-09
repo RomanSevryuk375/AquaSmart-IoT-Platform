@@ -1,19 +1,17 @@
-﻿using Device.Domain.Entities;
-using Device.Domain.Interfaces;
 using Device.Infrastructure.Persistence.Repositories;
-using Microsoft.EntityFrameworkCore;
 
 namespace Device.Infrastructure.Persistence.Outbox;
 
-public sealed class OutboxRepository(SystemDbContext dbContext)
+public sealed class OutboxRepository(DeviceDbContext dbContext)
     : BaseRepository<OutboxMessage>(dbContext), IOutboxRepository
 {
     public async Task<IReadOnlyList<OutboxMessage>> GetPendingMessagesAsync(
         int batchSize,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         return await Context.OutboxMessages
             .Where(x => x.ProcessedOnUtc == null)
+            .OrderBy(x => x.OccurredOnUtc)
             .Take(batchSize)
             .ToListAsync(cancellationToken);
     }

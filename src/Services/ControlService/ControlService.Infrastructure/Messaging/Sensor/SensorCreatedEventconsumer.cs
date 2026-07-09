@@ -1,20 +1,23 @@
-﻿using Contracts.Events.SensorEvents;
-using Control.Application.Interfaces;
+using AutoMapper;
+using Contracts.Events.SensorEvents;
+using Contracts.Results;
+using Control.Application.Features.Sensors.Commands.SyncSensorCreated;
 using MassTransit;
+using MediatR;
 
 namespace Control.Infrastructure.Messaging.Sensor;
 
-internal sealed class SensorCreatedEventconsumer(ISensorService service) 
+internal sealed class SensorCreatedEventconsumer(ISender sender, IMapper mapper)
     : IConsumer<SensorCreatedEvent>
 {
     public async Task Consume(ConsumeContext<SensorCreatedEvent> context)
     {
-        var result = await service.CreateSensorAsync(
-            context.Message, context.CancellationToken);
+        SyncSensorCreatedCommand command = mapper.Map<SyncSensorCreatedCommand>(context.Message);
 
-        if (!result.IsSuccess && result.IsRetryable)
+        Result result = await sender.Send(command, context.CancellationToken);
+        if (result.IsFailure)
         {
-            throw new Exception(result.Error);
+            throw new InvalidOperationException(result.Error.Message);
         }
     }
 }

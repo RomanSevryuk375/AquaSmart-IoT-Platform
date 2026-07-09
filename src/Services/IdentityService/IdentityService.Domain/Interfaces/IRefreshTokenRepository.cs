@@ -1,25 +1,14 @@
-﻿using IdentityService.Domain.Entities;
+using Contracts.Abstractions;
+using IdentityService.Domain.Entities;
 
-namespace IdentityService.Domain.Interfaces;
+namespace IdentityService.Infrastructure.Repositories;
 
-public interface IRefreshTokenRepository
+public interface IRefreshTokenRepository : IRepository<RefreshToken>
 {
-    Task<string> AddTokenAsync(
-        RefreshTokenEntity refreshToken, 
-        CancellationToken cancellationToken);
+    public Task DeleteIncorrectTokensAsync(
+        CancellationToken cancellationToken = default);
 
-    Task DeleteIncorrectTokensAsync(
-        CancellationToken cancellationToken);
-
-    Task<RefreshTokenEntity?> GetByIdAsync(
-        Guid tokenId, 
-        CancellationToken cancellationToken);
-
-    Task DeleteTokensByUserIdAsync(
+    public Task DeleteTokensByUserIdAsync(
         Guid userId,
-        CancellationToken cancellationToken);
-
-    Task UpdateTokenAsync(
-        RefreshTokenEntity token, 
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

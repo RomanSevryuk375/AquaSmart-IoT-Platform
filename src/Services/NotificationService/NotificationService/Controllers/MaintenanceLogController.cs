@@ -1,49 +1,74 @@
-﻿using Contracts.Authorization;
+using Contracts.Authorization;
+using Contracts.Constants;
 using Contracts.Results;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Notification.Application.DTOs.MaintenanceLog;
-using Notification.Application.Interfaces;
+using Notification.Application.Features.MaintenanceLogs.Commands.CreateMaintenanceLog;
+using Notification.Application.Features.MaintenanceLogs.Queries.GetAllMaintenanceLogs;
+using Notification.Application.Features.MaintenanceLogs.Queries.GetMaintenanceLogById;
+using Notification.Application.Features.MaintenanceLogs.Queries.Shared;
+using Notification.Domain.Interfaces;
 
 namespace Notification.API.Controllers;
 
 [ApiController]
-[Route("api/notification/v1/maintenance-logs")]
-public class MaintenanceLogsController(IMaintenanceLogService logService) : ControllerBase
+[Route(ApiConstants.Routes.MaintenanceLogs)]
+public class MaintenanceLogsController(
+    ISender sender,
+    IUserContext userContext) : ControllerBase
 {
-    private const string GetByIdRouteName = "GetLogById";
+    private const string GetByIdRouteName = "GetMaintenanceLogById";
 
     [HttpGet]
     [Authorize(Policy = SubPermissions.MaintenanceLogRead)]
-    public async Task<ActionResult<IReadOnlyList<MaintenanceLogResponseDto>>> GetAllLogsAsync(
-        [FromQuery] MaintenanceLogFilterDto filter,
-        [FromQuery] int? skip = 0,
-        [FromQuery] int? take = 10,
+    public async Task<ActionResult<IReadOnlyList<MaintenanceLogDto>>> GetAllLogsAsync(
+        [FromQuery] Guid? ecosystemId,
+        [FromQuery] DateTime? actionDateFrom,
+        [FromQuery] DateTime? actionDateTo,
+        [FromQuery] int skip = 0,
+        [FromQuery] int take = 10,
         CancellationToken cancellationToken = default)
     {
-        var result = await logService.GetAllLogs(filter, skip, take, cancellationToken);
+        var query = new GetAllMaintenanceLogsQuery
+        {
+            UserId = userContext.UserId,
+            EcosystemId = ecosystemId,
+            ActionDateFrom = actionDateFrom,
+            ActionDateTo = actionDateTo,
+            Skip = skip,
+            Take = take
+        };
 
+        Result<IReadOnlyList<MaintenanceLogDto>> result = await sender.Send(query, cancellationToken);
         return this.ToActionResult(result);
     }
 
     [HttpGet("{id:guid}", Name = GetByIdRouteName)]
     [Authorize(Policy = SubPermissions.MaintenanceLogRead)]
-    public async Task<ActionResult<MaintenanceLogResponseDto>> GetLogByIdAsync(
-        Guid id,
+    public async Task<ActionResult<MaintenanceLogDto>> GetLogByIdAsync(
+        [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        var result = await logService.GetLogById(id, cancellationToken);
+        var query = new GetMaintenanceLogByIdQuery
+        {
+            Id = id,
+            UserId = userContext.UserId
+        };
 
+        Result<MaintenanceLogDto> result = await sender.Send(query, cancellationToken);
         return this.ToActionResult(result);
     }
 
     [HttpPost]
     [Authorize(Policy = SubPermissions.MaintenanceLogWrite)]
     public async Task<ActionResult<Guid>> AddLogAsync(
-        [FromBody] MaintenanceLogRequestDto request,
+        [FromBody] CreateMaintenanceLogCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await logService.AddLogAsync(request, cancellationToken);
+        CreateMaintenanceLogCommand enrichedCommand = command with { UserId = userContext.UserId };
+
+        Result<Guid> result = await sender.Send(enrichedCommand, cancellationToken);
 
         if (result.IsFailure)
         {
