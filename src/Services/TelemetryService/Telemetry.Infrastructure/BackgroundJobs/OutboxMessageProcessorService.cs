@@ -2,7 +2,6 @@ using Contracts.Abstractions;
 using Contracts.Results;
 using MediatR;
 using Newtonsoft.Json;
-using Telemetry.Application.Interfaces;
 using Telemetry.Domain.Interfaces;
 using Telemetry.Infrastructure.Persistence.Outbox;
 
@@ -11,7 +10,7 @@ namespace Telemetry.Infrastructure.BackgroundJobs;
 public sealed class OutboxMessageProcessorService(
     IOutboxRepository outboxRepository,
     IPublisher publisher,
-    IUnitOfWork unitOfWork) : IOutboxMessageProcessorService
+    IUnitOfWork unitOfWork)
 {
     public async Task<Result> ProcessAsync(CancellationToken cancellationToken = default)
     {

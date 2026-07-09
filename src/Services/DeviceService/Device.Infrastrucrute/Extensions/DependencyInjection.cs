@@ -28,6 +28,7 @@ public static class DependencyInjection
     public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<ConvertDomainEventsToOutboxMessagesInterceptor>();
+        services.AddScoped<OutboxMessageProcessorService>();
 
         services.AddScoped<IControllerRepository, ControllerRepository>();
         services.AddScoped<IOutboxRepository, OutboxRepository>();
@@ -62,8 +63,6 @@ public static class DependencyInjection
 
     public static IServiceCollection AddQuartzJobs(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<OutboxMessageProcessorService>();
-
         IConfigurationSection backgroudSection = configuration.GetSection(BackgroundJobsOptions.SectionName);
         BackgroundJobsOptions backgroudJobOptions = backgroudSection.Get<BackgroundJobsOptions>()
             ?? throw new InvalidOperationException(DiErrors.BackgroundJobsConfiguration);
