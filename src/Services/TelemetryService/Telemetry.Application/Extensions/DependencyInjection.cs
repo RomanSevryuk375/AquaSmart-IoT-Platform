@@ -1,32 +1,39 @@
 using System.Reflection;
+using FluentValidation;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Telemetry.Application.Behaviors;
+using Telemetry.Application.Features.BackgroundJobs.Commands.Shared;
 using Telemetry.Application.Interfaces;
-using Telemetry.Application.Services;
 
 namespace Telemetry.Application.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration cfg)
+    public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<ICompressorService, CompressorService>();
-        services.AddScoped<IEcosystemService, EcosystemService>();
-        services.AddScoped<IOutboxMessageProcessorService, OutboxMessageProcessorService>();
-        services.AddScoped<ISensorService, SensorService>();
-        services.AddScoped<ISensorStateCheckerService, SensorStateCheckerService>();
-        services.AddScoped<ITelemetryDataService, TelemetryDataService>();
-        services.AddScoped<ITelemetryRetentionService, TelemetryRetentionService>();
-        services.AddScoped<IDataAggregateService, DataAggregateService>();
+        services.AddScoped<ICompressorHelper, CompressorHelper>();
+
+        Assembly assembly = typeof(DependencyInjection).Assembly;
 
         services.AddMediatR(cfg =>
-            cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+        {
+            cfg.RegisterServicesFromAssembly(assembly);
 
-        services.AddAutoMapper(cfg =>
-            cfg.AddMaps(typeof(DependencyInjection).Assembly));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
+        });
+
+        services.AddValidatorsFromAssembly(assembly);
+
+        services.AddAutoMapper(cfg => cfg.AddMaps(assembly));
+
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
 
         services.Configure<TelemetrySettings>(
-            cfg.GetSection(TelemetrySettings.SectionName));
+            configuration.GetSection(TelemetrySettings.SectionName));
 
         return services;
     }

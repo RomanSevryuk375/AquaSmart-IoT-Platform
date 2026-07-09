@@ -185,7 +185,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080  
-      - ConnectionStrings__SystemDbContext=Host=telemetry-db;Database=telemetry_db;Username=postgres;Password=password
+      - ConnectionStrings__TelemetryDbContext=Host=telemetry-db;Database=telemetry_db;Username=postgres;Password=password
       - ElasticConfiguration__Uri=http://elasticsearch:9200
       - RabbitMqOptions__Host=amqp://rabbitmq:5672
       - RabbitMqOptions__UserName=guest

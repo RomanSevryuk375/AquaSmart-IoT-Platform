@@ -6,10 +6,10 @@ using Telemetry.Domain.ValueObjects;
 
 namespace Telemetry.Infrastructure.Persistence.Repositories;
 
-public sealed class TelemetryAggregateDataRepository(SystemDbContext dbContext)
+public sealed class TelemetryAggregateDataRepository(TelemetryDbContext dbContext)
     : BaseRepository<AggregateTelemetry>(dbContext), ITelemetryAggregateDataRepository
 {
-    public async Task<IReadOnlyList<TelemetrySummary>> GetSummaryForPeriodAsync(
+    public async Task<IReadOnlyDictionary<Guid, TelemetrySummary>> GetSummaryForPeriodAsync(
         PeriodType sourcePeriod,
         DateTime from,
         DateTime to,
@@ -22,6 +22,7 @@ public sealed class TelemetryAggregateDataRepository(SystemDbContext dbContext)
             .GroupBy(x => x.SensorId)
             .Select(g => new
             {
+                SensorId = g.Key,
                 MinValue = g.Min(x => x.Summary.MinValue),
                 AvgValue = g.Sum(x => x.Summary.AvgValue * x.Summary.Count) / g.Sum(x => x.Summary.Count),
                 MaxValue = g.Max(x => x.Summary.MaxValue),
@@ -29,10 +30,9 @@ public sealed class TelemetryAggregateDataRepository(SystemDbContext dbContext)
             })
             .ToListAsync(cancellationToken);
 
-        return rawData
-            .Select(x => TelemetrySummary.Create(x.MinValue, x.AvgValue, x.MaxValue, x.Count).Value)
-            .ToList()
-            .AsReadOnly();
+        return rawData.ToDictionary(
+            x => x.SensorId,
+            x => TelemetrySummary.Create(x.MinValue, x.AvgValue, x.MaxValue, x.Count).Value);
     }
 
     public async Task DeleteOldRawDataAsync(

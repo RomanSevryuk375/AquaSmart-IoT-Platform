@@ -14,10 +14,10 @@ public interface ITelemetryRawDataRepository : IRepository<RawTelemetry>
         DateTime olderThan,
         CancellationToken cancellationToken = default);
 
-    public Task<IReadOnlyList<TelemetrySummary>> GetSummaryForPeriodAsync(
-        DateTime from,
-        DateTime to,
-        CancellationToken cancellationToken = default);
+    public Task<IReadOnlyDictionary<Guid, TelemetrySummary>> GetSummaryForPeriodAsync(
+            DateTime from,
+            DateTime to,
+            CancellationToken cancellationToken = default);
 
     public Task MarkAsAggregatedAsync(
         List<Guid> sensorIds,

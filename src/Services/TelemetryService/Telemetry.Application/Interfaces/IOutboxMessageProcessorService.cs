@@ -4,6 +4,5 @@ namespace Telemetry.Application.Interfaces;
 
 public interface IOutboxMessageProcessorService
 {
-    public Task<Result> ProcessAsync(
-        CancellationToken cancellationToken);
+    public Task<Result> ProcessAsync(CancellationToken cancellationToken = default);
 }

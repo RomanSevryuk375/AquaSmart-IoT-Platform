@@ -2,9 +2,12 @@
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
   </Folder>
+  <Folder Name="/src/">
+    <Project Path="../Telemetry.Application/Telemetry.Application.csproj" />
+    <Project Path="../Telemetry.Domain/Telemetry.Domain.csproj" />
+    <Project Path="../Telemetry.Infrastructure/Telemetry.Infrastructure.csproj" />
+    <Project Path="Telemetry.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
   <Project Path="../../../Contracts/Contracts/Contracts.csproj" />
-  <Project Path="../Telemetry.Application/Telemetry.Application.csproj" />
-  <Project Path="../Telemetry.Domain/Telemetry.Domain.csproj" />
-  <Project Path="../Telemetry.Infrastructure/Telemetry.Infrastructure.csproj" />
-  <Project Path="Telemetry.API.csproj" />
 </Solution>

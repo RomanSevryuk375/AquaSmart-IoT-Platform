@@ -19,6 +19,7 @@ public static class ApiConstants
         public const string MaintenanceLogs = "api/notification/v1/maintenance-logs";
         public const string Reminders = "api/notification/v1/reminders";
         public const string Notifications = "api/notification/v1/notifications";
+        public const string Data = "api/telemetry/v1/data";
     }
 
     public static class Headers

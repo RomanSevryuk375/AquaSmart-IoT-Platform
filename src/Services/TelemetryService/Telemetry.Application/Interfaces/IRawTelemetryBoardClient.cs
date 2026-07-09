@@ -5,7 +5,10 @@ namespace Telemetry.Application.Interfaces;
 
 public interface IRawTelemetryBoardClient
 {
-    public Task TelemetryRawReceived(TelemetryRawChartPointDto rawChartPoint);
+    public Task TelemetryRawReceived(
+        TelemetryRawChartPointDto rawChartPoint);
 
-    public Task AggregatePointGenerated(PeriodType period, TelemetryChartPointDto point);
+    public Task AggregatePointGenerated(
+        PeriodType period,
+        TelemetryChartPointDto point);
 }

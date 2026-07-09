@@ -4,7 +4,7 @@ using Telemetry.Domain.Interfaces;
 
 namespace Telemetry.Infrastructure.Persistence.Repositories;
 
-public sealed class EcosystemRepository(SystemDbContext dbContext)
+public sealed class EcosystemRepository(TelemetryDbContext dbContext)
     : BaseRepository<Ecosystem>(dbContext), IEcosystemRepository
 {
     public async Task<Ecosystem?> GetByControllerIdAsync(

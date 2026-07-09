@@ -1,24 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-  </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="EFCore.NamingConventions" />
+        <PackageReference Include="MassTransit.RabbitMQ" />
+        <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
+        <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Newtonsoft.Json" />
+        <PackageReference Include="Quartz.Extensions.Hosting" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="EFCore.NamingConventions" />
-    <PackageReference Include="MassTransit.RabbitMQ" />
-	<PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
-	<PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" />
-    <PackageReference Include="Quartz.Extensions.Hosting" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Telemetry.Application\Telemetry.Application.csproj" />
-    <ProjectReference Include="..\Telemetry.Domain\Telemetry.Domain.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Telemetry.Application\Telemetry.Application.csproj" />
+        <ProjectReference Include="..\Telemetry.Domain\Telemetry.Domain.csproj" />
+    </ItemGroup>
 
 </Project>

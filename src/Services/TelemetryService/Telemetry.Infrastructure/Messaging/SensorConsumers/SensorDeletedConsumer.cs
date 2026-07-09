@@ -1,21 +1,23 @@
+using AutoMapper;
 using Contracts.Events.SensorEvents;
 using Contracts.Results;
 using MassTransit;
-using Telemetry.Application.Interfaces;
+using MediatR;
+using Telemetry.Application.Features.Sensors.Commands.SyncSensorDeleted;
 
 namespace Telemetry.Infrastructure.Messaging.SensorConsumers;
 
-public class SensorDeletedConsumer(
-    ISensorService sensorService) : IConsumer<SensorDeletedEvent>
+public sealed class SensorDeletedConsumer(ISender sender, IMapper mapper)
+    : IConsumer<SensorDeletedEvent>
 {
     public async Task Consume(ConsumeContext<SensorDeletedEvent> context)
     {
-        ConsumerResult result = await sensorService.DeletedSensorAsync(
-            context.Message, context.CancellationToken);
+        SyncSensorDeletedCommand command = mapper.Map<SyncSensorDeletedCommand>(context.Message);
 
-        if (!result.IsSuccess && result.IsRetryable)
+        Result result = await sender.Send(command, context.CancellationToken);
+        if (result.IsFailure)
         {
-            throw new Exception(result.Error);
+            throw new InvalidOperationException(result.Error.Message);
         }
     }
 }

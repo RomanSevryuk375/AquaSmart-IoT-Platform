@@ -41,7 +41,7 @@ public sealed class SensorConfiguration
 
         builder.HasMany<AggregateTelemetry>()
             .WithOne()
-            .HasForeignKey(x => x.Summary.SensorId)
+            .HasForeignKey(x => x.SensorId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(x => x.EcosystemId);

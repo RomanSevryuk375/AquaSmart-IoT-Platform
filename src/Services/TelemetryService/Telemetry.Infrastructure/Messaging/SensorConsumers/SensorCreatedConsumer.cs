@@ -1,21 +1,22 @@
+using AutoMapper;
 using Contracts.Events.SensorEvents;
 using Contracts.Results;
 using MassTransit;
-using Telemetry.Application.Interfaces;
+using MediatR;
+using Telemetry.Application.Features.Sensors.Commands.SyncSensorCreated;
 
 namespace Telemetry.Infrastructure.Messaging.SensorConsumers;
 
-public class SensorCreatedConsumer(
-    ISensorService sensorService) : IConsumer<SensorCreatedEvent>
+public sealed class SensorCreatedConsumer(ISender sender, IMapper mapper) : IConsumer<SensorCreatedEvent>
 {
     public async Task Consume(ConsumeContext<SensorCreatedEvent> context)
     {
-        ConsumerResult result = await sensorService.CreateSensorAsync(
-            context.Message, context.CancellationToken);
+        SyncSensorCreatedCommand command = mapper.Map<SyncSensorCreatedCommand>(context.Message);
 
-        if (!result.IsSuccess && result.IsRetryable)
+        Result result = await sender.Send(command, context.CancellationToken);
+        if (result.IsFailure)
         {
-            throw new Exception(result.Error);
+            throw new InvalidOperationException(result.Error.Message);
         }
     }
 }

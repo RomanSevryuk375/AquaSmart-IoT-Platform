@@ -1,27 +1,37 @@
 using Contracts.Authorization;
+using Contracts.Constants;
 using Contracts.Results;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Telemetry.Application.DTOs;
-using Telemetry.Application.Interfaces;
+using Telemetry.Application.Features.Telemetry.Queries.GetAggregatedTelemetryChart;
+using Telemetry.Application.Features.Telemetry.Queries.GetRawTelemetryChart;
 
 namespace Telemetry.API.Controllers;
 
 [ApiController]
-[Route("api/telemetry/v1/data")]
-public class TelemetryDataController(
-    ITelemetryDataService rawService,
-    IDataAggregateService aggregateService) : ControllerBase
+[Route(ApiConstants.Routes.Data)]
+public class TelemetryDataController(ISender sender) : ControllerBase
 {
     [HttpGet("raw")]
-    [Authorize(Policy = SubPermissions.AccountView)]
+    [Authorize(Policy = SubPermissions.DataRealtime)]
     public async Task<ActionResult<TelemetryRawChartResponseDto>> GetAllRawDataAsync(
         [FromQuery] TelemetryDataFilterDto filter,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 10,
         CancellationToken cancellationToken = default)
     {
-        Result<TelemetryRawChartResponseDto> result = await rawService.GetAllDataAsync(filter, skip, take, cancellationToken);
+        var query = new GetRawTelemetryChartQuery
+        {
+            SensorId = filter.SensorId,
+            From = filter.From,
+            To = filter.To,
+            Skip = skip,
+            Take = take
+        };
+
+        Result<TelemetryRawChartResponseDto> result = await sender.Send(query, cancellationToken);
 
         return this.ToActionResult(result);
     }
@@ -34,7 +44,17 @@ public class TelemetryDataController(
         [FromQuery] int take = 10,
         CancellationToken cancellationToken = default)
     {
-        Result<TelemetryChartResponseDto> result = await aggregateService.GetChartDataAsync(filter, skip, take, cancellationToken);
+        var query = new GetAggregatedTelemetryChartQuery
+        {
+            SensorId = filter.SensorId,
+            Period = filter.Period,
+            From = filter.From,
+            To = filter.To,
+            Skip = skip,
+            Take = take
+        };
+
+        Result<TelemetryChartResponseDto> result = await sender.Send(query, cancellationToken);
 
         return this.ToActionResult(result);
     }

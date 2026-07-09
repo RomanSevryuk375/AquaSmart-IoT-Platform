@@ -2,10 +2,6 @@
 
 using Contracts.Options;
 using MassTransit;
-// Ignore Spelling: Mq
-
-using Contracts.Options;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -88,6 +84,7 @@ public static class DependencyInjection
 
             busConfigurator.AddConsumer<UserCreatedEventConsumer>();
             busConfigurator.AddConsumer<UserUpdatedEventConsumer>();
+            busConfigurator.AddConsumer<SubscriptionDowngradedEventConsumer>();
 
             busConfigurator.AddConsumer<CriticalTelemetryThresholdAlertEventConsumer>();
 

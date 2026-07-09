@@ -13,7 +13,7 @@ public sealed class OutboxMessageProcessorService(
     IPublisher publisher,
     IUnitOfWork unitOfWork) : IOutboxMessageProcessorService
 {
-    public async Task<Result> ProcessAsync(CancellationToken cancellationToken)
+    public async Task<Result> ProcessAsync(CancellationToken cancellationToken = default)
     {
         int batchSize = 50;
 

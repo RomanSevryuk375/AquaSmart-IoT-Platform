@@ -5,7 +5,7 @@ using Telemetry.Domain.ValueObjects;
 
 namespace Telemetry.Infrastructure.Persistence.Repositories;
 
-public sealed class TelemetryRawDataRepository(SystemDbContext dbContext)
+public sealed class TelemetryRawDataRepository(TelemetryDbContext dbContext)
     : BaseRepository<RawTelemetry>(dbContext), ITelemetryRawDataRepository
 {
     public async Task<RawTelemetry?> GetByExternalMessageIdAsync(
@@ -17,16 +17,17 @@ public sealed class TelemetryRawDataRepository(SystemDbContext dbContext)
                 x.ExternalMessageId == externalMessageId, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<TelemetrySummary>> GetSummaryForPeriodAsync(
-            DateTime from,
-            DateTime to,
-            CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyDictionary<Guid, TelemetrySummary>> GetSummaryForPeriodAsync(
+        DateTime from,
+        DateTime to,
+        CancellationToken cancellationToken = default)
     {
         var rawData = await Context.TelemetryRawData
             .Where(x => x.RecordedAt >= from && x.RecordedAt < to)
             .GroupBy(x => x.SensorId)
             .Select(g => new
             {
+                SensorId = g.Key,
                 MinValue = g.Min(x => x.Value),
                 AvgValue = g.Average(x => x.Value),
                 MaxValue = g.Max(x => x.Value),
@@ -34,10 +35,9 @@ public sealed class TelemetryRawDataRepository(SystemDbContext dbContext)
             })
             .ToListAsync(cancellationToken);
 
-        return rawData
-            .Select(x => TelemetrySummary.Create(x.MinValue, x.AvgValue, x.MaxValue, x.Count).Value)
-            .ToList()
-            .AsReadOnly();
+        return rawData.ToDictionary(
+            x => x.SensorId,
+            x => TelemetrySummary.Create(x.MinValue, x.AvgValue, x.MaxValue, x.Count).Value);
     }
 
     public async Task DeleteOldRawDataAsync(

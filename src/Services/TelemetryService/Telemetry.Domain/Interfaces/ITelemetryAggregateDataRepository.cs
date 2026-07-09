@@ -12,7 +12,7 @@ public interface ITelemetryAggregateDataRepository : IRepository<AggregateTeleme
         DateTime olderThan,
         CancellationToken cancellationToken = default);
 
-    public Task<IReadOnlyList<TelemetrySummary>> GetSummaryForPeriodAsync(
+    public Task<IReadOnlyDictionary<Guid, TelemetrySummary>> GetSummaryForPeriodAsync(
         PeriodType sourcePeriod,
         DateTime from,
         DateTime to,

@@ -7,7 +7,7 @@ namespace Telemetry.API.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddIConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHttpContextAccessor();
         services.AddEndpointsApiExplorer();
@@ -41,14 +41,10 @@ public static class DependencyInjection
         services.AddControllers();
 
         services.AddCommonAuthentication(configuration);
-        services.AddServices(configuration);
-
-        services.AddRepositories(configuration);
-        services.AddQuartzJob();
-        services.AddRabbitMq(configuration);
-        services.AddMySignalR();
-
         services.AddAquaAuthorizationPolicies();
+
+        services.AddServices(configuration);
+        services.AddInfrastructure(configuration);
 
         return services;
     }
