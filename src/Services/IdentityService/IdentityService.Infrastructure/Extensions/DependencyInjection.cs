@@ -5,6 +5,7 @@ using IdentityService.Domain.Interfaces;
 using IdentityService.Infrastructure.BackgroundJobs;
 using IdentityService.Infrastructure.Factories;
 using IdentityService.Infrastructure.Persistence.Interceptors;
+using IdentityService.Infrastructure.Persistence.Outbox;
 using IdentityService.Infrastructure.Repositories;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,8 @@ public static class DependencyInjection
     {
         services.AddSingleton<ConvertDomainEventsToOutboxMessagesInterceptor>();
         services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
+        services.AddScoped<IOutboxRepository, OutboxRepository>();
+        services.AddScoped<OutboxMessageProcessorService>();
 
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();

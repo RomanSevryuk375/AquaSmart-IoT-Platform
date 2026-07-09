@@ -43,6 +43,8 @@ public static class DependencyInjection
         services.AddScoped<ITelemetryAggregateDataRepository, TelemetryAggregateDataRepository>();
         services.AddScoped<IOutboxRepository, OutboxRepository>();
 
+        services.AddScoped<OutboxMessageProcessorService>();
+
         services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
 
         string? connectionString = configuration.GetConnectionString(nameof(TelemetryDbContext));

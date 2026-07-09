@@ -4,13 +4,13 @@ using Contracts.Options;
 using Control.Application.Interfaces;
 using Control.Domain.Interfaces;
 using Control.Infrastructure.BackgroundJobs;
+using Control.Infrastructure.Factories;
 using Control.Infrastructure.Messaging.Relay;
 using Control.Infrastructure.Messaging.Sensor;
 using Control.Infrastructure.Messaging.Telemetry;
 using Control.Infrastructure.Persistence;
 using Control.Infrastructure.Persistence.Interceptors;
 using Control.Infrastructure.Persistence.Outbox;
-using Control.Infrastructure.Factories;
 using Control.Infrastructure.Persistence.Repositories;
 using Control.Infrastructure.Services;
 using MassTransit;
@@ -34,15 +34,15 @@ public static class DependencyInjection
     public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<ConvertDomainEventsToOutboxMessagesInterceptor>();
+        services.AddScoped<IOutboxRepository, OutboxRepository>();
+        services.AddScoped<OutboxMessageProcessorService>();
 
         services.AddScoped<IAutomationRuleRepository, AutomationRuleRepository>();
         services.AddScoped<IEcosystemRepository, EcosystemRepository>();
-        services.AddScoped<IOutboxRepository, OutboxRepository>();
         services.AddScoped<IRelayRepository, RelayRepository>();
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
         services.AddScoped<ISensorRepository, SensorRepository>();
         services.AddScoped<IVacationModeRepository, VacationModeRepository>();
-        services.AddScoped<OutboxMessageProcessorService>();
 
         services.AddSingleton<ICronValidator, CronValidator>();
         services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
