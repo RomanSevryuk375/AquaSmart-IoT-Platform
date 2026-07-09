@@ -1,4 +1,5 @@
-﻿using Quartz;
+using Contracts.Results;
+using Quartz;
 using Telemetry.Application.Interfaces;
 
 namespace Telemetry.Infrastructure.BackgroundJobs;
@@ -8,7 +9,7 @@ public sealed class OutboxMessageProcessorJob(
 {
     public async Task Execute(IJobExecutionContext context)
     {
-        var result = await service.ProcessAsync(context.CancellationToken);
+        Result result = await service.ProcessAsync(context.CancellationToken);
 
         if (result.IsFailure)
         {

@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Telemetry.Application.Interfaces;
 using Telemetry.Application.Services;
 
@@ -19,7 +19,7 @@ public static class DependencyInjection
         services.AddScoped<ITelemetryRetentionService, TelemetryRetentionService>();
         services.AddScoped<IDataAggregateService, DataAggregateService>();
 
-        services.AddMediatR(cfg => 
+        services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
         services.AddAutoMapper(cfg =>

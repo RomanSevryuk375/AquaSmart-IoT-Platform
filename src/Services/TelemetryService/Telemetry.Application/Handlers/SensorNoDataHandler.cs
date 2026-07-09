@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Contracts.Events.SensorEvents;
 using MassTransit;
 using MediatR;
@@ -8,10 +8,10 @@ namespace Telemetry.Application.Handlers;
 
 public sealed class SensorNoDataHandler(
     IPublishEndpoint publishEndpoint,
-    IMapper mapper): INotificationHandler<SensorNoDataDomainEvent>
+    IMapper mapper) : INotificationHandler<SensorNoDataDomainEvent>
 {
     public async Task Handle(
-        SensorNoDataDomainEvent notification, 
+        SensorNoDataDomainEvent notification,
         CancellationToken cancellationToken)
     {
         await publishEndpoint.Publish(

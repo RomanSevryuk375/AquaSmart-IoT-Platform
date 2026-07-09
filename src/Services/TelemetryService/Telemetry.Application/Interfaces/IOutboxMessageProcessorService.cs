@@ -1,9 +1,9 @@
-﻿using Contracts.Results;
+using Contracts.Results;
 
 namespace Telemetry.Application.Interfaces;
 
 public interface IOutboxMessageProcessorService
 {
-    Task<Result> ProcessAsync(
+    public Task<Result> ProcessAsync(
         CancellationToken cancellationToken);
 }

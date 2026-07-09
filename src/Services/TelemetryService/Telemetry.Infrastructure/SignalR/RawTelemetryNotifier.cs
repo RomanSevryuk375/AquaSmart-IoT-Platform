@@ -10,7 +10,7 @@ public sealed class RawTelemetryNotifier(
 {
     public async Task AggregatePointGenerated(
         string ecosystemId,
-        PeriodType period, 
+        PeriodType period,
         TelemetryChartPointDto point)
     {
         await hubContext.Clients

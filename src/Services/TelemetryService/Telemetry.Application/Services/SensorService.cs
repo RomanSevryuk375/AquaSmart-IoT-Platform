@@ -37,7 +37,7 @@ public class SensorService(
         SensorDeletedEvent @event,
         CancellationToken cancellationToken)
     {
-        var sensor = await sensorRepository.GetByIdAsync(@event.SensorId, cancellationToken);
+        Sensor? sensor = await sensorRepository.GetByIdAsync(@event.SensorId, cancellationToken);
         if (sensor is null)
         {
             return ConsumerResult.Success();
@@ -53,7 +53,7 @@ public class SensorService(
         SensorUpdatedEvent @event,
         CancellationToken cancellationToken)
     {
-        var sensor = await sensorRepository.GetByIdAsync(@event.SensorId, cancellationToken);
+        Sensor? sensor = await sensorRepository.GetByIdAsync(@event.SensorId, cancellationToken);
         if (sensor is null)
         {
             var form = new SensorForm(
@@ -65,7 +65,7 @@ public class SensorService(
                 @event.Unit,
                 @event.CreatedAt);
 
-            var creationResult = await CreateValidSensorAsync(form, cancellationToken);
+            ConsumerResult creationResult = await CreateValidSensorAsync(form, cancellationToken);
 
             return creationResult;
         }
@@ -84,7 +84,7 @@ public class SensorService(
         SensorStateChangedEvent @event,
         CancellationToken cancellationToken)
     {
-        var sensor = await sensorRepository.GetByIdAsync(@event.SensorId, cancellationToken);
+        Sensor? sensor = await sensorRepository.GetByIdAsync(@event.SensorId, cancellationToken);
         if (sensor is null)
         {
             return ConsumerResult.RetryableError($"Sensor {@event.SensorId} not found.");
@@ -102,7 +102,7 @@ public class SensorService(
         SensorRenamedEvent sensor,
         CancellationToken cancellationToken)
     {
-        var existingSensor = await sensorRepository.GetByIdAsync(sensor.SensorId, cancellationToken);
+        Sensor? existingSensor = await sensorRepository.GetByIdAsync(sensor.SensorId, cancellationToken);
         if (existingSensor is null)
         {
             return ConsumerResult
@@ -121,14 +121,14 @@ public class SensorService(
         SensorForm form,
         CancellationToken cancellationToken)
     {
-        var ecosystem = await ecosystemRepository.GetByControllerIdAsync(form.ControllerId, cancellationToken);
+        Ecosystem? ecosystem = await ecosystemRepository.GetByControllerIdAsync(form.ControllerId, cancellationToken);
         if (ecosystem is null)
         {
             return ConsumerResult.RetryableError(
                 $"Ecosystem with controller {form.ControllerId} not found.");
         }
 
-        var result = SensorEntity.Create(
+        Result<Sensor> result = Sensor.Create(
             form.SensorId,
             form.ControllerId,
             ecosystem.Id,

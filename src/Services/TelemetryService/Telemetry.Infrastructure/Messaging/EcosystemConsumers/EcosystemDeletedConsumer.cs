@@ -1,4 +1,5 @@
-﻿using Contracts.Events.EcosystemEvents;
+using Contracts.Events.EcosystemEvents;
+using Contracts.Results;
 using MassTransit;
 using Telemetry.Application.Interfaces;
 
@@ -9,7 +10,7 @@ public sealed class EcosystemDeletedConsumer(
 {
     public async Task Consume(ConsumeContext<EcosystemDeletedEvent> context)
     {
-        var result = await service.DeleteEcosystemAsync(
+        ConsumerResult result = await service.DeleteEcosystemAsync(
             context.Message, context.CancellationToken);
 
         if (!result.IsSuccess && result.IsRetryable)

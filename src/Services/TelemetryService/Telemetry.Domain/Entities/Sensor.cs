@@ -2,21 +2,16 @@ using Contracts.Abstractions;
 using Contracts.Enums;
 using Contracts.Results;
 using Telemetry.Domain.Events;
+using Telemetry.Domain.ValueObjects;
 
 namespace Telemetry.Domain.Entities;
 
-public sealed class SensorEntity : AggregateRoot, IEntity
+public sealed class Sensor : AggregateRoot, IEntity
 {
-    private SensorEntity(
-        Guid id,
-        Guid controllerId,
-        Guid ecosystemId,
-        string name,
-        SensorType type,
-        SensorState state,
-        string unit,
-        double lastValue,
-        DateTime updatedAt,
+    private Sensor(
+        Guid id, Guid controllerId, Guid ecosystemId,
+        DeviceName name, SensorType type, SensorState state, string unit,
+        double lastValue, DateTime updatedAt,
         DateTime createdAt,
         bool isDataDelayed)
     {
@@ -33,10 +28,14 @@ public sealed class SensorEntity : AggregateRoot, IEntity
         IsDataDelayed = isDataDelayed;
     }
 
+#pragma warning disable CS8618 
+    private Sensor() { }
+#pragma warning restore CS8618 
+
     public Guid Id { get; private set; }
     public Guid ControllerId { get; private set; }
     public Guid EcosystemId { get; private set; }
-    public string Name { get; private set; }
+    public DeviceName Name { get; private set; }
     public SensorType Type { get; private set; }
     public SensorState State { get; private set; }
     public string Unit { get; private set; }
@@ -45,67 +44,40 @@ public sealed class SensorEntity : AggregateRoot, IEntity
     public DateTime CreatedAt { get; private set; }
     public bool IsDataDelayed { get; private set; }
 
-    public static Result<SensorEntity> Create(
-        Guid id,
-        Guid controllerId,
-        Guid ecosystemId,
-        string name,
-        SensorType type,
-        SensorState state,
-        string unit,
-        double lastValue,
-        DateTime updatedAt,
+    public static Result<Sensor> Create(
+        Guid id, Guid controllerId, Guid ecosystemId,
+        string rawName, SensorType type, SensorState state, string unit,
+        double lastValue, DateTime updatedAt,
         DateTime createdAt)
     {
         var errors = new List<string>();
-
-        if (id == Guid.Empty)
-        {
-            errors.Add("Id must not be empty.");
-        }
-
-        if (controllerId == Guid.Empty)
-        {
-            errors.Add("Controller id must not be empty.");
-        }
-
-        if (ecosystemId == Guid.Empty)
-        {
-            errors.Add("Ecosystem id must not be empty.");
-        }
 
         if (string.IsNullOrWhiteSpace(unit))
         {
             errors.Add("Unit must not be empty.");
         }
 
-        if (string.IsNullOrWhiteSpace(name))
+        Result<DeviceName> nameResut = DeviceName.Create(rawName);
+        if (nameResut.IsFailure)
         {
-            errors.Add("Name must not be empty.");
+            errors.Add(nameResut.Error.Message);
         }
+
 
         if (errors.Count > 0)
         {
-            return Result<SensorEntity>.Failure(
-                  Error.Validation(
-                      "Sensor.Invalid",
+            return Result<Sensor>.Failure(Error.Validation<Sensor>(
                       string.Join("; ", errors)));
         }
 
-        var sensor = new SensorEntity(
-            id,
-            controllerId,
-            ecosystemId,
-            name.Trim(),
-            type,
-            state,
-            unit.Trim(),
-            lastValue,
-            updatedAt,
+        var sensor = new Sensor(
+            id, controllerId, ecosystemId,
+            nameResut.Value, type, state, unit.Trim(),
+            lastValue, updatedAt,
             createdAt,
-            false);
+            isDataDelayed: false);
 
-        return Result<SensorEntity>.Success(sensor);
+        return Result<Sensor>.Success(sensor);
     }
 
     public Result Update(
@@ -113,42 +85,32 @@ public sealed class SensorEntity : AggregateRoot, IEntity
         SensorType type,
         string unit)
     {
-        var errors = new List<string>();
-
-        if (controllerId == Guid.Empty)
-        {
-            errors.Add("Controller id must not be empty.");
-        }
-
         if (string.IsNullOrWhiteSpace(unit))
         {
-            errors.Add("Unit must not be empty.");
-        }
-
-        if (errors.Count > 0)
-        {
-            return Result.Failure(Error.Validation(
-                    "Sensor.Invalid",
-                    string.Join("; ", errors)));
+            return Result.Failure(Error.Validation<Sensor>(
+                "Unit must not be empty."));
         }
 
         ControllerId = controllerId;
         Type = type;
         Unit = unit.Trim();
 
+        IncrementVersion();
+
         return Result.Success();
     }
 
-    public Result SetName(string name)
+    public Result SetName(string rawName)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        Result<DeviceName> nameResut = DeviceName.Create(rawName);
+        if (nameResut.IsFailure)
         {
-            return Result.Failure(Error.Validation(
-                    "Sensor.Invalid",
-                    "Name must not be empty."));
+            return Result.Failure(nameResut.Error);
         }
 
-        Name = name;
+        Name = nameResut.Value;
+
+        IncrementVersion();
 
         return Result.Success();
     }
@@ -158,11 +120,13 @@ public sealed class SensorEntity : AggregateRoot, IEntity
         UpdatedAt = DateTime.UtcNow;
         LastValue = newValue;
 
-        if (IsDataDelayed || State == SensorState.NoData) 
+        if (IsDataDelayed || State == SensorState.NoData)
         {
             IsDataDelayed = false;
             State = SensorState.Active;
         }
+
+        IncrementVersion();
     }
 
     public void SetState(SensorState newStatus)
@@ -173,6 +137,8 @@ public sealed class SensorEntity : AggregateRoot, IEntity
         }
 
         State = newStatus;
+
+        IncrementVersion();
     }
 
     public void SetType(SensorType type)
@@ -183,6 +149,8 @@ public sealed class SensorEntity : AggregateRoot, IEntity
         }
 
         Type = type;
+
+        IncrementVersion();
     }
 
     public void MarkAsNoData()
@@ -196,5 +164,7 @@ public sealed class SensorEntity : AggregateRoot, IEntity
             State = State,
             LastSeenAt = UpdatedAt,
         });
+
+        IncrementVersion();
     }
 }

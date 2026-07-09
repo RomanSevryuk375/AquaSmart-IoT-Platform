@@ -1,13 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Telemetry.Domain.Entities;
 
 namespace Telemetry.Infrastructure.Persistence.Configurations;
 
-public sealed class EcosystemEntityConfiguration 
-    : IEntityTypeConfiguration<EcosystemEntity>
+public sealed class EcosystemConfiguration : IEntityTypeConfiguration<Ecosystem>
 {
-    public void Configure(EntityTypeBuilder<EcosystemEntity> builder)
+    public void Configure(EntityTypeBuilder<Ecosystem> builder)
     {
         builder.ToTable("ecosystems");
 
@@ -18,5 +17,7 @@ public sealed class EcosystemEntityConfiguration
         builder.Property(x => x.CreatedAt).IsRequired();
 
         builder.HasIndex(x => x.ControllerId);
+
+        builder.Property(x => x.Version).IsConcurrencyToken();
     }
 }

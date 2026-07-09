@@ -1,14 +1,14 @@
-﻿using Contracts.Events.EcosystemEvents;
+using Contracts.Events.EcosystemEvents;
 using Contracts.Results;
 
 namespace Telemetry.Application.Interfaces;
 
 public interface IEcosystemService
 {
-    Task<ConsumerResult> CreateEcosystemAsync(
-        EcosystemCreatedEvent ecosystem, 
+    public Task<ConsumerResult> CreateEcosystemAsync(
+        EcosystemCreatedEvent ecosystem,
         CancellationToken cancellationToken);
-    Task<ConsumerResult> DeleteEcosystemAsync(
-        EcosystemDeletedEvent ecosystem, 
+    public Task<ConsumerResult> DeleteEcosystemAsync(
+        EcosystemDeletedEvent ecosystem,
         CancellationToken cancellationToken);
 }

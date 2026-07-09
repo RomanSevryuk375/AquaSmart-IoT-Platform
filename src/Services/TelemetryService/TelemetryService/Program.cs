@@ -5,17 +5,17 @@ using Telemetry.API.Extensions;
 using Telemetry.Infrastructure.Persistence;
 using Telemetry.Infrastructure.SignalR;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 app.UseGlobalExceptionHandler();
 
-using (var scope = app.Services.CreateScope())
+using (IServiceScope scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<SystemDbContext>();
+    SystemDbContext context = scope.ServiceProvider.GetRequiredService<SystemDbContext>();
     context.Database.Migrate();
 }
 

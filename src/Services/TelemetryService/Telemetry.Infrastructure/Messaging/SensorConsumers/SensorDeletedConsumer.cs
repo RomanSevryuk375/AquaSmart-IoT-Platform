@@ -1,4 +1,5 @@
-﻿using Contracts.Events.SensorEvents;
+using Contracts.Events.SensorEvents;
+using Contracts.Results;
 using MassTransit;
 using Telemetry.Application.Interfaces;
 
@@ -9,7 +10,7 @@ public class SensorDeletedConsumer(
 {
     public async Task Consume(ConsumeContext<SensorDeletedEvent> context)
     {
-        var result = await sensorService.DeletedSensorAsync(
+        ConsumerResult result = await sensorService.DeletedSensorAsync(
             context.Message, context.CancellationToken);
 
         if (!result.IsSuccess && result.IsRetryable)

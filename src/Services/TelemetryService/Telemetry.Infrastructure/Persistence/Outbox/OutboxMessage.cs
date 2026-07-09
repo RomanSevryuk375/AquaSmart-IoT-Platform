@@ -1,6 +1,6 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 
-namespace Telemetry.Domain.Entities;
+namespace Telemetry.Infrastructure.Persistence.Outbox;
 
 public sealed class OutboxMessage : IEntity
 {

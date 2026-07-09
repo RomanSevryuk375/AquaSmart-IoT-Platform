@@ -1,4 +1,5 @@
-﻿using MassTransit;
+using Contracts.Results;
+using MassTransit;
 using Telemetry.Application.Interfaces;
 
 namespace Telemetry.Infrastructure.Messaging.EcosystemConsumers;
@@ -8,10 +9,10 @@ public sealed class EcosystemCreatedConsumer(
 {
     public async Task Consume(ConsumeContext<Contracts.Events.EcosystemEvents.EcosystemCreatedEvent> context)
     {
-        var result = await service.CreateEcosystemAsync(
+        ConsumerResult result = await service.CreateEcosystemAsync(
             context.Message, context.CancellationToken);
 
-        if (!result.IsSuccess && result.IsRetryable) 
+        if (!result.IsSuccess && result.IsRetryable)
         {
             throw new Exception(result.Error);
         }

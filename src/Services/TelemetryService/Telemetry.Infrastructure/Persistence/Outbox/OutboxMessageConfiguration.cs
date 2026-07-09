@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Telemetry.Domain.Entities;
 
 namespace Telemetry.Infrastructure.Persistence.Outbox;
 

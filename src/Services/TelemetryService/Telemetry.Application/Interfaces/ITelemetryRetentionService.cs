@@ -1,7 +1,7 @@
-﻿namespace Telemetry.Application.Interfaces;
+namespace Telemetry.Application.Interfaces;
 
 public interface ITelemetryRetentionService
 {
-    Task CleanUpOldDataAsync(
+    public Task CleanUpOldDataAsync(
         CancellationToken cancellationToken);
 }

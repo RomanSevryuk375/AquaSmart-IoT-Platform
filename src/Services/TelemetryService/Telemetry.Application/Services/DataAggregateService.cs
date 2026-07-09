@@ -3,6 +3,7 @@ using Contracts.Enums;
 using Contracts.Results;
 using Telemetry.Application.DTOs;
 using Telemetry.Application.Interfaces;
+using Telemetry.Domain.Entities;
 using Telemetry.Domain.Interfaces;
 using Telemetry.Domain.SpecificationParams;
 using Telemetry.Domain.Specifications;
@@ -23,17 +24,17 @@ public sealed class DataAggregateService(
         int? take,
         CancellationToken cancellationToken)
     {
-        var to = filter.To ?? DateTime.UtcNow;
-        var from = filter.From ?? to.AddDays(-1);
+        DateTime to = filter.To ?? DateTime.UtcNow;
+        DateTime from = filter.From ?? to.AddDays(-1);
 
-        var sensor = await sensorRepository.GetByIdAsync(filter.SensorId, cancellationToken);
+        Sensor? sensor = await sensorRepository.GetByIdAsync(filter.SensorId, cancellationToken);
         if (sensor is null)
         {
             return Result<TelemetryChartResponseDto>
                 .Failure(Error.NotFound("Sensor.NotFound", "Sensor not found"));
         }
 
-        var period = filter.Period ?? DetermineBestPeriod(from, to);
+        PeriodType period = filter.Period ?? DetermineBestPeriod(from, to);
 
         var specification = new TelemetryAggregateFilterSpecification(
             new TelemetryAggregateFilterParams
@@ -46,7 +47,7 @@ public sealed class DataAggregateService(
 
         var data = await dataRepository.GetAllAsync(specification, skip, take, cancellationToken);
 
-        var points = mapper.Map<IReadOnlyList<TelemetryChartPointDto>>(data);
+        IReadOnlyList<TelemetryChartPointDto> points = mapper.Map<IReadOnlyList<TelemetryChartPointDto>>(data);
 
         return Result<TelemetryChartResponseDto>
             .Success(new TelemetryChartResponseDto
@@ -60,7 +61,7 @@ public sealed class DataAggregateService(
 
     private static PeriodType DetermineBestPeriod(DateTime from, DateTime to)
     {
-        var duration = to - from;
+        TimeSpan duration = to - from;
 
         if (duration.TotalHours <= MaxHoursForMinuteInterval)
         {

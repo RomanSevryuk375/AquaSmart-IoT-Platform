@@ -1,4 +1,4 @@
-﻿using Contracts.Options;
+using Contracts.Options;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -29,10 +29,10 @@ public static class DependencyInjection
         services.AddScoped<ITelemetryAggregateDataRepository, TelemetryAggregateDataRepository>();
         services.AddScoped<IOutboxRepository, OutboxRepository>();
 
-        var connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
+        string? connectionString = configuration.GetConnectionString(nameof(SystemDbContext));
         services.AddDbContext<SystemDbContext>((sp, options) =>
         {
-            var interceptor = sp.GetService<ConvertDomainEventsToOutboxMessagesInterceptor>();
+            ConvertDomainEventsToOutboxMessagesInterceptor? interceptor = sp.GetService<ConvertDomainEventsToOutboxMessagesInterceptor>();
 
             options.UseNpgsql(connectionString)
                    .UseSnakeCaseNamingConvention();
@@ -97,7 +97,7 @@ public static class DependencyInjection
                 .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever()));
         });
 
-        services.AddQuartzHostedService(hostOptions 
+        services.AddQuartzHostedService(hostOptions
             => hostOptions.WaitForJobsToComplete = true);
 
         return services;
@@ -105,8 +105,8 @@ public static class DependencyInjection
 
     public static IServiceCollection AddRabbitMq(this IServiceCollection services, IConfiguration configuration)
     {
-        var rabbitSection = configuration.GetSection(RabbitMqOptions.SectionName);
-        var rabbitOptions = rabbitSection.Get<RabbitMqOptions>()
+        IConfigurationSection rabbitSection = configuration.GetSection(RabbitMqOptions.SectionName);
+        RabbitMqOptions rabbitOptions = rabbitSection.Get<RabbitMqOptions>()
             ?? throw new InvalidOperationException("RabbitMQ configuration is missing.");
 
         services.Configure<RabbitMqOptions>(rabbitSection);

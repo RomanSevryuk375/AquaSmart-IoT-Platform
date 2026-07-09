@@ -1,4 +1,4 @@
-﻿using Contracts.Events.EcosystemEvents;
+using Contracts.Events.EcosystemEvents;
 using Contracts.Results;
 using Telemetry.Application.Interfaces;
 using Telemetry.Domain.Entities;
@@ -14,14 +14,14 @@ public sealed class EcosystemService(
         EcosystemCreatedEvent ecosystem,
         CancellationToken cancellationToken)
     {
-        var existingEcosystem = await ecosystemRepository.GetByIdAsync(
+        Ecosystem? existingEcosystem = await ecosystemRepository.GetByIdAsync(
             ecosystem.EcosystemId, cancellationToken);
         if (existingEcosystem is not null)
         {
             return ConsumerResult.Success();
         }
 
-        var result = EcosystemEntity.Create(
+        Result<Ecosystem> result = Ecosystem.Create(
             ecosystem.EcosystemId,
             ecosystem.ControllerId,
             ecosystem.UserId);
@@ -40,7 +40,7 @@ public sealed class EcosystemService(
         EcosystemDeletedEvent ecosystem,
         CancellationToken cancellationToken)
     {
-        var existingEcosystem = await ecosystemRepository.GetByIdAsync(
+        Ecosystem? existingEcosystem = await ecosystemRepository.GetByIdAsync(
             ecosystem.EcosystemId, cancellationToken);
         if (existingEcosystem is null)
         {

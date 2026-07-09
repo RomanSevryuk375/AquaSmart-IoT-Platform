@@ -1,4 +1,5 @@
-﻿using Contracts.Events.SensorEvents;
+using Contracts.Events.SensorEvents;
+using Contracts.Results;
 using MassTransit;
 using Telemetry.Application.Interfaces;
 
@@ -9,7 +10,7 @@ public class SensorStateChangedConsumer(
 {
     public async Task Consume(ConsumeContext<SensorStateChangedEvent> context)
     {
-        var result = await sensorService.SetSensorStateAsync(
+        ConsumerResult result = await sensorService.SetSensorStateAsync(
             context.Message, context.CancellationToken);
 
         if (!result.IsSuccess && result.IsRetryable)

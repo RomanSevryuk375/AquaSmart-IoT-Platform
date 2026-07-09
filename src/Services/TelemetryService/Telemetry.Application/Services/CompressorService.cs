@@ -1,11 +1,13 @@
+using System.Data;
 using Contracts.Enums;
 using Contracts.Results;
+using MassTransit;
 using MassTransit.Initializers;
-using System.Data;
 using Telemetry.Application.DTOs;
 using Telemetry.Application.Interfaces;
 using Telemetry.Domain.Entities;
 using Telemetry.Domain.Interfaces;
+using Telemetry.Domain.ValueObjects;
 
 namespace Telemetry.Application.Services;
 
@@ -25,15 +27,15 @@ public sealed class CompressorService(
         var to = new DateTime(
             DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day,
             DateTime.UtcNow.Hour, DateTime.UtcNow.Minute, 0, DateTimeKind.Utc);
-        var from = to.AddMinutes(MinuteInterval);
+        DateTime from = to.AddMinutes(MinuteInterval);
 
-        var data = await telemetryRaw.GetSummaryForPeriodAsync(from, to, cancellationToken);
+        IReadOnlyList<TelemetrySummary>? data = await telemetryRaw.GetSummaryForPeriodAsync(from, to, cancellationToken);
         if (data is null)
         {
             return Result.Success();
         }
 
-        foreach (var item in data)
+        foreach (TelemetrySummary item in data)
         {
             await CreateAndSaveAggregatedTelemetryAsync(
                 item, from, PeriodType.Minute, cancellationToken);
@@ -54,9 +56,9 @@ public sealed class CompressorService(
         var to = new DateTime(
             DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day,
             DateTime.UtcNow.Hour, 0, 0, DateTimeKind.Utc);
-        var from = to.AddHours(HourlyInterval);
+        DateTime from = to.AddHours(HourlyInterval);
 
-        var data = await telemetryAggregate.GetSummaryForPeriodAsync(
+        IReadOnlyList<TelemetrySummary>? data = await telemetryAggregate.GetSummaryForPeriodAsync(
             PeriodType.Minute, from, to, cancellationToken);
         if (data is null)
         {
@@ -65,7 +67,7 @@ public sealed class CompressorService(
 
         var sensorIds = new List<Guid>();
 
-        foreach (var item in data)
+        foreach (TelemetrySummary item in data)
         {
             await CreateAndSaveAggregatedTelemetryAsync(
                 item, from, PeriodType.Hourly, cancellationToken);
@@ -86,9 +88,9 @@ public sealed class CompressorService(
         var to = new DateTime(
             DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day,
             0, 0, 0, DateTimeKind.Utc);
-        var from = to.AddHours(DailyInterval);
+        DateTime from = to.AddHours(DailyInterval);
 
-        var data = await telemetryAggregate.GetSummaryForPeriodAsync(
+        IReadOnlyList<TelemetrySummary>? data = await telemetryAggregate.GetSummaryForPeriodAsync(
             PeriodType.Hourly, from, to, cancellationToken);
         if (data is null)
         {
@@ -96,7 +98,7 @@ public sealed class CompressorService(
         }
 
         var sensorIds = new List<Guid>();
-        foreach (var item in data)
+        foreach (TelemetrySummary item in data)
         {
             await CreateAndSaveAggregatedTelemetryAsync(
                 item, from, PeriodType.Daily, cancellationToken);
@@ -118,7 +120,8 @@ public sealed class CompressorService(
         PeriodType periodType,
         CancellationToken cancellationToken)
     {
-        var result = TelemetryAggregateEntity.Create(
+        Result<AggregateTelemetry> result = AggregateTelemetry.Create(
+            NewId.NextGuid(),
             telemetry.SensorId,
             from,
             periodType,
@@ -141,14 +144,14 @@ public sealed class CompressorService(
         CancellationToken cancellationToken)
     {
         var sensorIds = data.Select(x => x.SensorId).Distinct().ToList();
-        var sensors = await sensorRepository.GetManyByIdsAsync(sensorIds, cancellationToken);
+        IReadOnlyList<Sensor> sensors = await sensorRepository.GetManyByIdsAsync(sensorIds, cancellationToken);
         var ecosystemMap = sensors.ToDictionary(s => s.Id, s => s.EcosystemId.ToString());
 
-        foreach (var item in data)
+        foreach (TelemetrySummary item in data)
         {
-            if (!ecosystemMap.TryGetValue(item.SensorId, out var ecosystemId))
+            if (!ecosystemMap.TryGetValue(item.SensorId, out string? ecosystemId))
             {
-                continue; 
+                continue;
             }
 
             var point = new TelemetryChartPointDto
@@ -157,7 +160,7 @@ public sealed class CompressorService(
                 MinValue = item.MinValue,
                 MaxValue = item.MaxValue,
                 AvgValue = item.AvgValue,
-                Time = periodStart 
+                Time = periodStart
             };
 
             await telemetryNotifier.AggregatePointGenerated(ecosystemId, periodType, point);

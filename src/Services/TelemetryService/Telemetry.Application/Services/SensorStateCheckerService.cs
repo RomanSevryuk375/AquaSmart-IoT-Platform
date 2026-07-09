@@ -1,4 +1,4 @@
-﻿using Contracts.Results;
+using Contracts.Results;
 using Telemetry.Application.Interfaces;
 using Telemetry.Domain.Interfaces;
 using Telemetry.Domain.Specifications;
@@ -14,7 +14,7 @@ public class SensorStateCheckerService(
 
     public async Task<Result> CheckStateAndNotify(CancellationToken cancellationToken)
     {
-        var offlineThreshold = DateTime.UtcNow.AddMinutes(OfflineThreshold);
+        DateTime offlineThreshold = DateTime.UtcNow.AddMinutes(OfflineThreshold);
         var specification = new SensorIsDelayedSpecification(offlineThreshold);
 
         var sensors = await sensorRepository.GetAllAsync(specification, null, null, cancellationToken);

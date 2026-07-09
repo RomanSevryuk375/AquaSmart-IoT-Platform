@@ -1,46 +1,51 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Telemetry.Domain.Entities;
 using Telemetry.Domain.Interfaces;
+using Telemetry.Domain.ValueObjects;
 
 namespace Telemetry.Infrastructure.Persistence.Repositories;
 
 public sealed class TelemetryRawDataRepository(SystemDbContext dbContext)
-    : BaseRepository<TelemetryRawEntity>(dbContext), ITelemetryRawDataRepository
+    : BaseRepository<RawTelemetry>(dbContext), ITelemetryRawDataRepository
 {
-    public async Task<TelemetryRawEntity?> GetByExternalMessageIdAsync(
-        string externalMessageId, 
+    public async Task<RawTelemetry?> GetByExternalMessageIdAsync(
+        string externalMessageId,
         CancellationToken cancellationToken = default)
     {
         return await Context.TelemetryRawData
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => 
+            .FirstOrDefaultAsync(x =>
                 x.ExternalMessageId == externalMessageId, cancellationToken);
     }
 
     public async Task<IReadOnlyList<TelemetrySummary>> GetSummaryForPeriodAsync(
-        DateTime from,
-        DateTime to,
-        CancellationToken cancellationToken)
+            DateTime from,
+            DateTime to,
+            CancellationToken cancellationToken = default)
     {
-        return await Context.TelemetryRawData
-            .AsNoTracking()
+        var rawData = await Context.TelemetryRawData
             .Where(x => x.RecordedAt >= from && x.RecordedAt < to)
             .GroupBy(x => x.SensorId)
-            .Select(g => new TelemetrySummary {
-                SensorId = g.Key,
+            .Select(g => new
+            {
                 MinValue = g.Min(x => x.Value),
-                MaxValue = g.Max(x => x.Value),
                 AvgValue = g.Average(x => x.Value),
+                MaxValue = g.Max(x => x.Value),
                 Count = g.Count()
-            }).ToListAsync(cancellationToken);
+            })
+            .ToListAsync(cancellationToken);
+
+        return rawData
+            .Select(x => TelemetrySummary.Create(x.MinValue, x.AvgValue, x.MaxValue, x.Count).Value)
+            .ToList()
+            .AsReadOnly();
     }
 
     public async Task DeleteOldRawDataAsync(
-        DateTime olderThan, 
-        CancellationToken cancellationToken)
+        DateTime olderThan,
+        CancellationToken cancellationToken = default)
     {
         await Context.TelemetryRawData
-            .Where(x => x.RecordedAt < olderThan && x.IsAggregated == true)
+            .Where(x => x.RecordedAt < olderThan && x.IsAggregated)
             .ExecuteDeleteAsync(cancellationToken);
     }
 
@@ -48,7 +53,7 @@ public sealed class TelemetryRawDataRepository(SystemDbContext dbContext)
         List<Guid> sensorIds,
         DateTime from,
         DateTime to,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         await Context.TelemetryRawData
             .Where(x => sensorIds.Contains(x.SensorId) &&

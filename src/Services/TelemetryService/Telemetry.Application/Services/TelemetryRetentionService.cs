@@ -13,18 +13,18 @@ public sealed class TelemetryRetentionService(
 {
     public async Task CleanUpOldDataAsync(CancellationToken cancellationToken)
     {
-        var rawThreshold = DateTime.UtcNow
-            .AddHours(telemetrySettings.Value.MaxLiveTimeForRawDataInHours); 
+        DateTime rawThreshold = DateTime.UtcNow
+            .AddHours(telemetrySettings.Value.MaxLiveTimeForRawDataInHours);
         await rawRepo
             .DeleteOldRawDataAsync(rawThreshold, cancellationToken);
 
-        var minuteThreshold = DateTime.UtcNow
-            .AddDays(telemetrySettings.Value.MaxLiveTimeForMinutesDataInDayes); 
+        DateTime minuteThreshold = DateTime.UtcNow
+            .AddDays(telemetrySettings.Value.MaxLiveTimeForMinutesDataInDayes);
         await aggregateRepo
             .DeleteOldRawDataAsync(PeriodType.Minute, minuteThreshold, cancellationToken);
 
-        var hourlyThreshold = DateTime.UtcNow
-            .AddDays(telemetrySettings.Value.MaxLiveTimeForHourseDataInDayes); 
+        DateTime hourlyThreshold = DateTime.UtcNow
+            .AddDays(telemetrySettings.Value.MaxLiveTimeForHourseDataInDayes);
         await aggregateRepo
             .DeleteOldRawDataAsync(PeriodType.Hourly, hourlyThreshold, cancellationToken);
     }

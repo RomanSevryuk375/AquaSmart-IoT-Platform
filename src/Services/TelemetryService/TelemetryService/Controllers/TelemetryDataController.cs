@@ -1,4 +1,4 @@
-﻿using Contracts.Authorization;
+using Contracts.Authorization;
 using Contracts.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,8 +21,8 @@ public class TelemetryDataController(
         [FromQuery] int take = 10,
         CancellationToken cancellationToken = default)
     {
-        var result = await rawService.GetAllDataAsync(filter, skip, take, cancellationToken);
-        
+        Result<TelemetryRawChartResponseDto> result = await rawService.GetAllDataAsync(filter, skip, take, cancellationToken);
+
         return this.ToActionResult(result);
     }
 
@@ -34,7 +34,7 @@ public class TelemetryDataController(
         [FromQuery] int take = 10,
         CancellationToken cancellationToken = default)
     {
-        var result = await aggregateService.GetChartDataAsync(filter, skip, take, cancellationToken);
+        Result<TelemetryChartResponseDto> result = await aggregateService.GetChartDataAsync(filter, skip, take, cancellationToken);
 
         return this.ToActionResult(result);
     }

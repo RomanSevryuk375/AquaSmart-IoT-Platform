@@ -1,12 +1,12 @@
-﻿using Contracts.Abstractions;
+using Contracts.Abstractions;
 using Contracts.Results;
 using MediatR;
 using Newtonsoft.Json;
 using Telemetry.Application.Interfaces;
-using Telemetry.Domain.Entities;
 using Telemetry.Domain.Interfaces;
+using Telemetry.Infrastructure.Persistence.Outbox;
 
-namespace Telemetry.Application.Services;
+namespace Telemetry.Infrastructure.BackgroundJobs;
 
 public sealed class OutboxMessageProcessorService(
     IOutboxRepository outboxRepository,
@@ -15,16 +15,17 @@ public sealed class OutboxMessageProcessorService(
 {
     public async Task<Result> ProcessAsync(CancellationToken cancellationToken)
     {
-        var batchSize = 50;
+        int batchSize = 50;
 
-        var messages = await outboxRepository.GetPendingMessagesAsync(batchSize, cancellationToken);
+        IReadOnlyList<OutboxMessage>? messages = await outboxRepository.GetPendingMessagesAsync(
+            batchSize, cancellationToken);
         bool anyMessagesForPublish = messages is null || !messages.Any();
         if (anyMessagesForPublish)
         {
             return Result.Success();
         }
 
-        foreach (var message in messages!)
+        foreach (OutboxMessage message in messages!)
         {
             await PublishDomainEventAsync(message, cancellationToken);
         }

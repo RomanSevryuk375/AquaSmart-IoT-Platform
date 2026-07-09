@@ -1,4 +1,5 @@
-﻿using Contracts.Events.TelemetryEvents;
+using Contracts.Events.TelemetryEvents;
+using Contracts.Results;
 using MassTransit;
 using Telemetry.Application.Interfaces;
 
@@ -9,7 +10,7 @@ public class TelemetryBatchConsumer(
 {
     public async Task Consume(ConsumeContext<TelemetryBatchEvent> context)
     {
-        var result = await dataService.AddDataAsync(
+        ConsumerResult result = await dataService.AddDataAsync(
             context.Message, context.CancellationToken);
 
         if (!result.IsSuccess && result.IsRetryable)
