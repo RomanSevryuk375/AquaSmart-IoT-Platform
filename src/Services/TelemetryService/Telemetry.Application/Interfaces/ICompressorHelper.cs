@@ -11,10 +11,4 @@ public interface ICompressorHelper
         DateTime from,
         PeriodType periodType,
         CancellationToken cancellationToken = default);
-
-    public Task NotifyClientsAsync(
-        IReadOnlyDictionary<Guid, TelemetrySummary> data,
-        DateTime periodStart,
-        PeriodType periodType,
-        CancellationToken cancellationToken = default);
 }

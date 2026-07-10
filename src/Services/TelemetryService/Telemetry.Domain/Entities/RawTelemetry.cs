@@ -1,5 +1,6 @@
 using Contracts.Abstractions;
 using Contracts.Results;
+using Telemetry.Domain.Events;
 
 namespace Telemetry.Domain.Entities;
 
@@ -36,7 +37,7 @@ public sealed class RawTelemetry : AggregateRoot, IEntity
     public bool IsAggregated { get; private set; }
 
     public static Result<RawTelemetry> Create(
-        Guid id, Guid sensorId,
+        Guid id, Guid sensorId, Guid ecosystemId,
         double value, string externalMessageId, DateTime recordedAt)
     {
         var errors = new List<string>();
@@ -61,6 +62,15 @@ public sealed class RawTelemetry : AggregateRoot, IEntity
             id, sensorId,
             value, externalMessageId, recordedAt,
             createdAt: DateTime.UtcNow, isAggregated: false);
+
+        telemetryData.RaiseEvent(new RawTelemetryAddedDomainEvent
+        {
+            SensorId = sensorId,
+            EcosystemId = ecosystemId,
+            Value = value,
+            RecordedAt = recordedAt,
+            ExternalMessageId = externalMessageId
+        });
 
         return Result<RawTelemetry>.Success(telemetryData);
     }

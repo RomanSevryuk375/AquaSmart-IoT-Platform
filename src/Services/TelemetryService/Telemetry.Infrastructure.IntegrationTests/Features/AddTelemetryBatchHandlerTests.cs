@@ -2,8 +2,10 @@ using Contracts.Events.TelemetryEvents;
 using Contracts.Results;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Telemetry.Application.Features.Telemetry.Commands.AddTelemetryBatch;
 using Telemetry.Domain.Entities;
+using Telemetry.Domain.Events;
 using Telemetry.Infrastructure.IntegrationTests.Infrastructure;
 using Telemetry.Infrastructure.Persistence.Outbox;
 using Telemetry.TestShared.Builders;
@@ -67,6 +69,17 @@ public class AddTelemetryBatchHandlerTests(IntegrationTestWebAppFactory factory)
         updatedSensor!.LastValue.Should().Be(24.5);
 
         List<OutboxMessage> outboxMessages = await DbContext.OutboxMessages.AsNoTracking().ToListAsync();
-        outboxMessages.Should().BeEmpty();
+        outboxMessages.Should().ContainSingle();
+        OutboxMessage outboxMessage = outboxMessages.Single();
+        outboxMessage.Type.Should().Contain(nameof(RawTelemetryAddedDomainEvent));
+
+        RawTelemetryAddedDomainEvent? deserializedEvent = JsonConvert.DeserializeObject<RawTelemetryAddedDomainEvent>(
+            outboxMessage.Content,
+            new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+
+        deserializedEvent.Should().NotBeNull();
+        deserializedEvent!.SensorId.Should().Be(sensor.Id);
+        deserializedEvent.EcosystemId.Should().Be(ecosystem.Id);
+        deserializedEvent.Value.Should().Be(24.5);
     }
 }

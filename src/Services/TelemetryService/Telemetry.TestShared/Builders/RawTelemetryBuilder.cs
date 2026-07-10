@@ -4,9 +4,16 @@ public class RawTelemetryBuilder
 {
     private Guid _id = Guid.NewGuid();
     private Guid _sensorId = Guid.NewGuid();
+    private Guid _ecosystemId = Guid.NewGuid();
     private double _value = 23.4;
     private string _externalMessageId = "msg_123456";
     private DateTime _recordedAt = DateTime.UtcNow;
+
+    public RawTelemetryBuilder WithEcosystemId(Guid ecosystemId)
+    {
+        _ecosystemId = ecosystemId;
+        return this;
+    }
 
     public RawTelemetryBuilder WithId(Guid id)
     {
@@ -41,7 +48,7 @@ public class RawTelemetryBuilder
     public RawTelemetry Build()
     {
         Result<RawTelemetry> result = RawTelemetry.Create(
-            _id, _sensorId, _value, _externalMessageId, _recordedAt);
+            _id, _sensorId, _ecosystemId, _value, _externalMessageId, _recordedAt);
 
         if (result.IsFailure)
         {

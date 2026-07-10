@@ -1,9 +1,5 @@
-using AutoMapper;
 using Contracts.Events.TelemetryEvents;
-using MassTransit;
-using Telemetry.Application.DTOs;
 using Telemetry.Application.Features.Telemetry.Commands.AddTelemetryBatch;
-using Telemetry.Application.Interfaces;
 using Telemetry.Domain.Interfaces;
 
 namespace Telemetry.Application.UnitTests.Features.Telemetry;
@@ -13,9 +9,6 @@ public class AddTelemetryBatchHandlerTests
     private readonly ITelemetryRawDataRepository _telemetryRepositoryMock;
     private readonly ISensorRepository _sensorRepositoryMock;
     private readonly IEcosystemRepository _ecosystemRepositoryMock;
-    private readonly IPublishEndpoint _publishEndpointMock;
-    private readonly ITelemetryNotifier _realtimeNotifierMock;
-    private readonly IMapper _mapperMock;
     private readonly AddTelemetryBatchHandler _handler;
 
     public AddTelemetryBatchHandlerTests()
@@ -23,41 +16,11 @@ public class AddTelemetryBatchHandlerTests
         _telemetryRepositoryMock = Substitute.For<ITelemetryRawDataRepository>();
         _sensorRepositoryMock = Substitute.For<ISensorRepository>();
         _ecosystemRepositoryMock = Substitute.For<IEcosystemRepository>();
-        _publishEndpointMock = Substitute.For<IPublishEndpoint>();
-        _realtimeNotifierMock = Substitute.For<ITelemetryNotifier>();
-        _mapperMock = Substitute.For<IMapper>();
-
-        _mapperMock.Map<TelemetryReceivedEvent>(Arg.Any<TelemetryBatchEventItem>())
-            .Returns(callInfo =>
-            {
-                TelemetryBatchEventItem item = callInfo.Arg<TelemetryBatchEventItem>();
-                return new TelemetryReceivedEvent
-                {
-                    SensorId = item.SensorId,
-                    Value = item.Value,
-                    RecordedAt = item.RecordedAt
-                };
-            });
-
-        _mapperMock.Map<TelemetryRawChartPointDto>(Arg.Any<TelemetryBatchEventItem>())
-            .Returns(callInfo =>
-            {
-                TelemetryBatchEventItem item = callInfo.Arg<TelemetryBatchEventItem>();
-                return new TelemetryRawChartPointDto
-                {
-                    SensorId = item.SensorId,
-                    Value = item.Value,
-                    RecordedAt = item.RecordedAt
-                };
-            });
 
         _handler = new AddTelemetryBatchHandler(
             _telemetryRepositoryMock,
             _sensorRepositoryMock,
-            _ecosystemRepositoryMock,
-            _publishEndpointMock,
-            _mapperMock,
-            _realtimeNotifierMock);
+            _ecosystemRepositoryMock);
     }
 
     [Fact]
@@ -154,16 +117,6 @@ public class AddTelemetryBatchHandlerTests
             Arg.Is<RawTelemetry>(t => t.SensorId == sensor.Id &&
             Math.Abs(t.Value - 42.5) < 0.001 && t.ExternalMessageId == "ext_msg_987" && t.RecordedAt == recordedAt),
             Arg.Any<CancellationToken>());
-
-        await _publishEndpointMock.Received(1).Publish(
-            Arg.Is<TelemetryReceivedEvent>(e => e.SensorId == sensor.Id &&
-            Math.Abs(e.Value - 42.5) < 0.001 && e.RecordedAt == recordedAt),
-            Arg.Any<CancellationToken>());
-
-        await _realtimeNotifierMock.Received(1).TelemetryRawReceived(
-            ecosystem.Id.ToString(),
-            Arg.Is<TelemetryRawChartPointDto>(p => p.SensorId == sensor.Id &&
-            Math.Abs(p.Value - 42.5) < 0.001 && p.RecordedAt == recordedAt));
     }
 
     [Fact]
@@ -208,10 +161,6 @@ public class AddTelemetryBatchHandlerTests
 
         await _telemetryRepositoryMock.DidNotReceive()
             .AddAsync(Arg.Any<RawTelemetry>(), Arg.Any<CancellationToken>());
-        await _publishEndpointMock.DidNotReceive()
-            .Publish(Arg.Any<TelemetryReceivedEvent>(), Arg.Any<CancellationToken>());
-        await _realtimeNotifierMock.DidNotReceive()
-            .TelemetryRawReceived(Arg.Any<string>(), Arg.Any<TelemetryRawChartPointDto>());
     }
 
     [Fact]
@@ -260,9 +209,5 @@ public class AddTelemetryBatchHandlerTests
 
         await _telemetryRepositoryMock.DidNotReceive()
             .AddAsync(Arg.Any<RawTelemetry>(), Arg.Any<CancellationToken>());
-        await _publishEndpointMock.DidNotReceive()
-            .Publish(Arg.Any<TelemetryReceivedEvent>(), Arg.Any<CancellationToken>());
-        await _realtimeNotifierMock.DidNotReceive()
-            .TelemetryRawReceived(Arg.Any<string>(), Arg.Any<TelemetryRawChartPointDto>());
     }
 }

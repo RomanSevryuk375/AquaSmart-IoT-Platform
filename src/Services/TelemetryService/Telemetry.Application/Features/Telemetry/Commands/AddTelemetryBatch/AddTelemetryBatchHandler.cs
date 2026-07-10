@@ -1,10 +1,7 @@
-using AutoMapper;
 using Contracts.Events.TelemetryEvents;
 using Contracts.Results;
 using MassTransit;
 using MediatR;
-using Telemetry.Application.DTOs;
-using Telemetry.Application.Interfaces;
 using Telemetry.Domain.Entities;
 using Telemetry.Domain.Interfaces;
 
@@ -13,10 +10,7 @@ namespace Telemetry.Application.Features.Telemetry.Commands.AddTelemetryBatch;
 internal sealed class AddTelemetryBatchHandler(
     ITelemetryRawDataRepository telemetryRepository,
     ISensorRepository sensorRepository,
-    IEcosystemRepository ecosystemRepository,
-    IPublishEndpoint publishEndpoint,
-    IMapper mapper,
-    ITelemetryNotifier realtimeNotifier) : IRequestHandler<AddTelemetryBatchCommand, Result>
+    IEcosystemRepository ecosystemRepository) : IRequestHandler<AddTelemetryBatchCommand, Result>
 {
     public async Task<Result> Handle(AddTelemetryBatchCommand request, CancellationToken cancellationToken)
     {
@@ -36,8 +30,6 @@ internal sealed class AddTelemetryBatchHandler(
                 $"No sensors found for ecosystem {ecosystem.Id}."));
         }
 
-        var points = new List<TelemetryRawChartPointDto>();
-
         foreach (TelemetryBatchEventItem item in request.Items)
         {
             RawTelemetry? existingTelemetry = await telemetryRepository.GetByExternalMessageIdAsync(
@@ -55,29 +47,15 @@ internal sealed class AddTelemetryBatchHandler(
             }
 
             Result<RawTelemetry> telemetryResult = RawTelemetry.Create(
-                Guid.NewGuid(),
-                item.SensorId,
-                item.Value,
-                item.ExternalMessageId,
-                item.RecordedAt);
-
+                id: NewId.NextGuid(), item.SensorId, ecosystem.Id,
+                item.Value, item.ExternalMessageId, item.RecordedAt);
             if (telemetryResult.IsFailure)
             {
                 continue;
             }
 
             sensor.UpdateLastValue(item.Value);
-
             await telemetryRepository.AddAsync(telemetryResult.Value, cancellationToken);
-
-            await publishEndpoint.Publish(mapper.Map<TelemetryReceivedEvent>(item), cancellationToken);
-
-            points.Add(mapper.Map<TelemetryRawChartPointDto>(item));
-        }
-
-        foreach (TelemetryRawChartPointDto point in points)
-        {
-            await realtimeNotifier.TelemetryRawReceived(ecosystem.Id.ToString(), point);
         }
 
         return Result.Success();

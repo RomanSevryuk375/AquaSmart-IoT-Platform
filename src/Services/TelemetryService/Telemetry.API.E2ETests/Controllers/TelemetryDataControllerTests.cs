@@ -42,6 +42,7 @@ public class TelemetryDataControllerTests(E2ETestWebAppFactory factory) : BaseE2
 
         RawTelemetry telemetry1 = new RawTelemetryBuilder()
             .WithSensorId(sensor.Id)
+            .WithEcosystemId(ecosystem.Id)
             .WithValue(25.5)
             .WithExternalMessageId("raw_p1")
             .WithRecordedAt(baseTime.AddMinutes(5))
@@ -49,6 +50,7 @@ public class TelemetryDataControllerTests(E2ETestWebAppFactory factory) : BaseE2
 
         RawTelemetry telemetry2 = new RawTelemetryBuilder()
             .WithSensorId(sensor.Id)
+            .WithEcosystemId(ecosystem.Id)
             .WithValue(26.0)
             .WithExternalMessageId("raw_p2")
             .WithRecordedAt(baseTime)
@@ -127,6 +129,7 @@ public class TelemetryDataControllerTests(E2ETestWebAppFactory factory) : BaseE2
 
         AggregateTelemetry agg1 = new AggregateTelemetryBuilder()
             .WithSensorId(sensor.Id)
+            .WithEcosystemId(ecosystem.Id)
             .WithPeriod(PeriodType.Hourly)
             .WithPeriodStart(baseTime.AddHours(2))
             .WithValues(minValue: 10.0, maxValue: 20.0, avgValue: 15.0, dataPointsCount: 5)
@@ -134,6 +137,7 @@ public class TelemetryDataControllerTests(E2ETestWebAppFactory factory) : BaseE2
 
         AggregateTelemetry agg2 = new AggregateTelemetryBuilder()
             .WithSensorId(sensor.Id)
+            .WithEcosystemId(ecosystem.Id)
             .WithPeriod(PeriodType.Hourly)
             .WithPeriodStart(baseTime)
             .WithValues(minValue: 12.0, maxValue: 22.0, avgValue: 17.0, dataPointsCount: 6)

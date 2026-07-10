@@ -31,6 +31,7 @@ public class GetRawTelemetryChartHandlerTests(IntegrationTestWebAppFactory facto
 
         RawTelemetry point1 = new RawTelemetryBuilder()
             .WithSensorId(sensor.Id)
+            .WithEcosystemId(ecosystem.Id)
             .WithValue(18.5)
             .WithExternalMessageId("raw_p1")
             .WithRecordedAt(baseTime)
@@ -38,6 +39,7 @@ public class GetRawTelemetryChartHandlerTests(IntegrationTestWebAppFactory facto
 
         RawTelemetry point2 = new RawTelemetryBuilder()
             .WithSensorId(sensor.Id)
+            .WithEcosystemId(ecosystem.Id)
             .WithValue(22.0)
             .WithExternalMessageId("raw_p2")
             .WithRecordedAt(baseTime.AddHours(1))
@@ -45,6 +47,7 @@ public class GetRawTelemetryChartHandlerTests(IntegrationTestWebAppFactory facto
 
         RawTelemetry point3 = new RawTelemetryBuilder()
             .WithSensorId(sensor.Id)
+            .WithEcosystemId(ecosystem.Id)
             .WithValue(25.3)
             .WithExternalMessageId("raw_p3")
             .WithRecordedAt(baseTime.AddHours(2))

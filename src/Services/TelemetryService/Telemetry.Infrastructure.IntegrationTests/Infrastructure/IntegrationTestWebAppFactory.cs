@@ -1,6 +1,8 @@
 using MassTransit;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using NSubstitute;
+using Telemetry.Application.Interfaces;
 using Telemetry.Infrastructure.Persistence;
 using Testcontainers.PostgreSql;
 
@@ -55,6 +57,8 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
             {
                 services.Remove(quartzHostedService);
             }
+
+            services.AddSingleton(Substitute.For<ITelemetryNotifier>());
 
             ServiceProvider serviceProvider = services.BuildServiceProvider();
             using IServiceScope scope = serviceProvider.CreateScope();
