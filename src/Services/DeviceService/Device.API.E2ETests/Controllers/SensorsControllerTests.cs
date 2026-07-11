@@ -1,7 +1,6 @@
 using Contracts.Enums;
 using Device.Application.Extesions;
 using Device.Application.Features.Sensors.Command.AddSensor;
-using Device.Application.Features.Telemetry.Command.TransmittTelemetry;
 using Device.Domain.Entities;
 using Device.Domain.Entities.Sensors;
 
@@ -111,109 +110,6 @@ public class SensorsControllerTests(E2ETestWebAppFactory factory) : BaseE2ETest(
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    [Fact]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task ReceiveBatchTelemetry_WithValidDeviceToken_Returns202Accepted()
-    {
-        // Arrange
-        var hasher = new MyHasher();
-
-        Controller controller = new ControllerBuilder()
-            .WithId(TestConstants.ControllerId)
-            .WithDeviceTokenHash(hasher.Generate(TestConstants.ValidRawToken))
-            .Build();
-
-        Sensor sensor = new SensorBuilder()
-            .WithId(TestConstants.SensorId)
-            .WithControllerId(TestConstants.ControllerId)
-            .Build();
-
-        DbContext.Controllers.Add(controller);
-        DbContext.Sensors.Add(sensor);
-        await DbContext.SaveChangesAsync();
-
-        var command = new TransmitTelemetryCommand
-        {
-            MacAddress = controller.MacAddress.Value,
-            Items =
-            [
-                new()
-                {
-                    SensorId = TestConstants.SensorId,
-                    Value = 24.5,
-                    ExternalMessageId = "msg-123",
-                    RecordedAt = DateTime.UtcNow
-                }
-            ]
-        };
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiConstants.Routes.Sensors}/telemetry");
-        request.Headers.Add(ApiConstants.Headers.DeviceToken, TestConstants.ValidRawToken);
-        request.Content = JsonContent.Create(command);
-
-        // Act
-        HttpResponseMessage response = await Client.SendAsync(request);
-
-        // Assert
-        if (response.StatusCode == HttpStatusCode.InternalServerError)
-        {
-            string errorText = await response.Content.ReadAsStringAsync();
-            throw new Exception($"API crashed with 500: {errorText}");
-        }
-        response.StatusCode.Should().Be(HttpStatusCode.Accepted);
-
-        TelemetryTransmittedResponse? content = await response.Content
-            .ReadFromJsonAsync<TelemetryTransmittedResponse>();
-        content.Should().NotBeNull();
-        content!.AcceptedCount.Should().Be(1);
-        content.SkippedCount.Should().Be(0);
-    }
-
-    [Fact]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task ReceiveBatchTelemetry_WithInvalidDeviceToken_Returns409Conflict()
-    {
-        // Arrange
-        var hasher = new MyHasher();
-
-        Controller controller = new ControllerBuilder()
-            .WithId(TestConstants.ControllerId)
-            .WithDeviceTokenHash(hasher.Generate(TestConstants.ValidRawToken))
-            .Build();
-
-        DbContext.Controllers.Add(controller);
-        await DbContext.SaveChangesAsync();
-
-        var command = new TransmitTelemetryCommand
-        {
-            MacAddress = controller.MacAddress.Value,
-            Items =
-            [
-                new()
-                {
-                    SensorId = Guid.NewGuid(),
-                    Value = 1.0,
-                    RecordedAt = DateTime.UtcNow,
-                    ExternalMessageId = "msg-123"
-                }
-            ]
-        };
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiConstants.Routes.Sensors}/telemetry");
-        request.Headers.Add(ApiConstants.Headers.DeviceToken, "invalid_hacker_token");
-        request.Content = JsonContent.Create(command);
-
-        // Act
-        HttpResponseMessage response = await Client.SendAsync(request);
-
-        // Assert
-        if (response.StatusCode == HttpStatusCode.InternalServerError)
-        {
-            string errorText = await response.Content.ReadAsStringAsync();
-            throw new Exception($"API crashed with 500: {errorText}");
-        }
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
-    }
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]

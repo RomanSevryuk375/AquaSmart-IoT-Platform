@@ -2,6 +2,8 @@ using Contracts.Enums;
 using Contracts.Results;
 using MassTransit;
 using MediatR;
+using Notification.Application.DTOs;
+using Notification.Application.Interfaces;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
 
@@ -10,7 +12,8 @@ namespace Notification.Application.Features.Alerts.Commands.SendSensorNoDataAler
 public sealed class SendSensorNoDataAlertHandler(
     INotificationRepository notificationRepository,
     IUserRepository userRepository,
-    IEcosystemRepository ecosystemRepository) : IRequestHandler<SendSensorNoDataAlertCommand, Result>
+    IEcosystemRepository ecosystemRepository,
+    IDeviceMetadataEnricher metadataEnricher) : IRequestHandler<SendSensorNoDataAlertCommand, Result>
 {
     public async Task<Result> Handle(SendSensorNoDataAlertCommand request, CancellationToken cancellationToken)
     {
@@ -30,10 +33,18 @@ public sealed class SendSensorNoDataAlertHandler(
                 $"Ecosystem {request.UserId} not found"));
         }
 
+        Result<DeviceMetadataDto> enrichedMetadataResult = await metadataEnricher.EnrichAsync(
+            null, request.SensorId, null, cancellationToken);
+        if (enrichedMetadataResult.IsFailure)
+        {
+            return Result.Failure(enrichedMetadataResult.Error);
+        }
+
+        string sensorName = enrichedMetadataResult.Value.SensorName;
         Result<Domain.Entities.Notification>? notificationResult = Domain.Entities.Notification.Create(
             notificationId: NewId.NextGuid(), request.UserId, request.EcosystemId,
             level: NotificationLevel.Critical,
-            rawMessage: $"Sensor {request.SensorId} " +
+            rawMessage: $"Sensor {sensorName} " +
             $"from aquarium {existingEcosystem.EcosystemName} did not send data " +
             $"at time {request.LastSeenAt:HH:mm:ss}");
 

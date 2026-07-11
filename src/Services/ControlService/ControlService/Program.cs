@@ -1,6 +1,5 @@
 using Contracts.Middlewares;
 using Control.API.Extensions;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -12,20 +11,12 @@ try
     Log.Information("Starting ControlService application");
 
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-
     builder.AddElkLogging();
-
     builder.Services.AddConfiguration(builder.Configuration);
 
     WebApplication app = builder.Build();
-
     app.UseGlobalExceptionHandler();
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.UseAuthentication();
-    app.UseAuthorization();
-    app.MapHealthChecks(ApiConstants.HealthRoute);
-    app.MapControllers();
+    app.AddConfiguration();
 
     await app.RunAsync();
 }

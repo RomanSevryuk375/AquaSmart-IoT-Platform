@@ -140,8 +140,6 @@ public static class DependencyInjection
             busConfigurator.AddConsumer<SensorRenamedConsumer>();
             busConfigurator.AddConsumer<SensorStateChangedConsumer>();
 
-            busConfigurator.AddConsumer<TelemetryBatchConsumer>();
-
             busConfigurator.UsingRabbitMq((context, configurator) =>
             {
                 configurator.Host(new Uri(rabbitOptions.Host), h =>

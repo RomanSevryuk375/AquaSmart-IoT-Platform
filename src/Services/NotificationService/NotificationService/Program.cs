@@ -1,4 +1,3 @@
-using Contracts.Constants;
 using Contracts.Middlewares;
 using Notification.API.Extensions;
 using Serilog;
@@ -12,20 +11,12 @@ try
     Log.Information("Starting NotificationService application");
 
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-
     builder.AddElkLogging();
-
     builder.Services.AddConfiguration(builder.Configuration);
 
     WebApplication app = builder.Build();
-
     app.UseGlobalExceptionHandler();
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.UseAuthentication();
-    app.UseAuthorization();
-    app.MapHealthChecks(ApiConstants.HealthRoute);
-    app.MapControllers();
+    app.AddConfiguration();
 
     await app.RunAsync();
 }

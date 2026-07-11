@@ -1,6 +1,7 @@
 using Contracts.Abstractions;
 using Contracts.Enums;
 using Contracts.Results;
+using Telemetry.Domain.Events;
 using Telemetry.Domain.ValueObjects;
 
 namespace Telemetry.Domain.Entities;
@@ -39,7 +40,7 @@ public sealed class AggregateTelemetry : AggregateRoot, IEntity
 
 
     public static Result<AggregateTelemetry> Create(
-        Guid id, Guid sensorId,
+        Guid id, Guid sensorId, Guid ecosystemId,
         DateTime periodStart, PeriodType period,
         double minValue, double maxValue, double avgValue, int dataPointsCount)
     {
@@ -50,14 +51,27 @@ public sealed class AggregateTelemetry : AggregateRoot, IEntity
             return Result<AggregateTelemetry>.Failure(summaryResult.Error);
         }
 
+        TelemetrySummary summary = summaryResult.Value;
+
         var aggregateData = new AggregateTelemetry(
             id,
             sensorId,
             periodStart,
             period,
-            summaryResult.Value,
+            summary,
             createdAt: DateTime.UtcNow,
             isAggregated: false);
+
+        aggregateData.RaiseEvent(new AggregatedTelemetryAddedDomainEvent
+        {
+            SensorId = sensorId,
+            EcosystemId = ecosystemId,
+            Period = period,
+            MaxValue = summary.MaxValue,
+            MinValue = summary.MinValue,
+            AvgValue = summary.AvgValue,
+            Time = periodStart,
+        });
 
         return Result<AggregateTelemetry>.Success(aggregateData);
     }

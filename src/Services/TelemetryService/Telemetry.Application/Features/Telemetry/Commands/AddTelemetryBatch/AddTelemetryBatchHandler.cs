@@ -1,4 +1,4 @@
-using AutoMapper;
+using Contracts.Constants;
 using Contracts.Events.TelemetryEvents;
 using Contracts.Results;
 using MassTransit;
@@ -14,19 +14,31 @@ internal sealed class AddTelemetryBatchHandler(
     ITelemetryRawDataRepository telemetryRepository,
     ISensorRepository sensorRepository,
     IEcosystemRepository ecosystemRepository,
-    IPublishEndpoint publishEndpoint,
-    IMapper mapper,
-    ITelemetryNotifier realtimeNotifier) : IRequestHandler<AddTelemetryBatchCommand, Result>
+    IDeviceTokenValidator deviceTokenValidator) : IRequestHandler<AddTelemetryBatchCommand, Result>
 {
     public async Task<Result> Handle(AddTelemetryBatchCommand request, CancellationToken cancellationToken)
     {
+        Result<ValidateResponseDto> validationResult = await deviceTokenValidator.ValidateAsync(
+            request.MacAddress, request.DeviceToken, cancellationToken);
+        if (validationResult.IsFailure)
+        {
+            return Result.Failure(validationResult.Error);
+        }
+
         Ecosystem? ecosystem = await ecosystemRepository.GetByControllerIdAsync(
-            request.ControllerId, cancellationToken);
+            validationResult.Value.ControllerId, cancellationToken);
         if (ecosystem is null)
         {
             return Result.Failure(Error.NotFound<Ecosystem>(
-                $"Ecosystem for controller {request.ControllerId} not found."));
+                $"Ecosystem for controller {validationResult.Value.ControllerId} not found."));
         }
+
+        if (ecosystem.UserId != validationResult.Value.UserId)
+        {
+            return Result.Failure(Error.Conflict(ErrorMessages.AccessDenied,
+                ErrorMessages.YouDontOwnThisController));
+        }
+
 
         IReadOnlyList<Sensor> sensors = await sensorRepository.GetAllByEcosystemId(
             ecosystem.Id, cancellationToken);
@@ -35,8 +47,6 @@ internal sealed class AddTelemetryBatchHandler(
             return Result.Failure(Error.NotFound<Sensor>(
                 $"No sensors found for ecosystem {ecosystem.Id}."));
         }
-
-        var points = new List<TelemetryRawChartPointDto>();
 
         foreach (TelemetryBatchEventItem item in request.Items)
         {
@@ -55,29 +65,15 @@ internal sealed class AddTelemetryBatchHandler(
             }
 
             Result<RawTelemetry> telemetryResult = RawTelemetry.Create(
-                Guid.NewGuid(),
-                item.SensorId,
-                item.Value,
-                item.ExternalMessageId,
-                item.RecordedAt);
-
+                id: NewId.NextGuid(), item.SensorId, ecosystem.Id,
+                item.Value, item.ExternalMessageId, item.RecordedAt);
             if (telemetryResult.IsFailure)
             {
                 continue;
             }
 
             sensor.UpdateLastValue(item.Value);
-
             await telemetryRepository.AddAsync(telemetryResult.Value, cancellationToken);
-
-            await publishEndpoint.Publish(mapper.Map<TelemetryReceivedEvent>(item), cancellationToken);
-
-            points.Add(mapper.Map<TelemetryRawChartPointDto>(item));
-        }
-
-        foreach (TelemetryRawChartPointDto point in points)
-        {
-            await realtimeNotifier.TelemetryRawReceived(ecosystem.Id.ToString(), point);
         }
 
         return Result.Success();

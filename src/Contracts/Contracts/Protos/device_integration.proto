@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+option csharp_namespace = "Contracts.gRPC.Devices";
+package aquasmart.devices.v1;
+
+service DeviceIntegrationGrpc {
+  rpc GetMetadata (GetMetadataRequest) returns (GetMetadataResponse);
+  rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
+  rpc ValidateHardwareAssignment (ValidateHardwareAssignmentRequest) returns (ValidateHardwareAssignmentResponse);
+}
+
+message GetMetadataRequest {
+  string controller_id = 1; 
+  string sensor_id = 2; 
+  string relay_id = 3; 
+}
+
+message GetMetadataResponse {
+  string controller_name = 1;
+  string sensor_name = 2;
+  string relay_name = 3;
+}
+
+message ValidateTokenRequest {
+  string mac_address = 1; 
+  string device_token = 2; 
+}
+
+message ValidateTokenResponse {
+  bool is_valid = 1;
+  string controller_id = 2;
+  string user_id = 3;
+}
+
+message ValidateHardwareAssignmentRequest {
+  string sensor_id = 1; 
+  string relay_id = 2; 
+}
+
+message ValidateHardwareAssignmentResponse {
+  bool is_valid = 1;
+}

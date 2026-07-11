@@ -1,3 +1,4 @@
+using Control.Application.DTOs.AutomationRule;
 using Control.Application.Features.AutomationRules.Commands.CreateRule;
 using Control.Infrastructure.Persistence.Outbox;
 
@@ -25,8 +26,15 @@ public class CreateRuleHandlerTests(
             .WithEcosystemId(ecosystem.Id)
             .Build();
 
+        Sensor sensor = new SensorBuilder()
+            .WithId(Guid.NewGuid())
+            .WithEcosystemId(ecosystem.Id)
+            .Build();
+
         DbContext.Set<Ecosystem>().Add(ecosystem);
         DbContext.Set<Relay>().Add(relay);
+        DbContext.Set<Sensor>().Add(sensor);
+        await DbContext.SaveChangesAsync();
 
         var command = new CreateRuleCommand
         {
@@ -35,7 +43,17 @@ public class CreateRuleHandlerTests(
             Name = "Temperature Control",
             Operator = Operator.AND,
             Action = RuleAction.SwitchOn,
-            IsActive = true
+            IsActive = true,
+            Conditions =
+            [
+                new RuleConditionRequestDto
+                {
+                    SensorId = sensor.Id,
+                    Condition = Condition.Greater,
+                    Threshold = 25.0,
+                    Hysteresis = 1.0
+                }
+            ]
         };
 
         // Act
@@ -47,11 +65,20 @@ public class CreateRuleHandlerTests(
         Guid ruleId = result.Value;
 
         AutomationRule? rule = await DbContext.Set<AutomationRule>()
+            .Include(r => r.Conditions)
             .AsNoTracking()
             .FirstOrDefaultAsync(r => r.Id == ruleId);
 
         rule.Should().NotBeNull();
         rule!.Name.Value.Should().Be("Temperature Control");
+        rule.Conditions.Should().ContainSingle();
+        rule.Conditions.First().SensorId.Should().Be(sensor.Id);
+
+        RuleCondition? dbCondition = await DbContext.Set<RuleCondition>()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.AutomationRuleId == ruleId);
+        dbCondition.Should().NotBeNull();
+        dbCondition!.SensorId.Should().Be(sensor.Id);
 
         List<OutboxMessage> outboxMessages = await DbContext.Set<OutboxMessage>()
             .AsNoTracking()

@@ -10,12 +10,14 @@ public class RawTelemetryTests
         // Arrange
         var id = Guid.NewGuid();
         var sensorId = Guid.NewGuid();
+        var ecosystemId = Guid.NewGuid();
         double value = 25.5;
         string externalMessageId = "msg-12345";
         DateTime recordedAt = DateTime.UtcNow;
 
         // Act
-        Result<RawTelemetry> result = RawTelemetry.Create(id, sensorId, value, externalMessageId, recordedAt);
+        Result<RawTelemetry> result = RawTelemetry.Create(
+            id, sensorId, ecosystemId, value, externalMessageId, recordedAt);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -35,7 +37,7 @@ public class RawTelemetryTests
 
         // Act
         Result<RawTelemetry> result = RawTelemetry.Create(
-            Guid.NewGuid(), Guid.NewGuid(), 25.5, "msg-123", futureDate);
+            Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 25.5, "msg-123", futureDate);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -51,7 +53,7 @@ public class RawTelemetryTests
     {
         // Arrange & Act
         Result<RawTelemetry> result = RawTelemetry.Create(
-            Guid.NewGuid(), Guid.NewGuid(), 25.5, invalidMessageId, DateTime.UtcNow);
+            Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 25.5, invalidMessageId, DateTime.UtcNow);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -67,7 +69,7 @@ public class RawTelemetryTests
 
         // Act
         Result<RawTelemetry> result = RawTelemetry.Create(
-            Guid.NewGuid(), Guid.NewGuid(), 25.5, "", futureDate);
+            Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 25.5, "", futureDate);
 
         // Assert
         result.IsFailure.Should().BeTrue();

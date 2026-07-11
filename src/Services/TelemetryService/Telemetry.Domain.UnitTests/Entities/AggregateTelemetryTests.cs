@@ -10,6 +10,7 @@ public class AggregateTelemetryTests
         // Arrange
         var id = Guid.NewGuid();
         var sensorId = Guid.NewGuid();
+        var ecosystemId = Guid.NewGuid();
         DateTime periodStart = DateTime.UtcNow.Date;
         PeriodType period = PeriodType.Hourly;
         double minValue = 10.0;
@@ -19,7 +20,7 @@ public class AggregateTelemetryTests
 
         // Act
         Result<AggregateTelemetry> result = AggregateTelemetry.Create(
-            id, sensorId, periodStart, period, minValue, maxValue, avgValue, dataPointsCount);
+            id, sensorId, ecosystemId, periodStart, period, minValue, maxValue, avgValue, dataPointsCount);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -42,6 +43,7 @@ public class AggregateTelemetryTests
         // Arrange
         var id = Guid.NewGuid();
         var sensorId = Guid.NewGuid();
+        var ecosystemId = Guid.NewGuid();
         DateTime periodStart = DateTime.UtcNow.Date;
         PeriodType period = PeriodType.Hourly;
         double minValue = 30.0;
@@ -51,7 +53,7 @@ public class AggregateTelemetryTests
 
         // Act
         Result<AggregateTelemetry> result = AggregateTelemetry.Create(
-            id, sensorId, periodStart, period, minValue, maxValue, avgValue, dataPointsCount);
+            id, sensorId, ecosystemId, periodStart, period, minValue, maxValue, avgValue, dataPointsCount);
 
         // Assert
         result.IsFailure.Should().BeTrue();

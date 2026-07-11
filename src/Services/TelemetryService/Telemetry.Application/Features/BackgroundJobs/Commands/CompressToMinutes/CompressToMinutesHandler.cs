@@ -35,7 +35,6 @@ public sealed class CompressToMinutesHandler(
 
         var sensorIds = data.Keys.ToList();
         await telemetryRaw.MarkAsAggregatedAsync(sensorIds, from, to, cancellationToken);
-        await compressorHelper.NotifyClientsAsync(data, from, PeriodType.Minute, cancellationToken);
 
         return Result.Success();
     }

@@ -1,6 +1,4 @@
-using AutoMapper;
 using Contracts.Events.TelemetryEvents;
-using MassTransit;
 using Telemetry.Application.DTOs;
 using Telemetry.Application.Features.Telemetry.Commands.AddTelemetryBatch;
 using Telemetry.Application.Interfaces;
@@ -13,9 +11,7 @@ public class AddTelemetryBatchHandlerTests
     private readonly ITelemetryRawDataRepository _telemetryRepositoryMock;
     private readonly ISensorRepository _sensorRepositoryMock;
     private readonly IEcosystemRepository _ecosystemRepositoryMock;
-    private readonly IPublishEndpoint _publishEndpointMock;
-    private readonly ITelemetryNotifier _realtimeNotifierMock;
-    private readonly IMapper _mapperMock;
+    private readonly IDeviceTokenValidator _deviceTokenValidatorMock;
     private readonly AddTelemetryBatchHandler _handler;
 
     public AddTelemetryBatchHandlerTests()
@@ -23,41 +19,13 @@ public class AddTelemetryBatchHandlerTests
         _telemetryRepositoryMock = Substitute.For<ITelemetryRawDataRepository>();
         _sensorRepositoryMock = Substitute.For<ISensorRepository>();
         _ecosystemRepositoryMock = Substitute.For<IEcosystemRepository>();
-        _publishEndpointMock = Substitute.For<IPublishEndpoint>();
-        _realtimeNotifierMock = Substitute.For<ITelemetryNotifier>();
-        _mapperMock = Substitute.For<IMapper>();
-
-        _mapperMock.Map<TelemetryReceivedEvent>(Arg.Any<TelemetryBatchEventItem>())
-            .Returns(callInfo =>
-            {
-                TelemetryBatchEventItem item = callInfo.Arg<TelemetryBatchEventItem>();
-                return new TelemetryReceivedEvent
-                {
-                    SensorId = item.SensorId,
-                    Value = item.Value,
-                    RecordedAt = item.RecordedAt
-                };
-            });
-
-        _mapperMock.Map<TelemetryRawChartPointDto>(Arg.Any<TelemetryBatchEventItem>())
-            .Returns(callInfo =>
-            {
-                TelemetryBatchEventItem item = callInfo.Arg<TelemetryBatchEventItem>();
-                return new TelemetryRawChartPointDto
-                {
-                    SensorId = item.SensorId,
-                    Value = item.Value,
-                    RecordedAt = item.RecordedAt
-                };
-            });
+        _deviceTokenValidatorMock = Substitute.For<IDeviceTokenValidator>();
 
         _handler = new AddTelemetryBatchHandler(
             _telemetryRepositoryMock,
             _sensorRepositoryMock,
             _ecosystemRepositoryMock,
-            _publishEndpointMock,
-            _mapperMock,
-            _realtimeNotifierMock);
+            _deviceTokenValidatorMock);
     }
 
     [Fact]
@@ -66,14 +34,19 @@ public class AddTelemetryBatchHandlerTests
     {
         // Arrange
         var controllerId = Guid.NewGuid();
-        _ecosystemRepositoryMock.GetByControllerIdAsync(controllerId, Arg.Any<CancellationToken>())
-            .Returns((Ecosystem?)null);
-
+        var userId = Guid.NewGuid();
         var command = new AddTelemetryBatchCommand
         {
-            ControllerId = controllerId,
+            MacAddress = "00:1A:2B:3C:4D:5E",
+            DeviceToken = "valid-token",
             Items = new List<TelemetryBatchEventItem>()
         };
+
+        _deviceTokenValidatorMock.ValidateAsync(command.MacAddress, command.DeviceToken, Arg.Any<CancellationToken>())
+            .Returns(Result<ValidateResponseDto>.Success(new ValidateResponseDto { ControllerId = controllerId, UserId = userId }));
+
+        _ecosystemRepositoryMock.GetByControllerIdAsync(controllerId, Arg.Any<CancellationToken>())
+            .Returns((Ecosystem?)null);
 
         // Act
         Result result = await _handler.Handle(command, CancellationToken.None);
@@ -89,18 +62,24 @@ public class AddTelemetryBatchHandlerTests
     {
         // Arrange
         var controllerId = Guid.NewGuid();
-        Ecosystem ecosystem = new EcosystemBuilder().WithControllerId(controllerId).Build();
+        var userId = Guid.NewGuid();
+        Ecosystem ecosystem = new EcosystemBuilder().WithControllerId(controllerId).WithUserId(userId).Build();
+
+        var command = new AddTelemetryBatchCommand
+        {
+            MacAddress = "00:1A:2B:3C:4D:5E",
+            DeviceToken = "valid-token",
+            Items = new List<TelemetryBatchEventItem>()
+        };
+
+        _deviceTokenValidatorMock.ValidateAsync(command.MacAddress, command.DeviceToken, Arg.Any<CancellationToken>())
+            .Returns(Result<ValidateResponseDto>.Success(new ValidateResponseDto { ControllerId = controllerId, UserId = userId }));
+
         _ecosystemRepositoryMock.GetByControllerIdAsync(controllerId, Arg.Any<CancellationToken>())
             .Returns(ecosystem);
 
         _sensorRepositoryMock.GetAllByEcosystemId(ecosystem.Id, Arg.Any<CancellationToken>())
             .Returns(new List<Sensor>());
-
-        var command = new AddTelemetryBatchCommand
-        {
-            ControllerId = controllerId,
-            Items = new List<TelemetryBatchEventItem>()
-        };
 
         // Act
         Result result = await _handler.Handle(command, CancellationToken.None);
@@ -116,8 +95,19 @@ public class AddTelemetryBatchHandlerTests
     {
         // Arrange
         var controllerId = Guid.NewGuid();
-        Ecosystem ecosystem = new EcosystemBuilder().WithControllerId(controllerId).Build();
+        var userId = Guid.NewGuid();
+        Ecosystem ecosystem = new EcosystemBuilder().WithControllerId(controllerId).WithUserId(userId).Build();
         Sensor sensor = new SensorBuilder().WithEcosystemId(ecosystem.Id).Build();
+
+        var command = new AddTelemetryBatchCommand
+        {
+            MacAddress = "00:1A:2B:3C:4D:5E",
+            DeviceToken = "valid-token",
+            Items = new List<TelemetryBatchEventItem>()
+        };
+
+        _deviceTokenValidatorMock.ValidateAsync(command.MacAddress, command.DeviceToken, Arg.Any<CancellationToken>())
+            .Returns(Result<ValidateResponseDto>.Success(new ValidateResponseDto { ControllerId = controllerId, UserId = userId }));
 
         _ecosystemRepositoryMock.GetByControllerIdAsync(controllerId, Arg.Any<CancellationToken>())
             .Returns(ecosystem);
@@ -134,11 +124,7 @@ public class AddTelemetryBatchHandlerTests
             RecordedAt = recordedAt
         };
 
-        var command = new AddTelemetryBatchCommand
-        {
-            ControllerId = controllerId,
-            Items = new List<TelemetryBatchEventItem> { batchItem }
-        };
+        command = command with { Items = new List<TelemetryBatchEventItem> { batchItem } };
 
         _telemetryRepositoryMock.GetByExternalMessageIdAsync(batchItem.ExternalMessageId, Arg.Any<CancellationToken>())
             .Returns((RawTelemetry?)null);
@@ -154,16 +140,6 @@ public class AddTelemetryBatchHandlerTests
             Arg.Is<RawTelemetry>(t => t.SensorId == sensor.Id &&
             Math.Abs(t.Value - 42.5) < 0.001 && t.ExternalMessageId == "ext_msg_987" && t.RecordedAt == recordedAt),
             Arg.Any<CancellationToken>());
-
-        await _publishEndpointMock.Received(1).Publish(
-            Arg.Is<TelemetryReceivedEvent>(e => e.SensorId == sensor.Id &&
-            Math.Abs(e.Value - 42.5) < 0.001 && e.RecordedAt == recordedAt),
-            Arg.Any<CancellationToken>());
-
-        await _realtimeNotifierMock.Received(1).TelemetryRawReceived(
-            ecosystem.Id.ToString(),
-            Arg.Is<TelemetryRawChartPointDto>(p => p.SensorId == sensor.Id &&
-            Math.Abs(p.Value - 42.5) < 0.001 && p.RecordedAt == recordedAt));
     }
 
     [Fact]
@@ -172,8 +148,19 @@ public class AddTelemetryBatchHandlerTests
     {
         // Arrange
         var controllerId = Guid.NewGuid();
-        Ecosystem ecosystem = new EcosystemBuilder().WithControllerId(controllerId).Build();
+        var userId = Guid.NewGuid();
+        Ecosystem ecosystem = new EcosystemBuilder().WithControllerId(controllerId).WithUserId(userId).Build();
         Sensor sensor = new SensorBuilder().WithEcosystemId(ecosystem.Id).Build();
+
+        var command = new AddTelemetryBatchCommand
+        {
+            MacAddress = "00:1A:2B:3C:4D:5E",
+            DeviceToken = "valid-token",
+            Items = new List<TelemetryBatchEventItem>()
+        };
+
+        _deviceTokenValidatorMock.ValidateAsync(command.MacAddress, command.DeviceToken, Arg.Any<CancellationToken>())
+            .Returns(Result<ValidateResponseDto>.Success(new ValidateResponseDto { ControllerId = controllerId, UserId = userId }));
 
         _ecosystemRepositoryMock.GetByControllerIdAsync(controllerId, Arg.Any<CancellationToken>())
             .Returns(ecosystem);
@@ -190,11 +177,7 @@ public class AddTelemetryBatchHandlerTests
             RecordedAt = DateTime.UtcNow
         };
 
-        var command = new AddTelemetryBatchCommand
-        {
-            ControllerId = controllerId,
-            Items = new List<TelemetryBatchEventItem> { batchItem }
-        };
+        command = command with { Items = new List<TelemetryBatchEventItem> { batchItem } };
 
         _telemetryRepositoryMock.GetByExternalMessageIdAsync(
             batchItem.ExternalMessageId, Arg.Any<CancellationToken>())
@@ -208,10 +191,6 @@ public class AddTelemetryBatchHandlerTests
 
         await _telemetryRepositoryMock.DidNotReceive()
             .AddAsync(Arg.Any<RawTelemetry>(), Arg.Any<CancellationToken>());
-        await _publishEndpointMock.DidNotReceive()
-            .Publish(Arg.Any<TelemetryReceivedEvent>(), Arg.Any<CancellationToken>());
-        await _realtimeNotifierMock.DidNotReceive()
-            .TelemetryRawReceived(Arg.Any<string>(), Arg.Any<TelemetryRawChartPointDto>());
     }
 
     [Fact]
@@ -220,8 +199,19 @@ public class AddTelemetryBatchHandlerTests
     {
         // Arrange
         var controllerId = Guid.NewGuid();
-        Ecosystem ecosystem = new EcosystemBuilder().WithControllerId(controllerId).Build();
+        var userId = Guid.NewGuid();
+        Ecosystem ecosystem = new EcosystemBuilder().WithControllerId(controllerId).WithUserId(userId).Build();
         Sensor sensor = new SensorBuilder().WithEcosystemId(ecosystem.Id).Build();
+
+        var command = new AddTelemetryBatchCommand
+        {
+            MacAddress = "00:1A:2B:3C:4D:5E",
+            DeviceToken = "valid-token",
+            Items = new List<TelemetryBatchEventItem>()
+        };
+
+        _deviceTokenValidatorMock.ValidateAsync(command.MacAddress, command.DeviceToken, Arg.Any<CancellationToken>())
+            .Returns(Result<ValidateResponseDto>.Success(new ValidateResponseDto { ControllerId = controllerId, UserId = userId }));
 
         _ecosystemRepositoryMock.GetByControllerIdAsync(controllerId, Arg.Any<CancellationToken>())
             .Returns(ecosystem);
@@ -237,11 +227,7 @@ public class AddTelemetryBatchHandlerTests
             RecordedAt = DateTime.UtcNow
         };
 
-        var command = new AddTelemetryBatchCommand
-        {
-            ControllerId = controllerId,
-            Items = new List<TelemetryBatchEventItem> { batchItem }
-        };
+        command = command with { Items = new List<TelemetryBatchEventItem> { batchItem } };
 
         RawTelemetry existingTelemetry = new RawTelemetryBuilder()
             .WithSensorId(sensor.Id)
@@ -260,9 +246,72 @@ public class AddTelemetryBatchHandlerTests
 
         await _telemetryRepositoryMock.DidNotReceive()
             .AddAsync(Arg.Any<RawTelemetry>(), Arg.Any<CancellationToken>());
-        await _publishEndpointMock.DidNotReceive()
-            .Publish(Arg.Any<TelemetryReceivedEvent>(), Arg.Any<CancellationToken>());
-        await _realtimeNotifierMock.DidNotReceive()
-            .TelemetryRawReceived(Arg.Any<string>(), Arg.Any<TelemetryRawChartPointDto>());
+    }
+
+    [Fact]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+    public async Task Handle_WhenValidationFails_ReturnsFailureAndDoesNotCallRepositories()
+    {
+        // Arrange
+        var command = new AddTelemetryBatchCommand
+        {
+            MacAddress = "00:1A:2B:3C:4D:5E",
+            DeviceToken = "invalid-token",
+            Items = new List<TelemetryBatchEventItem>
+            {
+                new() { SensorId = Guid.NewGuid(), Value = 12.3, ExternalMessageId = "msg_123", RecordedAt = DateTime.UtcNow }
+            }
+        };
+
+        var error = Error.Conflict("Device.InvalidToken", "The token is invalid.");
+        _deviceTokenValidatorMock.ValidateAsync(command.MacAddress, command.DeviceToken, Arg.Any<CancellationToken>())
+            .Returns(Result<ValidateResponseDto>.Failure(error));
+
+        // Act
+        Result result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(error);
+
+        _sensorRepositoryMock.DidNotReceiveWithAnyArgs();
+        _telemetryRepositoryMock.DidNotReceiveWithAnyArgs();
+    }
+
+    [Fact]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+    public async Task Handle_WhenEcosystemUserMismatch_ReturnsAccessDeniedConflict()
+    {
+        // Arrange
+        var controllerId = Guid.NewGuid();
+        var ecosystemUserId = Guid.NewGuid();
+        var validatorUserId = Guid.NewGuid();
+
+        Ecosystem ecosystem = new EcosystemBuilder()
+            .WithControllerId(controllerId)
+            .WithUserId(ecosystemUserId)
+            .Build();
+
+        var command = new AddTelemetryBatchCommand
+        {
+            MacAddress = "00:1A:2B:3C:4D:5E",
+            DeviceToken = "valid-token-wrong-user",
+            Items = new List<TelemetryBatchEventItem>()
+        };
+
+        _deviceTokenValidatorMock.ValidateAsync(command.MacAddress, command.DeviceToken, Arg.Any<CancellationToken>())
+            .Returns(Result<ValidateResponseDto>.Success(new ValidateResponseDto { ControllerId = controllerId, UserId = validatorUserId }));
+
+        _ecosystemRepositoryMock.GetByControllerIdAsync(controllerId, Arg.Any<CancellationToken>())
+            .Returns(ecosystem);
+
+        // Act
+        Result result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("Access.Denied");
+        result.Error.Type.Should().Be(ErrorType.Conflict);
     }
 }
+

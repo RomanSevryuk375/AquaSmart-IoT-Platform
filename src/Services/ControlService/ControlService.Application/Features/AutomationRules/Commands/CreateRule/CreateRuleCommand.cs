@@ -1,5 +1,6 @@
 using Contracts.Abstractions;
 using Contracts.Enums;
+using Control.Application.DTOs.AutomationRule;
 using Control.Application.Interfaces;
 
 namespace Control.Application.Features.AutomationRules.Commands.CreateRule;
@@ -13,4 +14,6 @@ public sealed record CreateRuleCommand
     public Operator Operator { get; init; }
     public RuleAction Action { get; init; }
     public bool IsActive { get; init; }
+
+    public List<RuleConditionRequestDto> Conditions { get; init; } = [];
 }

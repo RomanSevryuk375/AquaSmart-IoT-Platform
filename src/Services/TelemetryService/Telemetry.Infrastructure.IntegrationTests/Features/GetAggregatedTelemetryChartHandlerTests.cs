@@ -32,6 +32,7 @@ public class GetAggregatedTelemetryChartHandlerTests(IntegrationTestWebAppFactor
 
         AggregateTelemetry agg1 = new AggregateTelemetryBuilder()
             .WithSensorId(sensor.Id)
+            .WithEcosystemId(ecosystem.Id)
             .WithPeriod(PeriodType.Hourly)
             .WithPeriodStart(baseTime)
             .WithValues(minValue: 10.0, maxValue: 20.0, avgValue: 15.0, dataPointsCount: 5)
@@ -39,6 +40,7 @@ public class GetAggregatedTelemetryChartHandlerTests(IntegrationTestWebAppFactor
 
         AggregateTelemetry agg2 = new AggregateTelemetryBuilder()
             .WithSensorId(sensor.Id)
+            .WithEcosystemId(ecosystem.Id)
             .WithPeriod(PeriodType.Hourly)
             .WithPeriodStart(baseTime.AddHours(1))
             .WithValues(minValue: 12.0, maxValue: 22.0, avgValue: 17.0, dataPointsCount: 6)
@@ -46,6 +48,7 @@ public class GetAggregatedTelemetryChartHandlerTests(IntegrationTestWebAppFactor
 
         AggregateTelemetry agg3 = new AggregateTelemetryBuilder()
             .WithSensorId(sensor.Id)
+            .WithEcosystemId(ecosystem.Id)
             .WithPeriod(PeriodType.Hourly)
             .WithPeriodStart(baseTime.AddHours(2))
             .WithValues(minValue: 14.0, maxValue: 24.0, avgValue: 19.0, dataPointsCount: 7)

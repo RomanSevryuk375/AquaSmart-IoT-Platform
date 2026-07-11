@@ -2,9 +2,12 @@ using Contracts.Enums;
 using Contracts.Results;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Telemetry.Application.Features.BackgroundJobs.Commands.CompressToMinutes;
 using Telemetry.Domain.Entities;
+using Telemetry.Domain.Events;
 using Telemetry.Infrastructure.IntegrationTests.Infrastructure;
+using Telemetry.Infrastructure.Persistence.Outbox;
 using Telemetry.TestShared.Builders;
 
 namespace Telemetry.Infrastructure.IntegrationTests.Features;
@@ -33,6 +36,7 @@ public class CompressToMinutesHandlerTests(IntegrationTestWebAppFactory factory)
 
         RawTelemetry raw1 = new RawTelemetryBuilder()
             .WithSensorId(sensor.Id)
+            .WithEcosystemId(ecosystem.Id)
             .WithValue(20.0)
             .WithExternalMessageId("raw_msg_1")
             .WithRecordedAt(from.AddSeconds(10))
@@ -40,6 +44,7 @@ public class CompressToMinutesHandlerTests(IntegrationTestWebAppFactory factory)
 
         RawTelemetry raw2 = new RawTelemetryBuilder()
             .WithSensorId(sensor.Id)
+            .WithEcosystemId(ecosystem.Id)
             .WithValue(30.0)
             .WithExternalMessageId("raw_msg_2")
             .WithRecordedAt(from.AddSeconds(40))
@@ -47,6 +52,7 @@ public class CompressToMinutesHandlerTests(IntegrationTestWebAppFactory factory)
 
         RawTelemetry outsideRaw = new RawTelemetryBuilder()
             .WithSensorId(sensor.Id)
+            .WithEcosystemId(ecosystem.Id)
             .WithValue(50.0)
             .WithExternalMessageId("raw_msg_outside")
             .WithRecordedAt(from.AddMinutes(-1))
@@ -88,5 +94,23 @@ public class CompressToMinutesHandlerTests(IntegrationTestWebAppFactory factory)
 
         unprocessedRaw.Should().NotBeNull();
         unprocessedRaw!.IsAggregated.Should().BeFalse();
+
+        List<OutboxMessage> outboxMessages = await DbContext.OutboxMessages.AsNoTracking().ToListAsync();
+        outboxMessages.Should().ContainSingle();
+        OutboxMessage outboxMessage = outboxMessages.Single();
+        outboxMessage.Type.Should().Contain(nameof(AggregatedTelemetryAddedDomainEvent));
+
+        AggregatedTelemetryAddedDomainEvent? deserializedEvent = JsonConvert
+            .DeserializeObject<AggregatedTelemetryAddedDomainEvent>(
+            outboxMessage.Content,
+            new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+
+        deserializedEvent.Should().NotBeNull();
+        deserializedEvent!.SensorId.Should().Be(sensor.Id);
+        deserializedEvent.EcosystemId.Should().Be(ecosystem.Id);
+        deserializedEvent.Period.Should().Be(PeriodType.Minute);
+        deserializedEvent.MinValue.Should().Be(20.0);
+        deserializedEvent.MaxValue.Should().Be(30.0);
+        deserializedEvent.AvgValue.Should().Be(25.0);
     }
 }

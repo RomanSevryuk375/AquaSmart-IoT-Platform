@@ -47,8 +47,7 @@ public sealed class OutboxMessageProcessorService(
                 return;
             }
 
-            var domainEvent = JsonConvert.DeserializeObject(message.Content, type) as IDomainEvent;
-            if (domainEvent is null)
+            if (JsonConvert.DeserializeObject(message.Content, type) is not IDomainEvent domainEvent)
             {
                 MarkAsPoisonMessage(message, "Deserialization returned null or invalid type.");
                 return;

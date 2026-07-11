@@ -20,9 +20,9 @@ public sealed class CompressToHoursHandler(
             DateTime.UtcNow.Hour, 0, 0, DateTimeKind.Utc);
         DateTime from = to.AddHours(HourlyInterval);
 
-        IReadOnlyDictionary<Guid, TelemetrySummary>? data = await telemetryAggregate.GetSummaryForPeriodAsync(
+        IReadOnlyDictionary<Guid, TelemetrySummary> data = await telemetryAggregate.GetSummaryForPeriodAsync(
             PeriodType.Minute, from, to, cancellationToken);
-        if (data is null)
+        if (data.Count == 0)
         {
             return Result.Success();
         }
@@ -35,7 +35,6 @@ public sealed class CompressToHoursHandler(
 
         var sensorIds = data.Keys.ToList();
         await telemetryAggregate.MarkAsAggregatedAsync(sensorIds, from, to, cancellationToken);
-        await compressorHelper.NotifyClientsAsync(data, from, PeriodType.Hourly, cancellationToken);
 
         return Result.Success();
     }

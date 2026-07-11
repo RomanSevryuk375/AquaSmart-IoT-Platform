@@ -4,12 +4,19 @@ public class AggregateTelemetryBuilder
 {
     private Guid _id = Guid.NewGuid();
     private Guid _sensorId = Guid.NewGuid();
+    private Guid _ecosystemId = Guid.NewGuid();
     private DateTime _periodStart = DateTime.UtcNow.Date;
     private PeriodType _period = PeriodType.Hourly;
     private double _minValue = 10.0;
     private double _maxValue = 30.0;
     private double _avgValue = 20.0;
     private int _dataPointsCount = 5;
+
+    public AggregateTelemetryBuilder WithEcosystemId(Guid ecosystemId)
+    {
+        _ecosystemId = ecosystemId;
+        return this;
+    }
 
     public AggregateTelemetryBuilder WithId(Guid id)
     {
@@ -47,7 +54,7 @@ public class AggregateTelemetryBuilder
     public AggregateTelemetry Build()
     {
         Result<AggregateTelemetry> result = AggregateTelemetry.Create(
-            _id, _sensorId, _periodStart, _period,
+            _id, _sensorId, _ecosystemId, _periodStart, _period,
             _minValue, _maxValue, _avgValue, _dataPointsCount);
 
         if (result.IsFailure)

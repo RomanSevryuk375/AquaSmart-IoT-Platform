@@ -41,10 +41,6 @@ public class CompressToMinutesHandlerTests
         await _telemetryRawMock.DidNotReceive().MarkAsAggregatedAsync(
             Arg.Any<List<Guid>>(), Arg.Any<DateTime>(), Arg.Any<DateTime>(),
             Arg.Any<CancellationToken>());
-
-        await _compressorHelperMock.DidNotReceive().NotifyClientsAsync(
-            Arg.Any<IReadOnlyDictionary<Guid, TelemetrySummary>>(), Arg.Any<DateTime>(),
-            Arg.Any<PeriodType>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -87,11 +83,5 @@ public class CompressToMinutesHandlerTests
             Arg.Any<DateTime>(),
             Arg.Any<CancellationToken>());
 
-        await _compressorHelperMock.Received(1).NotifyClientsAsync(
-            Arg.Is<IReadOnlyDictionary<Guid, TelemetrySummary>>(d =>
-                d.ContainsKey(sensorId1) && d.ContainsKey(sensorId2)),
-            Arg.Any<DateTime>(),
-            PeriodType.Minute,
-            Arg.Any<CancellationToken>());
     }
 }

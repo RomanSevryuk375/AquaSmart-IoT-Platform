@@ -1,4 +1,7 @@
+// Ignore Spelling: Grpc
+
 using Contracts.Authorization;
+using Contracts.gRPC.Devices;
 using Microsoft.OpenApi.Models;
 using Notification.Application.Extensions;
 using Notification.Infrastructure.Extensions;
@@ -10,7 +13,30 @@ public static class DependencyInjection
     public static IServiceCollection AddConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(options =>
+        services.AddMySwaggerGen();
+        services.AddControllers();
+        services.AddAquaAuthorizationPolicies();
+        services.AddCommonAuthentication(configuration);
+        services.AddServices();
+        services.AddInfrastructure(configuration);
+        services.AddMyGrpcClient(configuration);
+
+        return services;
+    }
+
+    public static IServiceCollection AddMyGrpcClient(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddGrpcClient<DeviceIntegrationGrpc.DeviceIntegrationGrpcClient>(options =>
+        {
+            options.Address = new Uri(configuration["GrpcConfiguration:DeviceServiceUrl"]!);
+        });
+
+        return services;
+    }
+
+    public static IServiceCollection AddMySwaggerGen(this IServiceCollection services)
+    {
+        return services.AddSwaggerGen(options =>
         {
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
@@ -37,12 +63,5 @@ public static class DependencyInjection
                 }
             });
         });
-        services.AddControllers();
-        services.AddAquaAuthorizationPolicies();
-        services.AddCommonAuthentication(configuration);
-        services.AddServices()
-                .AddInfrastructure(configuration);
-
-        return services;
     }
 }

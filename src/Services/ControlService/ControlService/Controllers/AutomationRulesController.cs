@@ -1,3 +1,4 @@
+using AutoMapper;
 using Control.Application.DTOs.AutomationRule;
 using Control.Application.Features.AutomationRules.Commands.AddCondition;
 using Control.Application.Features.AutomationRules.Commands.CreateRule;
@@ -15,7 +16,8 @@ namespace Control.API.Controllers;
 [Route(ApiConstants.Routes.AutomationRules)]
 public class AutomationRulesController(
     IUserContext userContext,
-    ISender sender) : ControllerBase
+    ISender sender,
+    IMapper mapper) : ControllerBase
 {
     private const string GetRuleByIdRoute = "GetRuleById";
 
@@ -46,9 +48,11 @@ public class AutomationRulesController(
     [HttpPost]
     [Authorize(Policy = SubPermissions.AutoRuleCreate)]
     public async Task<ActionResult<Guid>> CreateRuleAsync(
-        [FromBody] CreateRuleCommand command,
+        [FromBody] CreateRuleRequestDto request,
         CancellationToken cancellationToken)
     {
+        CreateRuleCommand command = mapper.Map<CreateRuleCommand>(request);
+
         Result<Guid> result = await sender.Send(command, cancellationToken);
         if (result.IsFailure)
         {
