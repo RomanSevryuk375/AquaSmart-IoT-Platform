@@ -1,10 +1,12 @@
+using Device.Application.Extesions;
+using Device.Infrastructure.Extensions;
 using Microsoft.OpenApi.Models;
 
 namespace Device.API.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApi(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHttpContextAccessor();
         services.AddEndpointsApiExplorer();
@@ -13,6 +15,9 @@ public static class DependencyInjection
         services.AddCommonAuthentication(configuration);
         services.AddAquaAuthorizationPolicies();
         services.AddControllers();
+        services.AddGrpc();
+        services.AddInfrastructure(configuration);
+        services.AddApplication(configuration);
 
         return services;
     }

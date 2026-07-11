@@ -5,7 +5,6 @@ using Device.Application.Features.Sensors.Command.UpdateSensor;
 using Device.Application.Features.Sensors.Query.GetAllSensors;
 using Device.Application.Features.Sensors.Query.GetSensorById;
 using Device.Application.Features.Sensors.Query.Shared;
-using Device.Application.Features.Telemetry.Command.TransmittTelemetry;
 using MediatR;
 
 namespace Device.API.Controllers;
@@ -77,24 +76,6 @@ public sealed class SensorsController(
             NameGetById,
             new { id = result.Value.Id },
             result.Value);
-    }
-
-    [HttpPost("telemetry")]
-    [AllowAnonymous]
-    public async Task<ActionResult> ReceiveBatchTelemetryAsync(
-        [FromBody] TransmitTelemetryCommand command,
-        [FromHeader(Name = ApiConstants.Headers.DeviceToken)] string deviceToken,
-        CancellationToken cancellationToken = default)
-    {
-        TransmitTelemetryCommand enrichedCommand = command with { DeviceToken = deviceToken };
-
-        Result<TelemetryTransmittedResponse> result = await sender.Send(enrichedCommand, cancellationToken);
-        if (result.IsFailure)
-        {
-            return this.ToActionResult(result);
-        }
-
-        return Accepted(result.Value);
     }
 
     [HttpPut("{id:guid}")]

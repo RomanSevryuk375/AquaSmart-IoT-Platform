@@ -1,7 +1,5 @@
 using Contracts.Middlewares;
 using Device.API.Extensions;
-using Device.Application.Extesions;
-using Device.Infrastructure.Extensions;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -15,28 +13,21 @@ try
 
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-    builder.AddElkLogging()
-        .Services
-            .AddInfrastructure(builder.Configuration)
-            .AddApplication(builder.Configuration)
-            .AddApi(builder.Configuration);
+    builder.AddElkLogging();
+
+    builder.Services.AddConfiguration(builder.Configuration);
 
     WebApplication app = builder.Build();
 
     app.UseGlobalExceptionHandler();
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.UseAuthentication();
-    app.UseAuthorization();
-    app.MapHealthChecks(ApiConstants.HealthRoute);
-    app.MapControllers();
+    app.AddConfiguration();
 
     await app.RunAsync();
 }
 #pragma warning disable S2139
 catch (Exception ex) when (ex is not HostAbortedException)
 {
-    Log.Fatal(ex, "ControlService terminated unexpectedly");
+    Log.Fatal(ex, "DeviceService terminated unexpectedly");
     throw;
 }
 #pragma warning restore S2139
