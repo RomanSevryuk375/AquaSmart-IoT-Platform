@@ -10,13 +10,15 @@ service DeviceIntegrationGrpc {
 }
 
 message GetMetadataRequest {
-  string sensor_id = 1; 
-  string relay_id = 2; 
+  string controller_id = 1; 
+  string sensor_id = 2; 
+  string relay_id = 3; 
 }
 
 message GetMetadataResponse {
-  string sensor_name = 1;
-  string relay_name = 2;
+  string controller_name = 1;
+  string sensor_name = 2;
+  string relay_name = 3;
 }
 
 message ValidateTokenRequest {

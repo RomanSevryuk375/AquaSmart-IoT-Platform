@@ -14,19 +14,15 @@ public sealed class DeviceIntegrationEndpoint(ISender sender)
         GetMetadataRequest request,
         ServerCallContext context)
     {
-        if (!Guid.TryParse(request.SensorId, out Guid sensorId) ||
-            !Guid.TryParse(request.RelayId, out Guid relayId))
-        {
-            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid Guid format"));
-        }
-
         var query = new GetDeviceMetadataQuery
         {
-            RelayId = relayId,
-            SensorId = sensorId
+            ControllerId = Guid.TryParse(request.ControllerId, out Guid cid) ? cid : null,
+            SensorId = Guid.TryParse(request.SensorId, out Guid sid) ? sid : null,
+            RelayId = Guid.TryParse(request.RelayId, out Guid rid) ? rid : null
         };
 
         Result<DeviceMetadataDto> result = await sender.Send(query, context.CancellationToken);
+
         if (result.IsFailure)
         {
             throw new RpcException(new Status(StatusCode.NotFound, result.Error.Message));
@@ -34,8 +30,9 @@ public sealed class DeviceIntegrationEndpoint(ISender sender)
 
         return new GetMetadataResponse
         {
-            RelayName = result.Value.RelayName,
-            SensorName = result.Value.SensorName,
+            ControllerName = result.Value.ControllerName ?? string.Empty,
+            SensorName = result.Value.SensorName ?? string.Empty,
+            RelayName = result.Value.RelayName ?? string.Empty
         };
     }
 

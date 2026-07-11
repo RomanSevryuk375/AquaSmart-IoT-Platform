@@ -6,9 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Notification.Application.Interfaces;
 using Notification.Domain.Interfaces;
 using Notification.Infrastructure.BackgroundJob;
 using Notification.Infrastructure.Factories;
+using Notification.Infrastructure.GrpcClients;
 using Notification.Infrastructure.Messaging;
 using Notification.Infrastructure.Persistence;
 using Notification.Infrastructure.Persistence.Repositories;
@@ -29,6 +31,8 @@ public static class DependencyInjection
 
     public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddScoped<IDeviceMetadataEnricher, DeviceMetadataEnricher>();
+
         Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
         string? connectionSting = configuration.GetConnectionString(nameof(NotificationDbContext));
         services.AddDbContext<NotificationDbContext>(options =>

@@ -12,26 +12,25 @@ public sealed class GetDeviceMetadataHandler(ISqlConnectionFactory sqlConnection
 
         const string SQL = """
             SELECT 
-                (SELECT name
-                 FROM sensors
-                 WHERE id = @SensorId
-                 LIMIT 1) AS SensorName,
-                (SELECT name
-                 FROM relays
-                 WHERE id = @RelayId
-                 LIMIT 1) AS RelayName
+                (SELECT name FROM controllers WHERE id = @ControllerId) AS ControllerName,
+                (SELECT name FROM sensors WHERE id = @SensorId) AS SensorName,
+                (SELECT name FROM relays WHERE id = @RelayId) AS RelayName
             """;
 
         DeviceMetadataDto? metadata = await connection.QuerySingleOrDefaultAsync<DeviceMetadataDto>(SQL, new
         {
-            request.SensorId,
-            request.RelayId
+            ControllerId = request.ControllerId ?? Guid.Empty,
+            SensorId = request.SensorId ?? Guid.Empty,
+            RelayId = request.RelayId ?? Guid.Empty
         });
 
-        if (metadata is null || metadata.SensorName is null || metadata.RelayName is null)
+        if (metadata is null ||
+           (request.ControllerId.HasValue && metadata.ControllerName is null) ||
+           (request.SensorId.HasValue && metadata.SensorName is null) ||
+           (request.RelayId.HasValue && metadata.RelayName is null))
         {
-            return Result<DeviceMetadataDto>.Failure(Error.NotFound<DeviceMetadataDto>(
-                "Sensor or Relay not found."));
+            return Result<DeviceMetadataDto>.Failure(Error.NotFound(
+                "Hardware.NotFound", "One or more hardware components were not found in DeviceService."));
         }
 
         return Result<DeviceMetadataDto>.Success(metadata);
