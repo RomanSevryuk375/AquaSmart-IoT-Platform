@@ -133,8 +133,5 @@ public sealed class Ecosystem : AggregateRoot, IEntity
         return Result.Success();
     }
 
-    public void MarkAsDeleted()
-    {
-        RaiseEvent(new EcosystemDeletedDomainEvent { EcosystemId = Id });
-    }
+    public void MarkAsDeleted() => RaiseEvent(new EcosystemDeletedDomainEvent { EcosystemId = Id });
 }

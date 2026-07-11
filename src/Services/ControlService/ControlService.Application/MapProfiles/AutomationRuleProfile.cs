@@ -1,4 +1,6 @@
 using AutoMapper;
+using Control.Application.DTOs.AutomationRule;
+using Control.Application.Features.AutomationRules.Commands.CreateRule;
 using Control.Application.Features.AutomationRules.Queries;
 using Control.Domain.Entities;
 
@@ -8,6 +10,8 @@ public sealed class AutomationRuleProfile : Profile
 {
     public AutomationRuleProfile()
     {
+        CreateMap<CreateRuleRequestDto, CreateRuleCommand>();
+
         CreateMap<AutomationRule, AutomationRuleDto>();
 
         CreateMap<AutomationRule, AutomationRuleDto>()

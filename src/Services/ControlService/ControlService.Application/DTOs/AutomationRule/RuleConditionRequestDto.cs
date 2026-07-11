@@ -1,3 +1,5 @@
+// Ignore Spelling: Dto
+
 using Contracts.Enums;
 
 namespace Control.Application.DTOs.AutomationRule;

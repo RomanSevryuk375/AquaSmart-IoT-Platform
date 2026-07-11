@@ -1,6 +1,5 @@
 using Contracts.Enums;
 using Control.Application.DTOs.AutomationRule;
-using Control.Application.Features.AutomationRules.Commands.CreateRule;
 using Control.Application.Features.AutomationRules.Queries;
 using Control.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -162,19 +161,20 @@ public class AutomationRulesControllerTests(E2ETestWebAppFactory factory) : Base
     {
         // Arrange
         Client.DefaultRequestHeaders.Authorization = null;
-        var command = new CreateRuleCommand
+        var request = new CreateRuleRequestDto
         {
             EcosystemId = Guid.NewGuid(),
             RelayId = Guid.NewGuid(),
             Name = "Rule 1",
             Operator = Operator.AND,
             Action = RuleAction.SwitchOn,
-            IsActive = true
+            IsActive = true,
+            Conditions = []
         };
 
         // Act
         HttpResponseMessage response = await Client.PostAsJsonAsync(
-            ApiConstants.Routes.AutomationRules, command);
+            ApiConstants.Routes.AutomationRules, request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -192,19 +192,20 @@ public class AutomationRulesControllerTests(E2ETestWebAppFactory factory) : Base
         DbContext.Aquariums.Add(ecosystem);
         await DbContext.SaveChangesAsync();
 
-        var command = new CreateRuleCommand
+        var request = new CreateRuleRequestDto
         {
             EcosystemId = ecosystem.Id,
             RelayId = Guid.NewGuid(),
             Name = "Valid Rule Name",
             Operator = Operator.AND,
             Action = RuleAction.SwitchOn,
-            IsActive = true
+            IsActive = true,
+            Conditions = []
         };
 
         // Act
         HttpResponseMessage response = await Client.PostAsJsonAsync(
-            ApiConstants.Routes.AutomationRules, command);
+            ApiConstants.Routes.AutomationRules, request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -216,7 +217,7 @@ public class AutomationRulesControllerTests(E2ETestWebAppFactory factory) : Base
 
         AutomationRule? dbRule = await DbContext.Rules.AsNoTracking().FirstOrDefaultAsync(r => r.Id == createdId);
         dbRule.Should().NotBeNull();
-        dbRule!.Name.Value.Should().Be(command.Name);
+        dbRule!.Name.Value.Should().Be(request.Name);
     }
 
     [Fact]
@@ -224,19 +225,20 @@ public class AutomationRulesControllerTests(E2ETestWebAppFactory factory) : Base
     public async Task Create_WithInvalidData_Returns400BadRequest()
     {
         // Arrange
-        var command = new CreateRuleCommand
+        var request = new CreateRuleRequestDto
         {
             EcosystemId = Guid.NewGuid(),
             RelayId = Guid.NewGuid(),
             Name = "", // Invalid
             Operator = Operator.AND,
             Action = RuleAction.SwitchOn,
-            IsActive = true
+            IsActive = true,
+            Conditions = []
         };
 
         // Act
         HttpResponseMessage response = await Client.PostAsJsonAsync(
-            ApiConstants.Routes.AutomationRules, command);
+            ApiConstants.Routes.AutomationRules, request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -254,19 +256,20 @@ public class AutomationRulesControllerTests(E2ETestWebAppFactory factory) : Base
         DbContext.Aquariums.Add(ecosystem);
         await DbContext.SaveChangesAsync();
 
-        var command = new CreateRuleCommand
+        var request = new CreateRuleRequestDto
         {
             EcosystemId = ecosystem.Id,
             RelayId = Guid.NewGuid(),
             Name = "Hacker Rule Attempt",
             Operator = Operator.AND,
             Action = RuleAction.SwitchOn,
-            IsActive = true
+            IsActive = true,
+            Conditions = []
         };
 
         // Act
         HttpResponseMessage response = await Client.PostAsJsonAsync(
-            ApiConstants.Routes.AutomationRules, command);
+            ApiConstants.Routes.AutomationRules, request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);

@@ -5,6 +5,7 @@ using Control.Application.Interfaces;
 using Control.Domain.Interfaces;
 using Control.Infrastructure.BackgroundJobs;
 using Control.Infrastructure.Factories;
+using Control.Infrastructure.GrpcClients;
 using Control.Infrastructure.Messaging.Relay;
 using Control.Infrastructure.Messaging.Sensor;
 using Control.Infrastructure.Messaging.Telemetry;
@@ -45,6 +46,7 @@ public static class DependencyInjection
         services.AddScoped<IVacationModeRepository, VacationModeRepository>();
 
         services.AddSingleton<ICronValidator, CronValidator>();
+        services.AddScoped<IHardwareValidator, HardwareValidator>();
         services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
 
         Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;

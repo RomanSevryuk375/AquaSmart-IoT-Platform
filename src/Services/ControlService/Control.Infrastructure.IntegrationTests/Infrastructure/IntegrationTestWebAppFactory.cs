@@ -1,6 +1,8 @@
 using Control.Application.Interfaces;
+using Control.Domain.Interfaces;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc.Testing;
+using NSubstitute;
 using Testcontainers.PostgreSql;
 
 namespace Control.Infrastructure.IntegrationTests.Infrastructure;
@@ -67,6 +69,11 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
             services.AddSingleton<TestUserContext>();
             services.AddTransient<IUserContext>(sp =>
                 sp.GetRequiredService<TestUserContext>());
+
+            IHardwareValidator hardwareValidatorMock = Substitute.For<IHardwareValidator>();
+            hardwareValidatorMock.ValidateAssignmentAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+                .Returns(Result.Success());
+            services.AddSingleton(hardwareValidatorMock);
 
             ServiceProvider serviceProvider = services.BuildServiceProvider();
             using IServiceScope scope = serviceProvider.CreateScope();
