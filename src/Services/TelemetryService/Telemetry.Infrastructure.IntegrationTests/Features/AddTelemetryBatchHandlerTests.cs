@@ -9,6 +9,7 @@ using Telemetry.Domain.Events;
 using Telemetry.Infrastructure.IntegrationTests.Infrastructure;
 using Telemetry.Infrastructure.Persistence.Outbox;
 using Telemetry.TestShared.Builders;
+using Telemetry.TestShared.Constants;
 
 namespace Telemetry.Infrastructure.IntegrationTests.Features;
 
@@ -20,7 +21,10 @@ public class AddTelemetryBatchHandlerTests(IntegrationTestWebAppFactory factory)
     public async Task Handle_WithValidBatch_SavesTelemetryAndUpdatesSensorLastValue()
     {
         // Arrange
-        Ecosystem ecosystem = new EcosystemBuilder().Build();
+        Ecosystem ecosystem = new EcosystemBuilder()
+            .WithControllerId(TestConstants.ControllerId)
+            .WithUserId(TestConstants.UserId)
+            .Build();
         Sensor sensor = new SensorBuilder()
             .WithEcosystemId(ecosystem.Id)
             .WithControllerId(ecosystem.ControllerId)
@@ -34,7 +38,8 @@ public class AddTelemetryBatchHandlerTests(IntegrationTestWebAppFactory factory)
 
         var command = new AddTelemetryBatchCommand
         {
-            ControllerId = ecosystem.ControllerId,
+            MacAddress = TestConstants.ValidMacAddress,
+            DeviceToken = TestConstants.ValidDeviceToken,
             Items = new List<TelemetryBatchEventItem>
             {
                 new()

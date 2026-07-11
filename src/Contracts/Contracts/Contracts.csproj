@@ -1,11 +1,21 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <PackageReference Include="MediatR" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" />
-	<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	<PackageReference Include="Microsoft.EntityFrameworkCore" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="MediatR" />
+        <PackageReference Include="Grpc.AspNetCore" />
+        <PackageReference Include="Grpc.Net.Client" />
+        <PackageReference Include="Google.Protobuf" />
+        <PackageReference Include="Grpc.Tools">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" />
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    </ItemGroup>
 
+    <ItemGroup>
+        <Protobuf Include="Protos\device_integration.proto" GrpcServices="Both" />
+    </ItemGroup>
 </Project>

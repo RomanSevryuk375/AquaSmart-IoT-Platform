@@ -5,6 +5,7 @@ namespace Telemetry.Application.Features.Telemetry.Commands.AddTelemetryBatch;
 
 public sealed record AddTelemetryBatchCommand : ICommand
 {
-    public Guid ControllerId { get; init; }
+    public string MacAddress { get; init; } = string.Empty;
+    public string DeviceToken { get; init; } = string.Empty;
     public IReadOnlyList<TelemetryBatchEventItem> Items { get; init; } = [];
 }

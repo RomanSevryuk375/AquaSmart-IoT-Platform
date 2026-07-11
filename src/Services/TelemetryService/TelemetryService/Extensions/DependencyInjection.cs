@@ -1,4 +1,7 @@
+// Ignore Spelling: Grpc
+
 using Contracts.Authorization;
+using Contracts.gRPC.Devices;
 using Microsoft.OpenApi.Models;
 using Telemetry.Application.Extensions;
 using Telemetry.Infrastructure.Extensions;
@@ -11,7 +14,30 @@ public static class DependencyInjection
     {
         services.AddHttpContextAccessor();
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(options =>
+        services.AddMySwaggerGen();
+        services.AddControllers();
+        services.AddCommonAuthentication(configuration);
+        services.AddAquaAuthorizationPolicies();
+        services.AddServices(configuration);
+        services.AddInfrastructure(configuration);
+        services.AddMyGrpcClient(configuration);
+
+        return services;
+    }
+
+    public static IServiceCollection AddMyGrpcClient(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddGrpcClient<DeviceIntegrationGrpc.DeviceIntegrationGrpcClient>(options =>
+        {
+            options.Address = new Uri(configuration["GrpcConfiguration:DeviceServiceUrl"]!);
+        });
+
+        return services;
+    }
+
+    public static IServiceCollection AddMySwaggerGen(this IServiceCollection services)
+    {
+        return services.AddSwaggerGen(options =>
         {
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
@@ -38,14 +64,5 @@ public static class DependencyInjection
                 }
             });
         });
-        services.AddControllers();
-
-        services.AddCommonAuthentication(configuration);
-        services.AddAquaAuthorizationPolicies();
-
-        services.AddServices(configuration);
-        services.AddInfrastructure(configuration);
-
-        return services;
     }
 }
