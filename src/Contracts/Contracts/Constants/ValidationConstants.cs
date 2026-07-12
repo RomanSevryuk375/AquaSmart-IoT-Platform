@@ -40,6 +40,13 @@ public static class RelayConstants
     public const int ConnectionAddressLength = CommonConstants.ConnectionAddressLength;
 }
 
+public static class RelayCommandConstants
+{
+    public const int MaxAttemptCount = 3;
+    public const int RetryCooldownMinutes = 1;
+    public const int DefaultExpiryMinutes = 5;
+}
+
 public static class RuleConstants
 {
     public const int NameLength = CommonConstants.NameLength;
@@ -58,6 +65,7 @@ public static class ReminderConstants
 public static class MaintenanceLogConstants
 {
     public const int Length = 1024;
+    public const int MaxFutureDelayMinutes = 5;
 }
 
 public static class NotificationConstants
@@ -69,4 +77,9 @@ public static class UserConstants
 {
     public const int PhoneNumberLength = 128;
     public const int EmailLength = 64;
+}
+
+public static class TelemetryConstants
+{
+    public const int MaxFutureDelayMinutes = 5;
 }

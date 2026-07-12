@@ -2,6 +2,7 @@ using Contracts.Events.RelayEvents;
 using Contracts.Events.SensorEvents;
 using Device.Application.Features.Controllers.Query.GetControllerConfig;
 using Device.Application.Features.Sensors.Command.AddSensor;
+using Device.Application.Features.Sensors.Command.SetSensorState;
 using Device.Domain.Events.RelayEvents;
 using Device.Domain.Events.SensorEvents;
 
@@ -38,5 +39,7 @@ public sealed class SensorProfile : Profile
         CreateMap<SensorUpdatedDomainEvent, SensorUpdatedEvent>();
 
         CreateMap<SetRelayPowerSensorDomainEvent, SetRelayPowerSensorEvent>();
+
+        CreateMap<SensorNoDataEvent, SetSensorStateCommand>();
     }
 }

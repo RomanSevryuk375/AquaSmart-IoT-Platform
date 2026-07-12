@@ -29,7 +29,7 @@ public sealed class ValidationBehavior<TRequest, TResponse>(
         if (failures.Count != 0)
         {
             ValidationFailure firstFailure = failures[0];
-            var error = Error.Validation("Validation.Error", firstFailure.ErrorMessage);
+            var error = Error.Validation(ErrorCodes.ValidationError, firstFailure.ErrorMessage);
 
             return BehaviorHelpers.CreateFailedResult<TResponse>(error);
         }

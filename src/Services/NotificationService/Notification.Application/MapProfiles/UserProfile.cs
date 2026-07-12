@@ -9,10 +9,10 @@ public sealed class UserProfile : Profile
 {
     public UserProfile()
     {
-        CreateMap<UserCreatedEvent, SyncUserUpdateCommand>();
+        CreateMap<UserCreatedEvent, SyncUserCreatedCommand>();
 
         CreateMap<UserUpdatedEvent, SyncUserUpdatedCommand>();
 
-        CreateMap<SyncUserUpdateCommand, SyncUserUpdatedCommand>();
+        CreateMap<SyncUserCreatedCommand, SyncUserUpdatedCommand>();
     }
 }

@@ -1,5 +1,3 @@
-using System;
-
 namespace Telemetry.TestShared.Constants;
 
 public static class TestConstants

@@ -1,16 +1,14 @@
+using Contracts.Results;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using Telemetry.Infrastructure.IntegrationTests.Infrastructure;
 using NSubstitute;
-using Telemetry.Application.Interfaces;
 using Telemetry.Application.DTOs;
-using Contracts.Results;
+using Telemetry.Application.Interfaces;
+using Telemetry.Infrastructure.IntegrationTests.Infrastructure;
 using Telemetry.TestShared.Constants;
-using System.Threading;
-using System.Linq;
 
 namespace Telemetry.API.E2ETests.Infrastructure;
 
@@ -31,7 +29,7 @@ public sealed class E2ETestWebAppFactory : IntegrationTestWebAppFactory
 
             services.AddMassTransitTestHarness();
 
-            var tokenValidatorMock = Substitute.For<IDeviceTokenValidator>();
+            IDeviceTokenValidator tokenValidatorMock = Substitute.For<IDeviceTokenValidator>();
             tokenValidatorMock.ValidateAsync(
                     TestConstants.ValidMacAddress,
                     TestConstants.ValidDeviceToken,
@@ -42,7 +40,7 @@ public sealed class E2ETestWebAppFactory : IntegrationTestWebAppFactory
                     UserId = TestConstants.UserId
                 }));
 
-            var descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IDeviceTokenValidator));
+            ServiceDescriptor? descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IDeviceTokenValidator));
             if (descriptor != null)
             {
                 services.Remove(descriptor);

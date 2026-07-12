@@ -1,5 +1,6 @@
 // Ignore Spelling: Validator
 
+using Contracts.Constants;
 using FluentValidation;
 
 namespace IdentityService.Application.Features.Profile.Commands.ChangePassword;
@@ -13,7 +14,7 @@ public sealed class ChangePasswordValidator : AbstractValidator<ChangePasswordCo
 
         RuleFor(x => x.NewPassword)
             .NotEmpty()
-            .MinimumLength(8)
-            .WithMessage("Password must be at least 8 characters long.");
+            .MinimumLength(IdentityConstants.PasswordLength)
+            .WithMessage(ValidationMessages.PasswordMinLength);
     }
 }

@@ -1,11 +1,7 @@
-using Contracts.Results;
 using Microsoft.Extensions.Caching.Memory;
-using NSubstitute;
 using Telemetry.Application.DTOs;
 using Telemetry.Application.Interfaces;
 using Telemetry.Infrastructure.GrpcClients;
-using Xunit;
-using FluentAssertions;
 
 namespace Telemetry.Application.UnitTests.Features.Telemetry;
 
@@ -16,15 +12,15 @@ public class CachedDeviceTokenValidatorTests
     public async Task ValidateAsync_OnCacheMissAndSuccess_CallsInnerValidatorAndReturnsSuccess()
     {
         // Arrange
-        var macAddress = "00:1A:2B:3C:4D:5E";
-        var deviceToken = "some-token";
+        string macAddress = "00:1A:2B:3C:4D:5E";
+        string deviceToken = "some-token";
         var expectedResponse = new ValidateResponseDto
         {
             ControllerId = Guid.NewGuid(),
             UserId = Guid.NewGuid()
         };
 
-        var innerValidatorMock = Substitute.For<IDeviceTokenValidator>();
+        IDeviceTokenValidator innerValidatorMock = Substitute.For<IDeviceTokenValidator>();
         innerValidatorMock.ValidateAsync(macAddress, deviceToken, Arg.Any<CancellationToken>())
             .Returns(Result<ValidateResponseDto>.Success(expectedResponse));
 
@@ -45,15 +41,15 @@ public class CachedDeviceTokenValidatorTests
     public async Task ValidateAsync_OnCacheHit_CallsInnerValidatorOnlyOnceAndReturnsCachedValue()
     {
         // Arrange
-        var macAddress = "00:1A:2B:3C:4D:5E";
-        var deviceToken = "some-token";
+        string macAddress = "00:1A:2B:3C:4D:5E";
+        string deviceToken = "some-token";
         var expectedResponse = new ValidateResponseDto
         {
             ControllerId = Guid.NewGuid(),
             UserId = Guid.NewGuid()
         };
 
-        var innerValidatorMock = Substitute.For<IDeviceTokenValidator>();
+        IDeviceTokenValidator innerValidatorMock = Substitute.For<IDeviceTokenValidator>();
         innerValidatorMock.ValidateAsync(macAddress, deviceToken, Arg.Any<CancellationToken>())
             .Returns(Result<ValidateResponseDto>.Success(expectedResponse));
 
@@ -63,7 +59,7 @@ public class CachedDeviceTokenValidatorTests
         // Act
         // First call (Cache Miss)
         Result<ValidateResponseDto> result1 = await cachedValidator.ValidateAsync(macAddress, deviceToken, CancellationToken.None);
-        
+
         // Second call (Cache Hit)
         Result<ValidateResponseDto> result2 = await cachedValidator.ValidateAsync(macAddress, deviceToken, CancellationToken.None);
 

@@ -18,20 +18,20 @@ public sealed partial record EmailAddress
         if (string.IsNullOrWhiteSpace(value))
         {
             return Result<EmailAddress>.Failure(Error.Validation<EmailAddress>(
-                "Email address is required."));
+                ErrorMessages.Identity.EmailRequired));
         }
 
         string cleanEmail = value.Trim().ToLowerInvariant();
-        if (cleanEmail.Length > 256)
+        if (cleanEmail.Length > IdentityConstants.EmailLength)
         {
             return Result<EmailAddress>.Failure(Error.Validation<EmailAddress>(
-                "Email address cannot exceed 256 characters."));
+                ErrorMessages.Identity.EmailTooLong));
         }
 
         if (!EmailRegex().IsMatch(cleanEmail))
         {
             return Result<EmailAddress>.Failure(Error.Validation<EmailAddress>(
-                "Invalid email address format."));
+                ErrorMessages.Identity.EmailFormatInvalid));
         }
 
         return Result<EmailAddress>.Success(new EmailAddress(cleanEmail));

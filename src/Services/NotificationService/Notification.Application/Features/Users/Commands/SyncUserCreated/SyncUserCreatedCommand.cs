@@ -2,7 +2,7 @@ using Contracts.Abstractions;
 
 namespace Notification.Application.Features.Users.Commands.SyncUserCreated;
 
-public sealed record SyncUserUpdateCommand : ICommand
+public sealed record SyncUserCreatedCommand : ICommand
 {
     public Guid UserId { get; init; }
     public string Email { get; init; } = string.Empty;

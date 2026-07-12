@@ -16,6 +16,6 @@ public sealed class UpdateProfileValidator : AbstractValidator<UpdateProfileComm
         RuleFor(x => x.PhoneNumber)
             .NotEmpty()
             .Matches(IdentityConstants.PhoneNumberRegex)
-            .WithMessage("Phone number should be in format +375XXXXXXXXX or 80XXXXXXXXX");
+            .WithMessage(ValidationMessages.PhoneFormatInvalid);
     }
 }

@@ -1,7 +1,9 @@
+using Contracts.Constants;
 using Contracts.Results;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Notification.Application.Features.BackgroundJobs.Commands.ProcessUnpublishedNotices;
+using Notification.Application.InternalEvents;
 using Notification.Domain.Entities;
 using Notification.Infrastructure.IntegrationTests.Infrastructure;
 using Notification.TestShared.Builders;
@@ -15,7 +17,7 @@ public class ProcessUnpublishedNoticesHandlerTests(IntegrationTestWebAppFactory 
 {
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Handle_ShouldMarkNotificationAsPublished_WhenProviderSucceeds()
+    public async Task Handle_ShouldMarkNotificationAsPublished_AndPublishCommands_WhenUserHasChannelsEnabled()
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -41,15 +43,6 @@ public class ProcessUnpublishedNoticesHandlerTests(IntegrationTestWebAppFactory 
         await DbContext.SaveChangesAsync();
         DbContext.ChangeTracker.Clear();
 
-        Factory.EmailProviderMock.IsEnabled(Arg.Any<User>()).Returns(true);
-        Factory.EmailProviderMock.SendAsync(
-            Arg.Any<User>(),
-            Arg.Is("Success notification message"),
-            Arg.Any<CancellationToken>())
-            .Returns(Result.Success());
-
-        Factory.TgProviderMock.IsEnabled(Arg.Any<User>()).Returns(false);
-
         var command = new ProcessUnpublishedNoticesCommand();
 
         // Act
@@ -66,11 +59,18 @@ public class ProcessUnpublishedNoticesHandlerTests(IntegrationTestWebAppFactory 
         updatedNotification!.IsPublished.Should().BeTrue();
         updatedNotification.FailureReason.Should().BeNull();
         updatedNotification.RetryCount.Should().Be(0);
+
+        await Factory.PublishEndpointMock.Received(1).Publish(
+            Arg.Is<SendEmailCommand>(cmd =>
+                cmd.NotificationId == notificationId &&
+                cmd.Email == "user@example.com" &&
+                cmd.Message == "Success notification message"),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Handle_ShouldIncrementRetryCountAndSetFailureReason_WhenProviderFails()
+    public async Task Handle_ShouldIncrementRetryCountAndSetFailureReason_WhenUserDisabledOrNotFound()
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -79,8 +79,7 @@ public class ProcessUnpublishedNoticesHandlerTests(IntegrationTestWebAppFactory 
         User user = new UserBuilder()
             .WithId(userId)
             .WithEmail("user@example.com")
-            .WithEnable(true)
-            .WithEmailEnable(true)
+            .WithEnable(false)
             .Build();
 
         DomainNotification notification = new NotificationBuilder()
@@ -95,15 +94,6 @@ public class ProcessUnpublishedNoticesHandlerTests(IntegrationTestWebAppFactory 
         DbContext.Set<DomainNotification>().Add(notification);
         await DbContext.SaveChangesAsync();
         DbContext.ChangeTracker.Clear();
-
-        Factory.EmailProviderMock.IsEnabled(Arg.Any<User>()).Returns(true);
-        Factory.EmailProviderMock.SendAsync(
-            Arg.Any<User>(),
-            Arg.Is("Failure notification message"),
-            Arg.Any<CancellationToken>())
-            .Returns(Result.Failure(Error.Failure("Provider.Failed", "SMTP server is down")));
-
-        Factory.TgProviderMock.IsEnabled(Arg.Any<User>()).Returns(false);
 
         var command = new ProcessUnpublishedNoticesCommand();
 
@@ -120,6 +110,8 @@ public class ProcessUnpublishedNoticesHandlerTests(IntegrationTestWebAppFactory 
         updatedNotification.Should().NotBeNull();
         updatedNotification!.IsPublished.Should().BeFalse();
         updatedNotification.RetryCount.Should().Be(1);
-        updatedNotification.FailureReason.Should().Contain("SMTP server is down");
+        updatedNotification.FailureReason.Should().Be(ErrorMessages.NotificationProvider.UserDisabledOrNotFound);
+
+        await Factory.PublishEndpointMock.DidNotReceive().Publish(Arg.Any<object>(), Arg.Any<CancellationToken>());
     }
 }

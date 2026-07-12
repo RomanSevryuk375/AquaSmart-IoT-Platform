@@ -1,4 +1,5 @@
 using System.Data;
+using Contracts.Constants;
 using Contracts.Results;
 using Control.Application.Interfaces;
 using Control.Domain.Entities;
@@ -34,8 +35,9 @@ public sealed class AutomationRuleSecurityBehavior<TRequest, TResponse>(
 
         if (ecosystem.UserId != userContext.UserId)
         {
-            return BehaviorHelpers.CreateFailedResult<TResponse>(Error.Conflict("Access.Denied",
-                    "You are not the owner of this ecosystem"));
+            return BehaviorHelpers.CreateFailedResult<TResponse>(Error.Conflict(
+                    ErrorCodes.Security.AccessDenied,
+                    ErrorMessages.Security.YouAreNotOwnerOfEcosystem));
         }
 
         return await next();

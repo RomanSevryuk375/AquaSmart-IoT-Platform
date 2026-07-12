@@ -2,10 +2,11 @@ using ApiGateway;
 using Contracts.Authorization;
 using Contracts.Middlewares;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 
-builder.Services.AddReverseProxy()
+builder.Services
+    .AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 builder.Services.AddEndpointsApiExplorer();
@@ -15,7 +16,7 @@ builder.Services.AddApiAuthentication(builder.Configuration);
 builder.Services.AddAquaAuthorizationPolicies();
 builder.Services.AddAuthorization();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 app.UseGlobalExceptionHandler();
 
@@ -29,9 +30,9 @@ app.UseSwaggerUI(options =>
     options.SwaggerEndpoint("/swagger-docs/notification/swagger/v1/swagger.json", "Notification API");
 });
 
-app.UseAuthentication(); 
-app.UseAuthorization();  
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapReverseProxy();
 
-app.Run();
+await app.RunAsync();

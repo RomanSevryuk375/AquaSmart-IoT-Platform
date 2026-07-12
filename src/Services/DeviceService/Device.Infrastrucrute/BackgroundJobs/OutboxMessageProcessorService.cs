@@ -65,7 +65,7 @@ public sealed class OutboxMessageProcessorService(
             {
                 logger.LogError(ex, "Failed to publish domain event {MessageType} for outbox message {MessageId}", message.Type, message.Id);
                 message.Error = ex.Message;
-                return Result.Failure(Error.Failure("Outbox.PublishError", ex.Message));
+                return Result.Failure(Error.Failure(ErrorCodes.Outbox.PublishError, ex.Message));
             }
         }
 

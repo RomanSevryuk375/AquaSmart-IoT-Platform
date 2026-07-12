@@ -11,7 +11,9 @@ using Notification.Domain.Interfaces;
 using Notification.Infrastructure.BackgroundJob;
 using Notification.Infrastructure.Factories;
 using Notification.Infrastructure.GrpcClients;
-using Notification.Infrastructure.Messaging;
+using Notification.Infrastructure.Messaging.Alert;
+using Notification.Infrastructure.Messaging.Ecosystem;
+using Notification.Infrastructure.Messaging.User;
 using Notification.Infrastructure.Persistence;
 using Notification.Infrastructure.Persistence.Repositories;
 using Notification.Infrastructure.Providers;
@@ -64,8 +66,8 @@ public static class DependencyInjection
         services.Configure<TelegramOptions>(configuration.GetSection(TelegramOptions.SectionName));
         services.Configure<EmailOptions>(configuration.GetSection(EmailOptions.SectionName));
 
-        services.AddHttpClient<INotificationProvider, TgProvider>();
-        services.AddSingleton<INotificationProvider, EmailProvider>();
+        services.AddHttpClient<ITgProvider, TgProvider>();
+        services.AddSingleton<IEmailProvider, EmailProvider>();
 
         return services;
     }

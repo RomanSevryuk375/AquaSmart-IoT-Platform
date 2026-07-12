@@ -1,5 +1,6 @@
 // Ignore Spelling: Validator
 
+using Contracts.Constants;
 using FluentValidation;
 
 namespace Notification.Application.Features.MaintenanceLogs.Commands.CreateMaintenanceLog;
@@ -17,12 +18,12 @@ public sealed class CreateMaintenanceLogValidator
 
         RuleFor(x => x.ActionDate)
             .NotEmpty()
-            .LessThanOrEqualTo(DateTime.UtcNow.AddMinutes(5));
+            .LessThanOrEqualTo(DateTime.UtcNow.AddMinutes(MaintenanceLogConstants.MaxFutureDelayMinutes));
 
         RuleFor(x => x.Metrics)
             .NotNull();
 
         RuleFor(x => x.Notes)
-            .MaximumLength(1024);
+            .MaximumLength(MaintenanceLogConstants.Length);
     }
 }

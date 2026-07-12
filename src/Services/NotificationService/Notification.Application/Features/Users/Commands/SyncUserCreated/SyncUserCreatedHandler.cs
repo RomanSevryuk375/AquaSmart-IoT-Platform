@@ -6,9 +6,9 @@ using Notification.Domain.Interfaces;
 namespace Notification.Application.Features.Users.Commands.SyncUserCreated;
 
 public sealed class SyncUserCreatedHandler(IUserRepository userRepository)
-    : IRequestHandler<SyncUserUpdateCommand, Result>
+    : IRequestHandler<SyncUserCreatedCommand, Result>
 {
-    public async Task<Result> Handle(SyncUserUpdateCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(SyncUserCreatedCommand request, CancellationToken cancellationToken)
     {
         User? existingUser = await userRepository.GetByIdAsync(request.UserId, cancellationToken);
         if (existingUser is not null)

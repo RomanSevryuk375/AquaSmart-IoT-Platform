@@ -1,7 +1,6 @@
 using Contracts.Results;
 using FluentAssertions;
 using IdentityService.Domain.ValueObjects;
-using Xunit;
 
 namespace Identity.Domain.UnitTests.ValueObjects;
 
@@ -14,7 +13,7 @@ public class PhoneNumberTests
     public void Create_WithNullOrWhitespacePhoneNumber_ReturnsFailure(string? invalidPhone)
     {
         // Act
-        var result = PhoneNumber.Create(invalidPhone!);
+        Result<PhoneNumber> result = PhoneNumber.Create(invalidPhone!);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -33,7 +32,7 @@ public class PhoneNumberTests
     public void Create_WithInvalidPhoneNumberFormat_ReturnsFailure(string invalidPhone)
     {
         // Act
-        var result = PhoneNumber.Create(invalidPhone);
+        Result<PhoneNumber> result = PhoneNumber.Create(invalidPhone);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -50,7 +49,7 @@ public class PhoneNumberTests
     public void Create_WithValidPhoneNumberFormat_ReturnsSuccessAndTrimsValue(string input, string expected)
     {
         // Act
-        var result = PhoneNumber.Create(input);
+        Result<PhoneNumber> result = PhoneNumber.Create(input);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

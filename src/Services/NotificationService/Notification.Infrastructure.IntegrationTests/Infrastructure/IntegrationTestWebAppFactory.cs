@@ -1,5 +1,6 @@
 // Ignore Spelling: Tg
 
+using MassTransit;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Notification.Domain.Interfaces;
@@ -22,8 +23,9 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
         .WithPassword(Password)
         .Build();
 
-    public INotificationProvider EmailProviderMock { get; } = Substitute.For<INotificationProvider>();
-    public INotificationProvider TgProviderMock { get; } = Substitute.For<INotificationProvider>();
+    public IEmailProvider EmailProviderMock { get; } = Substitute.For<IEmailProvider>();
+    public ITgProvider TgProviderMock { get; } = Substitute.For<ITgProvider>();
+    public IPublishEndpoint PublishEndpointMock { get; } = Substitute.For<IPublishEndpoint>();
 
     public async Task InitializeAsync() => await _dbContainer.StartAsync();
 
@@ -58,14 +60,27 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
                 services.Remove(migrationHostedService);
             }
 
-            var descriptors = services.Where(d => d.ServiceType == typeof(INotificationProvider)).ToList();
-            foreach (ServiceDescriptor? descriptor in descriptors)
+            var tgDescriptors = services.Where(d => d.ServiceType == typeof(ITgProvider)).ToList();
+            foreach (ServiceDescriptor? descriptor in tgDescriptors)
             {
                 services.Remove(descriptor);
             }
 
-            services.AddSingleton<INotificationProvider>(EmailProviderMock);
-            services.AddSingleton<INotificationProvider>(TgProviderMock);
+            var emailDescriptors = services.Where(d => d.ServiceType == typeof(IEmailProvider)).ToList();
+            foreach (ServiceDescriptor? descriptor in emailDescriptors)
+            {
+                services.Remove(descriptor);
+            }
+
+            services.AddSingleton<IEmailProvider>(EmailProviderMock);
+            services.AddSingleton<ITgProvider>(TgProviderMock);
+
+            ServiceDescriptor? publishEndpointDescriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IPublishEndpoint));
+            if (publishEndpointDescriptor != null)
+            {
+                services.Remove(publishEndpointDescriptor);
+            }
+            services.AddSingleton<IPublishEndpoint>(PublishEndpointMock);
 
             ServiceDescriptor? userContextDescriptor = services.FirstOrDefault(d =>
                 d.ServiceType == typeof(IUserContext));

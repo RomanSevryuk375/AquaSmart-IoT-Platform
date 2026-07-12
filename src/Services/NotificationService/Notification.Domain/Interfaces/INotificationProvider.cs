@@ -1,13 +1,14 @@
+// Ignore Spelling: Tg
+
 using Contracts.Results;
-using Notification.Domain.Entities;
+using Notification.Domain.ValueObjects;
 
 namespace Notification.Domain.Interfaces;
 
 public interface INotificationProvider
 {
-    public bool IsEnabled(User user);
     public Task<Result> SendAsync(
-        User user,
+        NotificationRecipient recipient,
         string message,
         CancellationToken cancellationToken = default);
 }

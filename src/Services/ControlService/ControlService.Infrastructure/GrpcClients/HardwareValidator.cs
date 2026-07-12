@@ -1,5 +1,6 @@
 // Ignore Spelling: Validator
 
+using Contracts.Constants;
 using Contracts.gRPC.Devices;
 using Contracts.Results;
 using Control.Domain.Interfaces;
@@ -27,21 +28,24 @@ public sealed class HardwareValidator(DeviceIntegrationGrpc.DeviceIntegrationGrp
                 request, cancellationToken: cancellationToken);
             if (!response.IsValid)
             {
-                return Result.Failure(Error.Conflict("Hardware.Mismatch",
-                    $"Sensor {sensorId} and Relay {relayId} do not belong to the same controller."));
+                return Result.Failure(Error.Conflict(
+                    ErrorCodes.Hardware.Mismatch,
+                    string.Format(ErrorMessages.Hardware.MismatchFormat, sensorId, relayId)));
             }
 
             return Result.Success();
         }
         catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
         {
-            return Result.Failure(Error.NotFound("Device.NotFound",
-                $"Sensor {sensorId} or Relay {relayId} does not exist."));
+            return Result.Failure(Error.NotFound(
+                ErrorCodes.Device.NotFound,
+                string.Format(ErrorMessages.Hardware.NotFoundFormat, sensorId, relayId)));
         }
         catch (RpcException ex)
         {
-            return Result.Failure(Error.Failure("Grpc.Error",
-                $"Communication failed: {ex.Status.Detail}"));
+            return Result.Failure(Error.Failure(
+                ErrorCodes.Grpc.Error,
+                string.Format(ErrorMessages.Grpc.CommunicationFailedFormat, ex.Status.Detail)));
         }
     }
 }

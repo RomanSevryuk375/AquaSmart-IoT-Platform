@@ -1,4 +1,5 @@
 using System.Data;
+using Contracts.Constants;
 using Contracts.Results;
 using Dapper;
 using IdentityService.Application.DTOs;
@@ -35,7 +36,7 @@ public sealed class GetMyProfileHandler(
         if (profile is null)
         {
             return Result<UserProfileResponseDto>.Failure(Error.NotFound<User>(
-                "User not found."));
+                ErrorMessages.Identity.UserNotFound));
         }
 
         return Result<UserProfileResponseDto>.Success(profile);

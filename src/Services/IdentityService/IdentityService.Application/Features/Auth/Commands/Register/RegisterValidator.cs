@@ -21,12 +21,12 @@ public sealed class RegisterValidator : AbstractValidator<RegisterCommand>
         RuleFor(x => x.PhoneNumber)
             .NotEmpty()
             .Matches(IdentityConstants.PhoneNumberRegex)
-            .WithMessage("Phone number should be in format +375XXXXXXXXX or 80XXXXXXXXX");
+            .WithMessage(ValidationMessages.PhoneFormatInvalid);
 
         RuleFor(x => x.Password)
             .NotEmpty()
             .MinimumLength(IdentityConstants.PasswordLength)
-            .WithMessage("Password must be at least 8 characters long.");
+            .WithMessage(ValidationMessages.PasswordMinLength);
 
         RuleFor(x => x.TimeZone)
             .NotEmpty();

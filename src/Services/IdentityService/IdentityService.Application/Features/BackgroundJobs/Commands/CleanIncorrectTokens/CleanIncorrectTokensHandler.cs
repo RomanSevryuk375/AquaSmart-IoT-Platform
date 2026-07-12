@@ -1,5 +1,5 @@
 using Contracts.Results;
-using IdentityService.Infrastructure.Repositories;
+using IdentityService.Domain.Interfaces;
 using MediatR;
 
 namespace IdentityService.Application.Features.BackgroundJobs.Commands.CleanIncorrectTokens;
