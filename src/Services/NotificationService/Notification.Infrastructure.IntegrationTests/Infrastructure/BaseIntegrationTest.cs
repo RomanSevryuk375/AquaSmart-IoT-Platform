@@ -47,6 +47,7 @@ public abstract class BaseIntegrationTest : IAsyncLifetime
         UserContext.UserId = Guid.Parse("22222222-2222-2222-2222-222222222222");
         Factory.EmailProviderMock.ClearReceivedCalls();
         Factory.TgProviderMock.ClearReceivedCalls();
+        Factory.PublishEndpointMock.ClearReceivedCalls();
     }
 
     public Task DisposeAsync()

@@ -45,4 +45,15 @@ public static class ErrorCodes
     {
         public const string PublishError = "Outbox.PublishError";
     }
+
+    public static class NotificationProvider
+    {
+        public const string TgProviderError = "TgProvider.Error";
+        public const string EmailProviderError = "EmailProvider.Error";
+        public const string TgChatIdMissing = "TgProvider.ChatIdMissing";
+        public const string EmailMissing = "EmailProvider.EmailMissing";
+        public const string UserDisabledOrNotFound = "Notification.UserDisabledOrNotFound";
+        public const string NoActiveChannels = "Notification.NoActiveChannels";
+    }
 }
+

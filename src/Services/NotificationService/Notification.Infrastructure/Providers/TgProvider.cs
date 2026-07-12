@@ -1,28 +1,32 @@
-// Ignore Spelling: Tg
-
+using Contracts.Constants;
 using Contracts.Options;
 using Contracts.Results;
 using Microsoft.Extensions.Options;
-using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
+using Notification.Domain.ValueObjects;
 
 namespace Notification.Infrastructure.Providers;
 
 public sealed class TgProvider(
     HttpClient httpClient,
-    IOptions<TelegramOptions> options) : INotificationProvider
+    IOptions<TelegramOptions> options) : ITgProvider
 {
     private readonly TelegramOptions _settings = options.Value;
 
-    public bool IsEnabled(User user) => user.TgEnable && user.TelegramChatId.HasValue;
-
     public async Task<Result> SendAsync(
-        User user,
+        NotificationRecipient recipient,
         string message,
         CancellationToken cancellationToken = default)
     {
+        if (!recipient.TgChatId.HasValue)
+        {
+            return Result.Failure(Error.Validation(
+                ErrorCodes.NotificationProvider.TgChatIdMissing,
+                ErrorMessages.NotificationProvider.TgChatIdMissing));
+        }
+
         string token = _settings.BotToken;
-        string chatId = user.TelegramChatId!.Value.ToString();
+        string chatId = recipient.TgChatId.Value.ToString();
 
         string url = $"https://api.telegram.org/bot{token}/sendMessage" +
                      $"?chat_id={chatId}&text={Uri.EscapeDataString(message)}";
@@ -34,7 +38,8 @@ public sealed class TgProvider(
             if (!response.IsSuccessStatusCode)
             {
                 string errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-                return Result.Failure(Error.Failure<TgProvider>(
+                return Result.Failure(Error.Failure(
+                    ErrorCodes.NotificationProvider.TgProviderError,
                     $"Telegram API Error: {response.StatusCode}. Details: {errorContent}"));
             }
 
@@ -42,8 +47,9 @@ public sealed class TgProvider(
         }
         catch (Exception ex)
         {
-            return Result.Failure(Error.Failure<TgProvider>(
-                $"{ex.Message} {ex.StackTrace}"));
+            return Result.Failure(Error.Failure(
+                ErrorCodes.NotificationProvider.TgProviderError,
+                ex.Message));
         }
     }
 }

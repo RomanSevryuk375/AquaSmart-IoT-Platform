@@ -94,4 +94,13 @@ public static class ErrorMessages
     {
         public const string NotFoundFormat = "Reminder {0} not found.";
     }
+
+    public static class NotificationProvider
+    {
+        public const string TgChatIdMissing = "Recipient Telegram ChatId is missing.";
+        public const string EmailMissing = "Recipient email is missing.";
+        public const string UserDisabledOrNotFound = "User disabled notifications or not found.";
+        public const string NoActiveChannels = "No active notification channels (Email/Telegram) are enabled.";
+    }
 }
+

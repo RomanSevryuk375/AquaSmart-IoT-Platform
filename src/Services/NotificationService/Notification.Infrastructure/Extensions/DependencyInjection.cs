@@ -64,8 +64,8 @@ public static class DependencyInjection
         services.Configure<TelegramOptions>(configuration.GetSection(TelegramOptions.SectionName));
         services.Configure<EmailOptions>(configuration.GetSection(EmailOptions.SectionName));
 
-        services.AddHttpClient<INotificationProvider, TgProvider>();
-        services.AddSingleton<INotificationProvider, EmailProvider>();
+        services.AddHttpClient<ITgProvider, TgProvider>();
+        services.AddSingleton<IEmailProvider, EmailProvider>();
 
         return services;
     }

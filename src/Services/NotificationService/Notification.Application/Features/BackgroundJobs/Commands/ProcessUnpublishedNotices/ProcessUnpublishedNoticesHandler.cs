@@ -1,5 +1,8 @@
+using Contracts.Constants;
 using Contracts.Results;
+using MassTransit;
 using MediatR;
+using Notification.Application.InternalEvents;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
 
@@ -8,7 +11,7 @@ namespace Notification.Application.Features.BackgroundJobs.Commands.ProcessUnpub
 public sealed class ProcessUnpublishedNoticesHandler(
     INotificationRepository notificationRepository,
     IUserRepository userRepository,
-    IEnumerable<INotificationProvider> providers) : IRequestHandler<ProcessUnpublishedNoticesCommand, Result>
+    IPublishEndpoint publishEndpoint) : IRequestHandler<ProcessUnpublishedNoticesCommand, Result>
 {
     public async Task<Result> Handle(ProcessUnpublishedNoticesCommand request, CancellationToken cancellationToken)
     {
@@ -27,44 +30,36 @@ public sealed class ProcessUnpublishedNoticesHandler(
         {
             if (!usersDict.TryGetValue(notification.UserId, out User? user) || !user.IsNotifyEnabled)
             {
-                notification.MarkAsFailure("User disabled notifications or not found.");
+                notification.MarkAsFailure(ErrorMessages.NotificationProvider.UserDisabledOrNotFound);
+                continue;
+            }
+            if (!user.TgEnable && !user.EmailEnable)
+            {
+                notification.MarkAsFailure(ErrorMessages.NotificationProvider.NoActiveChannels);
                 continue;
             }
 
-            bool overallSuccess = false;
-            var errors = new List<string>();
-
-#pragma warning disable S3267 
-            foreach (INotificationProvider provider in providers)
+            if (user.TgEnable)
             {
-                if (provider.IsEnabled(user))
+                await publishEndpoint.Publish(new SendTelegramCommand
                 {
-                    Result result = await provider.SendAsync(user, notification.Message.Value, cancellationToken);
-
-                    if (result.IsSuccess)
-                    {
-                        overallSuccess = true;
-                    }
-                    else
-                    {
-                        errors.Add(result.Error.Message);
-                    }
-                }
+                    NotificationId = notification.Id,
+                    ChatId = user.TelegramChatId!.Value,
+                    Message = notification.Message.Value
+                }, cancellationToken);
             }
-#pragma warning restore S3267 
 
-            if (overallSuccess)
+            if (user.EmailEnable)
             {
-                notification.MarkAsPublished();
+                await publishEndpoint.Publish(new SendEmailCommand
+                {
+                    NotificationId = notification.Id,
+                    Email = user.Email.Value,
+                    Message = notification.Message.Value
+                }, cancellationToken);
             }
-            else
-            {
-                string failureReason = errors.Count > 0
-                    ? string.Join(" | ", errors)
-                    : "No enabled notification providers found for user.";
 
-                notification.MarkAsFailure(failureReason);
-            }
+            notification.MarkAsPublished();
         }
 
         return Result.Success();
