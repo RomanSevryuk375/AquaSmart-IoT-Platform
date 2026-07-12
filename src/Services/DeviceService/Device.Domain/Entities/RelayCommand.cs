@@ -54,7 +54,7 @@ public sealed class RelayCommand : AggregateRoot, IEntity
             relayId,
             targetState,
             status: CommandStatus.Pending,
-            expireAt ?? DateTime.UtcNow.AddMinutes(5),
+            expireAt ?? DateTime.UtcNow.AddMinutes(RelayCommandConstants.DefaultExpiryMinutes),
             attemptCount: 0,
             processedAt: null,
             errorMessage: null,

@@ -1,5 +1,3 @@
-using System;
-
 namespace Notification.TestShared.Constants;
 
 public static class NotificationTestConstants

@@ -1,3 +1,4 @@
+using Contracts.Constants;
 using Contracts.Results;
 
 namespace Telemetry.Domain.ValueObjects;
@@ -31,17 +32,17 @@ public sealed record TelemetrySummary
 
         if (count <= 0)
         {
-            errors.Add("Data points count must be greater than zero.");
+            errors.Add(ErrorMessages.TelemetrySummary.DataPointsCountMustBePositive);
         }
 
         if (minValue > maxValue)
         {
-            errors.Add("MinValue cannot be greater than MaxValue.");
+            errors.Add(ErrorMessages.TelemetrySummary.MinValueCannotBeGreaterThanMaxValue);
         }
 
         if (avgValue < minValue || avgValue > maxValue)
         {
-            errors.Add("AvgValue must be between MinValue and MaxValue.");
+            errors.Add(ErrorMessages.TelemetrySummary.AvgValueMustBeBetweenMinAndMax);
         }
 
         if (errors.Count > 0)

@@ -1,9 +1,9 @@
+using Contracts.Constants;
 using Contracts.Results;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Interfaces;
 using IdentityService.Domain.Entities;
 using IdentityService.Domain.Interfaces;
-using IdentityService.Infrastructure.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -22,8 +22,9 @@ public sealed class LoginHandler(
 
         if (existingUser is null || !await userManager.CheckPasswordAsync(existingUser, request.Password))
         {
-            return Result<LoginResponseDto>.Failure(Error.Conflict("Auth.Invalid",
-                "Invalid credentials."));
+            return Result<LoginResponseDto>.Failure(Error.Conflict(
+                ErrorCodes.Identity.InvalidCredentials,
+                ErrorMessages.InvalidCredentials));
         }
 
         Subscription? subscription = await subscriptionRepository.GetByIdAsync(

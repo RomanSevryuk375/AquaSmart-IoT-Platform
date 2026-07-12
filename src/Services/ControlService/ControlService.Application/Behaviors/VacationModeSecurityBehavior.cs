@@ -1,4 +1,5 @@
 using System.Data;
+using Contracts.Constants;
 using Contracts.Results;
 using Control.Application.Interfaces;
 using Control.Domain.Entities;
@@ -38,8 +39,9 @@ public sealed class VacationModeSecurityBehavior<TRequest, TResponse>(
 
         if (ownerId != userContext.UserId)
         {
-            return BehaviorHelpers.CreateFailedResult<TResponse>(Error.Conflict("Access.Denied",
-                "You are not the owner of this vacation mode."));
+            return BehaviorHelpers.CreateFailedResult<TResponse>(Error.Conflict(
+                ErrorCodes.Security.AccessDenied,
+                ErrorMessages.Security.YouAreNotOwnerOfVacationMode));
         }
 
         return await next();

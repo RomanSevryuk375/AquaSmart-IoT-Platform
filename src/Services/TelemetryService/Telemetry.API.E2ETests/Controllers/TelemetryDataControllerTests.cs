@@ -1,17 +1,17 @@
 using System.Net;
 using System.Net.Http.Json;
 using Contracts.Enums;
-using FluentAssertions;
-using Telemetry.API.E2ETests.Infrastructure;
-using Telemetry.Application.DTOs;
-using Telemetry.Domain.Entities;
-using Telemetry.TestShared.Builders;
-using Contracts.Results;
 using Contracts.Events.TelemetryEvents;
+using Contracts.Results;
+using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Telemetry.API.E2ETests.Infrastructure;
+using Telemetry.Application.DTOs;
 using Telemetry.Application.Interfaces;
+using Telemetry.Domain.Entities;
+using Telemetry.TestShared.Builders;
 using Telemetry.TestShared.Constants;
 
 namespace Telemetry.API.E2ETests.Controllers;
@@ -214,7 +214,7 @@ public class TelemetryDataControllerTests(E2ETestWebAppFactory factory) : BaseE2
         await DbContext.SaveChangesAsync();
         DbContext.ChangeTracker.Clear();
 
-        var deviceTokenValidator = Factory.Services.GetRequiredService<IDeviceTokenValidator>();
+        IDeviceTokenValidator deviceTokenValidator = Factory.Services.GetRequiredService<IDeviceTokenValidator>();
         deviceTokenValidator.ValidateAsync(
                 TestConstants.ValidMacAddress,
                 TestConstants.ValidDeviceToken,
@@ -248,7 +248,7 @@ public class TelemetryDataControllerTests(E2ETestWebAppFactory factory) : BaseE2
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Accepted);
 
-        var savedTelemetry = await DbContext.TelemetryRawData
+        RawTelemetry? savedTelemetry = await DbContext.TelemetryRawData
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.SensorId == sensor.Id);
 
@@ -261,7 +261,7 @@ public class TelemetryDataControllerTests(E2ETestWebAppFactory factory) : BaseE2
     public async Task ReceiveBatchTelemetry_WithInvalidToken_Returns409Conflict()
     {
         // Arrange
-        var deviceTokenValidator = Factory.Services.GetRequiredService<IDeviceTokenValidator>();
+        IDeviceTokenValidator deviceTokenValidator = Factory.Services.GetRequiredService<IDeviceTokenValidator>();
         const string badToken = "invalid_token";
 
         deviceTokenValidator.ValidateAsync(

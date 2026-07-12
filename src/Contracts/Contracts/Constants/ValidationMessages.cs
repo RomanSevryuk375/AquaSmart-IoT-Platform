@@ -13,4 +13,8 @@ public static class ValidationMessages
     public const string ExternalMessageIdTooLong = "ExternalMessageId is too long (max 100).";
     public const string RecordedAtProvided = "RecordedAt must be provided.";
     public const string RecordedAtFuture = "RecordedAt can not be in the future.";
+
+    // New constants:
+    public const string PhoneFormatInvalid = "Phone number should be in format +375XXXXXXXXX or 80XXXXXXXXX";
+    public const string PasswordMinLength = "Password must be at least 8 characters long.";
 }

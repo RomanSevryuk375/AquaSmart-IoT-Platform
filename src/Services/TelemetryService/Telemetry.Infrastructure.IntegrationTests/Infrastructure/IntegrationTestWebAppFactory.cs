@@ -1,3 +1,4 @@
+using Contracts.Results;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +7,6 @@ using Telemetry.Application.DTOs;
 using Telemetry.Application.Interfaces;
 using Telemetry.Infrastructure.Persistence;
 using Telemetry.TestShared.Constants;
-using Contracts.Results;
 using Testcontainers.PostgreSql;
 
 namespace Telemetry.Infrastructure.IntegrationTests.Infrastructure;
@@ -63,7 +63,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
 
             services.AddSingleton(Substitute.For<ITelemetryNotifier>());
 
-            var tokenValidatorMock = Substitute.For<IDeviceTokenValidator>();
+            IDeviceTokenValidator tokenValidatorMock = Substitute.For<IDeviceTokenValidator>();
             tokenValidatorMock.ValidateAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
                 .Returns(Result<ValidateResponseDto>.Success(new ValidateResponseDto { ControllerId = TestConstants.ControllerId, UserId = TestConstants.UserId }));
             services.AddSingleton(tokenValidatorMock);

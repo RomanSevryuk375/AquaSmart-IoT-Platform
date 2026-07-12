@@ -1,7 +1,6 @@
 using Contracts.Results;
 using FluentAssertions;
 using IdentityService.Domain.ValueObjects;
-using Xunit;
 
 namespace Identity.Domain.UnitTests.ValueObjects;
 
@@ -14,7 +13,7 @@ public class TimeZoneIdTests
     public void Create_WithNullOrWhitespaceTimeZone_ReturnsFailure(string? invalidTz)
     {
         // Act
-        var result = TimeZoneId.Create(invalidTz!);
+        Result<TimeZoneId> result = TimeZoneId.Create(invalidTz!);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -29,7 +28,7 @@ public class TimeZoneIdTests
     public void Create_WithUnrecognizedTimeZone_ReturnsFailure(string unrecognizedTz)
     {
         // Act
-        var result = TimeZoneId.Create(unrecognizedTz);
+        Result<TimeZoneId> result = TimeZoneId.Create(unrecognizedTz);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -45,7 +44,7 @@ public class TimeZoneIdTests
     public void Create_WithValidTimeZone_ReturnsSuccessAndTrimsValue(string input, string expected)
     {
         // Act
-        var result = TimeZoneId.Create(input);
+        Result<TimeZoneId> result = TimeZoneId.Create(input);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

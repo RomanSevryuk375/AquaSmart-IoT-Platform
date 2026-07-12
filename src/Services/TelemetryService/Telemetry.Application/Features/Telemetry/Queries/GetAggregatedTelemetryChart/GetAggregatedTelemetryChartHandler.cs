@@ -1,4 +1,5 @@
 using System.Data;
+using Contracts.Constants;
 using Contracts.Enums;
 using Contracts.Results;
 using Dapper;
@@ -60,7 +61,7 @@ internal sealed class GetAggregatedTelemetryChartHandler(ISqlConnectionFactory s
         if (sensor is null)
         {
             return Result<TelemetryChartResponseDto>.Failure(Error.NotFound<Sensor>(
-                $"Sensor {request.SensorId} not found"));
+                string.Format(ErrorMessages.SensorNotFound, request.SensorId)));
         }
 
         IEnumerable<TelemetryChartPointDto> points = await multi.ReadAsync<TelemetryChartPointDto>();

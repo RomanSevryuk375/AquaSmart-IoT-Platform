@@ -1,7 +1,7 @@
 using Contracts.Abstractions;
 using IdentityService.Domain.Entities;
 
-namespace IdentityService.Infrastructure.Repositories;
+namespace IdentityService.Domain.Interfaces;
 
 public interface IRefreshTokenRepository : IRepository<RefreshToken>
 {

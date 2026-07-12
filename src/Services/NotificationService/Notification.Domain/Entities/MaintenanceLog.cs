@@ -1,4 +1,5 @@
 using Contracts.Abstractions;
+using Contracts.Constants;
 using Contracts.Results;
 
 namespace Notification.Domain.Entities;
@@ -43,10 +44,10 @@ public sealed class MaintenanceLog : AggregateRoot, IEntity
         Dictionary<string, double>? metrics,
         string notes)
     {
-        if (actionDate > DateTime.UtcNow.AddMinutes(5))
+        if (actionDate > DateTime.UtcNow.AddMinutes(MaintenanceLogConstants.MaxFutureDelayMinutes))
         {
             return Result<MaintenanceLog>.Failure(Error.Validation<MaintenanceLog>(
-                "Action date cannot be in the future."));
+                ErrorMessages.MaintenanceLog.ActionDateInFuture));
         }
 
         var log = new MaintenanceLog(

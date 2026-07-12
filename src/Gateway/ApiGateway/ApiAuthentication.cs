@@ -11,8 +11,8 @@ public static class ApiAuthentication
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var jwtSection = configuration.GetSection(JwtOptions.SectionName);
-        var jwtOptions = jwtSection.Get<JwtOptions>();
+        IConfigurationSection jwtSection = configuration.GetSection(JwtOptions.SectionName);
+        JwtOptions? jwtOptions = jwtSection.Get<JwtOptions>();
 
         if (jwtOptions is null || string.IsNullOrWhiteSpace(jwtOptions.SecretKey))
         {
@@ -30,7 +30,7 @@ public static class ApiAuthentication
                     {
                         if (!context.Request.Headers.ContainsKey("Authorization"))
                         {
-                            var token = context.Request.Cookies["AccessToken"];
+                            string? token = context.Request.Cookies["AccessToken"];
                             if (!string.IsNullOrEmpty(token))
                             {
                                 context.Token = token;

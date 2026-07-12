@@ -186,7 +186,7 @@ public sealed class Relay : AggregateRoot, IEntity
             ControllerId = ControllerId,
             RelayId = Id,
             TargetState = IsActive,
-            ExpireAt = DateTime.UtcNow.AddMinutes(5)
+            ExpireAt = DateTime.UtcNow.AddMinutes(RelayCommandConstants.DefaultExpiryMinutes)
         });
 
         IncrementVersion();

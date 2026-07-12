@@ -30,7 +30,7 @@ public sealed class GetDeviceMetadataHandler(ISqlConnectionFactory sqlConnection
            (request.RelayId.HasValue && metadata.RelayName is null))
         {
             return Result<DeviceMetadataDto>.Failure(Error.NotFound(
-                "Hardware.NotFound", "One or more hardware components were not found in DeviceService."));
+                ErrorCodes.Hardware.NotFound, ErrorMessages.Hardware.ComponentsNotFound));
         }
 
         return Result<DeviceMetadataDto>.Success(metadata);

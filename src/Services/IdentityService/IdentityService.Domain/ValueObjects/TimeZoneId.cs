@@ -1,3 +1,4 @@
+using Contracts.Constants;
 using Contracts.Results;
 
 namespace IdentityService.Domain.ValueObjects;
@@ -16,7 +17,7 @@ public sealed record TimeZoneId
         if (string.IsNullOrWhiteSpace(value))
         {
             return Result<TimeZoneId>.Failure(Error.Validation<TimeZoneId>(
-                "Time zone is required."));
+                ErrorMessages.Identity.TimeZoneRequired));
         }
 
         string cleanZone = value.Trim();
@@ -28,7 +29,7 @@ public sealed record TimeZoneId
         catch (TimeZoneNotFoundException)
         {
             return Result<TimeZoneId>.Failure(Error.Validation<TimeZoneId>(
-                $"Time zone '{cleanZone}' is not recognized."));
+                string.Format(ErrorMessages.Identity.TimeZoneNotRecognized, cleanZone)));
         }
 
         return Result<TimeZoneId>.Success(new TimeZoneId(cleanZone));

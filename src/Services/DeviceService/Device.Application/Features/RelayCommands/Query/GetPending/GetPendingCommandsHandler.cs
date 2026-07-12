@@ -9,9 +9,6 @@ internal sealed class GetPendingCommandsHandler(
     IMyHasher hasher)
     : IRequestHandler<GetPendingCommandsQuery, Result<IReadOnlyList<RelayCommandDto>>>
 {
-    private const int MaxAttemptCount = 3;
-    private const int RetryCooldownMinutes = 1;
-
     public async Task<Result<IReadOnlyList<RelayCommandDto>>> Handle(
         GetPendingCommandsQuery request,
         CancellationToken cancellationToken)
@@ -34,7 +31,7 @@ internal sealed class GetPendingCommandsHandler(
         }
 
         DateTime now = DateTime.UtcNow;
-        DateTime retryThreshold = now.AddMinutes(-RetryCooldownMinutes);
+        DateTime retryThreshold = now.AddMinutes(-RelayCommandConstants.RetryCooldownMinutes);
 
         const string PopSql = """
             UPDATE relay_command_queues
@@ -61,7 +58,7 @@ internal sealed class GetPendingCommandsHandler(
             request.ControllerId,
             Now = now,
             RetryThreshold = retryThreshold,
-            MaxAttemptCount,
+            MaxAttemptCount = RelayCommandConstants.MaxAttemptCount,
             SentStatus = (int)CommandStatus.Sent,
             PendingStatus = (int)CommandStatus.Pending
         });

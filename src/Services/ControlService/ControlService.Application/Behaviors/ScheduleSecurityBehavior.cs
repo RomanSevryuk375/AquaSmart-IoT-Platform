@@ -1,4 +1,5 @@
 using System.Data;
+using Contracts.Constants;
 using Contracts.Results;
 using Control.Application.Interfaces;
 using Control.Domain.Entities;
@@ -38,8 +39,9 @@ public sealed class ScheduleSecurityBehavior<TRequest, TResponse>(
 
         if (ownerId != userContext.UserId)
         {
-            return BehaviorHelpers.CreateFailedResult<TResponse>(Error.Conflict("Access.Denied",
-                "You are not the owner of this schedule."));
+            return BehaviorHelpers.CreateFailedResult<TResponse>(Error.Conflict(
+                ErrorCodes.Security.AccessDenied,
+                ErrorMessages.Security.YouAreNotOwnerOfSchedule));
         }
 
         return await next();

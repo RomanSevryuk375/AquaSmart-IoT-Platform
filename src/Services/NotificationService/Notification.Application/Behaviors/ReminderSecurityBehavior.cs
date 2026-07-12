@@ -1,8 +1,10 @@
 using System.Data;
+using Contracts.Constants;
 using Contracts.Results;
 using Dapper;
 using MediatR;
 using Notification.Application.Interfaces;
+using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
 
 namespace Notification.Application.Behaviors;
@@ -26,14 +28,15 @@ public sealed class ReminderSecurityBehavior<TRequest, TResponse>(
 
         if (ownerId is null)
         {
-            return BehaviorHelpers.CreateFailedResult<TResponse>(
-                Error.NotFound("Reminder.NotFound", $"Reminder {request.ReminderId} not found."));
+            return BehaviorHelpers.CreateFailedResult<TResponse>(Error.NotFound<Reminder>(
+                    string.Format(ErrorMessages.Reminder.NotFoundFormat, request.ReminderId)));
         }
 
         if (ownerId != userContext.UserId)
         {
             return BehaviorHelpers.CreateFailedResult<TResponse>(
-                Error.Conflict("Access.Denied", "You are not the owner of this reminder."));
+                Error.Conflict(ErrorCodes.Security.AccessDenied,
+                    ErrorMessages.Security.YouAreNotOwnerOfReminder));
         }
 
         return await next();

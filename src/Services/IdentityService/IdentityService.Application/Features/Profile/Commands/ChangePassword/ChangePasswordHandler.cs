@@ -1,3 +1,4 @@
+using Contracts.Constants;
 using Contracts.Results;
 using IdentityService.Domain.Entities;
 using IdentityService.Domain.Interfaces;
@@ -16,7 +17,7 @@ public sealed class ChangePasswordHandler(
         if (user is null)
         {
             return Result.Failure(Error.NotFound<User>(
-                "User not found."));
+                ErrorMessages.Identity.UserNotFound));
         }
 
         IdentityResult result = await userManager.ChangePasswordAsync(
@@ -24,7 +25,7 @@ public sealed class ChangePasswordHandler(
         if (!result.Succeeded)
         {
             string error = string.Join("; ", result.Errors.Select(x => x.Description));
-            return Result.Failure(Error.Validation("Password.ChangeFailed", error));
+            return Result.Failure(Error.Validation(ErrorCodes.Identity.PasswordChangeFailed, error));
         }
 
         return Result.Success();

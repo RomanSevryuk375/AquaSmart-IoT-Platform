@@ -17,6 +17,6 @@ public sealed class LoginValidator : AbstractValidator<LoginCommand>
         RuleFor(x => x.Password)
             .NotEmpty()
             .MinimumLength(IdentityConstants.PasswordLength)
-            .WithMessage("Password must be at least 8 characters long.");
+            .WithMessage(ValidationMessages.PasswordMinLength);
     }
 }

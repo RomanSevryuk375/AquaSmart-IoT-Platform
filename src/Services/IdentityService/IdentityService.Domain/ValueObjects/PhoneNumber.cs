@@ -18,7 +18,7 @@ public sealed partial record PhoneNumber
         if (string.IsNullOrWhiteSpace(value))
         {
             return Result<PhoneNumber>.Failure(Error.Validation<PhoneNumber>(
-                "Phone number is required."));
+                ErrorMessages.Identity.PhoneRequired));
         }
 
         string cleanNumber = value.Trim();
@@ -26,7 +26,7 @@ public sealed partial record PhoneNumber
         if (!PhoneNumberRegex().IsMatch(cleanNumber))
         {
             return Result<PhoneNumber>.Failure(Error.Validation<PhoneNumber>(
-                "Phone number should be in format +375XXXXXXXXX or 80XXXXXXXXX."));
+                ErrorMessages.Identity.PhoneFormatInvalid));
         }
 
         return Result<PhoneNumber>.Success(new PhoneNumber(cleanNumber));

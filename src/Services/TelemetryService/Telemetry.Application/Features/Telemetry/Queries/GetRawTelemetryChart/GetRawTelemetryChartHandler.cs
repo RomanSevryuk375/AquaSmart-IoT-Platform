@@ -1,8 +1,10 @@
 using System.Data;
+using Contracts.Constants;
 using Contracts.Results;
 using Dapper;
 using MediatR;
 using Telemetry.Application.DTOs;
+using Telemetry.Domain.Entities;
 using Telemetry.Domain.Interfaces;
 
 namespace Telemetry.Application.Features.Telemetry.Queries.GetRawTelemetryChart;
@@ -52,8 +54,8 @@ internal sealed class GetRawTelemetryChartHandler(
         SensorInfoDto? sensor = await multi.ReadSingleOrDefaultAsync<SensorInfoDto>();
         if (sensor is null)
         {
-            return Result<TelemetryRawChartResponseDto>.Failure(Error.NotFound(
-                "Sensor.NotFound", $"Sensor {request.SensorId} not found"));
+            return Result<TelemetryRawChartResponseDto>.Failure(Error.NotFound<Sensor>(
+                string.Format(ErrorMessages.SensorNotFound, request.SensorId)));
         }
 
         IEnumerable<TelemetryRawChartPointDto> points = await multi.ReadAsync<TelemetryRawChartPointDto>();

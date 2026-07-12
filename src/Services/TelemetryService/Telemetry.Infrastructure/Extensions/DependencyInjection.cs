@@ -11,7 +11,6 @@ using Telemetry.Application.Interfaces;
 using Telemetry.Domain.Interfaces;
 using Telemetry.Infrastructure.BackgroundJobs;
 using Telemetry.Infrastructure.Factories;
-using Telemetry.Infrastructure.Messaging;
 using Telemetry.Infrastructure.Messaging.EcosystemConsumers;
 using Telemetry.Infrastructure.Messaging.SensorConsumers;
 using Telemetry.Infrastructure.Persistence;

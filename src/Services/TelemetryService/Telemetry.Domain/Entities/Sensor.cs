@@ -1,4 +1,5 @@
 using Contracts.Abstractions;
+using Contracts.Constants;
 using Contracts.Enums;
 using Contracts.Results;
 using Telemetry.Domain.Events;
@@ -54,7 +55,7 @@ public sealed class Sensor : AggregateRoot, IEntity
 
         if (string.IsNullOrWhiteSpace(unit))
         {
-            errors.Add("Unit must not be empty.");
+            errors.Add(ErrorMessages.Sensor.UnitMustNotBeEmpty);
         }
 
         Result<DeviceName> nameResut = DeviceName.Create(rawName);
@@ -88,7 +89,7 @@ public sealed class Sensor : AggregateRoot, IEntity
         if (string.IsNullOrWhiteSpace(unit))
         {
             return Result.Failure(Error.Validation<Sensor>(
-                "Unit must not be empty."));
+                ErrorMessages.Sensor.UnitMustNotBeEmpty));
         }
 
         ControllerId = controllerId;

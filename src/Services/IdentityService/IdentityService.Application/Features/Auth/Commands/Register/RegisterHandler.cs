@@ -1,10 +1,10 @@
+using Contracts.Constants;
 using Contracts.Enums;
 using Contracts.Results;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Interfaces;
 using IdentityService.Domain.Entities;
 using IdentityService.Domain.Interfaces;
-using IdentityService.Infrastructure.Repositories;
 using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -22,8 +22,9 @@ public sealed class RegisterHandler(
     {
         if (await userManager.FindByEmailAsync(request.Email) is not null)
         {
-            return Result<LoginResponseDto>.Failure(Error.Conflict("Email.Busy",
-                "Email is already in use."));
+            return Result<LoginResponseDto>.Failure(Error.Conflict(
+                ErrorCodes.Identity.EmailBusy,
+                ErrorMessages.Identity.EmailInUse));
         }
 
         Result<User> createdResult = User.Create(
@@ -45,7 +46,9 @@ public sealed class RegisterHandler(
         if (!identityResult.Succeeded)
         {
             string error = string.Join("; ", identityResult.Errors.Select(x => x.Description));
-            return Result<LoginResponseDto>.Failure(Error.Conflict("Register.Failure", error));
+            return Result<LoginResponseDto>.Failure(Error.Conflict(
+                ErrorCodes.Identity.RegisterFailure,
+                error));
         }
 
         Subscription? subscription = await subscriptionRepository.GetByIdAsync(

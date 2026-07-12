@@ -1,8 +1,10 @@
 using System.Data;
+using Contracts.Constants;
 using Contracts.Results;
 using Dapper;
 using MediatR;
 using Notification.Application.Features.Reminders.Queries.Shared;
+using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
 
 namespace Notification.Application.Features.Reminders.Queries.GetReminderById;
@@ -30,8 +32,8 @@ public sealed class GetReminderByIdHandler(ISqlConnectionFactory sqlConnectionFa
 
         if (reminder is null)
         {
-            return Result<ReminderDto>.Failure(Error.NotFound(
-                "Reminder.NotFound", $"Reminder {request.ReminderId} not found."));
+            return Result<ReminderDto>.Failure(Error.NotFound<Reminder>(
+                string.Format(ErrorMessages.Reminder.NotFoundFormat, request.ReminderId)));
         }
 
         return Result<ReminderDto>.Success(reminder);

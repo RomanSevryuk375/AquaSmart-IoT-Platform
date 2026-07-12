@@ -1,9 +1,9 @@
+using Contracts.Constants;
 using Contracts.Results;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Interfaces;
 using IdentityService.Domain.Entities;
 using IdentityService.Domain.Interfaces;
-using IdentityService.Infrastructure.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -22,21 +22,22 @@ public sealed class RefreshHandler(
         if (parts.Length != 2 || !Guid.TryParse(parts[0], out Guid tokenId))
         {
             return Result<LoginResponseDto>.Failure(Error.Validation<RefreshToken>(
-                "Invalid token format."));
+                ErrorMessages.Identity.InvalidTokenFormat));
         }
 
         RefreshToken? tokenEntity = await refreshTokenRepository.GetByIdAsync(tokenId, cancellationToken);
         if (tokenEntity is null)
         {
             return Result<LoginResponseDto>.Failure(Error.Validation<RefreshToken>(
-                "Token is invalid or expired."));
+                ErrorMessages.Identity.TokenInvalidOrExpired));
         }
 
         if (tokenEntity.IsUsed)
         {
             await refreshTokenRepository.DeleteTokensByUserIdAsync(tokenEntity.UserId, cancellationToken);
-            return Result<LoginResponseDto>.Failure(Error.Conflict("Security.Breach",
-                "Token reuse detected. All sessions revoked."));
+            return Result<LoginResponseDto>.Failure(Error.Conflict(
+                ErrorCodes.Identity.TokenReuse,
+                ErrorMessages.Identity.TokenReuseDetected));
         }
 
         if (tokenEntity.IsRevoked ||
@@ -44,7 +45,7 @@ public sealed class RefreshHandler(
             !myHasher.Verify(parts[1], tokenEntity.TokenHash))
         {
             return Result<LoginResponseDto>.Failure(Error.Validation<RefreshToken>(
-                "Token is invalid or expired."));
+                ErrorMessages.Identity.TokenInvalidOrExpired));
         }
 
         tokenEntity.MarkAsUsed();
@@ -53,7 +54,7 @@ public sealed class RefreshHandler(
         if (existingUser is null)
         {
             return Result<LoginResponseDto>.Failure(Error.NotFound<User>(
-                "User not found."));
+                ErrorMessages.Identity.UserNotFound));
         }
 
         Subscription? subscription = await subscriptionRepository.GetByIdAsync(

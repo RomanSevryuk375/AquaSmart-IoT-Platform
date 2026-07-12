@@ -1,4 +1,5 @@
 using IdentityService.Domain.Entities;
+using IdentityService.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace IdentityService.Infrastructure.Repositories;

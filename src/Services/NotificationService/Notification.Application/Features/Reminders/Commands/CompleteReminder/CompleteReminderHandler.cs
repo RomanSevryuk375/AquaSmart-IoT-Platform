@@ -1,3 +1,4 @@
+using Contracts.Constants;
 using Contracts.Results;
 using MediatR;
 using Notification.Domain.Entities;
@@ -15,12 +16,14 @@ public sealed class CompleteReminderHandler(
         Reminder? reminder = await reminderRepository.GetByIdAsync(request.ReminderId, cancellationToken);
         if (reminder is null)
         {
-            return Result.Failure(Error.NotFound("Reminder.NotFound", $"Reminder {request.ReminderId} not found."));
+            return Result.Failure(Error.NotFound<Reminder>(
+                string.Format(ErrorMessages.Reminder.NotFoundFormat, request.ReminderId)));
         }
 
         if (reminder.UserId != userContext.UserId)
         {
-            return Result.Failure(Error.Conflict("Access.Denied", "You are not the owner of this reminder."));
+            return Result.Failure(Error.Conflict(ErrorCodes.Security.AccessDenied,
+                ErrorMessages.Security.YouAreNotOwnerOfReminder));
         }
 
         reminder.CompleteTask();

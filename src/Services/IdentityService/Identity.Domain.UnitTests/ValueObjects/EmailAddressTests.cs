@@ -1,7 +1,6 @@
 using Contracts.Results;
 using FluentAssertions;
 using IdentityService.Domain.ValueObjects;
-using Xunit;
 
 namespace Identity.Domain.UnitTests.ValueObjects;
 
@@ -14,7 +13,7 @@ public class EmailAddressTests
     public void Create_WithNullOrWhitespace_ReturnsFailure(string? value)
     {
         // Act
-        var result = EmailAddress.Create(value!);
+        Result<EmailAddress> result = EmailAddress.Create(value!);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -27,10 +26,10 @@ public class EmailAddressTests
     public void Create_WithLengthExceedingLimit_ReturnsFailure()
     {
         // Arrange
-        var longEmail = new string('a', 250) + "@test.com"; // 259 chars total
+        string longEmail = new string('a', 250) + "@test.com"; // 259 chars total
 
         // Act
-        var result = EmailAddress.Create(longEmail);
+        Result<EmailAddress> result = EmailAddress.Create(longEmail);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -50,7 +49,7 @@ public class EmailAddressTests
     public void Create_WithInvalidFormat_ReturnsFailure(string invalidEmail)
     {
         // Act
-        var result = EmailAddress.Create(invalidEmail);
+        Result<EmailAddress> result = EmailAddress.Create(invalidEmail);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -66,7 +65,7 @@ public class EmailAddressTests
     public void Create_WithValidEmail_ReturnsSuccessAndFormatsValue(string input, string expected)
     {
         // Act
-        var result = EmailAddress.Create(input);
+        Result<EmailAddress> result = EmailAddress.Create(input);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

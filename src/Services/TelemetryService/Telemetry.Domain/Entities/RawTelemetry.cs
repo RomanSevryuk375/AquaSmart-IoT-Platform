@@ -1,4 +1,5 @@
 using Contracts.Abstractions;
+using Contracts.Constants;
 using Contracts.Results;
 using Telemetry.Domain.Events;
 
@@ -42,14 +43,14 @@ public sealed class RawTelemetry : AggregateRoot, IEntity
     {
         var errors = new List<string>();
 
-        if (recordedAt > DateTime.UtcNow.AddMinutes(5))
+        if (recordedAt > DateTime.UtcNow.AddMinutes(TelemetryConstants.MaxFutureDelayMinutes))
         {
-            errors.Add("recordedAt cannot be in the future.");
+            errors.Add(ErrorMessages.Telemetry.RecordedAtFuture);
         }
 
         if (string.IsNullOrWhiteSpace(externalMessageId))
         {
-            errors.Add("externalMessageId must not be empty.");
+            errors.Add(ErrorMessages.Telemetry.ExternalMessageIdEmpty);
         }
 
         if (errors.Count > 0)

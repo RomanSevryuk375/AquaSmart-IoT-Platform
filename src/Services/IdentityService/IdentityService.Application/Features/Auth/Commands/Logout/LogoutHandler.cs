@@ -1,6 +1,5 @@
 using Contracts.Results;
 using IdentityService.Domain.Interfaces;
-using IdentityService.Infrastructure.Repositories;
 using MediatR;
 
 namespace IdentityService.Application.Features.Auth.Commands.Logout;

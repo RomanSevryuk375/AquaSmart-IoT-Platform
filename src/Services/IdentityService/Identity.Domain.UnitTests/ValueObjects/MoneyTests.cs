@@ -1,7 +1,6 @@
 using Contracts.Results;
 using FluentAssertions;
 using IdentityService.Domain.ValueObjects;
-using Xunit;
 
 namespace Identity.Domain.UnitTests.ValueObjects;
 
@@ -13,7 +12,7 @@ public class MoneyTests
     public void Create_WithNegativeAmount_ReturnsFailure(decimal negativeAmount)
     {
         // Act
-        var result = Money.Create(negativeAmount);
+        Result<Money> result = Money.Create(negativeAmount);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -30,7 +29,7 @@ public class MoneyTests
     public void Create_WithValidAmount_ReturnsSuccess(decimal validAmount)
     {
         // Act
-        var result = Money.Create(validAmount);
+        Result<Money> result = Money.Create(validAmount);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

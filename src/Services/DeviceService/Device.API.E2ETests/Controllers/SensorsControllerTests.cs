@@ -1,5 +1,4 @@
 using Contracts.Enums;
-using Device.Application.Extesions;
 using Device.Application.Features.Sensors.Command.AddSensor;
 using Device.Domain.Entities;
 using Device.Domain.Entities.Sensors;
