@@ -1,5 +1,6 @@
 using Contracts.Events.RelayEvents;
 using Device.Application.Features.Controllers.Query.GetControllerConfig;
+using Device.Application.Features.RelayCommands.Command.SetRelayState;
 using Device.Application.Features.RelayCommands.Query.GetPending;
 using Device.Application.Features.Relays.Command.AddRelay;
 using Device.Domain.Events.RelayEvents;
@@ -33,5 +34,7 @@ public sealed class RelayProfile : Profile
         CreateMap<RelayStateChangedDomainEvent, ChangeRelayStateEvent>();
 
         CreateMap<RelayUpdatedDomainEvent, RelayUpdatedEvent>();
+
+        CreateMap<ChangeRelayStateEvent, SetRelayStateCommand>();
     }
 }

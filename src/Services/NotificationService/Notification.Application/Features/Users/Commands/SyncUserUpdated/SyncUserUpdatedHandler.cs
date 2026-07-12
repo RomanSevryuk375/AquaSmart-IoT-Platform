@@ -1,7 +1,6 @@
 using AutoMapper;
 using Contracts.Results;
 using MediatR;
-using Notification.Application.Features.Users.Commands.SyncUserCreated;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
 
@@ -17,7 +16,7 @@ public sealed class SyncUserUpdatedHandler(
 
         if (currentUser is null)
         {
-            SyncUserUpdateCommand command = mapper.Map<SyncUserUpdateCommand>(request);
+            SyncUserUpdatedCommand command = mapper.Map<SyncUserUpdatedCommand>(request);
             Result result = await sender.Send(command, cancellationToken);
             if (result.IsFailure)
             {

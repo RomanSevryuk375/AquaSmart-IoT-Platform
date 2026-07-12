@@ -26,7 +26,7 @@ public class SyncUserCreatedHandlerTests
         User user = new UserBuilder().Build();
         _userRepoMock.GetByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);
 
-        var command = new SyncUserUpdateCommand
+        var command = new SyncUserCreatedCommand
         {
             UserId = user.Id,
             Email = user.Email.Value,
@@ -51,7 +51,7 @@ public class SyncUserCreatedHandlerTests
         var userId = Guid.NewGuid();
         _userRepoMock.GetByIdAsync(userId, Arg.Any<CancellationToken>()).Returns((User?)null);
 
-        var command = new SyncUserUpdateCommand
+        var command = new SyncUserCreatedCommand
         {
             UserId = userId,
             Email = "newuser@test.com",
@@ -87,7 +87,7 @@ public class SyncUserCreatedHandlerTests
         var userId = Guid.NewGuid();
         _userRepoMock.GetByIdAsync(userId, Arg.Any<CancellationToken>()).Returns((User?)null);
 
-        var command = new SyncUserUpdateCommand
+        var command = new SyncUserCreatedCommand
         {
             UserId = userId,
             Email = "plainaddress",

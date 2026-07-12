@@ -3,6 +3,7 @@
 using Contracts.Options;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,6 +12,7 @@ using Telemetry.Application.Interfaces;
 using Telemetry.Domain.Interfaces;
 using Telemetry.Infrastructure.BackgroundJobs;
 using Telemetry.Infrastructure.Factories;
+using Telemetry.Infrastructure.GrpcClients;
 using Telemetry.Infrastructure.Messaging.EcosystemConsumers;
 using Telemetry.Infrastructure.Messaging.SensorConsumers;
 using Telemetry.Infrastructure.Persistence;
@@ -43,6 +45,12 @@ public static class DependencyInjection
         services.AddScoped<IOutboxRepository, OutboxRepository>();
 
         services.AddScoped<OutboxMessageProcessorService>();
+
+        services.AddMemoryCache();
+        services.AddScoped<DeviceTokenValidator>();
+        services.AddScoped<IDeviceTokenValidator>(sp => new CachedDeviceTokenValidator(
+            sp.GetRequiredService<DeviceTokenValidator>(),
+            sp.GetRequiredService<IMemoryCache>()));
 
         services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
 
