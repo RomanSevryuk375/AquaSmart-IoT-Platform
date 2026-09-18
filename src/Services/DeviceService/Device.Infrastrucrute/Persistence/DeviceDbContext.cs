@@ -1,4 +1,6 @@
 using BuildingBlocks.Infrastructure.Data.Outbox;
+using BuildingBlocks.Infrastructure.Extensions;
+using Device.Infrastructure.Persistence.Converters;
 
 namespace Device.Infrastructure.Persistence;
 
@@ -14,6 +16,15 @@ public sealed class DeviceDbContext(DbContextOptions<DeviceDbContext> options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(DeviceDbContext).Assembly);
+        modelBuilder.ConfigureOutbox();
+
         base.OnModelCreating(modelBuilder);
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.AddValueConverters();
+
+        base.ConfigureConventions(configurationBuilder);
     }
 }

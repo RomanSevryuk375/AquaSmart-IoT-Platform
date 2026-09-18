@@ -9,14 +9,8 @@ public sealed class RelayCommandConfiguration : IEntityTypeConfiguration<RelayCo
         builder.HasKey(x => x.Id);
         builder.Property(x => x.ControllerId).IsRequired();
         builder.Property(x => x.RelayId).IsRequired();
-        builder.Property(x => x.TargetState)
-            .HasColumnName("targe_state")
-            .IsRequired();
-
-        builder.Property(x => x.Status)
-            .HasConversion<int>()
-            .IsRequired();
-
+        builder.Property(x => x.TargetState).IsRequired();
+        builder.Property(x => x.Status).IsRequired();
         builder.Property(x => x.ExpireAt).IsRequired(false);
         builder.Property(x => x.AttemptCount).IsRequired();
         builder.Property(x => x.ProcessedAt).IsRequired(false);

@@ -1,6 +1,5 @@
 using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Enums;
-using Device.Domain.ValueObjects;
 
 namespace Device.Infrastructure.Persistence.Configurations;
 
@@ -14,35 +13,12 @@ public sealed class SensorConfiguration : IEntityTypeConfiguration<Sensor>
 
         builder.Property(x => x.ControllerId).IsRequired();
         builder.Property(x => x.UserId).IsRequired();
-        builder.Property(x => x.Name)
-            .HasConversion(
-                vo => vo.Value,
-                dbVal => DeviceName.Create(dbVal).Value)
-            .HasMaxLength(CommonConstants.NameLength)
-            .IsRequired();
-
-        builder.Property(x => x.ConnectionAddress)
-            .HasConversion(
-                vo => vo.ToString(),
-                dbVal => ConnectionAddress.Parse(dbVal))
-            .HasColumnName("connection_address")
-            .HasMaxLength(64)
-            .IsRequired();
-
-        builder.Property(x => x.Type)
-            .HasConversion<int>()
-            .IsRequired();
-
-        builder.Property(x => x.State)
-            .HasConversion<int>()
-            .IsRequired();
-
-        builder.Property(x => x.Unit)
-            .HasMaxLength(SensorConstants.UnitLength)
-            .IsRequired();
-
+        builder.Property(x => x.Name).IsRequired();
+        builder.Property(x => x.ConnectionAddress).IsRequired();
+        builder.Property(x => x.Type).IsRequired();
+        builder.Property(x => x.State).IsRequired();
+        builder.Property(x => x.Unit).HasMaxLength(SensorConstants.UnitLength).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
-
         builder.HasIndex(x => x.UserId);
 
         builder.HasIndex(x => new

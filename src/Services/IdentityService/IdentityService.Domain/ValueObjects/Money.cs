@@ -6,10 +6,12 @@ public sealed record Money
 {
     public decimal Amount { get; }
 
-    private Money(decimal amount)
+    internal Money(decimal amount)
     {
         Amount = amount;
     }
+
+    public static Money Parse(decimal dbVal) => new(dbVal);
 
     public static Result<Money> Create(decimal amount)
     {

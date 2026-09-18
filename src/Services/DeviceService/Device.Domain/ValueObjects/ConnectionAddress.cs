@@ -8,6 +8,7 @@ namespace Device.Domain.ValueObjects;
 public sealed partial record ConnectionAddress
 {
     private const int I2cHexPartLength = 2;
+    public const int MaxLength = 64;
 
     public ConnectionProtocol Protocol { get; }
     public string Address { get; } = string.Empty;

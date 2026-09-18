@@ -7,10 +7,12 @@ public sealed record DeviceName
 {
     public string Value { get; } = string.Empty;
 
-    private DeviceName(string name)
+    internal DeviceName(string name)
     {
         Value = name;
     }
+
+    public static DeviceName Parse(string dbVal) => new(dbVal);
 
     public static Result<DeviceName> Create(string name)
     {

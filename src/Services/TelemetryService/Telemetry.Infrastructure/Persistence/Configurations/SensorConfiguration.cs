@@ -2,7 +2,6 @@ using BuildingBlocks.Domain.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Telemetry.Domain.Entities;
-using Telemetry.Domain.ValueObjects;
 
 namespace Telemetry.Infrastructure.Persistence.Configurations;
 
@@ -17,19 +16,11 @@ public sealed class SensorConfiguration
 
         builder.Property(x => x.ControllerId).IsRequired();
         builder.Property(x => x.EcosystemId).IsRequired();
-
-        builder.Property(x => x.Name)
-            .HasConversion(
-                vo => vo.Value,
-                dbVal => DeviceName.Create(dbVal).Value)
-            .HasMaxLength(CommonConstants.NameLength)
-            .IsRequired();
-
-        builder.Property(x => x.Type).HasConversion<int>().IsRequired();
-        builder.Property(x => x.State).HasConversion<int>().IsRequired();
+        builder.Property(x => x.Name).IsRequired();
+        builder.Property(x => x.Type).IsRequired();
+        builder.Property(x => x.State).IsRequired();
         builder.Property(x => x.Unit).HasMaxLength(SensorConstants.NameLength).IsRequired();
         builder.Property(x => x.LastValue).HasPrecision(10, 4).IsRequired();
-
         builder.Property(x => x.UpdatedAt).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
         builder.Property(x => x.IsDataDelayed).IsRequired();

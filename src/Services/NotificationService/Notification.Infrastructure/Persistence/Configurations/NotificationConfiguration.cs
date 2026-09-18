@@ -1,7 +1,5 @@
-using BuildingBlocks.Domain.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Notification.Domain.ValueObjects;
 
 namespace Notification.Infrastructure.Persistence.Configurations;
 
@@ -15,15 +13,8 @@ public sealed class NotificationConfiguration : IEntityTypeConfiguration<Domain.
 
         builder.Property(x => x.UserId).IsRequired();
         builder.Property(x => x.EcosystemId).IsRequired(false);
-        builder.Property(x => x.Level).HasConversion<int>().IsRequired();
-
-        builder.Property(x => x.Message)
-            .HasConversion(
-                msg => msg.Value,
-                dbValue => MessageText.Create(dbValue).Value)
-            .HasMaxLength(NotificationConstants.MessageLength)
-            .IsRequired();
-
+        builder.Property(x => x.Level).IsRequired();
+        builder.Property(x => x.Message).IsRequired();
         builder.Property(x => x.IsRead).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
         builder.Property(x => x.IsPublished).IsRequired();

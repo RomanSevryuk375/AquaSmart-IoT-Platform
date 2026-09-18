@@ -1,3 +1,5 @@
+// Ignore Spelling: cnumeric Cooldown
+
 namespace BuildingBlocks.Domain.Constants;
 
 public static class CommonConstants

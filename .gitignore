@@ -41,6 +41,7 @@ packages/
 publish/
 
 # ASP.NET Core / local environment
+/docs
 appsettings.Development.json
 appsettings.Local.json
 .env

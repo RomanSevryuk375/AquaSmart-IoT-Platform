@@ -12,7 +12,7 @@ public sealed class EcosystemRepository(NotificationDbContext dbContext)
         (Guid ecosystemId,
         CancellationToken cancellationToken = default)
     {
-        return await Context.Aquariums
+        return await Context.Ecosystems
             .AsNoTracking()
             .AnyAsync(x => x.Id == ecosystemId, cancellationToken);
     }
@@ -21,7 +21,7 @@ public sealed class EcosystemRepository(NotificationDbContext dbContext)
         Guid userId,
         CancellationToken cancellationToken = default)
     {
-        return await Context.Aquariums
+        return await Context.Ecosystems
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
     }

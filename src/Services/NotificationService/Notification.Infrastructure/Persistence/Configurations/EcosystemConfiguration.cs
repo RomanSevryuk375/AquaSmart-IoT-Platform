@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notification.Domain.Entities;
-using Notification.Domain.ValueObjects;
 
 namespace Notification.Infrastructure.Persistence.Configurations;
 
@@ -14,18 +13,10 @@ public sealed class EcosystemConfiguration : IEntityTypeConfiguration<Ecosystem>
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.UserId).IsRequired();
-
-        builder.Property(x => x.EcosystemName)
-            .HasConversion(
-                name => name.Value,
-                dbValue => Name.Create(dbValue).Value)
-            .HasColumnName("name")
-            .HasMaxLength(128)
-            .IsRequired();
-
+        builder.Property(x => x.EcosystemName).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
-
         builder.Property(x => x.Version).IsConcurrencyToken();
+
         builder.HasIndex(x => x.UserId);
 
         builder.HasMany<Domain.Entities.Notification>()

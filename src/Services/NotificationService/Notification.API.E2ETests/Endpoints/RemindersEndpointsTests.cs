@@ -23,7 +23,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
             .Build();
 
         DbContext.Users.Add(user);
-        DbContext.Aquariums.Add(ecosystem);
+        DbContext.Ecosystems.Add(ecosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 
@@ -90,7 +90,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
             .Build();
 
         DbContext.Users.AddRange(hackerUser, ourUser);
-        DbContext.Aquariums.AddRange(hackerEcosystem, ourEcosystem);
+        DbContext.Ecosystems.AddRange(hackerEcosystem, ourEcosystem);
         DbContext.Reminders.AddRange(hackerReminder, ourReminder);
         await DbContext.SaveChangesAsync();
 
@@ -116,7 +116,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         Reminder reminder = new ReminderBuilder().WithUserId(user.Id).WithEcosystemId(ecosystem.Id).Build();
 
         DbContext.Users.Add(user);
-        DbContext.Aquariums.Add(ecosystem);
+        DbContext.Ecosystems.Add(ecosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 
@@ -167,7 +167,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
             .WithId(Guid.NewGuid()).WithUserId(hackerUserId).WithEcosystemId(hackerEcosystem.Id).Build();
 
         DbContext.Users.Add(hackerUser);
-        DbContext.Aquariums.Add(hackerEcosystem);
+        DbContext.Ecosystems.Add(hackerEcosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 
@@ -201,7 +201,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         Ecosystem ecosystem = new EcosystemBuilder().WithUserId(user.Id).Build();
 
         DbContext.Users.Add(user);
-        DbContext.Aquariums.Add(ecosystem);
+        DbContext.Ecosystems.Add(ecosystem);
         await DbContext.SaveChangesAsync();
 
         var command = new CreateReminderCommand
@@ -260,7 +260,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         User ourUser = new UserBuilder().WithId(NotificationTestConstants.UserId).Build();
 
         DbContext.Users.AddRange(hackerUser, ourUser);
-        DbContext.Aquariums.Add(hackerEcosystem);
+        DbContext.Ecosystems.Add(hackerEcosystem);
         await DbContext.SaveChangesAsync();
 
         var command = new CreateReminderCommand
@@ -307,7 +307,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         Reminder reminder = new ReminderBuilder().WithUserId(user.Id).WithEcosystemId(ecosystem.Id).Build();
 
         DbContext.Users.Add(user);
-        DbContext.Aquariums.Add(ecosystem);
+        DbContext.Ecosystems.Add(ecosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 
@@ -385,7 +385,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         User ourUser = new UserBuilder().WithId(NotificationTestConstants.UserId).Build();
 
         DbContext.Users.AddRange(hackerUser, ourUser);
-        DbContext.Aquariums.Add(hackerEcosystem);
+        DbContext.Ecosystems.Add(hackerEcosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 
@@ -434,7 +434,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
             .WithUserId(user.Id).WithEcosystemId(ecosystem.Id).WithIsCompleted(false).Build();
 
         DbContext.Users.Add(user);
-        DbContext.Aquariums.Add(ecosystem);
+        DbContext.Ecosystems.Add(ecosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 
@@ -491,7 +491,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         User ourUser = new UserBuilder().WithId(NotificationTestConstants.UserId).Build();
 
         DbContext.Users.AddRange(hackerUser, ourUser);
-        DbContext.Aquariums.Add(hackerEcosystem);
+        DbContext.Ecosystems.Add(hackerEcosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 
@@ -528,7 +528,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         Reminder reminder = new ReminderBuilder().WithUserId(user.Id).WithEcosystemId(ecosystem.Id).Build();
 
         DbContext.Users.Add(user);
-        DbContext.Aquariums.Add(ecosystem);
+        DbContext.Ecosystems.Add(ecosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 
@@ -581,7 +581,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         User ourUser = new UserBuilder().WithId(NotificationTestConstants.UserId).Build();
 
         DbContext.Users.AddRange(hackerUser, ourUser);
-        DbContext.Aquariums.Add(hackerEcosystem);
+        DbContext.Ecosystems.Add(hackerEcosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 

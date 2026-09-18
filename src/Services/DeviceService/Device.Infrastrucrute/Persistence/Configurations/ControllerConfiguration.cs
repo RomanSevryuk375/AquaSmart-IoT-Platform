@@ -1,6 +1,3 @@
-using BuildingBlocks.Domain.Constants;
-using Device.Domain.ValueObjects;
-
 namespace Device.Infrastructure.Persistence.Configurations;
 
 public sealed class ControllerConfiguration : IEntityTypeConfiguration<Controller>
@@ -11,23 +8,9 @@ public sealed class ControllerConfiguration : IEntityTypeConfiguration<Controlle
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.UserId).IsRequired();
-
-        builder.Property(x => x.MacAddress)
-            .HasConversion(
-                vo => vo.Value,
-                dbVal => MacAddress.Create(dbVal).Value)
-            .HasMaxLength(ControllerConstants.MacAddressLength)
-            .IsRequired();
-
+        builder.Property(x => x.MacAddress).IsRequired();
         builder.Property(x => x.DeviceTokenHash).IsRequired();
-
-        builder.Property(x => x.Name)
-            .HasConversion(
-                vo => vo.Value,
-                dbVal => DeviceName.Create(dbVal).Value)
-            .HasMaxLength(CommonConstants.NameLength)
-            .IsRequired();
-
+        builder.Property(x => x.Name).IsRequired();
         builder.Property(x => x.IsOnline).IsRequired();
         builder.Property(x => x.LastSeenAt).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();

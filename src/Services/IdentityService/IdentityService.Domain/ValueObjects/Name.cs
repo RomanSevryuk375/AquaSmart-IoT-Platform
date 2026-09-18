@@ -7,10 +7,12 @@ public sealed record Name
 {
     public string Value { get; } = string.Empty;
 
-    private Name(string value)
+    internal Name(string value)
     {
         Value = value;
     }
+
+    public static Name Parse(string dbVal) => new(dbVal);
 
     public static Result<Name> Create(string value)
     {

@@ -1,5 +1,4 @@
 using Control.Domain.Entities;
-using Control.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -17,14 +16,7 @@ public sealed class VacationModeConfiguration : IEntityTypeConfiguration<Vacatio
         builder.Property(x => x.IsActive).IsRequired();
         builder.Property(x => x.CalculatedFeed).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
-
-        builder.Property(x => x.DateRange)
-            .HasConversion(
-                dr => dr.ToString(),
-                dbValue => DateRange.Parse(dbValue))
-            .HasColumnName("date_range")
-            .HasMaxLength(128)
-            .IsRequired();
+        builder.Property(x => x.DateRange).IsRequired();
 
         builder.Property(x => x.Version).IsConcurrencyToken();
     }

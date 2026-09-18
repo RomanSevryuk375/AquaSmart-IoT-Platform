@@ -15,9 +15,7 @@ public class TelemetryAggregateEntityConfiguration
 
         builder.Property(x => x.SensorId).IsRequired();
         builder.Property(x => x.PeriodStart).IsRequired();
-        builder.Property(x => x.Period)
-            .HasConversion<int>()
-            .IsRequired();
+        builder.Property(x => x.Period).IsRequired();
 
         builder.ComplexProperty(x => x.Summary, a =>
         {
@@ -31,7 +29,6 @@ public class TelemetryAggregateEntityConfiguration
         builder.Property(x => x.IsAggregated).IsRequired();
 
         builder.HasIndex(x => x.IsAggregated);
-
         builder.HasIndex(t => new
         {
             t.SensorId,

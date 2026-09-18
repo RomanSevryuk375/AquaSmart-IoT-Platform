@@ -1,5 +1,7 @@
 using BuildingBlocks.Infrastructure.Data.Outbox;
+using BuildingBlocks.Infrastructure.Extensions;
 using IdentityService.Domain.Entities;
+using IdentityService.Infrastructure.Persistence.Converters;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +23,7 @@ public sealed class IdentityDbContext(DbContextOptions<IdentityDbContext> option
         base.OnModelCreating(builder);
 
         builder.ApplyConfigurationsFromAssembly(typeof(IdentityDbContext).Assembly);
+        builder.ConfigureOutbox();
 
         foreach (IMutableEntityType entity in builder.Model.GetEntityTypes())
         {
@@ -30,5 +33,12 @@ public sealed class IdentityDbContext(DbContextOptions<IdentityDbContext> option
                 entity.SetTableName(tableName[SubStringSize..].ToLower());
             }
         }
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.AddValueConverters();
+
+        base.ConfigureConventions(configurationBuilder);
     }
 }

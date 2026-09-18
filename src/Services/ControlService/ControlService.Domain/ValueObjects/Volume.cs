@@ -7,10 +7,12 @@ public sealed record Volume
 {
     public double Value { get; }
 
-    private Volume(double value)
+    internal Volume(double value)
     {
         Value = value;
     }
+
+    public static Volume Parse(double dbVal) => new(dbVal);
 
     public static Result<Volume> Create(double value)
     {

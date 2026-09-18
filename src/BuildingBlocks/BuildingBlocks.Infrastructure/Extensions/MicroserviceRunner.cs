@@ -1,15 +1,17 @@
+// Ignore Spelling: Microservice
+
+using BuildingBlocks.Presentation.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using BuildingBlocks.Presentation.Extensions;
 
 namespace BuildingBlocks.Infrastructure.Extensions;
 
 public static class MicroserviceRunner
 {
     public static async Task RunAsync(
-        string appName, 
-        string[] args, 
+        string appName,
+        string[] args,
         Action<WebApplicationBuilder> configureServices,
         Action<WebApplication>? configureApp = null)
     {

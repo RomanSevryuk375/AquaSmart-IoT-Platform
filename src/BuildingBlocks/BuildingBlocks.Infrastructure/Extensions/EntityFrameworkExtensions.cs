@@ -3,7 +3,9 @@
 using BuildingBlocks.Domain.Abstractions;
 using BuildingBlocks.Infrastructure.Data;
 using BuildingBlocks.Infrastructure.Data.Interceptors;
+using BuildingBlocks.Infrastructure.Data.Outbox;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -36,6 +38,33 @@ public static class EntityFrameworkExtensions
         services.AddHostedService<DatabaseMigrationService<TDbContext>>();
 
         return services;
+    }
+
+    public static EntityTypeBuilder<OutboxMessage> ConfigureOutboxMessage(
+        this EntityTypeBuilder<OutboxMessage> builder)
+    {
+        builder.ToTable("outbox_messages");
+
+        builder.HasKey(x => x.Id);
+
+        builder.Property(x => x.Type).IsRequired();
+        builder.Property(x => x.Content)
+            .HasColumnType("jsonb")
+            .IsRequired();
+        builder.Property(x => x.OccurredOnUtc).IsRequired();
+        builder.Property(x => x.ProcessedOnUtc).IsRequired(false);
+        builder.Property(x => x.Error).IsRequired(false);
+
+        builder.HasIndex(x => x.OccurredOnUtc);
+
+        return builder;
+    }
+
+    public static ModelBuilder ConfigureOutbox(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<OutboxMessage>().ConfigureOutboxMessage();
+
+        return modelBuilder;
     }
 }
 

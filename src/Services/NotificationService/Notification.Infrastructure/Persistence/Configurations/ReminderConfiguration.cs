@@ -1,8 +1,6 @@
-using BuildingBlocks.Domain.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notification.Domain.Entities;
-using Notification.Domain.ValueObjects;
 
 namespace Notification.Infrastructure.Persistence.Configurations;
 
@@ -16,15 +14,7 @@ public sealed class ReminderConfiguration : IEntityTypeConfiguration<Reminder>
 
         builder.Property(x => x.UserId).IsRequired();
         builder.Property(x => x.EcosystemId).IsRequired();
-
-        builder.Property(x => x.TaskName)
-            .HasConversion(
-                name => name.Value,
-                dbValue => Name.Create(dbValue).Value)
-            .HasColumnName("task_name")
-            .HasMaxLength(ReminderConstants.NameLength)
-            .IsRequired();
-
+        builder.Property(x => x.TaskName).IsRequired();
         builder.Property(x => x.IntervalDays).IsRequired();
         builder.Property(x => x.NextDueAt).IsRequired();
         builder.Property(x => x.LastNotifiedAt).IsRequired(false);
