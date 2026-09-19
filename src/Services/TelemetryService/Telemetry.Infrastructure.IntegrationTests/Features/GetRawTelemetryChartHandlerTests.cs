@@ -16,7 +16,8 @@ public class GetRawTelemetryChartHandlerTests(IntegrationTestWebAppFactory facto
     public async Task Handle_WhenSensorAndRawTelemetryExist_ReturnsChartDataWithPagination()
     {
         // Arrange
-        Ecosystem ecosystem = new EcosystemBuilder().Build();
+        var userId = Guid.NewGuid();
+        Ecosystem ecosystem = new EcosystemBuilder().WithUserId(userId).Build();
         Sensor sensor = new SensorBuilder()
             .WithEcosystemId(ecosystem.Id)
             .WithName("Raw Temp Sensor")
@@ -60,6 +61,7 @@ public class GetRawTelemetryChartHandlerTests(IntegrationTestWebAppFactory facto
         var query = new GetRawTelemetryChartQuery
         {
             SensorId = sensor.Id,
+            UserId = userId,
             From = baseTime.AddMinutes(-5),
             To = baseTime.AddHours(3),
             Skip = 1,

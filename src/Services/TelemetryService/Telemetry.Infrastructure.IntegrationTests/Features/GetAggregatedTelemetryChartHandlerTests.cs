@@ -17,7 +17,8 @@ public class GetAggregatedTelemetryChartHandlerTests(IntegrationTestWebAppFactor
     public async Task Handle_WhenSensorAndAggregatedDataExist_ReturnsChartDataWithPagination()
     {
         // Arrange
-        Ecosystem ecosystem = new EcosystemBuilder().Build();
+        var userId = Guid.NewGuid();
+        Ecosystem ecosystem = new EcosystemBuilder().WithUserId(userId).Build();
         Sensor sensor = new SensorBuilder()
             .WithEcosystemId(ecosystem.Id)
             .WithName("Agg Temp Sensor")
@@ -61,6 +62,7 @@ public class GetAggregatedTelemetryChartHandlerTests(IntegrationTestWebAppFactor
         var query = new GetAggregatedTelemetryChartQuery
         {
             SensorId = sensor.Id,
+            UserId = userId,
             Period = PeriodType.Hourly,
             From = baseTime.AddMinutes(-30),
             To = baseTime.AddHours(3),

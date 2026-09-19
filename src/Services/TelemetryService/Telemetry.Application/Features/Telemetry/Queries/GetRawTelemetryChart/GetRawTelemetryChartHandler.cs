@@ -9,8 +9,7 @@ using Telemetry.Domain.Entities;
 
 namespace Telemetry.Application.Features.Telemetry.Queries.GetRawTelemetryChart;
 
-internal sealed class GetRawTelemetryChartHandler(
-    ISqlConnectionFactory sqlConnectionFactory)
+internal sealed class GetRawTelemetryChartHandler(ISqlConnectionFactory sqlConnectionFactory)
     : IRequestHandler<GetRawTelemetryChartQuery, Result<TelemetryRawChartResponseDto>>
 {
     private const int DefaultPeriodDays = -1;
@@ -25,9 +24,11 @@ internal sealed class GetRawTelemetryChartHandler(
         using IDbConnection connection = sqlConnectionFactory.CreateConnection();
 
         const string SQL = """
-            SELECT id AS Id, name AS Name, unit AS Unit
-            FROM sensors
-            WHERE id = @SensorId
+            SELECT s.id AS Id, s.name AS Name, s.unit AS Unit
+            FROM sensors s
+            JOIN ecosystems e ON s.ecosystem_id = e.id
+            WHERE s.id = @SensorId
+              AND e.user_id = @UserId
             LIMIT 1;
 
             SELECT 
@@ -45,6 +46,7 @@ internal sealed class GetRawTelemetryChartHandler(
         using SqlMapper.GridReader multi = await connection.QueryMultipleAsync(SQL, new
         {
             request.SensorId,
+            request.UserId,
             From = from,
             To = to,
             request.Take,
