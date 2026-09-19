@@ -1,6 +1,5 @@
 // Ignore Spelling: Mq
 
-using BuildingBlocks.Infrastructure.Data.Interceptors;
 using BuildingBlocks.Infrastructure.Data.Outbox;
 using BuildingBlocks.Infrastructure.Extensions;
 using BuildingBlocks.IntegrationEvents;
@@ -29,7 +28,7 @@ public static class DependencyInjection
                        .AddDapper<TelemetryDbContext>()
                        .AddRepositories()
                        .AddRabbitMq(configuration)
-                       .AddOutboxProcessorQuartzJob<TelemetryDbContext>()
+                       .AddOutboxProcessorQuartzJob<TelemetryDbContext>(configuration)
                        .AddQuartzJob()
                        .AddMySignalR()
                        .AddUserContext()
@@ -38,13 +37,10 @@ public static class DependencyInjection
 
     private static IServiceCollection AddRepositories(this IServiceCollection services)
     {
-        services.AddSingleton<ConvertDomainEventsToOutboxMessagesInterceptor>();
-
         services.AddScoped<IEcosystemRepository, EcosystemRepository>();
         services.AddScoped<ISensorRepository, SensorRepository>();
         services.AddScoped<ITelemetryRawDataRepository, TelemetryRawDataRepository>();
         services.AddScoped<ITelemetryAggregateDataRepository, TelemetryAggregateDataRepository>();
-
 
         services.AddMemoryCache();
         services.AddScoped<DeviceTokenValidator>();

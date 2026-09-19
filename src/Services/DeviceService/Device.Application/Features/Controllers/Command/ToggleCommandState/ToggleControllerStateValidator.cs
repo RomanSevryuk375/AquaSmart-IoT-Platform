@@ -9,8 +9,5 @@ internal sealed class ToggleControllerStateValidator
     {
         RuleFor(x => x.UserId)
             .NotEmpty();
-
-        RuleFor(x => x.UserId)
-            .NotEmpty();
     }
 }

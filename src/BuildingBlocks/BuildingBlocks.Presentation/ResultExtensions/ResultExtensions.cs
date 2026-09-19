@@ -62,6 +62,8 @@ public static class ResultExtensions
             ErrorType.NotFound => controller.NotFound(response),
             ErrorType.Validation => controller.BadRequest(response),
             ErrorType.Conflict => controller.Conflict(response),
+            ErrorType.Forbidden => controller.StatusCode(StatusCodes.Status403Forbidden, response),
+            ErrorType.Unauthorized => controller.StatusCode(StatusCodes.Status401Unauthorized, response),
 
             _ => controller.StatusCode(500, new { error = "InternalError", message = error.Message })
         };
@@ -76,6 +78,9 @@ public static class ResultExtensions
             ErrorType.NotFound => Results.NotFound(response),
             ErrorType.Validation => Results.BadRequest(response),
             ErrorType.Conflict => Results.Conflict(response),
+            ErrorType.Forbidden => Results.Json(response, statusCode: StatusCodes.Status403Forbidden),
+            ErrorType.Unauthorized => Results.Json(response, statusCode: StatusCodes.Status401Unauthorized),
+
             _ => Results.Json(response, statusCode: StatusCodes.Status500InternalServerError)
         };
     }

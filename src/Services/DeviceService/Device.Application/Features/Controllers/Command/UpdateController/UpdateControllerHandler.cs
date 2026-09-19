@@ -25,7 +25,8 @@ internal sealed class UpdateControllerHandler(
         Result? result = controller.Update(request.MacAddress, request.Name);
         if (result.IsSuccess)
         {
-            await cache.RemoveAsync(CacheKeys.Controller(request.UserId, request.ControllerId), token: cancellationToken);
+            await cache.RemoveAsync(CacheKeys.Controller(
+                request.UserId, request.ControllerId), token: cancellationToken);
         }
 
         return result.IsFailure

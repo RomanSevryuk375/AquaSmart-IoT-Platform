@@ -73,6 +73,7 @@ public class RefreshHandlerTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be(ErrorCodes.Identity.TokenReuse);
+        result.Error.Type.Should().Be(ErrorType.Unauthorized);
         result.Error.Message.Should().Be("Token reuse detected. All sessions revoked.");
 
         await _tokenRepoMock.Received(1).DeleteTokensByUserIdAsync(userId, Arg.Any<CancellationToken>());

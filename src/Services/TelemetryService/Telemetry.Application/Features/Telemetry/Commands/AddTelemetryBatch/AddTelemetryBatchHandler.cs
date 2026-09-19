@@ -35,7 +35,7 @@ internal sealed class AddTelemetryBatchHandler(
 
         if (ecosystem.UserId != validationResult.Value.UserId)
         {
-            return Result.Failure(Error.Conflict(ErrorMessages.AccessDenied,
+            return Result.Failure(Error.Forbidden(ErrorMessages.AccessDenied,
                 ErrorMessages.YouDontOwnThisController));
         }
 

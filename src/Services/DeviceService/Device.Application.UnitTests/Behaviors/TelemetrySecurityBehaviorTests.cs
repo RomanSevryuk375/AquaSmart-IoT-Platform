@@ -60,6 +60,7 @@ public class TelemetrySecurityBehaviorTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be("Access.Denied");
+        result.Error.Type.Should().Be(ErrorType.Unauthorized);
         await _nextMock.DidNotReceive().Invoke();
     }
 

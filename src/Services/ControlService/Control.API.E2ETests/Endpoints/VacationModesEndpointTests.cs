@@ -55,7 +55,7 @@ public class VacationModesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task GetAll_TenantIsolation_Returns409Conflict()
+    public async Task GetAll_TenantIsolation_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -75,7 +75,7 @@ public class VacationModesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
             $"{ApiConstants.Routes.VacationModes}?ecosystemId={ecosystem.Id}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -135,7 +135,7 @@ public class VacationModesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task GetById_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task GetById_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -157,7 +157,7 @@ public class VacationModesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
             $"{ApiConstants.Routes.VacationModes}/{vacation.Id}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -253,7 +253,7 @@ public class VacationModesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Create_ForAnotherUserEcosystem_Returns409Conflict()
+    public async Task Create_ForAnotherUserEcosystem_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -277,7 +277,7 @@ public class VacationModesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
             ApiConstants.Routes.VacationModes, command);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -360,7 +360,7 @@ public class VacationModesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Update_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task Update_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -387,7 +387,7 @@ public class VacationModesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
             $"{ApiConstants.Routes.VacationModes}/{vacation.Id}", command);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -449,7 +449,7 @@ public class VacationModesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Toggle_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task Toggle_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -469,7 +469,7 @@ public class VacationModesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
             $"{ApiConstants.Routes.VacationModes}/{vacation.Id}/toggle", null);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -530,7 +530,7 @@ public class VacationModesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Delete_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task Delete_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -550,6 +550,6 @@ public class VacationModesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
             $"{ApiConstants.Routes.VacationModes}/{vacation.Id}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 }

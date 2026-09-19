@@ -116,6 +116,8 @@ func (fw *Firmware) SetStorageKey(key string) error {
 		return errors.New("key cannot be empty")
 	}
 
+	fw.storageKey = key
+
 	return nil
 }
 

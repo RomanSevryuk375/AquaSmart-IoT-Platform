@@ -54,8 +54,12 @@ public static class EntityFrameworkExtensions
         builder.Property(x => x.OccurredOnUtc).IsRequired();
         builder.Property(x => x.ProcessedOnUtc).IsRequired(false);
         builder.Property(x => x.Error).IsRequired(false);
+        builder.Property(x => x.CreatedAt).IsRequired();
+        builder.Property(x => x.RetryCount).HasDefaultValue(0);
+        builder.Property(x => x.NextRetryOnUtc).IsRequired(false);
 
-        builder.HasIndex(x => x.OccurredOnUtc);
+        builder.HasIndex(x => x.OccurredOnUtc)
+            .HasFilter("processed_on_utc IS NULL");
 
         return builder;
     }

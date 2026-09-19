@@ -55,7 +55,7 @@ public class RelaySecurityBehaviorTests
         _relayRepoMock.GetByIdAsync(request.RelayId, Arg.Any<CancellationToken>()).Returns(relay);
 
         _securityServiceMock.EnsureUserOwnsControllerAsync(relay.ControllerId, request.UserId, Arg.Any<CancellationToken>())
-            .Returns(Result.Failure(Error.Conflict("Access.Denied", "Forbidden")));
+            .Returns(Result.Failure(Error.Forbidden("Access.Denied", "Forbidden")));
 
         // Act
         Result result = await _behavior.Handle(request, _nextMock, CancellationToken.None);
@@ -63,6 +63,7 @@ public class RelaySecurityBehaviorTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be("Access.Denied");
+        result.Error.Type.Should().Be(ErrorType.Forbidden);
         await _nextMock.DidNotReceive().Invoke();
     }
 

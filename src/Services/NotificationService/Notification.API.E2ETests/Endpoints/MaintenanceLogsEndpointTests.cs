@@ -268,7 +268,7 @@ public class MaintenanceLogsEndpointTests(E2ETestWebAppFactory factory) : BaseE2
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task AddLogAsync_WhenEcosystemBelongsToAnotherUser_Returns409Conflict()
+    public async Task AddLogAsync_WhenEcosystemBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         var hackerUserId = Guid.NewGuid();
@@ -296,7 +296,7 @@ public class MaintenanceLogsEndpointTests(E2ETestWebAppFactory factory) : BaseE2
         HttpResponseMessage response = await Client.PostAsJsonAsync(ApiConstants.Routes.MaintenanceLogs, command);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]

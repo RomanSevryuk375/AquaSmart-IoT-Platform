@@ -71,6 +71,7 @@ public class LoginHandlerTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be(ErrorCodes.Identity.InvalidCredentials);
+        result.Error.Type.Should().Be(ErrorType.Unauthorized);
         result.Error.Message.Should().Be("Invalid credentials.");
 
         await _tokenRepoMock.DidNotReceive().AddAsync(Arg.Any<RefreshToken>(), Arg.Any<CancellationToken>());
@@ -97,6 +98,7 @@ public class LoginHandlerTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be(ErrorCodes.Identity.InvalidCredentials);
+        result.Error.Type.Should().Be(ErrorType.Unauthorized);
         result.Error.Message.Should().Be("Invalid credentials.");
 
         await _tokenRepoMock.DidNotReceive().AddAsync(Arg.Any<RefreshToken>(), Arg.Any<CancellationToken>());

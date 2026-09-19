@@ -101,7 +101,7 @@ public class EcosystemsEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task GetById_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task GetById_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -117,7 +117,7 @@ public class EcosystemsEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest
             $"{ApiConstants.Routes.Ecosystems}/{ecosystem.Id}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -292,7 +292,7 @@ public class EcosystemsEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Update_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task Update_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -313,7 +313,7 @@ public class EcosystemsEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest
             $"{ApiConstants.Routes.Ecosystems}/{ecosystem.Id}", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -369,7 +369,7 @@ public class EcosystemsEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Delete_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task Delete_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -384,6 +384,6 @@ public class EcosystemsEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest
             $"{ApiConstants.Routes.Ecosystems}/{ecosystem.Id}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 }

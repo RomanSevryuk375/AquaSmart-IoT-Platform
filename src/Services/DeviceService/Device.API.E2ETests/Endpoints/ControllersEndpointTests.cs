@@ -123,7 +123,7 @@ public class ControllersEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETes
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Ping_WithInvalidDeviceToken_Returns404NotFound()
+    public async Task Ping_WithInvalidDeviceToken_Returns401Unauthorized()
     {
         // Arrange
         var hasher = new MyHasher();
@@ -142,7 +142,7 @@ public class ControllersEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETes
         HttpResponseMessage response = await Client.SendAsync(request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
     private record ErrorResponseDummy(int StatusCode, string Message);
