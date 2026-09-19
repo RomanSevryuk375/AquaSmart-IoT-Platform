@@ -7,6 +7,10 @@ await MicroserviceRunner.RunAsync("AquaSmart.DeviceService", args, builder =>
 {
     builder.WebHost.ConfigureKestrel(options =>
     {
+        options.ListenAnyIP(8080, listenOptions =>
+        {
+            listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+        });
         options.ListenAnyIP(50051, listenOptions =>
         {
             listenOptions.Protocols = HttpProtocols.Http2;

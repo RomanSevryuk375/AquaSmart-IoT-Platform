@@ -25,8 +25,9 @@ public sealed class TelemetrySecurityBehavior<TRequest, TResponse>(
 
         if (!myHasher.Verify(request.DeviceToken, existingController.DeviceTokenHash))
         {
-            return BehaviorHelpers.CreateFailedResult<TResponse>(Error.Conflict(
-                ErrorMessages.AccessDenied, ErrorMessages.YouAreNotOwnerOfController));
+            return BehaviorHelpers.CreateFailedResult<TResponse>(Error.Unauthorized(
+                ErrorMessages.AccessDenied, 
+                ErrorMessages.YouAreNotOwnerOfController));
         }
 
         return await next(cancellationToken);

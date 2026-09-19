@@ -57,7 +57,7 @@ public class CommandSecurityBehaviorTests
 
         _securityServiceMock.EnsureDeviceAccessAsync(
             command.ControllerId, request.DeviceToken, Arg.Any<CancellationToken>())
-            .Returns(Result.Failure(Error.Conflict("Access.Denied", "Invalid device token")));
+            .Returns(Result.Failure(Error.Unauthorized("Access.Denied", "Invalid device token")));
 
         // Act
         Result result = await _behavior.Handle(request, _nextMock, CancellationToken.None);
@@ -65,6 +65,7 @@ public class CommandSecurityBehaviorTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be("Access.Denied");
+        result.Error.Type.Should().Be(ErrorType.Unauthorized);
         await _nextMock.DidNotReceive().Invoke();
     }
 

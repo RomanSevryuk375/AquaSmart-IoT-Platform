@@ -249,7 +249,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task CreateReminderAsync_WhenEcosystemBelongsToAnotherUser_Returns409Conflict()
+    public async Task CreateReminderAsync_WhenEcosystemBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         var hackerUserId = Guid.NewGuid();
@@ -274,7 +274,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         HttpResponseMessage response = await Client.PostAsJsonAsync(ApiConstants.Routes.Reminders, command);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -371,7 +371,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task UpdateReminderAsync_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task UpdateReminderAsync_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         var hackerUserId = Guid.NewGuid();
@@ -400,7 +400,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
             $"{ApiConstants.Routes.Reminders}/{reminder.Id}", command);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -477,7 +477,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task CompleteReminderAsync_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task CompleteReminderAsync_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         var hackerUserId = Guid.NewGuid();
@@ -500,7 +500,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
             $"{ApiConstants.Routes.Reminders}/{reminder.Id}/complete", null);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -567,7 +567,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task DeleteReminderAsync_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task DeleteReminderAsync_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         var hackerUserId = Guid.NewGuid();
@@ -589,7 +589,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         HttpResponseMessage response = await Client.DeleteAsync($"{ApiConstants.Routes.Reminders}/{reminder.Id}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]

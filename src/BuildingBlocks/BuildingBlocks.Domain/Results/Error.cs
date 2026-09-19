@@ -8,16 +8,29 @@ public record Error(string Code, string Message, ErrorType Type)
         new(code, message, ErrorType.NotFound);
     public static Error NotFound<T>(string message) =>
         new($"{typeof(T).Name}.NotFound", message, ErrorType.NotFound);
+
     public static Error Validation(string code, string message) =>
         new(code, message, ErrorType.Validation);
     public static Error Validation<T>(string message) =>
         new($"{typeof(T).Name}.Invalid", message, ErrorType.Validation);
+
     public static Error Conflict(string code, string message) =>
         new(code, message, ErrorType.Conflict);
     public static Error Conflict<T>(string message) =>
         new($"{typeof(T).Name}.Conflict", message, ErrorType.Conflict);
+
     public static Error Failure(string code, string message) =>
         new(code, message, ErrorType.Failure);
     public static Error Failure<T>(string message) =>
         new($"{typeof(T).Name}.Failure", message, ErrorType.Failure);
+
+    public static Error Forbidden(string code, string message) =>
+        new(code, message, ErrorType.Forbidden);
+    public static Error Forbidden<T>(string message) =>
+        new($"{typeof(T).Name}.Forbidden", message, ErrorType.Forbidden);
+
+    public static Error Unauthorized(string code, string message) =>
+        new(code, message, ErrorType.Unauthorized);
+    public static Error Unauthorized<T>(string message) =>
+        new($"{typeof(T).Name}.Unauthorized", message, ErrorType.Unauthorized);
 }

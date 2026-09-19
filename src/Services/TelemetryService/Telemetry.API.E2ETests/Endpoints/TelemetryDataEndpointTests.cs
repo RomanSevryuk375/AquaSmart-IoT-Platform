@@ -258,7 +258,7 @@ public class TelemetryDataEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task ReceiveBatchTelemetry_WithInvalidToken_Returns409Conflict()
+    public async Task ReceiveBatchTelemetry_WithInvalidToken_Returns401Unauthorized()
     {
         // Arrange
         IDeviceTokenValidator deviceTokenValidator = Factory.Services.GetRequiredService<IDeviceTokenValidator>();
@@ -268,7 +268,7 @@ public class TelemetryDataEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
                 Arg.Any<string>(),
                 badToken,
                 Arg.Any<CancellationToken>())
-            .Returns(Result<ValidateResponseDto>.Failure(Error.Conflict("Device.InvalidToken", "The token is invalid.")));
+            .Returns(Result<ValidateResponseDto>.Failure(Error.Unauthorized("Device.InvalidToken", "The token is invalid.")));
 
         var payload = new AddTelemetryBatchRequestDto
         {
@@ -291,6 +291,6 @@ public class TelemetryDataEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
         HttpResponseMessage response = await Client.PostAsJsonAsync("api/telemetry/v1/data", payload);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 }

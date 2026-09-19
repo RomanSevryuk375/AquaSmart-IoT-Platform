@@ -5,12 +5,12 @@ using Quartz;
 namespace BuildingBlocks.Infrastructure.Data.Outbox;
 
 [DisallowConcurrentExecution]
-public sealed class OutboxMessageProcessorJob<TDbContext>(OutboxMessageProcessorService<TDbContext> service)
+public sealed class OutboxCleanupJob<TDbContext>(OutboxMessageProcessorService<TDbContext> service)
     : IJob where TDbContext : DbContext
 {
     public async Task Execute(IJobExecutionContext context)
     {
-        Result result = await service.ProcessAsync(context.CancellationToken);
+        Result result = await service.CleanupAsync(context.CancellationToken);
 
         if (result.IsFailure)
         {

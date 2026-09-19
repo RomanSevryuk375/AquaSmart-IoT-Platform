@@ -154,7 +154,7 @@ func (r *PostgresCampaignRepository) Delete(ctx context.Context, rc *entities.Ro
 	}
 
 	queryCamp := `
-		DELETE FROM rollout_targets 
+		DELETE FROM rollout_campaigns 
 		WHERE id = $1;	
 	`
 	if _, err := tx.ExecContext(ctx, queryCamp, rc.ID()); err != nil {

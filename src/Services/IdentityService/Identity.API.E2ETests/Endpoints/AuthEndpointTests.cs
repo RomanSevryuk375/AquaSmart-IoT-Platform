@@ -128,7 +128,7 @@ public class AuthEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(facto
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Login_Conflict_InvalidPassword_ReturnsConflict()
+    public async Task Login_Conflict_InvalidPassword_ReturnsUnauthorized()
     {
         // Arrange
         User user = new UserBuilder()
@@ -148,12 +148,12 @@ public class AuthEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(facto
         HttpResponseMessage response = await Client.PostAsJsonAsync("api/identity/v1/auth/login", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Login_NotFound_EmailDoesNotExist_ReturnsConflict()
+    public async Task Login_NotFound_EmailDoesNotExist_ReturnsUnauthorized()
     {
         // Arrange
         var request = new LoginUserRequestDto
@@ -166,7 +166,7 @@ public class AuthEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(facto
         HttpResponseMessage response = await Client.PostAsJsonAsync("api/identity/v1/auth/login", request);
 
         // Assert
-        response.StatusCode.Should().BeOneOf(HttpStatusCode.Conflict, HttpStatusCode.NotFound);
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
     [Fact]
@@ -216,7 +216,7 @@ public class AuthEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(facto
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Refresh_TokenReuse_ReturnsConflictAndRevokesAllTokens()
+    public async Task Refresh_TokenReuse_ReturnsUnauthorizedAndRevokesAllTokens()
     {
         // Arrange
         User user = new UserBuilder()
@@ -249,7 +249,7 @@ public class AuthEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(facto
             "api/identity/v1/auth/refresh", refreshRequest);
 
         // Assert
-        secondRefreshResponse.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        secondRefreshResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
         string errorContent = await secondRefreshResponse.Content.ReadAsStringAsync();
         errorContent.Should().Contain(ErrorCodes.Identity.TokenReuse);

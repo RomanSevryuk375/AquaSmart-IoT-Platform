@@ -73,7 +73,7 @@ var userId = Guid.NewGuid();
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Handle_WhenReminderBelongsToDifferentUser_ReturnsConflictFailure()
+    public async Task Handle_WhenReminderBelongsToDifferentUser_ReturnsForbiddenFailure()
     {
         // Arrange
         Reminder reminder = new ReminderBuilder().Build();
@@ -95,6 +95,7 @@ var userId = Guid.NewGuid();
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be("Access.Denied");
+        result.Error.Type.Should().Be(ErrorType.Forbidden);
         result.Error.Message.Should().Be("You are not the owner of this reminder.");
     }
 }

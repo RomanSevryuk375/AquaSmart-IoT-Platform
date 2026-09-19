@@ -26,7 +26,7 @@ public static class DependencyInjection
                        .AddDapper<ControlDbContext>()
                        .AddRepositories()
                        .AddRabbitMq(configuration)
-                       .AddOutboxProcessorQuartzJob<ControlDbContext>()
+                       .AddOutboxProcessorQuartzJob<ControlDbContext>(configuration)
                        .AddQuartzJobs()
                        .AddUserContext()
                        .AddCache(configuration);

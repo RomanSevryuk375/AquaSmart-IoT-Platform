@@ -22,7 +22,7 @@ public sealed class LoginHandler(
 
         if (existingUser is null || !await userManager.CheckPasswordAsync(existingUser, request.Password))
         {
-            return Result<LoginResponseDto>.Failure(Error.Conflict(
+            return Result<LoginResponseDto>.Failure(Error.Unauthorized(
                 ErrorCodes.Identity.InvalidCredentials,
                 ErrorMessages.InvalidCredentials));
         }

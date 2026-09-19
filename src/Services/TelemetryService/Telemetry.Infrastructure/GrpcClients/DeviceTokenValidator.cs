@@ -29,7 +29,7 @@ public sealed class DeviceTokenValidator(DeviceIntegrationGrpc.DeviceIntegration
                 request, cancellationToken: cancellationToken);
             if (!response.IsValid)
             {
-                return Result<ValidateResponseDto>.Failure(Error.Conflict(
+                return Result<ValidateResponseDto>.Failure(Error.Unauthorized(
                     ErrorCodes.Security.AccessDenied,
                     ErrorMessages.Security.ControllerInvalid));
             }
@@ -49,8 +49,8 @@ public sealed class DeviceTokenValidator(DeviceIntegrationGrpc.DeviceIntegration
         }
         catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
         {
-            return Result<ValidateResponseDto>.Failure(Error.Conflict(
-                ErrorCodes.Grpc.Conflict,
+            return Result<ValidateResponseDto>.Failure(Error.Unauthorized(
+                ErrorCodes.Security.AccessDenied,
                 ex.Message));
         }
         catch (RpcException ex)

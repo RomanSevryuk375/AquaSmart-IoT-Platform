@@ -21,11 +21,10 @@ public static class DependencyInjection
                        .AddDapper<DeviceDbContext>()
                        .AddRepositories()
                        .AddRabbitMq(configuration)
-                       .AddOutboxProcessorQuartzJob<DeviceDbContext>()
+                       .AddOutboxProcessorQuartzJob<DeviceDbContext>(configuration)
                        .AddQuartzJobs(configuration)
                        .AddUserContext()
                        .AddCache(configuration);
-
     }
 
     private static IServiceCollection AddRepositories(this IServiceCollection services)
