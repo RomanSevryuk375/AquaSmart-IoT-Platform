@@ -35,7 +35,7 @@ func (r *PostgresHardwareProfileRepository) GetById(ctx context.Context, id uuid
 	var dao profileDAO
 	err := r.db.GetContext(ctx, &dao, query, id)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, fmt.Errorf("profile with id: %v", id)
+		return nil, nil
 	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to query profile by id %w not found", err)

@@ -10,8 +10,6 @@ public sealed class SyncRelayStateHandler(IRelayRepository relayRepository)
 {
     public async Task<Result> Handle(SyncRelayStateCommand request, CancellationToken cancellationToken)
     {
-        DateTime expireAt = DateTime.UtcNow.AddMinutes(5);
-
         Relay? existingRelay = await relayRepository.GetByIdAsync(
             request.RelayId, cancellationToken);
         if (existingRelay is null)
@@ -19,6 +17,8 @@ public sealed class SyncRelayStateHandler(IRelayRepository relayRepository)
             return Result.Failure(Error.NotFound<Relay>(
                 $"Relay {request.RelayId} not found. "));
         }
+
+        DateTime expireAt = request.ExpireAt ?? DateTime.UtcNow.AddMinutes(5);
 
         existingRelay.SetState(request.TargetState, expireAt);
 

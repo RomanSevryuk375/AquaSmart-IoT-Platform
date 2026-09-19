@@ -7,7 +7,7 @@ public class LayerTests : BaseArchitectureTest
     {
         TestResult result = Types.InAssembly(DomainAssembly)
             .Should()
-            .NotHaveDependencyOn("Device.Application")
+            .NotHaveDependencyOn("Control.Application")
             .GetResult();
 
         result.IsSuccessful.Should().BeTrue();
@@ -18,7 +18,7 @@ public class LayerTests : BaseArchitectureTest
     {
         TestResult result = Types.InAssembly(DomainAssembly)
             .Should()
-            .NotHaveDependencyOn("Device.Infrastructure")
+            .NotHaveDependencyOn("Control.Infrastructure")
             .GetResult();
 
         result.IsSuccessful.Should().BeTrue();
@@ -29,7 +29,7 @@ public class LayerTests : BaseArchitectureTest
     {
         TestResult result = Types.InAssembly(ApplicationAssembly)
             .Should()
-            .NotHaveDependencyOn("Device.Infrastructure")
+            .NotHaveDependencyOn("Control.Infrastructure")
             .GetResult();
 
         result.IsSuccessful.Should().BeTrue();
@@ -40,7 +40,7 @@ public class LayerTests : BaseArchitectureTest
     {
         TestResult result = Types.InAssembly(ApplicationAssembly)
             .Should()
-            .NotHaveDependencyOn("Device.API")
+            .NotHaveDependencyOn("Control.API")
             .GetResult();
 
         result.IsSuccessful.Should().BeTrue();

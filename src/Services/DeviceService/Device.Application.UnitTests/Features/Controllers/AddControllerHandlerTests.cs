@@ -5,7 +5,7 @@ namespace Device.Application.UnitTests.Features.Controllers;
 
 public class AddControllerHandlerTests
 {
-    private readonly IMyHasher _hasherMock = Substitute.For<IMyHasher>();
+    private readonly IDeviceTokenHasher _hasherMock = Substitute.For<IDeviceTokenHasher>();
     private readonly IControllerRepository _controllerRepoMock = Substitute.For<IControllerRepository>();
     private readonly AddControllerHandler _handler;
 
@@ -21,9 +21,11 @@ public class AddControllerHandlerTests
         // Arrange
         var userId = Guid.NewGuid();
 
-        string expectedHash = "some_generated_hash";
+        string expectedRawToken = "ak_test_raw_token_12345";
+        string expectedHash = "some_generated_hmac_hash";
 
-        _hasherMock.Generate(Arg.Any<string>()).Returns(expectedHash);
+        _hasherMock.GenerateRawToken().Returns(expectedRawToken);
+        _hasherMock.ComputeHash(expectedRawToken).Returns(expectedHash);
 
         var command = new AddControllerCommand
         {
@@ -38,7 +40,7 @@ public class AddControllerHandlerTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.DeviceToken.Should().NotBeNullOrWhiteSpace();
+        result.Value.DeviceToken.Should().Be(expectedRawToken);
         result.Value.ControllerId.Should().NotBeEmpty();
 
         await _controllerRepoMock.Received(1).AddAsync(

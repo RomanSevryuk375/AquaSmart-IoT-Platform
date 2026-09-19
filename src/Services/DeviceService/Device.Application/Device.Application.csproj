@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <Compile Remove="Features\Common\**" />
@@ -17,6 +17,10 @@
     <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.IntegrationEvents\BuildingBlocks.IntegrationEvents.csproj" />
     <ProjectReference Include="..\Device.Domain\Device.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Device.Application.UnitTests" />
   </ItemGroup>
 
 </Project>

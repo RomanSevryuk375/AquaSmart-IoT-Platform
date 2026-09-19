@@ -1,9 +1,11 @@
+// Ignore Spelling: Validator
+
 namespace Device.Application.Features.RelayCommands.Command.ToggleRelayState;
 
-internal sealed class ToggleRelayStateInvalidator
+internal sealed class ToggleRelayStateValidator
     : AbstractValidator<ToggleRelayStateCommand>
 {
-    public ToggleRelayStateInvalidator()
+    public ToggleRelayStateValidator()
     {
         RuleFor(x => x.RelayId)
             .NotEmpty();

@@ -1,6 +1,7 @@
 // Ignore Spelling: Tg
 
 using System.Data;
+using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using BuildingBlocks.Domain.Abstractions;
 using BuildingBlocks.Domain.Constants;
@@ -19,7 +20,7 @@ public sealed class ProcessUnpublishedNoticesHandler(
     private const int BatchSize = 100;
     private const int MaxRetryCount = 5;
 
-    private const string GetInitialNotificationsSql = """
+    private const string SelectBatchSql = """
         SELECT 
             id AS Id, 
             user_id AS UserId, 
@@ -29,19 +30,7 @@ public sealed class ProcessUnpublishedNoticesHandler(
           AND retry_count < @MaxRetryCount
         ORDER BY created_at
         LIMIT @BatchSize
-        """;
-
-    private const string GetSubsequentNotificationsSql = """
-        SELECT 
-            id AS Id, 
-            user_id AS UserId, 
-            message AS Message
-        FROM notifications
-        WHERE is_published = false 
-          AND retry_count < @MaxRetryCount
-          AND id != ALL(@ProcessedIds)
-        ORDER BY created_at
-        LIMIT @BatchSize
+        FOR UPDATE SKIP LOCKED;
         """;
 
     private const string GetUsersSql = """
@@ -53,48 +42,61 @@ public sealed class ProcessUnpublishedNoticesHandler(
             telegram_chat_id AS TelegramChatId, 
             is_notify_enabled AS IsNotifyEnabled
         FROM users
-        WHERE id = ANY(@UserIds)
+        WHERE id = ANY(@UserIds);
         """;
 
     private const string UpdateSuccessSql = """
         UPDATE notifications
         SET is_published = true,
             published_at = @PublishedAt
-        WHERE id = ANY(@Ids)
+        WHERE id = ANY(@Ids);
         """;
 
     private const string UpdateFailureSql = """
         UPDATE notifications
         SET retry_count = retry_count + 1,
             failure_reason = @FailureReason
-        WHERE id = ANY(@Ids)
+        WHERE id = ANY(@Ids);
         """;
 
     public async Task<Result> Handle(ProcessUnpublishedNoticesCommand request, CancellationToken cancellationToken)
     {
         using IDbConnection connection = sqlConnectionFactory.CreateConnection();
-        var processedIds = new HashSet<Guid>();
-
-        while (true)
+        if (connection is DbConnection dbConnection)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            await dbConnection.OpenAsync(cancellationToken);
+        }
+        else
+        {
+            connection.Open();
+        }
 
-            List<UnpublishedNotificationDto> rawNotifications = await FetchNotificationsBatchAsync(connection, processedIds, cancellationToken);
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            using IDbTransaction transaction = connection.BeginTransaction();
+
+            var rawNotifications = (await connection.QueryAsync<UnpublishedNotificationDto>(
+                new CommandDefinition(
+                    SelectBatchSql,
+                    new { BatchSize, MaxRetryCount },
+                    transaction: transaction,
+                    cancellationToken: cancellationToken))).ToList();
+
             if (rawNotifications.Count == 0)
             {
+                transaction.Commit();
                 break;
             }
 
             Guid[] userIds = rawNotifications.Select(n => n.UserId).Distinct().ToArray();
-            Dictionary<Guid, UserNotificationSettingsDto> usersDict = await FetchUsersDictionaryAsync(connection, userIds, cancellationToken);
+            Dictionary<Guid, UserNotificationSettingsDto> usersDict = await FetchUsersDictionaryAsync(
+                connection, userIds, transaction, cancellationToken);
 
-            var successfulNotificationIds = new List<Guid>();
+            var successfulIds = new List<Guid>();
             var failedNotifications = new List<FailedNotificationDto>();
 
             foreach (UnpublishedNotificationDto notification in rawNotifications)
             {
-                processedIds.Add(notification.Id);
-
                 if (!usersDict.TryGetValue(notification.UserId, out UserNotificationSettingsDto? user) || !user.IsNotifyEnabled)
                 {
                     failedNotifications.Add(new FailedNotificationDto(notification.Id, ErrorMessages.NotificationProvider.UserDisabledOrNotFound));
@@ -107,12 +109,21 @@ public sealed class ProcessUnpublishedNoticesHandler(
                     continue;
                 }
 
-                await DispatchNotificationAsync(notification, user, cancellationToken);
-                successfulNotificationIds.Add(notification.Id);
+                try
+                {
+                    await DispatchNotificationAsync(notification, user, cancellationToken);
+                    successfulIds.Add(notification.Id);
+                }
+                catch (Exception ex)
+                {
+                    failedNotifications.Add(new FailedNotificationDto(notification.Id, $"Dispatch error: {ex.Message}"));
+                }
             }
 
-            await MarkNotificationsAsPublishedAsync(connection, successfulNotificationIds, cancellationToken);
-            await MarkNotificationsAsFailedAsync(connection, failedNotifications, cancellationToken);
+            await MarkNotificationsAsPublishedAsync(connection, transaction, successfulIds, cancellationToken);
+            await MarkNotificationsAsFailedAsync(connection, transaction, failedNotifications, cancellationToken);
+
+            transaction.Commit();
 
             if (rawNotifications.Count < BatchSize)
             {
@@ -123,33 +134,17 @@ public sealed class ProcessUnpublishedNoticesHandler(
         return Result.Success();
     }
 
-    private static async Task<List<UnpublishedNotificationDto>> FetchNotificationsBatchAsync(
-        IDbConnection connection,
-        HashSet<Guid> processedIds,
-        CancellationToken cancellationToken)
-    {
-        string sql = processedIds.Count == 0
-            ? GetInitialNotificationsSql
-            : GetSubsequentNotificationsSql;
-
-        IEnumerable<UnpublishedNotificationDto> notifications = await connection.QueryAsync<UnpublishedNotificationDto>(
-            new CommandDefinition(
-                sql,
-                new { BatchSize, MaxRetryCount, ProcessedIds = processedIds.ToArray() },
-                cancellationToken: cancellationToken));
-
-        return notifications.ToList();
-    }
-
     private static async Task<Dictionary<Guid, UserNotificationSettingsDto>> FetchUsersDictionaryAsync(
         IDbConnection connection,
         Guid[] userIds,
+        IDbTransaction transaction,
         CancellationToken cancellationToken)
     {
         IEnumerable<UserNotificationSettingsDto> users = await connection.QueryAsync<UserNotificationSettingsDto>(
             new CommandDefinition(
                 GetUsersSql,
                 new { UserIds = userIds },
+                transaction: transaction,
                 cancellationToken: cancellationToken));
 
         return users.ToDictionary(u => u.Id);
@@ -183,6 +178,7 @@ public sealed class ProcessUnpublishedNoticesHandler(
 
     private static async Task MarkNotificationsAsPublishedAsync(
         IDbConnection connection,
+        IDbTransaction transaction,
         List<Guid> successfulNotificationIds,
         CancellationToken cancellationToken)
     {
@@ -194,11 +190,13 @@ public sealed class ProcessUnpublishedNoticesHandler(
         await connection.ExecuteAsync(new CommandDefinition(
             UpdateSuccessSql,
             new { PublishedAt = DateTime.UtcNow, Ids = successfulNotificationIds.ToArray() },
+            transaction: transaction,
             cancellationToken: cancellationToken));
     }
 
     private static async Task MarkNotificationsAsFailedAsync(
         IDbConnection connection,
+        IDbTransaction transaction,
         List<FailedNotificationDto> failedNotifications,
         CancellationToken cancellationToken)
     {
@@ -212,6 +210,7 @@ public sealed class ProcessUnpublishedNoticesHandler(
             await connection.ExecuteAsync(new CommandDefinition(
                 UpdateFailureSql,
                 new { FailureReason = group.Key, Ids = group.Select(x => x.Id).ToArray() },
+                transaction: transaction,
                 cancellationToken: cancellationToken));
         }
     }

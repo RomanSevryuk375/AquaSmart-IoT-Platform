@@ -21,8 +21,8 @@ func NewHardwareProfile(id uuid.UUID, name string, boardRevision string) (*Hardw
 		return nil, errors.New("name can not be empty")
 	}
 
-	if len(name) >= MaxNameLength {
-		return nil, fmt.Errorf("name should have %c symbols", MaxNameLength)
+	if len(name) > MaxNameLength {
+		return nil, fmt.Errorf("name should have %d symbols", MaxNameLength)
 	}
 
 	if boardRevision == "" {
@@ -51,8 +51,8 @@ func (hp *HardwareProfile) UpdateName(name string) error {
 		return errors.New("name can not be empty")
 	}
 
-	if len(name) >= MaxNameLength {
-		return fmt.Errorf("name should have %c symbols", MaxNameLength)
+	if len(name) > MaxNameLength {
+		return fmt.Errorf("name should have %d symbols", MaxNameLength)
 	}
 
 	hp.name = name

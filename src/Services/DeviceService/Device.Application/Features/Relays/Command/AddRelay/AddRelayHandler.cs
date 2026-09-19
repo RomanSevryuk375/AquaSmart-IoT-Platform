@@ -1,4 +1,3 @@
-using BuildingBlocks.Domain.Abstractions;
 using BuildingBlocks.Domain.Results;
 using MassTransit;
 
@@ -6,7 +5,6 @@ namespace Device.Application.Features.Relays.Command.AddRelay;
 
 internal sealed class AddRelayHandler(
     IRelayRepository relayRepository,
-    IUnitOfWork unitOfWork,
     IMapper mapper) : IRequestHandler<AddRelayCommand, Result<RelayCreatedResponse>>
 {
     public async Task<Result<RelayCreatedResponse>> Handle(
@@ -25,7 +23,6 @@ internal sealed class AddRelayHandler(
         }
 
         await relayRepository.AddAsync(relay.Value, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<RelayCreatedResponse>.Success(
             mapper.Map<RelayCreatedResponse>(relay.Value));

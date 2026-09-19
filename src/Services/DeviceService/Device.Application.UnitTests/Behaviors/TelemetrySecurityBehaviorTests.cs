@@ -9,14 +9,14 @@ public class TelemetrySecurityBehaviorTests
         : IRequest<Result>, IMacAddressTokenBoundRequest;
 
     private readonly IControllerRepository _controllerRepoMock;
-    private readonly IMyHasher _hasherMock;
+    private readonly IDeviceTokenHasher _hasherMock;
     private readonly RequestHandlerDelegate<Result> _nextMock;
     private readonly TelemetrySecurityBehavior<TestTelemetryRequest, Result> _behavior;
 
     public TelemetrySecurityBehaviorTests()
     {
         _controllerRepoMock = Substitute.For<IControllerRepository>();
-        _hasherMock = Substitute.For<IMyHasher>();
+        _hasherMock = Substitute.For<IDeviceTokenHasher>();
         _nextMock = Substitute.For<RequestHandlerDelegate<Result>>();
         _nextMock.Invoke().Returns(Result.Success());
 

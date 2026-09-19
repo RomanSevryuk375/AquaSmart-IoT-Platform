@@ -31,7 +31,7 @@ public class ProcessSchedulesHandlerTests(
         await DbContext.SaveChangesAsync();
         DbContext.ChangeTracker.Clear();
 
-        var command = new ProcessSchedulesCommand();
+        var command = new ProcessSchedulesCommand(DateTime.UtcNow);
 
         // Act
         Result result = await Sender.Send(command);
