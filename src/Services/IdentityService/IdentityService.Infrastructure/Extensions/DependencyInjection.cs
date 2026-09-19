@@ -20,7 +20,7 @@ public static class DependencyInjection
                        .AddDapper<IdentityDbContext>()
                        .AddRepositories()
                        .AddRabbitMq(configuration)
-                       .AddOutboxProcessorQuartzJob<IdentityDbContext>()
+                       .AddOutboxProcessorQuartzJob<IdentityDbContext>(configuration)
                        .AddQuartzJobs()
                        .AddUserContext()
                        .AddCache(configuration);

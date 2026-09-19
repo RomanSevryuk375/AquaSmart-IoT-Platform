@@ -8,7 +8,7 @@ public sealed partial record MacAddress
 {
     public string Value { get; } = string.Empty;
 
-    private MacAddress(string macAddress)
+    internal MacAddress(string macAddress)
     {
         Value = macAddress;
     }
@@ -44,6 +44,8 @@ public sealed partial record MacAddress
         return Result<MacAddress>.Success(
             new MacAddress(cleanMac.ToUpperInvariant()));
     }
+
+    public static MacAddress Parse(string dbVal) => new(dbVal);
 
     [GeneratedRegex(ControllerConstants.MacAddressRegex, RegexOptions.CultureInvariant)]
     private static partial Regex MacAddressRegex();

@@ -8,10 +8,12 @@ public sealed partial record EmailAddress
 {
     public string Value { get; }
 
-    private EmailAddress(string value)
+    internal EmailAddress(string value)
     {
         Value = value;
     }
+
+    public static EmailAddress Parse(string dbVal) => new(dbVal);
 
     public static Result<EmailAddress> Create(string value)
     {

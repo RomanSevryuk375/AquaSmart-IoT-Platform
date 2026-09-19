@@ -22,7 +22,7 @@ public class NotificationEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ET
             .Build();
 
         DbContext.Users.Add(user);
-        DbContext.Aquariums.Add(ecosystem);
+        DbContext.Ecosystems.Add(ecosystem);
         DbContext.Notifications.Add(notification);
         await DbContext.SaveChangesAsync();
 

@@ -12,9 +12,6 @@ internal sealed class UpdateControllerValidator
         RuleFor(x => x.UserId)
             .NotEmpty();
 
-        RuleFor(x => x.UserId)
-            .NotEmpty();
-
         RuleFor(x => x.MacAddress)
            .NotEmpty()
            .Matches(ControllerConstants.MacAddressRegex)

@@ -35,7 +35,7 @@ public sealed class AutomationRuleSecurityBehavior<TRequest, TResponse>(
 
         if (ecosystem.UserId != request.UserId)
         {
-            return BehaviorHelpers.CreateFailedResult<TResponse>(Error.Conflict(
+            return BehaviorHelpers.CreateFailedResult<TResponse>(Error.Forbidden(
                     ErrorCodes.Security.AccessDenied,
                     ErrorMessages.Security.YouAreNotOwnerOfEcosystem));
         }

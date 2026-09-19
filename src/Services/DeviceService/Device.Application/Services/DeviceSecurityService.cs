@@ -23,7 +23,7 @@ public sealed class DeviceSecurityService(
 
         if (controller.UserId != userId)
         {
-            return Result.Failure(Error.Conflict(
+            return Result.Failure(Error.Forbidden(
                 ErrorMessages.AccessDenied,
                 ErrorMessages.YouDontOwnThisController));
         }
@@ -46,7 +46,7 @@ public sealed class DeviceSecurityService(
 
         if (!myHasher.Verify(deviceToken, controller.DeviceTokenHash))
         {
-            return Result.Failure(Error.Conflict(
+            return Result.Failure(Error.Unauthorized(
                 ErrorMessages.AccessDenied,
                 ErrorMessages.InvalidDeviceToken));
         }

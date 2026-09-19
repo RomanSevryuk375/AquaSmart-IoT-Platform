@@ -51,7 +51,7 @@ internal sealed class GetPendingCommandsHandler(ISqlConnectionFactory sqlConnect
                 ORDER BY created_at
                 FOR UPDATE SKIP LOCKED)
             RETURNING
-                id, controller_id, relay_id, targe_state, status,
+                id, controller_id, relay_id, target_state, status,
                 expire_at, attempt_count, processed_at, error_message, created_at;
             """;
 

@@ -22,6 +22,59 @@ namespace IdentityService.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("BuildingBlocks.Infrastructure.Data.Outbox.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("content");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("text")
+                        .HasColumnName("error");
+
+                    b.Property<DateTime?>("NextRetryOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("next_retry_on_utc");
+
+                    b.Property<DateTime>("OccurredOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_on_utc");
+
+                    b.Property<DateTime?>("ProcessedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("processed_on_utc");
+
+                    b.Property<int>("RetryCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("retry_count");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_outbox_messages");
+
+                    b.HasIndex("OccurredOnUtc")
+                        .HasDatabaseName("ix_outbox_messages_occurred_on_utc")
+                        .HasFilter("processed_on_utc IS NULL");
+
+                    b.ToTable("outbox_messages", (string)null);
+                });
+
             modelBuilder.Entity("IdentityService.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -123,7 +176,7 @@ namespace IdentityService.Infrastructure.Migrations
                             Name = "Free",
                             Permissions = "[\"tank:read\",\"tank:create\",\"tank:update\",\"tank:delete\",\"tank:limit:1\",\"device:control\",\"auto:rule:create\",\"auto:rule:limit:5\",\"auto:schedule:create\",\"data:view\",\"notify:log:read\",\"notify:log:write\",\"account:update\",\"account:view\"]",
                             Price = 0m,
-                            Version = new Guid("b9875e1e-44bf-4d8a-aa4a-7ac5ada42a28")
+                            Version = new Guid("fb13f157-0552-4cb5-b00c-d07d866d387c")
                         },
                         new
                         {
@@ -133,7 +186,7 @@ namespace IdentityService.Infrastructure.Migrations
                             Name = "Professional",
                             Permissions = "[\"tank:read\",\"tank:create\",\"tank:update\",\"tank:delete\",\"tank:limit:10\",\"device:control\",\"auto:rule:create\",\"auto:rule:limit:10\",\"auto:schedule:create\",\"data:view\",\"data:history\",\"notify:tg\",\"notify:log:read\",\"notify:log:write\",\"notify:reminder\",\"account:update\",\"account:view\"]",
                             Price = 9.99m,
-                            Version = new Guid("78de41de-286a-4762-b88c-ed659975076a")
+                            Version = new Guid("c7cf844d-991a-4f28-9c0a-da9aaf3a42dc")
                         },
                         new
                         {
@@ -143,7 +196,7 @@ namespace IdentityService.Infrastructure.Migrations
                             Name = "Elite",
                             Permissions = "[\"tank:read\",\"tank:create\",\"tank:update\",\"tank:delete\",\"tank:limit:unlim\",\"device:control\",\"device:manual\",\"auto:rule:create\",\"auto:rule:limit:unlim\",\"auto:schedule:create\",\"auto:vacation\",\"data:view\",\"data:history\",\"data:diag\",\"data:rt\",\"notify:log:read\",\"notify:log:write\",\"notify:reminder\",\"notify:email\",\"notify:tg\"]",
                             Price = 19.99m,
-                            Version = new Guid("1f8c20bc-c96f-4731-8157-f270dcc20c92")
+                            Version = new Guid("4fe111a9-72c4-42dc-8df9-6725cc503be9")
                         });
                 });
 
@@ -254,48 +307,6 @@ namespace IdentityService.Infrastructure.Migrations
                         .HasDatabaseName("ix_users_subscription_id");
 
                     b.ToTable("users", (string)null);
-                });
-
-            modelBuilder.Entity("IdentityService.Infrastructure.Persistence.Outbox.OutboxMessage", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("content");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("Error")
-                        .HasColumnType("text")
-                        .HasColumnName("error");
-
-                    b.Property<DateTime>("OccurredOnUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("occurred_on_utc");
-
-                    b.Property<DateTime?>("ProcessedOnUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("processed_on_utc");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("type");
-
-                    b.HasKey("Id")
-                        .HasName("pk_outbox_messages");
-
-                    b.HasIndex("OccurredOnUtc")
-                        .HasDatabaseName("ix_outbox_messages_occurred_on_utc");
-
-                    b.ToTable("outbox_messages", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>

@@ -35,9 +35,9 @@ public sealed class ReminderSecurityBehavior<TRequest, TResponse>(
 
         if (ownerId != request.UserId)
         {
-            return BehaviorHelpers.CreateFailedResult<TResponse>(
-                Error.Conflict(ErrorCodes.Security.AccessDenied,
-                    ErrorMessages.Security.YouAreNotOwnerOfReminder));
+            return BehaviorHelpers.CreateFailedResult<TResponse>(Error.Forbidden(
+                ErrorCodes.Security.AccessDenied,
+                ErrorMessages.Security.YouAreNotOwnerOfReminder));
         }
 
         return await next(cancellationToken);

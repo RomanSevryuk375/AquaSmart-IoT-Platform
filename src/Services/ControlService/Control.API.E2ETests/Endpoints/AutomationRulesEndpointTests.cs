@@ -53,7 +53,7 @@ public class AutomationRulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task GetAll_TenantIsolation_Returns409Conflict()
+    public async Task GetAll_TenantIsolation_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -73,7 +73,7 @@ public class AutomationRulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2
             $"{ApiConstants.Routes.AutomationRules}?ecosystemId={ecosystem.Id}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public class AutomationRulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task GetById_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task GetById_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -156,7 +156,7 @@ public class AutomationRulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2
             $"{ApiConstants.Routes.AutomationRules}/{rule.Id}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -250,7 +250,7 @@ public class AutomationRulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Create_ForAnotherUserEcosystem_Returns409Conflict()
+    public async Task Create_ForAnotherUserEcosystem_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -276,7 +276,7 @@ public class AutomationRulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2
             ApiConstants.Routes.AutomationRules, request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -395,7 +395,7 @@ public class AutomationRulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Update_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task Update_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -423,7 +423,7 @@ public class AutomationRulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2
             $"{ApiConstants.Routes.AutomationRules}/{rule.Id}", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -483,7 +483,7 @@ public class AutomationRulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Delete_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task Delete_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -503,7 +503,7 @@ public class AutomationRulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2
             $"{ApiConstants.Routes.AutomationRules}/{rule.Id}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -661,7 +661,7 @@ public class AutomationRulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task AddCondition_WhenRuleBelongsToAnotherUser_Returns409Conflict()
+    public async Task AddCondition_WhenRuleBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -694,7 +694,7 @@ public class AutomationRulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2
             $"{ApiConstants.Routes.AutomationRules}/{rule.Id}/conditions", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -791,7 +791,7 @@ public class AutomationRulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task UpdateCondition_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task UpdateCondition_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -830,7 +830,7 @@ public class AutomationRulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2
             $"{ApiConstants.Routes.AutomationRules}/{rule.Id}/conditions/{condition.Id}", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -902,7 +902,7 @@ public class AutomationRulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task DeleteCondition_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task DeleteCondition_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -933,6 +933,6 @@ public class AutomationRulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2
             $"{ApiConstants.Routes.AutomationRules}/{rule.Id}/conditions/{condition.Id}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 }

@@ -17,8 +17,5 @@ internal class AddControllerValidator
         RuleFor(x => x.Name)
             .NotEmpty()
             .MaximumLength(CommonConstants.NameLength);
-
-        RuleFor(x => x.IsOnline)
-            .NotEmpty();
     }
 }

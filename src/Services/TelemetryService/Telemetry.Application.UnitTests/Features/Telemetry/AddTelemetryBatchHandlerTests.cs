@@ -281,7 +281,7 @@ public class AddTelemetryBatchHandlerTests
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Handle_WhenEcosystemUserMismatch_ReturnsAccessDeniedConflict()
+    public async Task Handle_WhenEcosystemUserMismatch_ReturnsAccessDeniedForbidden()
     {
         // Arrange
         var controllerId = Guid.NewGuid();
@@ -312,7 +312,7 @@ public class AddTelemetryBatchHandlerTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be(ErrorCodes.Security.AccessDenied);
-        result.Error.Type.Should().Be(ErrorType.Conflict);
+        result.Error.Type.Should().Be(ErrorType.Forbidden);
     }
 }
 

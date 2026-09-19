@@ -33,5 +33,6 @@ public sealed record CronSchedule
     }
 
     public static CronSchedule Load(string value) => new(value);
+    public static CronSchedule Parse(string value) => Load(value);
     public override string ToString() => Value;
 }

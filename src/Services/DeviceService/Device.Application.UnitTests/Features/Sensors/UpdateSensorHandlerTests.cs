@@ -72,7 +72,7 @@ public class UpdateSensorHandlerTests
 
         _sensorRepoMock.GetByIdAsync(sensor.Id, Arg.Any<CancellationToken>()).Returns(sensor);
 
-        var expectedError = Error.Conflict("Access.Denied", "Forbidden");
+        var expectedError = Error.Forbidden("Access.Denied", "Forbidden");
         _securityServiceMock.EnsureUserOwnsControllerAsync(newControllerId, command.UserId, Arg.Any<CancellationToken>())
             .Returns(Result.Failure(expectedError));
 

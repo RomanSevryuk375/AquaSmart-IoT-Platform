@@ -40,7 +40,7 @@ public sealed class VacationModeSecurityBehavior<TRequest, TResponse>(
 
         if (ownerId != request.UserId)
         {
-            return BehaviorHelpers.CreateFailedResult<TResponse>(Error.Conflict(
+            return BehaviorHelpers.CreateFailedResult<TResponse>(Error.Forbidden(
                 ErrorCodes.Security.AccessDenied,
                 ErrorMessages.Security.YouAreNotOwnerOfVacationMode));
         }

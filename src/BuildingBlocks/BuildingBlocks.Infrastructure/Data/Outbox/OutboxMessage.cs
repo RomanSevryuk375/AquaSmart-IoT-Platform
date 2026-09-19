@@ -10,6 +10,8 @@ public sealed class OutboxMessage : IEntity
     public DateTime OccurredOnUtc { get; set; }
     public DateTime? ProcessedOnUtc { get; set; }
     public string? Error { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public int RetryCount { get; set; }
+    public DateTime? NextRetryOnUtc { get; set; }
 }
 

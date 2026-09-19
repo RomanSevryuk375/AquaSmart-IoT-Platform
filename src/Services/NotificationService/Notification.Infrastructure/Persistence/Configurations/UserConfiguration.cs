@@ -1,8 +1,6 @@
-using BuildingBlocks.Domain.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notification.Domain.Entities;
-using Notification.Domain.ValueObjects;
 
 namespace Notification.Infrastructure.Persistence.Configurations;
 
@@ -14,27 +12,9 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.Email)
-            .HasConversion(
-                email => email.Value,
-                dbValue => EmailAddress.Create(dbValue).Value)
-            .HasMaxLength(UserConstants.EmailLength)
-            .IsRequired();
-
-        builder.Property(x => x.TimeZone)
-            .HasConversion(
-                tz => tz.Value,
-                dbValue => TimeZoneId.Create(dbValue).Value)
-            .HasColumnName("time_zone")
-            .IsRequired();
-
-        builder.Property(x => x.PhoneNumber)
-            .HasConversion(
-                phone => phone.Value,
-                dbValue => PhoneNumber.Create(dbValue).Value)
-            .HasMaxLength(UserConstants.PhoneNumberLength)
-            .IsRequired();
-
+        builder.Property(x => x.Email).IsRequired();
+        builder.Property(x => x.TimeZone).IsRequired();
+        builder.Property(x => x.PhoneNumber).IsRequired();
         builder.Property(x => x.EmailEnable).IsRequired();
         builder.Property(x => x.TgEnable).IsRequired();
         builder.Property(x => x.TelegramChatId).IsRequired(false);

@@ -24,7 +24,8 @@ public sealed class CompleteReminderHandler(
 
         if (reminder.UserId != request.UserId)
         {
-            return Result.Failure(Error.Conflict(ErrorCodes.Security.AccessDenied,
+            return Result.Failure(Error.Forbidden(
+                ErrorCodes.Security.AccessDenied,
                 ErrorMessages.Security.YouAreNotOwnerOfReminder));
         }
 

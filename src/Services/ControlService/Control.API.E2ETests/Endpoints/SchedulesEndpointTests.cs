@@ -62,7 +62,7 @@ public class SchedulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task GetAll_TenantIsolation_Returns409Conflict()
+    public async Task GetAll_TenantIsolation_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -88,7 +88,7 @@ public class SchedulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(
             $"{ApiConstants.Routes.Schedules}?ecosystemId={ecosystem.Id}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -155,7 +155,7 @@ public class SchedulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task GetById_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task GetById_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -184,7 +184,7 @@ public class SchedulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(
             $"{ApiConstants.Routes.Schedules}/{schedule.Id}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -293,7 +293,7 @@ public class SchedulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Create_ForAnotherUserEcosystem_Returns409Conflict()
+    public async Task Create_ForAnotherUserEcosystem_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -323,7 +323,7 @@ public class SchedulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(
             ApiConstants.Routes.Schedules, command);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -416,7 +416,7 @@ public class SchedulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Update_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task Update_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -450,7 +450,7 @@ public class SchedulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(
             $"{ApiConstants.Routes.Schedules}/{schedule.Id}", command);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -524,7 +524,7 @@ public class SchedulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task SetIsActive_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task SetIsActive_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -552,7 +552,7 @@ public class SchedulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(
             $"{ApiConstants.Routes.Schedules}/{schedule.Id}/active", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -619,7 +619,7 @@ public class SchedulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Delete_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task Delete_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         Ecosystem ecosystem = new EcosystemBuilder()
@@ -645,6 +645,6 @@ public class SchedulesEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(
             $"{ApiConstants.Routes.Schedules}/{schedule.Id}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 }

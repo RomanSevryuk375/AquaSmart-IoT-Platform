@@ -6,10 +6,12 @@ public sealed record TimeZoneId
 {
     public string Value { get; }
 
-    private TimeZoneId(string value)
+    internal TimeZoneId(string value)
     {
         Value = value;
     }
+
+    public static TimeZoneId Parse(string dbVal) => new(dbVal);
 
     public static Result<TimeZoneId> Create(string value)
     {

@@ -1,6 +1,4 @@
-using BuildingBlocks.Domain.Constants;
 using Control.Domain.Entities;
-using Control.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -16,16 +14,9 @@ public sealed class AutomationRuleConfiguration : IEntityTypeConfiguration<Autom
 
         builder.Property(x => x.EcosystemId).IsRequired();
         builder.Property(x => x.RelayId).IsRequired();
-
-        builder.Property(x => x.Name)
-            .HasConversion(
-                name => name.Value,
-                dbValue => Name.Create(dbValue).Value)
-            .HasMaxLength(CommonConstants.NameLength)
-            .IsRequired();
-
-        builder.Property(x => x.Operator).HasConversion<int>().IsRequired();
-        builder.Property(x => x.Action).HasConversion<int>().IsRequired();
+        builder.Property(x => x.Name).IsRequired();
+        builder.Property(x => x.Operator).IsRequired();
+        builder.Property(x => x.Action).IsRequired();
         builder.Property(x => x.IsActive).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
 

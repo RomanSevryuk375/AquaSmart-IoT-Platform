@@ -1,4 +1,5 @@
 using BuildingBlocks.Application.Behaviors;
+using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Results;
 using MediatR;
 using Notification.Application.Interfaces;
@@ -26,8 +27,9 @@ public sealed class EcosystemSecurityBehavior<TRequest, TResponse>(
 
         if (ecosystem.UserId != request.UserId)
         {
-            return BehaviorHelpers.CreateFailedResult<TResponse>(Error.Conflict("Access.Denied",
-                    "You are not the owner of this ecosystem"));
+            return BehaviorHelpers.CreateFailedResult<TResponse>(Error.Forbidden(
+                    ErrorCodes.Security.AccessDenied,
+                    ErrorMessages.Security.YouAreNotOwnerOfEcosystem));
         }
 
         return await next(cancellationToken);

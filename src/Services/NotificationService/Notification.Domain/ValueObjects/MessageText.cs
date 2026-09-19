@@ -7,10 +7,12 @@ public sealed record MessageText
 {
     public string Value { get; }
 
-    private MessageText(string value)
+    internal MessageText(string value)
     {
         Value = value;
     }
+
+    public static MessageText Parse(string dbVal) => new(dbVal);
 
     public static Result<MessageText> Create(string value)
     {

@@ -1,5 +1,4 @@
 using System.Text.Json;
-using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Presentation.Authorization;
 using IdentityService.Domain.ValueObjects;
@@ -18,33 +17,30 @@ public sealed class SubscriptionConfiguration : IEntityTypeConfiguration<Domain.
 
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.Name)
-            .HasConversion(
-                name => name.Value,
-                dbValue => Name.Create(dbValue).Value)
-            .HasMaxLength(CommonConstants.NameLength)
-            .IsRequired();
-
-        builder.Property(x => x.Price)
-            .HasConversion(
-                money => money.Amount,
-                dbValue => Money.Create(dbValue).Value)
-            .HasPrecision(18, 2)
-            .IsRequired();
+        builder.Property(x => x.Name).IsRequired();
+        builder.Property(x => x.Price).IsRequired();
 
         builder.Property(x => x.Permissions)
             .HasColumnType("jsonb")
             .HasConversion(
                 v => JsonSerializer.Serialize(v, Options),
                 v => JsonSerializer.Deserialize<List<string>>(v, Options) ?? new List<string>()
-            )
-            .IsRequired();
+            ).IsRequired();
 
         builder.Property(x => x.DurationDays).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
 
         builder.Property(x => x.Version).IsConcurrencyToken();
 
+        builder.AddSubscriptionData();
+    }
+}
+
+internal static class Extensions
+{
+    public static EntityTypeBuilder<Domain.Entities.Subscription> AddSubscriptionData(
+             this EntityTypeBuilder<Domain.Entities.Subscription> builder)
+    {
         builder.HasData(
             new
             {
@@ -134,5 +130,7 @@ public sealed class SubscriptionConfiguration : IEntityTypeConfiguration<Domain.
                 Version = Guid.NewGuid()
             }
         );
+
+        return builder;
     }
 }

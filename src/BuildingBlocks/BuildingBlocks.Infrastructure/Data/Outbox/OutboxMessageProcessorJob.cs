@@ -4,6 +4,7 @@ using Quartz;
 
 namespace BuildingBlocks.Infrastructure.Data.Outbox;
 
+[DisallowConcurrentExecution]
 public sealed class OutboxMessageProcessorJob<TDbContext>(OutboxMessageProcessorService<TDbContext> service)
     : IJob where TDbContext : DbContext
 {

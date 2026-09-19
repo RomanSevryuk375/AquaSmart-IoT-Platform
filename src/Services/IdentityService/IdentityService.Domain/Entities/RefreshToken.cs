@@ -5,6 +5,7 @@ namespace IdentityService.Domain.Entities;
 
 public sealed class RefreshToken : AggregateRoot, IEntity
 {
+    public const int MaxLength = 256;
     private RefreshToken(
         Guid id,
         Guid userId,

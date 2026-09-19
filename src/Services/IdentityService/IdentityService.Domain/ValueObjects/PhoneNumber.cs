@@ -8,10 +8,12 @@ public sealed partial record PhoneNumber
 {
     public string Value { get; }
 
-    private PhoneNumber(string value)
+    internal PhoneNumber(string value)
     {
         Value = value;
     }
+
+    public static PhoneNumber Parse(string dbVal) => new(dbVal);
 
     public static Result<PhoneNumber> Create(string value)
     {

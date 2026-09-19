@@ -22,7 +22,7 @@ public class MaintenanceLogsEndpointTests(E2ETestWebAppFactory factory) : BaseE2
             .Build();
 
         DbContext.Users.Add(user);
-        DbContext.Aquariums.Add(ecosystem);
+        DbContext.Ecosystems.Add(ecosystem);
         DbContext.MaintenanceLogs.Add(log);
         await DbContext.SaveChangesAsync();
 
@@ -96,7 +96,7 @@ public class MaintenanceLogsEndpointTests(E2ETestWebAppFactory factory) : BaseE2
             .Build();
 
         DbContext.Users.AddRange(hackerUser, ourUser);
-        DbContext.Aquariums.AddRange(hackerEcosystem, ourEcosystem);
+        DbContext.Ecosystems.AddRange(hackerEcosystem, ourEcosystem);
         DbContext.MaintenanceLogs.AddRange(hackerLog, ourLog);
         await DbContext.SaveChangesAsync();
 
@@ -125,7 +125,7 @@ public class MaintenanceLogsEndpointTests(E2ETestWebAppFactory factory) : BaseE2
         MaintenanceLog log = new MaintenanceLogBuilder().WithId(logId).WithUserId(user.Id).WithEcosystemId(ecosystem.Id).Build();
 
         DbContext.Users.Add(user);
-        DbContext.Aquariums.Add(ecosystem);
+        DbContext.Ecosystems.Add(ecosystem);
         DbContext.MaintenanceLogs.Add(log);
         await DbContext.SaveChangesAsync();
 
@@ -183,7 +183,7 @@ public class MaintenanceLogsEndpointTests(E2ETestWebAppFactory factory) : BaseE2
             .Build();
 
         DbContext.Users.Add(hackerUser);
-        DbContext.Aquariums.Add(hackerEcosystem);
+        DbContext.Ecosystems.Add(hackerEcosystem);
         DbContext.MaintenanceLogs.Add(log);
         await DbContext.SaveChangesAsync();
 
@@ -218,7 +218,7 @@ public class MaintenanceLogsEndpointTests(E2ETestWebAppFactory factory) : BaseE2
         Ecosystem ecosystem = new EcosystemBuilder().WithUserId(user.Id).Build();
 
         DbContext.Users.Add(user);
-        DbContext.Aquariums.Add(ecosystem);
+        DbContext.Ecosystems.Add(ecosystem);
         await DbContext.SaveChangesAsync();
 
         var command = new CreateMaintenanceLogCommand
@@ -268,7 +268,7 @@ public class MaintenanceLogsEndpointTests(E2ETestWebAppFactory factory) : BaseE2
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task AddLogAsync_WhenEcosystemBelongsToAnotherUser_Returns409Conflict()
+    public async Task AddLogAsync_WhenEcosystemBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         var hackerUserId = Guid.NewGuid();
@@ -282,7 +282,7 @@ public class MaintenanceLogsEndpointTests(E2ETestWebAppFactory factory) : BaseE2
         User ourUser = new UserBuilder().WithId(NotificationTestConstants.UserId).Build();
 
         DbContext.Users.AddRange(hackerUser, ourUser);
-        DbContext.Aquariums.Add(hackerEcosystem);
+        DbContext.Ecosystems.Add(hackerEcosystem);
         await DbContext.SaveChangesAsync();
 
         var command = new CreateMaintenanceLogCommand
@@ -296,7 +296,7 @@ public class MaintenanceLogsEndpointTests(E2ETestWebAppFactory factory) : BaseE2
         HttpResponseMessage response = await Client.PostAsJsonAsync(ApiConstants.Routes.MaintenanceLogs, command);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]

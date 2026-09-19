@@ -35,7 +35,7 @@ public sealed class RefreshHandler(
         if (tokenEntity.IsUsed)
         {
             await refreshTokenRepository.DeleteTokensByUserIdAsync(tokenEntity.UserId, cancellationToken);
-            return Result<LoginResponseDto>.Failure(Error.Conflict(
+            return Result<LoginResponseDto>.Failure(Error.Unauthorized(
                 ErrorCodes.Identity.TokenReuse,
                 ErrorMessages.Identity.TokenReuseDetected));
         }

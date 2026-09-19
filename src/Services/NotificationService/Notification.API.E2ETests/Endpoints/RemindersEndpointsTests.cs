@@ -23,7 +23,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
             .Build();
 
         DbContext.Users.Add(user);
-        DbContext.Aquariums.Add(ecosystem);
+        DbContext.Ecosystems.Add(ecosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 
@@ -90,7 +90,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
             .Build();
 
         DbContext.Users.AddRange(hackerUser, ourUser);
-        DbContext.Aquariums.AddRange(hackerEcosystem, ourEcosystem);
+        DbContext.Ecosystems.AddRange(hackerEcosystem, ourEcosystem);
         DbContext.Reminders.AddRange(hackerReminder, ourReminder);
         await DbContext.SaveChangesAsync();
 
@@ -116,7 +116,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         Reminder reminder = new ReminderBuilder().WithUserId(user.Id).WithEcosystemId(ecosystem.Id).Build();
 
         DbContext.Users.Add(user);
-        DbContext.Aquariums.Add(ecosystem);
+        DbContext.Ecosystems.Add(ecosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 
@@ -167,7 +167,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
             .WithId(Guid.NewGuid()).WithUserId(hackerUserId).WithEcosystemId(hackerEcosystem.Id).Build();
 
         DbContext.Users.Add(hackerUser);
-        DbContext.Aquariums.Add(hackerEcosystem);
+        DbContext.Ecosystems.Add(hackerEcosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 
@@ -201,7 +201,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         Ecosystem ecosystem = new EcosystemBuilder().WithUserId(user.Id).Build();
 
         DbContext.Users.Add(user);
-        DbContext.Aquariums.Add(ecosystem);
+        DbContext.Ecosystems.Add(ecosystem);
         await DbContext.SaveChangesAsync();
 
         var command = new CreateReminderCommand
@@ -249,7 +249,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task CreateReminderAsync_WhenEcosystemBelongsToAnotherUser_Returns409Conflict()
+    public async Task CreateReminderAsync_WhenEcosystemBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         var hackerUserId = Guid.NewGuid();
@@ -260,7 +260,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         User ourUser = new UserBuilder().WithId(NotificationTestConstants.UserId).Build();
 
         DbContext.Users.AddRange(hackerUser, ourUser);
-        DbContext.Aquariums.Add(hackerEcosystem);
+        DbContext.Ecosystems.Add(hackerEcosystem);
         await DbContext.SaveChangesAsync();
 
         var command = new CreateReminderCommand
@@ -274,7 +274,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         HttpResponseMessage response = await Client.PostAsJsonAsync(ApiConstants.Routes.Reminders, command);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -307,7 +307,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         Reminder reminder = new ReminderBuilder().WithUserId(user.Id).WithEcosystemId(ecosystem.Id).Build();
 
         DbContext.Users.Add(user);
-        DbContext.Aquariums.Add(ecosystem);
+        DbContext.Ecosystems.Add(ecosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 
@@ -371,7 +371,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task UpdateReminderAsync_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task UpdateReminderAsync_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         var hackerUserId = Guid.NewGuid();
@@ -385,7 +385,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         User ourUser = new UserBuilder().WithId(NotificationTestConstants.UserId).Build();
 
         DbContext.Users.AddRange(hackerUser, ourUser);
-        DbContext.Aquariums.Add(hackerEcosystem);
+        DbContext.Ecosystems.Add(hackerEcosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 
@@ -400,7 +400,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
             $"{ApiConstants.Routes.Reminders}/{reminder.Id}", command);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -434,7 +434,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
             .WithUserId(user.Id).WithEcosystemId(ecosystem.Id).WithIsCompleted(false).Build();
 
         DbContext.Users.Add(user);
-        DbContext.Aquariums.Add(ecosystem);
+        DbContext.Ecosystems.Add(ecosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 
@@ -477,7 +477,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task CompleteReminderAsync_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task CompleteReminderAsync_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         var hackerUserId = Guid.NewGuid();
@@ -491,7 +491,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         User ourUser = new UserBuilder().WithId(NotificationTestConstants.UserId).Build();
 
         DbContext.Users.AddRange(hackerUser, ourUser);
-        DbContext.Aquariums.Add(hackerEcosystem);
+        DbContext.Ecosystems.Add(hackerEcosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 
@@ -500,7 +500,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
             $"{ApiConstants.Routes.Reminders}/{reminder.Id}/complete", null);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -528,7 +528,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         Reminder reminder = new ReminderBuilder().WithUserId(user.Id).WithEcosystemId(ecosystem.Id).Build();
 
         DbContext.Users.Add(user);
-        DbContext.Aquariums.Add(ecosystem);
+        DbContext.Ecosystems.Add(ecosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 
@@ -567,7 +567,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task DeleteReminderAsync_WhenBelongsToAnotherUser_Returns409Conflict()
+    public async Task DeleteReminderAsync_WhenBelongsToAnotherUser_Returns403Forbidden()
     {
         // Arrange
         var hackerUserId = Guid.NewGuid();
@@ -581,7 +581,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         User ourUser = new UserBuilder().WithId(NotificationTestConstants.UserId).Build();
 
         DbContext.Users.AddRange(hackerUser, ourUser);
-        DbContext.Aquariums.Add(hackerEcosystem);
+        DbContext.Ecosystems.Add(hackerEcosystem);
         DbContext.Reminders.Add(reminder);
         await DbContext.SaveChangesAsync();
 
@@ -589,7 +589,7 @@ public class RemindersEndpointsTests(E2ETestWebAppFactory factory) : BaseE2ETest
         HttpResponseMessage response = await Client.DeleteAsync($"{ApiConstants.Routes.Reminders}/{reminder.Id}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
