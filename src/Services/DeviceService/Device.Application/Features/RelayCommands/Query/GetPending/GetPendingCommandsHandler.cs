@@ -51,8 +51,12 @@ internal sealed class GetPendingCommandsHandler(ISqlConnectionFactory sqlConnect
                 ORDER BY created_at
                 FOR UPDATE SKIP LOCKED)
             RETURNING
-                id, controller_id, relay_id, target_state, status,
-                expire_at, attempt_count, processed_at, error_message, created_at;
+                id, controller_id, relay_id, 
+                CASE WHEN target_state
+                  THEN 1
+                  ELSE 2
+                END AS action,
+                status, expire_at, attempt_count, processed_at, error_message, created_at;
             """;
 
         IEnumerable<RelayCommandDto> commands = await connection.QueryAsync<RelayCommandDto>(PopSql, new

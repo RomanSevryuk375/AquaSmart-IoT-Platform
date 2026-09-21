@@ -19,6 +19,14 @@ public sealed class CompressorHelper(
         PeriodType periodType,
         CancellationToken cancellationToken = default)
     {
+        AggregateTelemetry? existing = await telemetryAggregate.GetBySensorAndPeriodAsync(
+            sensorId, periodType, from, cancellationToken);
+        if (existing is not null)
+        {
+            existing.UpdateSummary(summary);
+            return;
+        }
+
         Sensor? sensor = await sensorRepository.GetByIdAsync(sensorId, cancellationToken);
         if (sensor is null)
         {

@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using BuildingBlocks.Domain.Constants;
 
 namespace BuildingBlocks.Domain.Results;
@@ -8,6 +9,7 @@ public class Result
     public bool IsFailure => !IsSuccess;
     public Error Error { get; }
 
+    [JsonConstructor]
     protected Result(bool isSuccess, Error error)
     {
         if (ErrorInvalid(isSuccess, error))
@@ -36,6 +38,7 @@ public class Result<T> : Result
         ? _value!
         : throw new InvalidOperationException(ResultErrors.ResultIsFailure);
 
+    [JsonConstructor]
     private Result(T? value, bool isSuccess, Error error) : base(isSuccess, error)
     {
         _value = value;

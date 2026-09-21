@@ -11,29 +11,42 @@ public sealed class CompressToDaysHandler(
     ITelemetryAggregateDataRepository telemetryAggregate,
     ICompressorHelper compressorHelper) : IRequestHandler<CompressToDaysCommand, Result>
 {
-    private const int DailyInterval = -24;
+    private const int MaxBatchDays = 14;
+
     public async Task<Result> Handle(CompressToDaysCommand request, CancellationToken cancellationToken)
     {
-        var to = new DateTime(
+        var ceilingUtc = new DateTime(
             DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day,
             0, 0, 0, DateTimeKind.Utc);
-        DateTime from = to.AddHours(DailyInterval);
 
-        IReadOnlyDictionary<Guid, TelemetrySummary> data = await telemetryAggregate.GetSummaryForPeriodAsync(
-            PeriodType.Hourly, from, to, cancellationToken);
-        if (data.Count == 0)
+        IReadOnlyList<DateTime> windows = await telemetryAggregate.GetUnaggregatedWindowsAsync(
+            PeriodType.Hourly, "day", ceilingUtc, MaxBatchDays, cancellationToken);
+
+        if (windows.Count == 0)
         {
             return Result.Success();
         }
 
-        foreach (KeyValuePair<Guid, TelemetrySummary> kvp in data)
+        foreach (DateTime windowStart in windows)
         {
-            await compressorHelper.CreateAndSaveAggregatedTelemetryAsync(
-                kvp.Key, kvp.Value, from, PeriodType.Daily, cancellationToken);
-        }
+            DateTime windowEnd = windowStart.AddDays(1);
 
-        var sensorIds = data.Keys.ToList();
-        await telemetryAggregate.MarkAsAggregatedAsync(sensorIds, from, to, cancellationToken);
+            IReadOnlyDictionary<Guid, TelemetrySummary> data = await telemetryAggregate.GetSummaryForPeriodAsync(
+                PeriodType.Hourly, windowStart, windowEnd, cancellationToken);
+
+            if (data.Count > 0)
+            {
+                foreach (KeyValuePair<Guid, TelemetrySummary> kvp in data)
+                {
+                    await compressorHelper.CreateAndSaveAggregatedTelemetryAsync(
+                        kvp.Key, kvp.Value, windowStart, PeriodType.Daily, cancellationToken);
+                }
+
+                var sensorIds = data.Keys.ToList();
+                await telemetryAggregate.MarkAsAggregatedAsync(
+                    sensorIds, PeriodType.Hourly, windowStart, windowEnd, cancellationToken);
+            }
+        }
 
         return Result.Success();
     }

@@ -3,7 +3,6 @@ using BuildingBlocks.Domain.Results;
 using BuildingBlocks.Infrastructure.Data.Outbox;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using Telemetry.Application.Features.BackgroundJobs.Commands.CompressToMinutes;
 using Telemetry.Domain.Entities;
 using Telemetry.Domain.Events;
@@ -55,10 +54,18 @@ public class CompressToMinutesHandlerTests(IntegrationTestWebAppFactory factory)
             .WithEcosystemId(ecosystem.Id)
             .WithValue(50.0)
             .WithExternalMessageId("raw_msg_outside")
-            .WithRecordedAt(from.AddMinutes(-1))
+            .WithRecordedAt(from.AddMinutes(-1).AddSeconds(20))
             .Build();
 
-        DbContext.TelemetryRawData.AddRange(raw1, raw2, outsideRaw);
+        RawTelemetry activeRaw = new RawTelemetryBuilder()
+            .WithSensorId(sensor.Id)
+            .WithEcosystemId(ecosystem.Id)
+            .WithValue(40.0)
+            .WithExternalMessageId("raw_msg_active_minute")
+            .WithRecordedAt(to.AddSeconds(15))
+            .Build();
+
+        DbContext.TelemetryRawData.AddRange(raw1, raw2, outsideRaw, activeRaw);
         await DbContext.SaveChangesAsync();
         DbContext.ChangeTracker.Clear();
 
@@ -70,6 +77,7 @@ public class CompressToMinutesHandlerTests(IntegrationTestWebAppFactory factory)
         // Assert
         result.IsSuccess.Should().BeTrue();
 
+        // Check aggregate for current window [from, to)
         AggregateTelemetry? aggregate = await DbContext.TelemetryAggregateData
             .AsNoTracking()
             .FirstOrDefaultAsync(a => a.SensorId == sensor.Id && a.Period == PeriodType.Minute && a.PeriodStart == from);
@@ -80,37 +88,37 @@ public class CompressToMinutesHandlerTests(IntegrationTestWebAppFactory factory)
         aggregate.Summary.AvgValue.Should().Be(25.0);
         aggregate.Summary.Count.Should().Be(2);
 
-        List<RawTelemetry> processedRawData = await DbContext.TelemetryRawData
+        // Check aggregate for buffered offline window [from - 1 min, from)
+        DateTime outsideFrom = from.AddMinutes(-1);
+        AggregateTelemetry? outsideAggregate = await DbContext.TelemetryAggregateData
             .AsNoTracking()
-            .Where(r => r.SensorId == sensor.Id && r.ExternalMessageId != "raw_msg_outside")
+            .FirstOrDefaultAsync(a => a.SensorId == sensor.Id && a.Period == PeriodType.Minute && a.PeriodStart == outsideFrom);
+
+        outsideAggregate.Should().NotBeNull();
+        outsideAggregate!.Summary.MinValue.Should().Be(50.0);
+        outsideAggregate.Summary.MaxValue.Should().Be(50.0);
+        outsideAggregate.Summary.AvgValue.Should().Be(50.0);
+        outsideAggregate.Summary.Count.Should().Be(1);
+
+        // Both completed minutes (including buffered offline) should now be marked as aggregated
+        List<RawTelemetry> completedRawData = await DbContext.TelemetryRawData
+            .AsNoTracking()
+            .Where(r => r.SensorId == sensor.Id && r.ExternalMessageId != "raw_msg_active_minute")
             .ToListAsync();
 
-        processedRawData.Should().HaveCount(2);
-        processedRawData.Should().AllSatisfy(r => r.IsAggregated.Should().BeTrue());
+        completedRawData.Should().HaveCount(3);
+        completedRawData.Should().AllSatisfy(r => r.IsAggregated.Should().BeTrue());
 
-        RawTelemetry? unprocessedRaw = await DbContext.TelemetryRawData
+        // The active minute raw telemetry must NOT be aggregated yet
+        RawTelemetry? activeMinuteRaw = await DbContext.TelemetryRawData
             .AsNoTracking()
-            .FirstOrDefaultAsync(r => r.ExternalMessageId == "raw_msg_outside");
+            .FirstOrDefaultAsync(r => r.ExternalMessageId == "raw_msg_active_minute");
 
-        unprocessedRaw.Should().NotBeNull();
-        unprocessedRaw!.IsAggregated.Should().BeFalse();
+        activeMinuteRaw.Should().NotBeNull();
+        activeMinuteRaw!.IsAggregated.Should().BeFalse();
 
         List<OutboxMessage> outboxMessages = await DbContext.OutboxMessages.AsNoTracking().ToListAsync();
-        outboxMessages.Should().ContainSingle();
-        OutboxMessage outboxMessage = outboxMessages.Single();
-        outboxMessage.Type.Should().Contain(nameof(AggregatedTelemetryAddedDomainEvent));
-
-        AggregatedTelemetryAddedDomainEvent? deserializedEvent = JsonConvert
-            .DeserializeObject<AggregatedTelemetryAddedDomainEvent>(
-            outboxMessage.Content,
-            new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
-
-        deserializedEvent.Should().NotBeNull();
-        deserializedEvent!.SensorId.Should().Be(sensor.Id);
-        deserializedEvent.EcosystemId.Should().Be(ecosystem.Id);
-        deserializedEvent.Period.Should().Be(PeriodType.Minute);
-        deserializedEvent.MinValue.Should().Be(20.0);
-        deserializedEvent.MaxValue.Should().Be(30.0);
-        deserializedEvent.AvgValue.Should().Be(25.0);
+        outboxMessages.Should().HaveCount(2);
+        outboxMessages.Should().AllSatisfy(m => m.Type.Should().Contain(nameof(AggregatedTelemetryAddedDomainEvent)));
     }
 }

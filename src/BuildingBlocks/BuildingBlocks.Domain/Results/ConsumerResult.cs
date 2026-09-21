@@ -1,5 +1,7 @@
 // Ignore Spelling: Retryable
 
+using System.Text.Json.Serialization;
+
 namespace BuildingBlocks.Domain.Results;
 
 public class ConsumerResult
@@ -8,6 +10,7 @@ public class ConsumerResult
     public string? Error { get; }
     public bool IsRetryable { get; }
 
+    [JsonConstructor]
     protected ConsumerResult(bool success, string? error, bool retryable)
     {
         IsSuccess = success;

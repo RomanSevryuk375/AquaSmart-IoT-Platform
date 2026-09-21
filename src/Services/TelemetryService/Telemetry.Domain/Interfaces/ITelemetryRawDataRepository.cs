@@ -15,6 +15,11 @@ public interface ITelemetryRawDataRepository : IRepository<RawTelemetry>
             DateTime to,
             CancellationToken cancellationToken = default);
 
+    public Task<IReadOnlyList<DateTime>> GetUnaggregatedMinuteWindowsAsync(
+        DateTime maxCeilingUtc,
+        int limit,
+        CancellationToken cancellationToken = default);
+
     public Task MarkAsAggregatedAsync(
         List<Guid> sensorIds,
         DateTime from,

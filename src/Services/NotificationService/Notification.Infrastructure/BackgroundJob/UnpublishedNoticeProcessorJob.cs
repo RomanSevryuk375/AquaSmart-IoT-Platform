@@ -5,6 +5,7 @@ using Quartz;
 
 namespace Notification.Infrastructure.BackgroundJob;
 
+[DisallowConcurrentExecution]
 public sealed class UnpublishedNoticeProcessorJob(ISender sender) : IJob
 {
     public async Task Execute(IJobExecutionContext context)

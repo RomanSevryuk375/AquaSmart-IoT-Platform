@@ -41,7 +41,7 @@ public static class RuleOperatorFactory
             return false;
         }
 
-        if (results.Exists(r => r is true))
+        if (results.TrueForAll(r => r is true))
         {
             return true;
         }
@@ -56,7 +56,7 @@ public static class RuleOperatorFactory
             return true;
         }
 
-        if (results.Exists(r => r is false))
+        if (results.TrueForAll(r => r is false))
         {
             return false;
         }

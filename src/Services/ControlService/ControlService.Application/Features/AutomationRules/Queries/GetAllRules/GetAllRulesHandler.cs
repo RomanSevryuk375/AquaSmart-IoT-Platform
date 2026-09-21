@@ -65,7 +65,7 @@ public sealed class GetAllRulesHandler(ISqlConnectionFactory sqlConnectionFactor
             """;
 
         IEnumerable<RuleConditionFlat> conditionsFlat = await connection.QueryAsync<RuleConditionFlat>(
-            ConditionsSql, new { ruleIds });
+            ConditionsSql, new { ruleIds = ruleIds.ToArray() });
 
         var conditionsByRuleId = conditionsFlat
             .GroupBy(c => c.AutomationRuleId)

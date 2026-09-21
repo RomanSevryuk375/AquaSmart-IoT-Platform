@@ -36,17 +36,65 @@ public sealed class TelemetryAggregateDataRepository(TelemetryDbContext dbContex
             x => TelemetrySummary.Create(x.MinValue, x.AvgValue, x.MaxValue, x.Count).Value);
     }
 
+    public async Task<AggregateTelemetry?> GetBySensorAndPeriodAsync(
+        Guid sensorId,
+        PeriodType period,
+        DateTime periodStart,
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.TelemetryAggregateData
+            .FirstOrDefaultAsync(
+                x => x.SensorId == sensorId &&
+                     x.Period == period &&
+                     x.PeriodStart == periodStart,
+                cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<DateTime>> GetUnaggregatedWindowsAsync(
+        PeriodType sourcePeriod,
+        string dateTruncPart,
+        DateTime maxCeilingUtc,
+        int limit,
+        CancellationToken cancellationToken = default)
+    {
+        string part = dateTruncPart.ToLowerInvariant() switch
+        {
+            "hour" => "hour",
+            "day" => "day",
+            _ => "hour"
+        };
+
+        string sql = $$"""
+            SELECT DISTINCT date_trunc('{{part}}', period_start) AS "Value"
+            FROM telemetry_aggregate_data
+            WHERE period = {0}
+              AND is_aggregated = false
+              AND period_start < {1}
+            ORDER BY "Value" ASC
+            LIMIT {2}
+            """;
+
+        return await Context.Database.SqlQueryRaw<DateTime>(
+            sql,
+            (int)sourcePeriod,
+            maxCeilingUtc,
+            limit)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task MarkAsAggregatedAsync(
         List<Guid> sensorIds,
+        PeriodType period,
         DateTime from,
         DateTime to,
         CancellationToken cancellationToken = default)
     {
         await Context.TelemetryAggregateData
-            .Where(x => sensorIds.Contains(
-                        x.SensorId) &&
-                        x.CreatedAt >= from &&
-                        x.CreatedAt < to)
+            .Where(x => sensorIds.Contains(x.SensorId) &&
+                        x.Period == period &&
+                        x.PeriodStart >= from &&
+                        x.PeriodStart < to &&
+                        !x.IsAggregated)
             .ExecuteUpdateAsync(x => x.SetProperty(p => p.IsAggregated, true), cancellationToken);
     }
 }
