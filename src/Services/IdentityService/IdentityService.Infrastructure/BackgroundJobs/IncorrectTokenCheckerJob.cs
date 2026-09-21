@@ -5,6 +5,7 @@ using Quartz;
 
 namespace IdentityService.Infrastructure.BackgroundJobs;
 
+[DisallowConcurrentExecution]
 public class IncorrectTokenCheckerJob(
     ISender sender) : IJob
 {

@@ -193,7 +193,7 @@ public class UserTests
     }
 
     [Fact]
-    public void SetSubscription_WhenCalled_UpdatesSubscriptionFieldsAndChangesConcurrencyStamp()
+    public void SetSubscription_WhenCalled_UpdatesSubscriptionFieldsRaisesDowngradedEventAndChangesConcurrencyStamp()
     {
         // Arrange
         User user = new UserBuilder().Build();
@@ -209,6 +209,13 @@ public class UserTests
         user.SubscriptionId.Should().Be(newSubId);
         user.SubscriptionEndDate.Should().BeCloseTo(DateTime.UtcNow.AddDays(durationDays), tolerance);
         user.ConcurrencyStamp.Should().NotBe(initialStamp);
-        user.DomainEvents.Should().BeEmpty();
+
+        user.DomainEvents.Should().ContainSingle()
+            .Which.Should().BeOfType<SubscriptionDowngradedDomainEvent>();
+
+        SubscriptionDowngradedDomainEvent domainEvent = user.DomainEvents.OfType<SubscriptionDowngradedDomainEvent>().Single();
+        domainEvent.UserId.Should().Be(user.Id);
+        domainEvent.NewSubscriptionId.Should().Be(newSubId);
+        domainEvent.OccurredOn.Should().BeCloseTo(DateTime.UtcNow, tolerance);
     }
 }

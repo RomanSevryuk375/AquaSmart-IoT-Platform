@@ -126,6 +126,12 @@ public sealed class User : IdentityUser<Guid>, IEntity, IHasDomainEvents
         SubscriptionId = subscriptionId;
         SubscriptionEndDate = DateTime.UtcNow.AddDays(durationDays);
 
+        RaiseEvent(new SubscriptionDowngradedDomainEvent
+        {
+            UserId = Id,
+            NewSubscriptionId = subscriptionId,
+        });
+
         IncrementVersion();
     }
 

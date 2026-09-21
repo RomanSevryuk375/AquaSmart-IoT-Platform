@@ -114,6 +114,10 @@ public sealed class Controller : AggregateRoot, IEntity
     public void RecordPing()
     {
         LastSeenAt = DateTime.UtcNow;
+        if (!IsOnline)
+        {
+            IsOnline = true;
+        }
 
         IncrementVersion();
     }

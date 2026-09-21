@@ -1,4 +1,3 @@
-using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Presentation.Constants;
 using Device.Application.Features.Sensors.Command.AddSensor;
@@ -28,8 +27,7 @@ public class SensorsEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(fa
             Name = "Water Temp Sensor",
             ConnectionProtocol = ConnectionProtocol.OneWire,
             ConnectionAddress = "28FF4A1B2C3D4E5F",
-            Type = SensorType.Temperature,
-            Unit = "°C"
+            Type = SensorType.Temperature
         };
 
         // Act
@@ -64,8 +62,7 @@ public class SensorsEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETest(fa
             Name = "Test",
             ConnectionProtocol = ConnectionProtocol.I2C,
             ConnectionAddress = "invalid_hex",
-            Type = SensorType.Temperature,
-            Unit = UnitConstants.Celsius
+            Type = SensorType.Temperature
         };
 
         // Act

@@ -36,5 +36,9 @@ public sealed class RelayProfile : Profile
         CreateMap<RelayUpdatedDomainEvent, RelayUpdatedEvent>();
 
         CreateMap<ChangeRelayStateEvent, SetRelayStateCommand>();
+
+        CreateMap<SetRelayPowerSensorDomainEvent, SetRelayPowerSensorEvent>();
+
+        CreateMap<RemoveRelayPowerSensorDomainEvent, RemoveRelayPowerSensorEvent>();
     }
 }

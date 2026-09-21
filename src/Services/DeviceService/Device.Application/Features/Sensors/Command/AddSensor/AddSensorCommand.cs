@@ -13,5 +13,4 @@ public sealed record AddSensorCommand
     public ConnectionProtocol ConnectionProtocol { get; init; }
     public string ConnectionAddress { get; init; } = string.Empty;
     public SensorType Type { get; init; }
-    public string Unit { get; init; } = string.Empty;
 }

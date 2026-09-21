@@ -254,8 +254,7 @@ public class ValidatorsTests
             Name = "Water Temp",
             ConnectionProtocol = ConnectionProtocol.I2C,
             ConnectionAddress = TestConstants.ValidI2cAddress,
-            Type = SensorType.Temperature,
-            Unit = "C"
+            Type = SensorType.Temperature
         };
         validator.Validate(valid).IsValid.Should().BeTrue();
 

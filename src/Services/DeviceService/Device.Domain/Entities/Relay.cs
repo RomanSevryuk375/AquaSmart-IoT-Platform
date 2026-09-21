@@ -143,7 +143,7 @@ public sealed class Relay : AggregateRoot, IEntity
     }
 
     public Result SetName(
-        Guid userId, 
+        Guid userId,
         string rawName)
     {
         Result<DeviceName> nameResult = DeviceName.Create(rawName);
@@ -183,6 +183,29 @@ public sealed class Relay : AggregateRoot, IEntity
         PowerSensorId = sensor.Id;
 
         RaiseEvent(new SetRelayPowerSensorDomainEvent
+        {
+            RelayId = Id,
+            PowerSensorId = sensor.Id,
+            UserId = userId,
+        });
+
+        IncrementVersion();
+
+        return Result.Success();
+    }
+
+    public Result RemovePowerSensor(Sensor sensor, Guid userId)
+    {
+        if (PowerSensorId != sensor.Id)
+        {
+            return Result.Failure(Error.Conflict<Relay>(
+                $"Specified sensor {sensor.Id} is not assigned " +
+                $"as the power sensor for this relay {Id}."));
+        }
+
+        PowerSensorId = null;
+
+        RaiseEvent(new RemoveRelayPowerSensorDomainEvent
         {
             RelayId = Id,
             PowerSensorId = sensor.Id,
@@ -236,9 +259,9 @@ public sealed class Relay : AggregateRoot, IEntity
 
     public void MarkAsDeleted(Guid userId)
     {
-        RaiseEvent(new RelayDeletedDomainEvent 
-        { 
-            RelayId = Id, 
+        RaiseEvent(new RelayDeletedDomainEvent
+        {
+            RelayId = Id,
             UserId = userId
         });
     }
