@@ -48,7 +48,7 @@ public class SensorCommandHandlersTests
         {
             ControllerId = TestConstants.ControllerId,
             UserId = TestConstants.UserId,
-            Name = "", // Invalid: empty name
+            Name = "", 
             ConnectionProtocol = ConnectionProtocol.OneWire,
             ConnectionAddress = "28-000000000001",
             Type = SensorType.Temperature

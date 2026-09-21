@@ -29,8 +29,8 @@ public sealed class GetPendingCommandsEndpoint : IEndpoint
         })
         .WithTags("Relay Commands")
         .Produces<IReadOnlyList<RelayCommandDto>>()
+        .Produces(StatusCodes.Status401Unauthorized)
         .Produces(StatusCodes.Status404NotFound)
-        .Produces(StatusCodes.Status409Conflict)
         .AllowAnonymous();
     }
 }

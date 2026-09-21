@@ -81,6 +81,6 @@ public class DateRangeTests
         string str = dateRange.ToString();
 
         // Assert
-        str.Should().Be($"{start}_{end}");
+        str.Should().Be($"{start:O}_{end:O}");
     }
 }

@@ -4,6 +4,7 @@ using BuildingBlocks.Presentation.Endpoints;
 using BuildingBlocks.Presentation.ResultExtensions;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Features.Auth.Commands.Refresh;
+using IdentityService.Application.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +18,7 @@ public sealed class RefreshEndpoint : IEndpoint
             [FromBody] RefreshTokenRequestDto? request,
             ISender sender,
             HttpContext context,
+            ICookieHelpers cookieHelpers,
             CancellationToken cancellationToken) =>
         {
             string? refreshToken = request?.RefreshToken;
@@ -35,7 +37,7 @@ public sealed class RefreshEndpoint : IEndpoint
 
             if (result.IsSuccess)
             {
-                CookieHelpers.AppendAuthCookies(context, result.Value);
+                cookieHelpers.AppendAuthCookies(context, result.Value);
             }
 
             return result.ToIResult();
@@ -43,7 +45,8 @@ public sealed class RefreshEndpoint : IEndpoint
         .WithTags("Auth")
         .Produces<LoginResponseDto>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status400BadRequest)
-        .Produces(StatusCodes.Status409Conflict)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Produces(StatusCodes.Status404NotFound)
         .AllowAnonymous();
     }
 }

@@ -6,7 +6,10 @@ public sealed class GetNotificationByIdValidator : AbstractValidator<GetNotifica
 {
     public GetNotificationByIdValidator()
     {
-        RuleFor(x => x.NotificationId).NotEmpty();
-        RuleFor(x => x.UserId).NotEmpty();
+        RuleFor(x => x.NotificationId)
+            .NotEmpty();
+
+        RuleFor(x => x.UserId)
+            .NotEmpty();
     }
 }

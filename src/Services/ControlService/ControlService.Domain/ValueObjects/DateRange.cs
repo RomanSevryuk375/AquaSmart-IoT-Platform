@@ -1,3 +1,4 @@
+using System.Globalization;
 using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Results;
 
@@ -28,11 +29,11 @@ public sealed record DateRange
     public static DateRange Parse(string dbValue)
     {
         string[] parts = dbValue.Split("_", 2);
-        var start = Convert.ToDateTime(parts[0]);
-        var end = Convert.ToDateTime(parts[1]);
+        var start = Convert.ToDateTime(parts[0], CultureInfo.InvariantCulture);
+        var end = Convert.ToDateTime(parts[1], CultureInfo.InvariantCulture);
 
         return Create(start, end).Value;
     }
 
-    public override string ToString() => $"{StartDate}_{EndDate}";
+    public override string ToString() => $"{StartDate:O}_{EndDate:O}";
 }

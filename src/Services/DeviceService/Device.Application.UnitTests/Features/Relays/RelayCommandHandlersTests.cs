@@ -60,7 +60,7 @@ public class RelayCommandHandlersTests
         {
             ControllerId = TestConstants.ControllerId,
             UserId = TestConstants.UserId,
-            Name = "", // Invalid: empty name
+            Name = "", 
             ConnectionProtocol = ConnectionProtocol.Digital,
             ConnectionAddress = TestConstants.ValidDigitalAddress
         };

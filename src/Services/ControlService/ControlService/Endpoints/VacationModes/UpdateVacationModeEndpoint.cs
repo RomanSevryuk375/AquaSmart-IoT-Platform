@@ -26,8 +26,8 @@ public sealed class UpdateVacationModeEndpoint : IEndpoint
         .WithTags("Vacation Modes")
         .Produces(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status403Forbidden)
         .Produces(StatusCodes.Status404NotFound)
-        .Produces(StatusCodes.Status409Conflict)
         .RequireAuthorization(SubPermissions.VacationMode);
     }
 }

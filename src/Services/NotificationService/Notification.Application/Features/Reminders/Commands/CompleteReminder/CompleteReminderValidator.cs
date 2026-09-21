@@ -6,6 +6,7 @@ public sealed class CompleteReminderValidator : AbstractValidator<CompleteRemind
 {
     public CompleteReminderValidator()
     {
-        RuleFor(x => x.ReminderId).NotEmpty();
+        RuleFor(x => x.ReminderId)
+            .NotEmpty();
     }
 }

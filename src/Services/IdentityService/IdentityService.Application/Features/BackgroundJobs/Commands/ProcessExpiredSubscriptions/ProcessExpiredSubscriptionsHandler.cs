@@ -8,7 +8,7 @@ using MediatR;
 
 namespace IdentityService.Application.Features.BackgroundJobs.Commands.ProcessExpiredSubscriptions;
 
-internal sealed class ProcessExpiredSubscriptionsHandler(
+public sealed class ProcessExpiredSubscriptionsHandler(
     IUserRepository userRepository,
     IPublishEndpoint publishEndpoint) : IRequestHandler<ProcessExpiredSubscriptionsCommand, Result>
 {
@@ -19,8 +19,7 @@ internal sealed class ProcessExpiredSubscriptionsHandler(
 
         foreach (User user in users)
         {
-            user.SetSubscription(Guid
-                .Parse(SubscriptionType.Free), SubscriptionType.FreeDuration);
+            user.SetSubscription(Guid.Parse(SubscriptionType.Free), SubscriptionType.FreeDuration);
 
             eventsToPublish.Add(new SubscriptionDowngradedEvent
             {

@@ -29,8 +29,8 @@ public sealed class PingControllerEndpoint : IEndpoint
         })
         .WithTags("Controllers")
         .Produces<ControllerPingResponse>()
+        .Produces(StatusCodes.Status401Unauthorized)
         .Produces(StatusCodes.Status404NotFound)
-        .Produces(StatusCodes.Status409Conflict)
         .AllowAnonymous();
     }
 }

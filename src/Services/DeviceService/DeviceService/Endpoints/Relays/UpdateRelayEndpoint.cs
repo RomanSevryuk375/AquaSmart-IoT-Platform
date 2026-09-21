@@ -29,8 +29,8 @@ public sealed class UpdateRelayEndpoint : IEndpoint
         .WithTags("Relays")
         .Produces(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status403Forbidden)
         .Produces(StatusCodes.Status404NotFound)
-        .Produces(StatusCodes.Status409Conflict)
         .RequireAuthorization(SubPermissions.DeviceControl);
     }
 }

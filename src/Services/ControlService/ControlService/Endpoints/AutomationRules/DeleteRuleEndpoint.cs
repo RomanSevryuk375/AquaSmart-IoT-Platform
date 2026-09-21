@@ -28,8 +28,8 @@ public sealed class DeleteRuleEndpoint : IEndpoint
         })
         .WithTags("Automation Rules")
         .Produces(StatusCodes.Status204NoContent)
+        .Produces(StatusCodes.Status403Forbidden)
         .Produces(StatusCodes.Status404NotFound)
-        .Produces(StatusCodes.Status409Conflict)
         .RequireAuthorization(SubPermissions.AutoRuleCreate);
     }
 }

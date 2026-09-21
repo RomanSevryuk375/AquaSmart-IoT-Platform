@@ -193,8 +193,7 @@ func (r *PostgresCampaignRepository) Save(ctx context.Context, campaign *entitie
 		ON CONFLICT (id) DO UPDATE SET
 			name = EXCLUDED.name,
 			status = EXCLUDED.status,
-			cancel_reason = EXCLUDED.cancel_reason,
-			name = EXCLUDED.name
+			cancel_reason = EXCLUDED.cancel_reason
 	`
 	if _, err := tx.NamedExecContext(ctx, queryCamp, cDAO); err != nil {
 		return fmt.Errorf("failed to upsert campaign: %w", err)

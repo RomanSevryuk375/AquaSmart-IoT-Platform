@@ -1,3 +1,4 @@
+using System.Data;
 using System.Data.Common;
 using BuildingBlocks.Domain.Abstractions;
 using BuildingBlocks.Domain.Results;
@@ -12,14 +13,15 @@ namespace Notification.Application.UnitTests.Features.BackgroundJobs.Commands.Pr
 public class ProcessUnpublishedNoticesHandlerTests
 {
     private readonly ISqlConnectionFactory _sqlConnectionFactoryMock = Substitute.For<ISqlConnectionFactory>();
-    private readonly DbConnection _dbConnectionMock = Substitute.For<DbConnection>();
     private readonly DbCommand _dbCommandMock = Substitute.For<DbCommand>();
+    private readonly TestDbTransaction _dbTransaction = new();
+    private readonly TestDbConnection _dbConnection;
     private readonly IPublishEndpoint _publishEndpointMock = Substitute.For<IPublishEndpoint>();
 
     public ProcessUnpublishedNoticesHandlerTests()
     {
-        _sqlConnectionFactoryMock.CreateConnection().Returns(_dbConnectionMock);
-        _dbConnectionMock.CreateCommand().Returns(_dbCommandMock);
+        _dbConnection = new TestDbConnection(_dbCommandMock, _dbTransaction);
+        _sqlConnectionFactoryMock.CreateConnection().Returns(_dbConnection);
         DbParameterCollection dbParameterCollectionMock = Substitute.For<DbParameterCollection>();
         DbParameter dbParameterMock = Substitute.For<DbParameter>();
         _dbCommandMock.Parameters.Returns(dbParameterCollectionMock);
@@ -28,10 +30,7 @@ public class ProcessUnpublishedNoticesHandlerTests
         _dbCommandMock.ExecuteNonQueryAsync(Arg.Any<CancellationToken>()).Returns(Task.FromResult(0));
     }
 
-    private ProcessUnpublishedNoticesHandler CreateHandler()
-    {
-        return new ProcessUnpublishedNoticesHandler(_sqlConnectionFactoryMock, _publishEndpointMock);
-    }
+    private ProcessUnpublishedNoticesHandler CreateHandler() => new ProcessUnpublishedNoticesHandler(_sqlConnectionFactoryMock, _publishEndpointMock);
 
     private void SetupQueryResults(
         List<(Guid Id, Guid UserId, string Message)> notifications,
@@ -46,7 +45,7 @@ public class ProcessUnpublishedNoticesHandlerTests
                 if (callCount == 1)
                 {
                     // First query: Notifications
-                    var columns = new[] { "Id", "UserId", "Message" };
+                    string[] columns = new[] { "Id", "UserId", "Message" };
                     var types = new[] { typeof(Guid), typeof(Guid), typeof(string) };
                     var rows = notifications.Select(n => new object?[] { n.Id, n.UserId, n.Message }).ToList();
                     return Task.FromResult<DbDataReader>(new TestDataReader(columns, types, rows));
@@ -54,7 +53,7 @@ public class ProcessUnpublishedNoticesHandlerTests
                 if (callCount == 2)
                 {
                     // Second query: Users
-                    var columns = new[] { "Id", "Email", "EmailEnable", "TgEnable", "TelegramChatId", "IsNotifyEnabled" };
+                    string[] columns = new[] { "Id", "Email", "EmailEnable", "TgEnable", "TelegramChatId", "IsNotifyEnabled" };
                     var types = new[] { typeof(Guid), typeof(string), typeof(bool), typeof(bool), typeof(long?), typeof(bool) };
                     var rows = users.Select(u => new object?[] { u.Id, u.Email, u.EmailEnable, u.TgEnable, u.TelegramChatId, u.IsNotifyEnabled }).ToList();
                     return Task.FromResult<DbDataReader>(new TestDataReader(columns, types, rows));
@@ -86,7 +85,7 @@ public class ProcessUnpublishedNoticesHandlerTests
         // Arrange
         var userId = Guid.NewGuid();
         var notificationId = Guid.NewGuid();
-        var message = "Test Message";
+        string message = "Test Message";
 
         SetupQueryResults(
             [(notificationId, userId, message)],
@@ -122,7 +121,7 @@ public class ProcessUnpublishedNoticesHandlerTests
         // Arrange
         var userId = Guid.NewGuid();
         var notificationId = Guid.NewGuid();
-        var message = "Test Message";
+        string message = "Test Message";
 
         SetupQueryResults(
             [(notificationId, userId, message)],
@@ -153,7 +152,7 @@ public class ProcessUnpublishedNoticesHandlerTests
         // Arrange
         var userId = Guid.NewGuid();
         var notificationId = Guid.NewGuid();
-        var message = "Test Message";
+        string message = "Test Message";
 
         SetupQueryResults(
             [(notificationId, userId, message)],
@@ -254,10 +253,7 @@ public class ProcessUnpublishedNoticesHandlerTests
             return _currentIndex < rows.Count;
         }
 
-        public override Task<bool> ReadAsync(CancellationToken cancellationToken)
-        {
-            return Task.FromResult(Read());
-        }
+        public override Task<bool> ReadAsync(CancellationToken cancellationToken) => Task.FromResult(Read());
 
         public override bool NextResult() => false;
         public override long GetBytes(int ordinal, long dataOffset, byte[]? buffer, int bufferOffset, int length) => 0;
@@ -290,13 +286,47 @@ public class ProcessUnpublishedNoticesHandlerTests
         public override int GetValues(object[] values)
         {
             int count = Math.Min(values.Length, FieldCount);
-            for (int i = 0; i < count; i++) values[i] = GetValue(i);
+            for (int i = 0; i < count; i++)
+            {
+                values[i] = GetValue(i);
+            }
+
             return count;
         }
         public override object this[int ordinal] => GetValue(ordinal);
         public override object this[string name] => GetValue(GetOrdinal(name));
         public override System.Collections.IEnumerator GetEnumerator() => throw new NotImplementedException();
         public override int Depth => 0;
+    }
+
+    private sealed class TestDbTransaction : DbTransaction
+    {
+        public override IsolationLevel IsolationLevel => IsolationLevel.ReadCommitted;
+        protected override DbConnection? DbConnection => null;
+        public int CommitCount { get; private set; }
+        public int RollbackCount { get; private set; }
+        public override void Commit() => CommitCount++;
+        public override void Rollback() => RollbackCount++;
+    }
+
+    private sealed class TestDbConnection(DbCommand command, DbTransaction? transaction = null) : DbConnection
+    {
+        private readonly DbTransaction _transaction = transaction ?? new TestDbTransaction();
+
+        [System.Diagnostics.CodeAnalysis.AllowNull]
+        public override string ConnectionString { get; set; } = string.Empty;
+        public override string Database => "TestDb";
+        public override ConnectionState State => ConnectionState.Open;
+        public override string DataSource => "TestServer";
+        public override string ServerVersion => "1.0";
+
+        public override void ChangeDatabase(string databaseName) { }
+        public override void Close() { }
+        public override void Open() { }
+        public override Task OpenAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        protected override DbCommand CreateDbCommand() => command;
+        protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel) => _transaction;
     }
 }
 
