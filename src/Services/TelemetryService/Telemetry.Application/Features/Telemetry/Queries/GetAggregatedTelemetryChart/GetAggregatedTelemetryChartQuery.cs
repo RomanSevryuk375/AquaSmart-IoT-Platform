@@ -9,6 +9,7 @@ public sealed record GetAggregatedTelemetryChartQuery
     : IQuery<Result<TelemetryChartResponseDto>>
 {
     public Guid SensorId { get; init; }
+    public Guid UserId { get; init; }
     public PeriodType? Period { get; init; }
     public DateTime? From { get; init; }
     public DateTime? To { get; init; }

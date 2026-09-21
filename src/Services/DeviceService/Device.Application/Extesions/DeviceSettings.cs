@@ -8,4 +8,5 @@ public sealed record DeviceSettings
     public int CommandTtlMinutes { get; init; } = 15;
     public int DefaultSendIntervalMs { get; init; } = 5000;
     public int MaxConfigBatchSize { get; init; } = 50;
+    public string TokenHmacSecret { get; init; } = string.Empty;
 }

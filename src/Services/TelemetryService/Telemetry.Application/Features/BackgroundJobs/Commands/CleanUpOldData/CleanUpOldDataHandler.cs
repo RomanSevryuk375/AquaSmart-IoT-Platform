@@ -74,7 +74,7 @@ public sealed class CleanUpOldDataHandler(
                 SELECT id
                 FROM telemetry_aggregate_data
                 WHERE created_at < @OlderThan
-                  AND is_aggregated = false
+                  AND is_aggregated = true
                   AND period = @Period
                 LIMIT @BatchSize
             )

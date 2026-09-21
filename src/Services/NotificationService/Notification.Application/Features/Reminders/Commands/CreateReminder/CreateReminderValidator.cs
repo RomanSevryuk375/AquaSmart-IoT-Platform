@@ -12,6 +12,7 @@ public sealed class CreateReminderValidator
     {
         RuleFor(x => x.UserId)
             .NotEmpty();
+
         RuleFor(x => x.EcosystemId)
             .NotEmpty();
 

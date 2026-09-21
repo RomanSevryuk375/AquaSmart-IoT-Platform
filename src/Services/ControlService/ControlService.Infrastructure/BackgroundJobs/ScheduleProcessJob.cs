@@ -5,11 +5,14 @@ using Quartz;
 
 namespace Control.Infrastructure.BackgroundJobs;
 
+[DisallowConcurrentExecution]
 public sealed class ScheduleProcessJob(ISender sender) : IJob
 {
     public async Task Execute(IJobExecutionContext context)
     {
-        Result result = await sender.Send(new ProcessSchedulesCommand(), context.CancellationToken);
+        DateTime fireTime = (context.ScheduledFireTimeUtc ?? context.FireTimeUtc).UtcDateTime;
+
+        Result result = await sender.Send(new ProcessSchedulesCommand(fireTime), context.CancellationToken);
         if (result.IsFailure)
         {
             throw new JobExecutionException(result.Error.Message);

@@ -76,7 +76,7 @@ public static class DependencyInjection
             opts.AddTrigger(triggerOpts => triggerOpts
                 .ForJob(jobKey)
                 .WithIdentity($"{jobKey}-trigger")
-                .WithSimpleSchedule(x => x.WithIntervalInSeconds(60).RepeatForever()));
+                .WithCronSchedule("0 * * * * ?"));
         });
 
         return services;

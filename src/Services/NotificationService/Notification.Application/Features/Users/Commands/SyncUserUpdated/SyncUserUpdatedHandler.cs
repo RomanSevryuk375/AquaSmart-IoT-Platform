@@ -1,6 +1,7 @@
 using AutoMapper;
 using BuildingBlocks.Domain.Results;
 using MediatR;
+using Notification.Application.Features.Users.Commands.SyncUserCreated;
 using Notification.Domain.Entities;
 using Notification.Domain.Interfaces;
 
@@ -13,19 +14,14 @@ public sealed class SyncUserUpdatedHandler(
     public async Task<Result> Handle(SyncUserUpdatedCommand request, CancellationToken cancellationToken)
     {
         User? currentUser = await userRepository.GetByIdAsync(request.UserId, cancellationToken);
-
         if (currentUser is null)
         {
-            SyncUserUpdatedCommand command = mapper.Map<SyncUserUpdatedCommand>(request);
-            Result result = await sender.Send(command, cancellationToken);
-            if (result.IsFailure)
-            {
-                return Result.Failure(result.Error);
-            }
+            SyncUserCreatedCommand createCommand = mapper.Map<SyncUserCreatedCommand>(request);
+            return await sender.Send(createCommand, cancellationToken);
         }
 
-        Result? updateResult = currentUser!.UpdateContacts(request.Email, request.PhoneNumber);
-        if (updateResult is not null)
+        Result updateResult = currentUser.UpdateContacts(request.Email, request.PhoneNumber);
+        if (updateResult.IsFailure)
         {
             return Result.Failure(updateResult.Error);
         }

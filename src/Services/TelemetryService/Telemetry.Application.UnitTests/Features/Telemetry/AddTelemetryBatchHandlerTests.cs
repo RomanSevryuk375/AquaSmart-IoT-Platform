@@ -264,7 +264,7 @@ public class AddTelemetryBatchHandlerTests
             }
         };
 
-        var error = Error.Conflict("Device.InvalidToken", "The token is invalid.");
+        var error = Error.Unauthorized("Device.InvalidToken", "The token is invalid.");
         _deviceTokenValidatorMock.ValidateAsync(command.MacAddress, command.DeviceToken, Arg.Any<CancellationToken>())
             .Returns(Result<ValidateResponseDto>.Failure(error));
 

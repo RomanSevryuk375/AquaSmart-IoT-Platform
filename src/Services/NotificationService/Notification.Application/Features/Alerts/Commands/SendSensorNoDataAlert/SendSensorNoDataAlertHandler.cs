@@ -17,24 +17,26 @@ public sealed class SendSensorNoDataAlertHandler(
 {
     public async Task<Result> Handle(SendSensorNoDataAlertCommand request, CancellationToken cancellationToken)
     {
-        bool existingUser = await userRepository.ExistsAsync(
-            request.UserId, cancellationToken);
+        bool existingUser = await userRepository.ExistsAsync(request.UserId, cancellationToken);
         if (!existingUser)
         {
             return Result.Failure(Error.NotFound<User>(
                 $"User {request.UserId} not found"));
         }
 
-        Ecosystem? existingEcosystem = await ecosystemRepository.GetByUserIdAsync(
-            request.UserId, cancellationToken);
+        Ecosystem? existingEcosystem = await ecosystemRepository.GetByIdAsync(
+            request.EcosystemId, cancellationToken);
         if (existingEcosystem is null)
         {
             return Result.Failure(Error.NotFound<Ecosystem>(
-                $"Ecosystem {request.UserId} not found"));
+                $"Ecosystem {request.EcosystemId} not found"));
         }
 
         Result<DeviceMetadataDto> enrichedMetadataResult = await metadataEnricher.EnrichAsync(
-            null, request.SensorId, null, cancellationToken);
+            controllerId: null,
+            request.SensorId,
+            relayId: null,
+            cancellationToken);
         if (enrichedMetadataResult.IsFailure)
         {
             return Result.Failure(enrichedMetadataResult.Error);
@@ -47,7 +49,6 @@ public sealed class SendSensorNoDataAlertHandler(
             rawMessage: $"Sensor {sensorName} " +
             $"from aquarium {existingEcosystem.EcosystemName} did not send data " +
             $"at time {request.LastSeenAt:HH:mm:ss}");
-
         if (notificationResult.IsFailure)
         {
             return Result.Failure(notificationResult.Error);

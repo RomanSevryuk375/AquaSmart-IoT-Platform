@@ -17,20 +17,19 @@ public sealed class ProcessSchedulesHandler(
     {
         IReadOnlyList<Schedule> schedules = await scheduleRepository.GetActiveSchedules(cancellationToken);
 
-        if (schedules == null || !schedules.Any())
+        if (!schedules.Any())
         {
             return Result.Success();
         }
 
         var roundedTime = new DateTime(
-            DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day,
-            DateTime.UtcNow.Hour, DateTime.UtcNow.Minute, 0, DateTimeKind.Utc);
+            request.ScheduledFireTime.Year, request.ScheduledFireTime.Month, request.ScheduledFireTime.Day,
+            request.ScheduledFireTime.Hour, request.ScheduledFireTime.Minute, 0, DateTimeKind.Utc);
 
         var triggeredSchedules = schedules.Where(s =>
         {
             var cron = CronExpression.Parse(s.CronExpression.ToString(), CronFormat.Standard);
             DateTime? nextOccurrence = cron.GetNextOccurrence(roundedTime.AddTicks(-1));
-
             return nextOccurrence == roundedTime;
         }).ToList();
 

@@ -6,6 +6,7 @@ public sealed class DeleteReminderValidator : AbstractValidator<DeleteReminderCo
 {
     public DeleteReminderValidator()
     {
-        RuleFor(x => x.ReminderId).NotEmpty();
+        RuleFor(x => x.ReminderId)
+            .NotEmpty();
     }
 }

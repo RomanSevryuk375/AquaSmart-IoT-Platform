@@ -4,6 +4,7 @@ using BuildingBlocks.Presentation.Constants;
 using BuildingBlocks.Presentation.Endpoints;
 using BuildingBlocks.Presentation.ResultExtensions;
 using IdentityService.Application.Features.Auth.Commands.Logout;
+using IdentityService.Application.Interfaces;
 using MediatR;
 
 namespace IdentityService.API.Endpoints.Auth;
@@ -16,13 +17,14 @@ public sealed class LogoutEndpoint : IEndpoint
             ISender sender,
             IUserContext userContext,
             HttpContext context,
+            ICookieHelpers cookieHelpers,
             CancellationToken cancellationToken) =>
         {
             var command = new LogoutCommand { UserId = userContext.UserId };
 
             Result result = await sender.Send(command, cancellationToken);
 
-            CookieHelpers.ClearAuthCookies(context);
+            cookieHelpers.ClearAuthCookies(context);
 
             return result.ToIResult();
         })

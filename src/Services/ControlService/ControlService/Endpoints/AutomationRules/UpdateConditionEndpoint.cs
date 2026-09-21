@@ -36,8 +36,8 @@ public sealed class UpdateConditionEndpoint : IEndpoint
         .WithTags("Automation Rules Conditions")
         .Produces(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status403Forbidden)
         .Produces(StatusCodes.Status404NotFound)
-        .Produces(StatusCodes.Status409Conflict)
         .RequireAuthorization(SubPermissions.AutoRuleCreate);
     }
 }

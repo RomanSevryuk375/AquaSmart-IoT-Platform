@@ -12,7 +12,7 @@ namespace Device.Application.Features.Controllers.Query.GetControllerConfig;
 public sealed class GetControllerConfigHandler(
     ISqlConnectionFactory sqlConnectionFactory,
     IOptions<DeviceSettings> deviceOptions,
-    IMyHasher myHasher)
+    IDeviceTokenHasher tokenHasher)
     : IRequestHandler<GetControllerConfigQuery, Result<ControllerConfig>>
 {
     public async Task<Result<ControllerConfig>> Handle(
@@ -50,7 +50,7 @@ public sealed class GetControllerConfigHandler(
 
         ControllerAuthInfo? controllerAuth = await multi.ReadSingleOrDefaultAsync<ControllerAuthInfo>();
         if (controllerAuth is null ||
-            !myHasher.Verify(request.DeviceToken, controllerAuth.DeviceTokenHash))
+            !tokenHasher.Verify(request.DeviceToken, controllerAuth.DeviceTokenHash))
         {
             return Result<ControllerConfig>.Failure(Error.NotFound<Controller>(
                 ErrorMessages.InvalidCredentials));

@@ -33,6 +33,8 @@ public sealed class CreateRuleEndpoint : IEndpoint
         .WithTags("Automation Rules")
         .Produces<Guid>(StatusCodes.Status201Created)
         .Produces(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status403Forbidden)
+        .Produces(StatusCodes.Status404NotFound)
         .Produces(StatusCodes.Status409Conflict)
         .RequireAuthorization(SubPermissions.AutoRuleCreate);
     }

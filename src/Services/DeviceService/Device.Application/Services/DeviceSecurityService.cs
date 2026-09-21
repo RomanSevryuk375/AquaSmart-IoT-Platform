@@ -6,7 +6,7 @@ namespace Device.Application.Services;
 
 public sealed class DeviceSecurityService(
     IControllerRepository controllerRepository,
-    IMyHasher myHasher) : IDeviceSecurityService
+    IDeviceTokenHasher tokenHasher) : IDeviceSecurityService
 {
     public async Task<Result> EnsureUserOwnsControllerAsync(
         Guid controllerId,
@@ -44,7 +44,7 @@ public sealed class DeviceSecurityService(
                 ErrorMessages.ControllerNotFoundPlain));
         }
 
-        if (!myHasher.Verify(deviceToken, controller.DeviceTokenHash))
+        if (!tokenHasher.Verify(deviceToken, controller.DeviceTokenHash))
         {
             return Result.Failure(Error.Unauthorized(
                 ErrorMessages.AccessDenied,

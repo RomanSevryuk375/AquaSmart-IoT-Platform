@@ -15,4 +15,14 @@ public sealed class EcosystemRepository(TelemetryDbContext dbContext)
         return await Context.Ecosystems
             .FirstOrDefaultAsync(x => x.ControllerId == controllerId, cancellationToken);
     }
+
+    public async Task<bool> UserOwnsEcosystemAsync(
+        Guid ecosystemId,
+        Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.Ecosystems
+            .AsNoTracking()
+            .AnyAsync(x => x.Id == ecosystemId && x.UserId == userId, cancellationToken);
+    }
 }

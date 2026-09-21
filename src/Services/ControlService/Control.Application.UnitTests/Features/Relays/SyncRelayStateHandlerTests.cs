@@ -1,5 +1,6 @@
 using BuildingBlocks.Domain.Results;
 using Control.Application.Features.Relays.Commands.SyncRelayState;
+using Control.Domain.Events;
 
 namespace Control.Application.UnitTests.Features.Relays;
 
@@ -59,5 +60,38 @@ public class SyncRelayStateHandlerTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be("Relay.NotFound");
+    }
+    [Fact]
+    public async Task Handle_WhenExpireAtProvided_SetsRelayStateWithGivenExpiry()
+    {
+        // Arrange
+        DateTime customExpireAt = DateTime.UtcNow.AddMinutes(30);
+
+        Relay relay = new RelayBuilder()
+            .WithIsActive(false)
+            .Build();
+
+        _relayRepoMock.GetByIdAsync(relay.Id, Arg.Any<CancellationToken>()).Returns(relay);
+
+        var command = new SyncRelayStateCommand
+        {
+            ControllerId = relay.ControllerId,
+            RelayId = relay.Id,
+            TargetState = true,
+            ExpireAt = customExpireAt
+        };
+
+        // Act
+        Result result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        relay.IsActive.Should().BeTrue();
+
+        RelayStateChangedDomainEvent domainEvent = relay.DomainEvents
+            .OfType<RelayStateChangedDomainEvent>()
+            .Single();
+
+        domainEvent.ExpireAt.Should().BeCloseTo(customExpireAt, TimeSpan.FromSeconds(1));
     }
 }

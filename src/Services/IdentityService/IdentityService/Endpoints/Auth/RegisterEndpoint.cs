@@ -4,6 +4,7 @@ using BuildingBlocks.Presentation.Endpoints;
 using BuildingBlocks.Presentation.ResultExtensions;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Features.Auth.Commands.Register;
+using IdentityService.Application.Interfaces;
 using MediatR;
 
 namespace IdentityService.API.Endpoints.Auth;
@@ -16,6 +17,7 @@ public sealed class RegisterEndpoint : IEndpoint
             RegisterUserRequestDto request,
             ISender sender,
             HttpContext context,
+            ICookieHelpers cookieHelpers,
             CancellationToken cancellationToken) =>
         {
             var command = new RegisterCommand
@@ -28,10 +30,9 @@ public sealed class RegisterEndpoint : IEndpoint
             };
 
             Result<LoginResponseDto> result = await sender.Send(command, cancellationToken);
-
             if (result.IsSuccess)
             {
-                CookieHelpers.AppendAuthCookies(context, result.Value);
+                cookieHelpers.AppendAuthCookies(context, result.Value);
             }
 
             return result.ToIResult();

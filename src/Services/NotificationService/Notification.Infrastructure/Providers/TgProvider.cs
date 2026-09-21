@@ -1,3 +1,4 @@
+using System.Net.Http.Json;
 using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Results;
 using Contracts.Options;
@@ -28,12 +29,14 @@ public sealed class TgProvider(
         string token = _settings.BotToken;
         string chatId = recipient.TgChatId.Value.ToString();
 
-        string url = $"https://api.telegram.org/bot{token}/sendMessage" +
-                     $"?chat_id={chatId}&text={Uri.EscapeDataString(message)}";
-
         try
         {
-            using HttpResponseMessage response = await httpClient.GetAsync(url, cancellationToken);
+            using HttpResponseMessage response = await httpClient.PostAsJsonAsync(
+                $"https://api.telegram.org/bot{token}/sendMessage", new
+                {
+                    chat_id = recipient.TgChatId.Value,
+                    text = message
+                }, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {

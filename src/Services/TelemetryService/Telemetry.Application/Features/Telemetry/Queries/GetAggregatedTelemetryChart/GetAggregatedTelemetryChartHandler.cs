@@ -27,9 +27,11 @@ internal sealed class GetAggregatedTelemetryChartHandler(ISqlConnectionFactory s
         using IDbConnection connection = sqlConnectionFactory.CreateConnection();
 
         const string SQL = """
-            SELECT id AS Id, name AS Name, unit AS Unit
-            FROM sensors
-            WHERE id = @SensorId
+            SELECT s.id AS Id, s.name AS Name, s.unit AS Unit
+            FROM sensors s
+            JOIN ecosystems e ON s.ecosystem_id = e.id
+            WHERE s.id = @SensorId
+              AND e.user_id = @UserId
             LIMIT 1;
 
             SELECT 
@@ -50,6 +52,7 @@ internal sealed class GetAggregatedTelemetryChartHandler(ISqlConnectionFactory s
         using SqlMapper.GridReader multi = await connection.QueryMultipleAsync(SQL, new
         {
             request.SensorId,
+            request.UserId,
             Period = (int)period,
             From = from,
             To = to,

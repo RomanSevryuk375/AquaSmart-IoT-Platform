@@ -31,8 +31,8 @@ public sealed class ToggleRelayModeEndpoint : IEndpoint
         })
         .WithTags("Relay Commands")
         .Produces<bool>()
+        .Produces(StatusCodes.Status403Forbidden)
         .Produces(StatusCodes.Status404NotFound)
-        .Produces(StatusCodes.Status409Conflict)
         .RequireAuthorization(SubPermissions.DeviceControl);
     }
 }

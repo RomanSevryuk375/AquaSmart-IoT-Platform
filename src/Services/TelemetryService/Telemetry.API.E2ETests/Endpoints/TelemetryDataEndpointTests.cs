@@ -38,7 +38,9 @@ public class TelemetryDataEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
     public async Task GetAllRawDataAsync_WithValidRequest_Returns200OKAndCorrectData()
     {
         // Arrange
-        Ecosystem ecosystem = new EcosystemBuilder().Build();
+        Ecosystem ecosystem = new EcosystemBuilder()
+            .WithUserId(TestConstants.UserId)
+            .Build();
         Sensor sensor = new SensorBuilder()
             .WithEcosystemId(ecosystem.Id)
             .WithName("Raw Temp Sensor")
@@ -125,7 +127,9 @@ public class TelemetryDataEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
     public async Task GetAllAggregatedDataAsync_WithValidRequest_Returns200OKAndCorrectData()
     {
         // Arrange
-        Ecosystem ecosystem = new EcosystemBuilder().Build();
+        Ecosystem ecosystem = new EcosystemBuilder()
+            .WithUserId(TestConstants.UserId)
+            .Build();
         Sensor sensor = new SensorBuilder()
             .WithEcosystemId(ecosystem.Id)
             .WithName("Agg Temp Sensor")

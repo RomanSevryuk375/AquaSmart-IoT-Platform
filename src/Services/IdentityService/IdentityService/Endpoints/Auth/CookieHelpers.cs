@@ -1,11 +1,12 @@
 using BuildingBlocks.Presentation.Constants;
 using IdentityService.Application.DTOs;
+using IdentityService.Application.Interfaces;
 
 namespace IdentityService.API.Endpoints.Auth;
 
-internal static class CookieHelpers
+internal class CookieHelpers(IWebHostEnvironment environment) : ICookieHelpers
 {
-    public static void AppendAuthCookies(HttpContext context, LoginResponseDto token)
+    public void AppendAuthCookies(HttpContext context, LoginResponseDto token)
     {
         context.Response.Cookies.Append(
             AuthConstants.AccessTokenCookieName,
@@ -18,7 +19,7 @@ internal static class CookieHelpers
             CreateRefreshTokenCookieOptions());
     }
 
-    public static void ClearAuthCookies(HttpContext context)
+    public void ClearAuthCookies(HttpContext context)
     {
         context.Response.Cookies.Delete(
             AuthConstants.AccessTokenCookieName,
@@ -29,20 +30,20 @@ internal static class CookieHelpers
             CreateRefreshTokenCookieOptions());
     }
 
-    private static CookieOptions CreateAccessTokenCookieOptions() => new()
+    private CookieOptions CreateAccessTokenCookieOptions() => new()
     {
         HttpOnly = true,
-        Secure = false,
+        Secure = !environment.IsDevelopment(),
         SameSite = SameSiteMode.Strict,
         Expires = DateTimeOffset.UtcNow.AddHours(12),
         Path = "/",
         IsEssential = true
     };
 
-    private static CookieOptions CreateRefreshTokenCookieOptions() => new()
+    private CookieOptions CreateRefreshTokenCookieOptions() => new()
     {
         HttpOnly = true,
-        Secure = false,
+        Secure = !environment.IsDevelopment(),
         SameSite = SameSiteMode.Strict,
         Expires = DateTimeOffset.UtcNow.AddDays(30),
         Path = "/api/identity/v1/auth",

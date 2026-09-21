@@ -5,20 +5,21 @@ using MassTransit;
 namespace Device.Application.Features.Controllers.Command.AddController;
 
 public sealed class AddControllerHandler(
-    IMyHasher myHasher,
+    IDeviceTokenHasher tokenHasher,
     IControllerRepository controllerRepository) : IRequestHandler<AddControllerCommand, Result<ControllerRegisteredResponse>>
 {
     public async Task<Result<ControllerRegisteredResponse>> Handle(
         AddControllerCommand request,
         CancellationToken cancellationToken)
     {
-        string deviceToken = NewId.NextGuid().ToString();
+        string deviceToken = tokenHasher.GenerateRawToken();
+        string deviceTokenHash = tokenHasher.ComputeHash(deviceToken);
 
         Result<Controller> controller = Controller.Create(
             NewId.NextGuid(),
             request.UserId,
             request.MacAddress,
-            myHasher.Generate(deviceToken),
+            deviceTokenHash,
             request.Name,
             request.IsOnline);
         if (controller.IsFailure)

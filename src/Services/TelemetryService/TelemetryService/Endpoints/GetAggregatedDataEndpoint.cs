@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Abstractions;
 using BuildingBlocks.Domain.Results;
 using BuildingBlocks.Presentation.Authorization;
 using BuildingBlocks.Presentation.Constants;
@@ -17,6 +18,7 @@ public sealed class GetAggregatedDataEndpoint : IEndpoint
         app.MapGet($"{ApiConstants.Routes.Data}/aggregate", async (
             [AsParameters] TelemetryAggregateFilterDto filter,
             ISender sender,
+            IUserContext userContext,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 10,
             CancellationToken cancellationToken = default) =>
@@ -24,6 +26,7 @@ public sealed class GetAggregatedDataEndpoint : IEndpoint
             var query = new GetAggregatedTelemetryChartQuery
             {
                 SensorId = filter.SensorId,
+                UserId = userContext.UserId,
                 Period = filter.Period,
                 From = filter.From,
                 To = filter.To,

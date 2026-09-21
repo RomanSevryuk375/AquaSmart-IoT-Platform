@@ -35,8 +35,8 @@ public sealed class SetIsActiveScheduleEndpoint : IEndpoint
         })
         .WithTags("Schedules")
         .Produces(StatusCodes.Status204NoContent)
+        .Produces(StatusCodes.Status403Forbidden)
         .Produces(StatusCodes.Status404NotFound)
-        .Produces(StatusCodes.Status409Conflict)
         .RequireAuthorization(SubPermissions.AutoScheduleCreate);
     }
 }

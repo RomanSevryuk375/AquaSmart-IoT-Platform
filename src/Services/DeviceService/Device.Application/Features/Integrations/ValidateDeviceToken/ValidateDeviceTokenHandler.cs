@@ -7,7 +7,7 @@ using Device.Application.Interfaces;
 
 namespace Device.Application.Features.Integrations.ValidateDeviceToken;
 
-public sealed class ValidateDeviceTokenHandler(ISqlConnectionFactory sqlConnectionFactory, IMyHasher myHasher)
+public sealed class ValidateDeviceTokenHandler(ISqlConnectionFactory sqlConnectionFactory, IDeviceTokenHasher tokenHasher)
     : IRequestHandler<ValidateDeviceTokenQuery, Result<ValidateDeviceTokenDto>>
 {
     public async Task<Result<ValidateDeviceTokenDto>> Handle(
@@ -29,7 +29,7 @@ public sealed class ValidateDeviceTokenHandler(ISqlConnectionFactory sqlConnecti
             Sql, new { request.MacAddress });
 
         if (controllerData is null ||
-            !myHasher.Verify(request.RawDeviceToken, controllerData.DeviceTokenHash))
+            !tokenHasher.Verify(request.RawDeviceToken, controllerData.DeviceTokenHash))
         {
             return Result<ValidateDeviceTokenDto>.Success(new ValidateDeviceTokenDto
             {

@@ -118,4 +118,31 @@ public class RegisterHandlerTests
 
         await _tokenRepoMock.DidNotReceive().AddAsync(Arg.Any<RefreshToken>(), Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+    public async Task Handle_WhenUserCreationFails_ReturnsDomainValidationError()
+    {
+        // Arrange
+        var command = new RegisterCommand
+        {
+            Email = "new.user@example.com",
+            Name = "",
+            Password = "Password123!",
+            PhoneNumber = "+375291112233",
+            TimeZone = "Europe/Minsk"
+        };
+
+        _userManagerMock.FindByEmailAsync(command.Email).Returns((User?)null);
+
+        // Act
+        Result<LoginResponseDto> result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("Name.Invalid");
+
+        await _userManagerMock.DidNotReceive().CreateAsync(Arg.Any<User>(), Arg.Any<string>());
+        await _tokenRepoMock.DidNotReceive().AddAsync(Arg.Any<RefreshToken>(), Arg.Any<CancellationToken>());
+    }
 }

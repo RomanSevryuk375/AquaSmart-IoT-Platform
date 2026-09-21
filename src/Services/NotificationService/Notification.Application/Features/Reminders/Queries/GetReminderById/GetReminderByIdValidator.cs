@@ -6,7 +6,10 @@ public sealed class GetReminderByIdValidator : AbstractValidator<GetReminderById
 {
     public GetReminderByIdValidator()
     {
-        RuleFor(x => x.ReminderId).NotEmpty();
-        RuleFor(x => x.UserId).NotEmpty();
+        RuleFor(x => x.ReminderId)
+            .NotEmpty();
+
+        RuleFor(x => x.UserId)
+            .NotEmpty();
     }
 }

@@ -11,9 +11,7 @@ public static class OutboxExtension
 {
     public static IServiceCollection AddOutboxProcessorQuartzJob<TDbContext>(
         this IServiceCollection services) where TDbContext : DbContext
-    {
-        return services.AddOutboxProcessorQuartzJobCore<TDbContext>(null);
-    }
+        => services.AddOutboxProcessorQuartzJobCore<TDbContext>(null);
 
     public static IServiceCollection AddOutboxProcessorQuartzJob<TDbContext>(
         this IServiceCollection services,
@@ -60,10 +58,7 @@ public static class OutboxExtension
 
     public static IServiceCollection AddOutboxProcessorQuartzJob<TDbContext>(
         this IServiceCollection services,
-        Action<OutboxOptions> configure) where TDbContext : DbContext
-    {
-        return services.AddOutboxProcessorQuartzJobCore<TDbContext>(configure);
-    }
+        Action<OutboxOptions> configure) where TDbContext : DbContext => services.AddOutboxProcessorQuartzJobCore<TDbContext>(configure);
 
     private static IServiceCollection AddOutboxProcessorQuartzJobCore<TDbContext>(
         this IServiceCollection services,

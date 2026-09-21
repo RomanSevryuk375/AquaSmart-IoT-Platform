@@ -16,6 +16,7 @@ public static class DependencyInjection
 
         services.AddScoped<IControllerOfflineCheckerService, ControllerOfflineCheckerService>();
         services.AddScoped<IDeviceSecurityService, DeviceSecurityService>();
+        services.AddSingleton<IDeviceTokenHasher, HmacDeviceTokenHasher>();
         services.AddSingleton<IMyHasher, MyHasher>();
 
         services.AddGlobalBehaviors();

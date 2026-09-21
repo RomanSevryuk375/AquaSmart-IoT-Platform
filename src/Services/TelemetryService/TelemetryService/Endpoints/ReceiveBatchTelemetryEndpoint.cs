@@ -35,7 +35,9 @@ public sealed class ReceiveBatchTelemetryEndpoint : IEndpoint
         .WithTags("Telemetry Data")
         .Produces(StatusCodes.Status202Accepted)
         .Produces(StatusCodes.Status400BadRequest)
-        .Produces(StatusCodes.Status409Conflict)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Produces(StatusCodes.Status403Forbidden)
+        .Produces(StatusCodes.Status404NotFound)
         .AllowAnonymous();
     }
 }

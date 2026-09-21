@@ -14,20 +14,14 @@ internal sealed class SyncEcosystemUpdatedHandler(
 {
     public async Task<Result> Handle(SyncEcosystemUpdatedCommand request, CancellationToken cancellationToken)
     {
-        Ecosystem? existingEcosystem = await ecosystemRepository.GetByIdAsync(
-            request.EcosystemId, cancellationToken);
-
+        Ecosystem? existingEcosystem = await ecosystemRepository.GetByIdAsync(request.EcosystemId, cancellationToken);
         if (existingEcosystem is null)
         {
             SyncEcosystemCreatedCommand command = mapper.Map<SyncEcosystemCreatedCommand>(request);
-            Result createResult = await sender.Send(command, cancellationToken);
-            if (createResult.IsFailure)
-            {
-                return Result.Failure(createResult.Error);
-            }
+            return await sender.Send(command, cancellationToken);
         }
 
-        existingEcosystem!.SetName(request.Name);
+        existingEcosystem.SetName(request.Name);
 
         return Result.Success();
     }

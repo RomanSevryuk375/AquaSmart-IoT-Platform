@@ -14,7 +14,7 @@ public static class ResultExtensions
             return controller.Ok(result.Value);
         }
 
-        return MapError(controller, result.Error);
+        return MapToObjectResult(result.Error);
     }
 
     public static ActionResult ToActionResult(
@@ -25,7 +25,7 @@ public static class ResultExtensions
             return controller.NoContent();
         }
 
-        return MapError(controller, result.Error);
+        return MapToObjectResult(result.Error);
     }
 
     public static IResult ToIResult(this Result result)
@@ -35,7 +35,7 @@ public static class ResultExtensions
             return Results.NoContent();
         }
 
-        return MapError(result.Error);
+        return MapToIResult(result.Error);
     }
 
     public static IResult ToIResult<T>(this Result<T> result)
@@ -45,43 +45,60 @@ public static class ResultExtensions
             return Results.Ok(result.Value);
         }
 
-        return MapError(result.Error);
+        return MapToIResult(result.Error);
     }
 
-    private static ObjectResult MapError(
-        ControllerBase controller, Error error)
+    private static ObjectResult MapToObjectResult(Error error)
     {
-        var response = new
+        int statusCode = GetStatusCode(error.Type);
+        var problemDetails = new ProblemDetails
         {
-            error = error.Code,
-            message = error.Message
+            Status = statusCode,
+            Title = GetTitle(error.Type),
+            Detail = error.Message,
+            Extensions =
+            {
+                ["code"] = error.Code,
+                ["error"] = error.Code,
+                ["message"] = error.Message
+            }
         };
 
-        return error.Type switch
-        {
-            ErrorType.NotFound => controller.NotFound(response),
-            ErrorType.Validation => controller.BadRequest(response),
-            ErrorType.Conflict => controller.Conflict(response),
-            ErrorType.Forbidden => controller.StatusCode(StatusCodes.Status403Forbidden, response),
-            ErrorType.Unauthorized => controller.StatusCode(StatusCodes.Status401Unauthorized, response),
-
-            _ => controller.StatusCode(500, new { error = "InternalError", message = error.Message })
-        };
+        return new ObjectResult(problemDetails) { StatusCode = statusCode };
     }
 
-    private static IResult MapError(Error error)
+    private static IResult MapToIResult(Error error)
     {
-        var response = new { error = error.Code, message = error.Message };
-
-        return error.Type switch
-        {
-            ErrorType.NotFound => Results.NotFound(response),
-            ErrorType.Validation => Results.BadRequest(response),
-            ErrorType.Conflict => Results.Conflict(response),
-            ErrorType.Forbidden => Results.Json(response, statusCode: StatusCodes.Status403Forbidden),
-            ErrorType.Unauthorized => Results.Json(response, statusCode: StatusCodes.Status401Unauthorized),
-
-            _ => Results.Json(response, statusCode: StatusCodes.Status500InternalServerError)
-        };
+        int statusCode = GetStatusCode(error.Type);
+        return Results.Problem(
+            detail: error.Message,
+            statusCode: statusCode,
+            title: GetTitle(error.Type),
+            extensions: new Dictionary<string, object?>
+            {
+                ["code"] = error.Code,
+                ["error"] = error.Code,
+                ["message"] = error.Message
+            });
     }
+
+    private static int GetStatusCode(ErrorType errorType) => errorType switch
+    {
+        ErrorType.Validation => StatusCodes.Status400BadRequest,
+        ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
+        ErrorType.Forbidden => StatusCodes.Status403Forbidden,
+        ErrorType.NotFound => StatusCodes.Status404NotFound,
+        ErrorType.Conflict => StatusCodes.Status409Conflict,
+        _ => StatusCodes.Status500InternalServerError
+    };
+
+    private static string GetTitle(ErrorType errorType) => errorType switch
+    {
+        ErrorType.Validation => "Bad Request",
+        ErrorType.Unauthorized => "Unauthorized",
+        ErrorType.Forbidden => "Forbidden",
+        ErrorType.NotFound => "Not Found",
+        ErrorType.Conflict => "Conflict",
+        _ => "Internal Server Error"
+    };
 }

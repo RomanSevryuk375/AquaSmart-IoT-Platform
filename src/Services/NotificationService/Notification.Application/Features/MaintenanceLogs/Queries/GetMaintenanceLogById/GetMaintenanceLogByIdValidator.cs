@@ -6,7 +6,10 @@ public sealed class GetMaintenanceLogByIdValidator : AbstractValidator<GetMainte
 {
     public GetMaintenanceLogByIdValidator()
     {
-        RuleFor(x => x.Id).NotEmpty();
-        RuleFor(x => x.UserId).NotEmpty();
+        RuleFor(x => x.Id)
+            .NotEmpty();
+
+        RuleFor(x => x.UserId)
+            .NotEmpty();
     }
 }

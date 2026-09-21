@@ -19,11 +19,11 @@ public static class DependencyInjection
         {
             cfg.RegisterServicesFromAssembly(assembly);
 
-            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ConditionOwnsSensorBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(VacationModeSecurityBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ScheduleSecurityBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(EcosystemSecurityBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(AutomationRuleSecurityBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ConditionOwnsSensorBehavior<,>));
         });
 
         services.AddValidatorsFromAssembly(assembly);

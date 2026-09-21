@@ -1,6 +1,8 @@
 using BuildingBlocks.Presentation.Endpoints;
 using BuildingBlocks.Presentation.Extensions;
+using IdentityService.API.Endpoints.Auth;
 using IdentityService.Application.Extensions;
+using IdentityService.Application.Interfaces;
 using IdentityService.Domain.Entities;
 using IdentityService.Infrastructure;
 using IdentityService.Infrastructure.Extensions;
@@ -23,6 +25,7 @@ public static class DependencyInjection
         .AddDefaultTokenProviders();
 
         services.AddGlobalApi(configuration);
+        services.AddScoped<ICookieHelpers, CookieHelpers>();
         
         services.AddEndpointsApiExplorer();
         services.AddEndpoints(typeof(DependencyInjection).Assembly);

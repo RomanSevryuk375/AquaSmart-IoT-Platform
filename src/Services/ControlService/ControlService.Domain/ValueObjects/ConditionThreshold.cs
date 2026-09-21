@@ -1,3 +1,4 @@
+using System.Globalization;
 using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Results;
 
@@ -28,11 +29,12 @@ public sealed record ConditionThreshold
     public static ConditionThreshold Parse(string dbValue)
     {
         string[] parts = dbValue.Split("_", 2);
-        double threshold = Convert.ToDouble(parts[0]);
-        double hysteresis = Convert.ToDouble(parts[1]);
+        double threshold = Convert.ToDouble(parts[0], CultureInfo.InvariantCulture);
+        double hysteresis = Convert.ToDouble(parts[1], CultureInfo.InvariantCulture);
 
         return Create(threshold, hysteresis).Value;
     }
 
-    public override string ToString() => $"{Threshold}_{Hysteresis}";
+    public override string ToString()
+        => $"{Threshold.ToString(CultureInfo.InvariantCulture)}_{Hysteresis.ToString(CultureInfo.InvariantCulture)}";
 }

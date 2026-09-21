@@ -27,8 +27,5 @@ public sealed class CreateRuleValidator
         RuleFor(x => x.Action)
             .NotEmpty()
             .IsInEnum();
-
-        RuleFor(x => x.IsActive)
-            .NotEmpty();
     }
 }

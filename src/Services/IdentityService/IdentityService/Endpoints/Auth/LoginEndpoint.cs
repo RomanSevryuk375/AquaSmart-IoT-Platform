@@ -4,6 +4,7 @@ using BuildingBlocks.Presentation.Endpoints;
 using BuildingBlocks.Presentation.ResultExtensions;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Features.Auth.Commands.Login;
+using IdentityService.Application.Interfaces;
 using MediatR;
 
 namespace IdentityService.API.Endpoints.Auth;
@@ -16,6 +17,7 @@ public sealed class LoginEndpoint : IEndpoint
             LoginUserRequestDto request,
             ISender sender,
             HttpContext context,
+            ICookieHelpers cookieHelpers,
             CancellationToken cancellationToken) =>
         {
             var command = new LoginCommand
@@ -28,7 +30,7 @@ public sealed class LoginEndpoint : IEndpoint
 
             if (result.IsSuccess)
             {
-                CookieHelpers.AppendAuthCookies(context, result.Value);
+                cookieHelpers.AppendAuthCookies(context, result.Value);
             }
 
             return result.ToIResult();
@@ -36,7 +38,7 @@ public sealed class LoginEndpoint : IEndpoint
         .WithTags("Auth")
         .Produces<LoginResponseDto>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status400BadRequest)
-        .Produces(StatusCodes.Status409Conflict)
+        .Produces(StatusCodes.Status401Unauthorized)
         .AllowAnonymous();
     }
 }

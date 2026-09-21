@@ -8,7 +8,7 @@ using Device.Application.Interfaces;
 
 namespace Device.Application.Features.RelayCommands.Query.GetPending;
 
-internal sealed class GetPendingCommandsHandler(ISqlConnectionFactory sqlConnectionFactory, IMyHasher hasher)
+internal sealed class GetPendingCommandsHandler(ISqlConnectionFactory sqlConnectionFactory, IDeviceTokenHasher tokenHasher)
     : IRequestHandler<GetPendingCommandsQuery, Result<IReadOnlyList<RelayCommandDto>>>
 {
     public async Task<Result<IReadOnlyList<RelayCommandDto>>> Handle(
@@ -26,7 +26,7 @@ internal sealed class GetPendingCommandsHandler(ISqlConnectionFactory sqlConnect
 
         string? tokenHash = await connection.QueryFirstOrDefaultAsync<string>(
             AuthSql, new { request.ControllerId });
-        if (tokenHash is null || !hasher.Verify(request.DeviceToken, tokenHash))
+        if (tokenHash is null || !tokenHasher.Verify(request.DeviceToken, tokenHash))
         {
             return Result<IReadOnlyList<RelayCommandDto>>.Failure(Error.NotFound<Controller>(
                 ErrorMessages.InvalidCredentialsOrControllerNotFound));
