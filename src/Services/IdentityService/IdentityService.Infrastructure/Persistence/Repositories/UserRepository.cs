@@ -17,4 +17,21 @@ public sealed class UserRepository(IdentityDbContext dbContext)
                      && (x.SubscriptionId != Guid.Parse(SubscriptionType.Free)))
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<bool> TelegramChatIdExistsAsync(
+        long chatId,
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.Users
+            .AsNoTracking()
+            .AnyAsync(x => x.TelegramChatId == chatId, cancellationToken);
+    }
+
+    public async Task<User?> GetByTelegramChatIdAsync(
+        long chatId,
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.Users
+            .FirstOrDefaultAsync(x => x.TelegramChatId == chatId, cancellationToken);
+    }
 }

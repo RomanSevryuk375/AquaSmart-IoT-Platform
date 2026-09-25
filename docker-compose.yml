@@ -53,7 +53,7 @@ services:
       - aqua-network
 
   rabbitmq:
-    image: heidiks/rabbitmq-delayed-message-exchange:3.13-management-alpine
+    image: masstransit/rabbitmq:latest
     container_name: aqua-rabbitmq
     ports:
       - "5672:5672"  

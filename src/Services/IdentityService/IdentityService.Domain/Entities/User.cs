@@ -11,6 +11,7 @@ public sealed class User : IdentityUser<Guid>, IEntity, IHasDomainEvents
     private User(
         Guid id,
         Name name,
+        long? telegramChatId,
         string email,
         PhoneNumber phoneNumber,
         Guid subscriptionId,
@@ -18,6 +19,7 @@ public sealed class User : IdentityUser<Guid>, IEntity, IHasDomainEvents
     {
         Id = id;
         Name = name;
+        TelegramChatId = telegramChatId;
         Email = email;
         UserName = email;
         PhoneNumber = phoneNumber.Value;
@@ -34,6 +36,7 @@ public sealed class User : IdentityUser<Guid>, IEntity, IHasDomainEvents
 #pragma warning restore CS8618
 
     public Name Name { get; private set; }
+    public long? TelegramChatId { get; private set; }
     public Guid SubscriptionId { get; private set; }
     public DateTime SubscriptionEndDate { get; private set; }
     public DateTime CreatedAt { get; private set; }
@@ -74,6 +77,7 @@ public sealed class User : IdentityUser<Guid>, IEntity, IHasDomainEvents
         var user = new User(
             userId,
             nameResult.Value,
+            telegramChatId: null,
             emailResult.Value.Value,
             phoneResult.Value,
             subscriptionId,
@@ -133,6 +137,24 @@ public sealed class User : IdentityUser<Guid>, IEntity, IHasDomainEvents
         });
 
         IncrementVersion();
+    }
+
+    public void LinkTelegramChat(long chatId)
+    {
+        if (TelegramChatId == chatId)
+        {
+            return;
+        }
+
+        TelegramChatId = chatId;
+
+        IncrementVersion();
+
+        RaiseEvent(new TelegramAccountLinkedDomainEvent
+        {
+            UserId = Id,
+            TelegramChatId = chatId,
+        });
     }
 
     private readonly List<IDomainEvent> _domainEvents = [];

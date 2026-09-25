@@ -1,8 +1,10 @@
 using System.Text.Json.Serialization;
 using BuildingBlocks.Domain.Constants;
+using BuildingBlocks.Domain.Results.Converters;
 
 namespace BuildingBlocks.Domain.Results;
 
+[JsonConverter(typeof(ResultJsonConverter))]
 public class Result
 {
     public bool IsSuccess { get; }
@@ -30,6 +32,7 @@ public class Result
     public static Result Failure(Error error) => new(false, error);
 }
 
+[JsonConverter(typeof(ResultJsonConverterFactory))]
 public class Result<T> : Result
 {
     private readonly T? _value;

@@ -12,4 +12,8 @@ public interface IUserRepository : IRepository<User>
     public Task<List<User>> GetAllUsersByIdAsync(
         List<Guid> userIds,
         CancellationToken cancellationToken = default);
+
+    public Task<bool> TelegramChatIdExistsAsync(
+        long chatId,
+        CancellationToken cancellationToken = default);
 }

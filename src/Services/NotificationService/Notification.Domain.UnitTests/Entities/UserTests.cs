@@ -180,37 +180,35 @@ public class UserTests
     }
 
     [Fact]
-    public void SetNotificationPreferences_WithValidData_UpdatesPreferencesAndIncrementsVersion()
+    public void LinkTelegramChat_WithNewChatId_SetsTgEnableAndUpdatesChatIdAndIncrementsVersion()
     {
         // Arrange
         User user = new UserBuilder().WithTgEnable(false).Build();
-        Guid initialVersion = user.Version;
+        Guid versionBefore = user.Version;
+        long chatId = 123456789L;
 
         // Act
-        Result result = user.SetNotificationPreferences(false, true, 987654321L);
+        user.LinkTelegramChat(chatId);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
-        user.EmailEnable.Should().BeFalse();
+        user.TelegramChatId.Should().Be(chatId);
         user.TgEnable.Should().BeTrue();
-        user.TelegramChatId.Should().Be(987654321L);
-        user.Version.Should().NotBe(initialVersion);
+        user.Version.Should().NotBe(versionBefore);
     }
 
     [Fact]
-    public void SetNotificationPreferences_WithTelegramEnabledAndChatIdNull_ReturnsFailureAndDoesNotChangeVersion()
+    public void LinkTelegramChat_WithSameChatIdAsAlreadyLinked_DoesNotChangeVersion()
     {
         // Arrange
-        User user = new UserBuilder().WithTgEnable(false).Build();
-        Guid initialVersion = user.Version;
+        long chatId = 999888777L;
+        User user = new UserBuilder().WithTgEnable(true, chatId).Build();
+        Guid versionAfterCreate = user.Version;
 
         // Act
-        Result result = user.SetNotificationPreferences(true, true, null);
+        user.LinkTelegramChat(chatId); // same id — should be no-op
 
         // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("User.Invalid");
-        result.Error.Message.Should().Be("Telegram Chat ID is required if Telegram notifications are enabled.");
-        user.Version.Should().Be(initialVersion);
+        user.TelegramChatId.Should().Be(chatId);
+        user.Version.Should().Be(versionAfterCreate);
     }
 }
