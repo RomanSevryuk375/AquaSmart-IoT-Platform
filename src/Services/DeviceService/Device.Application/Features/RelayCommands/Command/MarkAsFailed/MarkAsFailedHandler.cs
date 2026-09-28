@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Domain.Constants;
+using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
 

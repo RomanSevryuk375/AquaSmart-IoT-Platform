@@ -9,8 +9,5 @@ internal sealed class PingControllerValidator
     {
         RuleFor(x => x.ControllerId)
             .NotEmpty();
-
-        RuleFor(x => x.DeviceToken)
-            .NotEmpty();
     }
 }

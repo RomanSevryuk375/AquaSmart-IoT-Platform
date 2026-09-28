@@ -1,6 +1,5 @@
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
-using Device.Application.Extesions;
 using Device.Application.Features.Controllers.Query.GetControllerConfig;
 using Device.Domain.Entities.Sensors;
 
@@ -11,16 +10,10 @@ public class GetControllerConfigHandlerTests(
 {
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task GetConfig_WithValidCredentials_ReturnsControllerWithSensorsAndRelays()
+    public async Task GetConfig_WithValidMacAddress_ReturnsControllerWithSensorsAndRelays()
     {
         // Arrange
-        var hasher = new MyHasher();
-        string rawToken = "my_super_secret_token";
-        string realTokenHash = hasher.Generate(rawToken);
-
-        Controller controller = new ControllerBuilder()
-            .WithDeviceTokenHash(realTokenHash)
-            .Build();
+        Controller controller = new ControllerBuilder().Build();
 
         Sensor sensor1 = new SensorBuilder()
             .WithId(Guid.NewGuid())
@@ -46,8 +39,7 @@ public class GetControllerConfigHandlerTests(
 
         var query = new GetControllerConfigQuery
         {
-            MacAddress = controller.MacAddress.Value,
-            DeviceToken = rawToken
+            MacAddress = controller.MacAddress.Value
         };
 
         // Act
@@ -64,30 +56,25 @@ public class GetControllerConfigHandlerTests(
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task GetConfig_WithInvalidToken_ReturnsNotFound()
+    public async Task GetConfig_WhenNoRelaysOrSensors_ReturnsEmptyCollections()
     {
         // Arrange
-        var hasher = new MyHasher();
-        string realTokenHash = hasher.Generate("my_super_secret_token");
-
-        Controller controller = new ControllerBuilder()
-            .WithDeviceTokenHash(realTokenHash)
-            .Build();
+        Controller controller = new ControllerBuilder().Build();
 
         DbContext.Controllers.Add(controller);
         await DbContext.SaveChangesAsync();
 
         var query = new GetControllerConfigQuery
         {
-            MacAddress = controller.MacAddress.Value,
-            DeviceToken = "wrong_token_from_hacker"
+            MacAddress = controller.MacAddress.Value
         };
 
         // Act
         Result<ControllerConfig> result = await Sender.Send(query);
 
         // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Controller.NotFound");
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Sensors.Should().BeEmpty();
+        result.Value.Relays.Should().BeEmpty();
     }
 }

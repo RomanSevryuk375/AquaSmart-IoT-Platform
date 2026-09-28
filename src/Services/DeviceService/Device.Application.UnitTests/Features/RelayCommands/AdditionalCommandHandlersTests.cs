@@ -23,7 +23,7 @@ public class AdditionalCommandHandlersTests
         var commandId = Guid.NewGuid();
         _queueRepoMock.GetByIdAsync(commandId, Arg.Any<CancellationToken>()).Returns((RelayCommand?)null);
 
-        var result = await handler.Handle(new MarkAsCompletedCommand { CommandId = commandId, DeviceToken = "tok" }, CancellationToken.None);
+        var result = await handler.Handle(new MarkAsCompletedCommand { CommandId = commandId }, CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();
     }
@@ -36,7 +36,7 @@ public class AdditionalCommandHandlersTests
         _queueRepoMock.GetByIdAsync(relayCmd.Id, Arg.Any<CancellationToken>()).Returns(relayCmd);
         _relayRepoMock.GetByIdAsync(relayCmd.RelayId, Arg.Any<CancellationToken>()).Returns((Relay?)null);
 
-        var result = await handler.Handle(new MarkAsCompletedCommand { CommandId = relayCmd.Id, DeviceToken = "tok" }, CancellationToken.None);
+        var result = await handler.Handle(new MarkAsCompletedCommand { CommandId = relayCmd.Id }, CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();
     }
@@ -51,7 +51,7 @@ public class AdditionalCommandHandlersTests
         _queueRepoMock.GetByIdAsync(relayCmd.Id, Arg.Any<CancellationToken>()).Returns(relayCmd);
         _relayRepoMock.GetByIdAsync(relayCmd.RelayId, Arg.Any<CancellationToken>()).Returns(relay);
 
-        var result = await handler.Handle(new MarkAsCompletedCommand { CommandId = relayCmd.Id, DeviceToken = "tok" }, CancellationToken.None);
+        var result = await handler.Handle(new MarkAsCompletedCommand { CommandId = relayCmd.Id }, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         relayCmd.Status.Should().Be(CommandStatus.Completed);
@@ -64,7 +64,7 @@ public class AdditionalCommandHandlersTests
         var commandId = Guid.NewGuid();
         _queueRepoMock.GetByIdAsync(commandId, Arg.Any<CancellationToken>()).Returns((RelayCommand?)null);
 
-        var result = await handler.Handle(new MarkAsFailedCommand { CommandId = commandId, DeviceToken = "tok", ErrorMessage = "fail" }, CancellationToken.None);
+        var result = await handler.Handle(new MarkAsFailedCommand { CommandId = commandId, ErrorMessage = "fail" }, CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();
     }
@@ -76,7 +76,7 @@ public class AdditionalCommandHandlersTests
         RelayCommand relayCmd = new RelayCommandBuilder().Build();
         _queueRepoMock.GetByIdAsync(relayCmd.Id, Arg.Any<CancellationToken>()).Returns(relayCmd);
 
-        var result = await handler.Handle(new MarkAsFailedCommand { CommandId = relayCmd.Id, DeviceToken = "tok", ErrorMessage = "fail" }, CancellationToken.None);
+        var result = await handler.Handle(new MarkAsFailedCommand { CommandId = relayCmd.Id, ErrorMessage = "fail" }, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         relayCmd.Status.Should().Be(CommandStatus.Failed);
@@ -140,7 +140,7 @@ public class AdditionalCommandHandlersTests
         var controllerId = Guid.NewGuid();
         _controllerRepoMock.GetByIdAsync(controllerId, Arg.Any<CancellationToken>()).Returns((Controller?)null);
 
-        var result = await handler.Handle(new PingControllerCommand { ControllerId = controllerId, DeviceToken = "tok" }, CancellationToken.None);
+        var result = await handler.Handle(new PingControllerCommand { ControllerId = controllerId }, CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();
     }
@@ -152,7 +152,7 @@ public class AdditionalCommandHandlersTests
         Controller controller = new ControllerBuilder().Build();
         _controllerRepoMock.GetByIdAsync(controller.Id, Arg.Any<CancellationToken>()).Returns(controller);
 
-        var result = await handler.Handle(new PingControllerCommand { ControllerId = controller.Id, DeviceToken = "tok" }, CancellationToken.None);
+        var result = await handler.Handle(new PingControllerCommand { ControllerId = controller.Id }, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
     }

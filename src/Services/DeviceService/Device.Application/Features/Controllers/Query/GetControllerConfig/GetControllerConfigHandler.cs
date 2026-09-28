@@ -1,18 +1,15 @@
 using System.Data;
 using BuildingBlocks.Domain.Abstractions;
-using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Results;
 using Dapper;
 using Device.Application.Extesions;
-using Device.Application.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace Device.Application.Features.Controllers.Query.GetControllerConfig;
 
 public sealed class GetControllerConfigHandler(
     ISqlConnectionFactory sqlConnectionFactory,
-    IOptions<DeviceSettings> deviceOptions,
-    IDeviceTokenHasher tokenHasher)
+    IOptions<DeviceSettings> deviceOptions)
     : IRequestHandler<GetControllerConfigQuery, Result<ControllerConfig>>
 {
     public async Task<Result<ControllerConfig>> Handle(
@@ -22,11 +19,6 @@ public sealed class GetControllerConfigHandler(
         using IDbConnection connection = sqlConnectionFactory.CreateConnection();
 
         const string Sql = """
-            SELECT id AS Id, device_token_hash AS DeviceTokenHash
-            FROM controllers
-            WHERE mac_address = @MacAddress
-            LIMIT 1;
-
             SELECT
                 id AS relay_id,
                 name,
@@ -47,14 +39,6 @@ public sealed class GetControllerConfigHandler(
             """;
 
         await using SqlMapper.GridReader multi = await connection.QueryMultipleAsync(Sql, new { request.MacAddress });
-
-        ControllerAuthInfo? controllerAuth = await multi.ReadSingleOrDefaultAsync<ControllerAuthInfo>();
-        if (controllerAuth is null ||
-            !tokenHasher.Verify(request.DeviceToken, controllerAuth.DeviceTokenHash))
-        {
-            return Result<ControllerConfig>.Failure(Error.NotFound<Controller>(
-                ErrorMessages.InvalidCredentials));
-        }
 
         IEnumerable<RelayConfig> relayConfig = await multi.ReadAsync<RelayConfig>();
         IEnumerable<SensorConfig> sensorConfig = await multi.ReadAsync<SensorConfig>();

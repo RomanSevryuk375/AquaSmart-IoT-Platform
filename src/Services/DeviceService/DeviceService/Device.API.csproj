@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" />
@@ -12,6 +12,10 @@
         <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Presentation\BuildingBlocks.Presentation.csproj" />
         <ProjectReference Include="..\Device.Application\Device.Application.csproj" />
         <ProjectReference Include="..\Device.Infrastrucrute\Device.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Device.Application.UnitTests" />
     </ItemGroup>
 
 </Project>

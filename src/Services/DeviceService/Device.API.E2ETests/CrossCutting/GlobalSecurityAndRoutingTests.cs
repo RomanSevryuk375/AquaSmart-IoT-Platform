@@ -57,7 +57,7 @@ public class GlobalSecurityAndRoutingTests(E2ETestWebAppFactory factory) : BaseE
         await DbContext.SaveChangesAsync();
 
         // Act
-        HttpResponseMessage response = await Client.GetAsync($"{ApiConstants.Routes.Controllers}{hackerController.Id}");
+        HttpResponseMessage response = await Client.GetAsync($"{ApiConstants.Routes.Controllers}/{hackerController.Id}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);

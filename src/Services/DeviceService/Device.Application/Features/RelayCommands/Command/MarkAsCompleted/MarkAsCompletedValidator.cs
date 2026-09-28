@@ -9,8 +9,5 @@ internal sealed class MarkAsCompletedValidator
     {
         RuleFor(x => x.CommandId)
             .NotEmpty();
-
-        RuleFor(x => x.DeviceToken)
-            .NotEmpty();
     }
 }
