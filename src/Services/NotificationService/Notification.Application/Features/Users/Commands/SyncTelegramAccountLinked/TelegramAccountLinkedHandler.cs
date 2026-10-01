@@ -19,8 +19,6 @@ public sealed class TelegramAccountLinkedHandler(
                 $"User {request.UserId} not found."));
         }
 
-        // Idempotency: event could be delivered more than once (at-least-once semantics).
-        // If the user already has this exact ChatId, the sync is already done — return success silently.
         if (user.TelegramChatId == request.TelegramChatId)
         {
             return Result.Success();

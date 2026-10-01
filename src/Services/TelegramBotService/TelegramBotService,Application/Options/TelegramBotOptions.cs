@@ -1,4 +1,4 @@
-namespace Notification.Infrastructure.Options;
+namespace Options;
 
 public sealed record TelegramBotOptions
 {

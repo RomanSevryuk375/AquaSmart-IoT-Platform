@@ -16,7 +16,9 @@ public sealed class SendTelegramCommandConsumer(
         SendTelegramCommand cmd = context.Message;
         var recipient = NotificationRecipient.TelegramRecipient(cmd.ChatId);
 
-        Result result = await telegramProvider.SendAsync(recipient, cmd.Message, context.CancellationToken);
+        object? keyboard = BuildInlineKeyboard(cmd);
+
+        Result result = await telegramProvider.SendAsync(recipient, cmd.Message, keyboard, context.CancellationToken);
         if (result.IsFailure)
         {
             logger.LogWarning("Failed to send Telegram message for Notification {Id}: {Error}",
@@ -25,5 +27,41 @@ public sealed class SendTelegramCommandConsumer(
         }
 
         logger.LogInformation("Successfully sent Telegram notification {Id}", cmd.NotificationId);
+    }
+
+    private static object? BuildInlineKeyboard(SendTelegramCommand cmd)
+    {
+        if (cmd.ReminderId.HasValue)
+        {
+            return new
+            {
+                inline_keyboard = new[]
+                {
+                    new[]
+                    {
+                        new
+                        {
+                            text = "✅ Выполнено",
+                            callback_data = $"done_reminder:{cmd.ReminderId.Value}"
+                        }
+                    }
+                }
+            };
+        }
+
+        return new
+        {
+            inline_keyboard = new[]
+            {
+                new[]
+                {
+                    new
+                    {
+                        text = "👁 Отметить прочитанным",
+                        callback_data = $"read_notice:{cmd.NotificationId}"
+                    }
+                }
+            }
+        };
     }
 }
