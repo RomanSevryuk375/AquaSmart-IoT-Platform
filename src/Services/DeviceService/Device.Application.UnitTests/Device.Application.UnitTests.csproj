@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <PackageReference Include="NSubstitute" />
@@ -7,6 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Device.Application\Device.Application.csproj" />
     <ProjectReference Include="..\Device.TestShared\Device.TestShared.csproj" />
+    <ProjectReference Include="..\DeviceService\Device.API.csproj" />
   </ItemGroup>
 
   <ItemGroup>

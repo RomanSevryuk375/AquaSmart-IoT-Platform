@@ -11,11 +11,16 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.ToTable("users");
 
         builder.Property(x => x.Name).IsRequired();
+        builder.Property(x => x.TelegramChatId).IsRequired(false);
         builder.Property(x => x.TimeZone).IsRequired();
         builder.Property(x => x.PhoneNumber).HasMaxLength(20);
         builder.Property(x => x.SubscriptionEndDate).IsRequired();
         builder.Property(x => x.SubscriptionId).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
+
+        builder.HasIndex(x => x.TelegramChatId)
+            .IsUnique()
+            .HasFilter("telegram_chat_id IS NOT NULL");
 
         builder.HasOne<Subscription>()
             .WithMany()

@@ -5,6 +5,7 @@ using Telemetry.Application.Features.BackgroundJobs.Commands.CleanUpOldData;
 
 namespace Telemetry.Infrastructure.BackgroundJobs;
 
+[DisallowConcurrentExecution]
 public class CleanUpOldDataJob(ISender sender) : IJob
 {
     public async Task Execute(IJobExecutionContext context)

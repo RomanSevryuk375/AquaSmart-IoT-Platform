@@ -24,8 +24,8 @@ void RelayManager::applyRuntimeConfig(BackendRuntimeConfig& runtimeConfig, const
         relay.channel = index + 1;
         relay.pin = RELAY_PINS[index];
         relay.safeState = config.relaySafeState[index];
-        writePhysical(relay, relay.safeState);
-        relay.currentState = relay.safeState;
+        writePhysical(relay, relay.backendState);
+        relay.currentState = relay.backendState;
 
         if (relay.purpose == RelayPurpose::HEATING || relay.purpose == RelayPurpose::BOILER) {
             _runtimeConfig->hasHeaterRelay = true;

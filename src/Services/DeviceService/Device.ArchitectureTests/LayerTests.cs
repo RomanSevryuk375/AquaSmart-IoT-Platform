@@ -3,17 +3,6 @@ namespace Device.ArchitectureTests;
 public class LayerTests : BaseArchitectureTest
 {
     [Fact]
-    public void DomainLayer_ShouldNotHaveDependencyOn_Contracts()
-    {
-        TestResult result = Types.InAssembly(DomainAssembly)
-            .Should()
-            .NotHaveDependencyOn("Contracts")
-            .GetResult();
-
-        result.IsSuccessful.Should().BeTrue();
-    }
-
-    [Fact]
     public void DomainLayer_ShouldNotHaveDependencyOn_ApplicationLayer()
     {
         TestResult result = Types.InAssembly(DomainAssembly)

@@ -29,6 +29,12 @@ public class TelemetryAggregateEntityConfiguration
         builder.Property(x => x.IsAggregated).IsRequired();
 
         builder.HasIndex(x => x.IsAggregated);
+        builder.HasIndex(x => new
+        {
+            x.Period,
+            x.IsAggregated,
+            x.PeriodStart
+        });
         builder.HasIndex(t => new
         {
             t.SensorId,

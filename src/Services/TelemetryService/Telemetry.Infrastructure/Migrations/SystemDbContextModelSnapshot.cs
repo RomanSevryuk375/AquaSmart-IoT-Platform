@@ -138,6 +138,9 @@ namespace Telemetry.Infrastructure.Migrations
                     b.HasIndex("IsAggregated")
                         .HasDatabaseName("ix_telemetry_aggregate_data_is_aggregated");
 
+                    b.HasIndex("Period", "IsAggregated", "PeriodStart")
+                        .HasDatabaseName("ix_telemetry_aggregate_data_period_is_aggregated_period_start");
+
                     b.HasIndex("SensorId", "Period", "PeriodStart")
                         .HasDatabaseName("ix_telemetry_aggregate_data_sensor_id_period_period_start");
 
@@ -225,6 +228,9 @@ namespace Telemetry.Infrastructure.Migrations
 
                     b.HasIndex("IsAggregated")
                         .HasDatabaseName("ix_telemetry_raw_data_is_aggregated");
+
+                    b.HasIndex("IsAggregated", "RecordedAt")
+                        .HasDatabaseName("ix_telemetry_raw_data_is_aggregated_recorded_at");
 
                     b.HasIndex("SensorId", "RecordedAt")
                         .HasDatabaseName("ix_telemetry_raw_data_sensor_id_recorded_at");

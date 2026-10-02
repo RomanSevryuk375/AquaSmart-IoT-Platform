@@ -9,7 +9,7 @@ public class DeleteCompletedCommandsLogicTests(
 {
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task DeleteCompleted_RemovesCompletedAndExpired_KeepsPending()
+    public async Task DeleteCompleted_RemovesCompletedAndOldExpired_KeepsPendingAndRecentlyExpired()
     {
         // Arrange
         Controller controller = new ControllerBuilder().Build();
@@ -31,15 +31,21 @@ public class DeleteCompletedCommandsLogicTests(
 
         completedCommand.MarkAsCompleted();
 
-        RelayCommand expiredCommand = new RelayCommandBuilder()
+        RelayCommand recentlyExpiredCommand = new RelayCommandBuilder()
             .WithControllerId(controller.Id)
             .WithRelayId(relay.Id)
             .WithExpireAt(DateTime.UtcNow.AddMinutes(-5))
             .Build();
 
+        RelayCommand oldExpiredCommand = new RelayCommandBuilder()
+            .WithControllerId(controller.Id)
+            .WithRelayId(relay.Id)
+            .WithExpireAt(DateTime.UtcNow.AddDays(-2))
+            .Build();
+
         DbContext.Controllers.Add(controller);
         DbContext.Relays.Add(relay);
-        DbContext.RelayCommands.AddRange(pendingCommand, completedCommand, expiredCommand);
+        DbContext.RelayCommands.AddRange(pendingCommand, completedCommand, recentlyExpiredCommand, oldExpiredCommand);
         await DbContext.SaveChangesAsync();
 
         Result result = await Sender.Send(new DeleteCompletedCommand());
@@ -49,8 +55,14 @@ public class DeleteCompletedCommandsLogicTests(
 
         List<RelayCommand> remainingCommands = await DbContext.RelayCommands.AsNoTracking().ToListAsync();
 
-        remainingCommands.Should().ContainSingle();
-        remainingCommands[0].Id.Should().Be(pendingCommand.Id);
-        remainingCommands[0].Status.Should().Be(CommandStatus.Pending);
+        remainingCommands.Should().HaveCount(2);
+        remainingCommands.Select(c => c.Id).Should().Contain([pendingCommand.Id, recentlyExpiredCommand.Id]);
+        remainingCommands.Select(c => c.Id).Should().NotContain([completedCommand.Id, oldExpiredCommand.Id]);
+
+        RelayCommand savedPending = remainingCommands.Single(c => c.Id == pendingCommand.Id);
+        savedPending.Status.Should().Be(CommandStatus.Pending);
+
+        RelayCommand savedRecentlyExpired = remainingCommands.Single(c => c.Id == recentlyExpiredCommand.Id);
+        savedRecentlyExpired.Status.Should().Be(CommandStatus.Pending);
     }
 }

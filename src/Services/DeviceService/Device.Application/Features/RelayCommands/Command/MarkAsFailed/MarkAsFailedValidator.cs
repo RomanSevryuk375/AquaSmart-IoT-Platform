@@ -10,9 +10,6 @@ internal sealed class MarkAsFailedValidator
         RuleFor(x => x.CommandId)
             .NotEmpty();
 
-        RuleFor(x => x.DeviceToken)
-            .NotEmpty();
-
         RuleFor(x => x.ErrorMessage)
             .NotEmpty();
     }

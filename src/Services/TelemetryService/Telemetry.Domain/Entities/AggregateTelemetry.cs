@@ -81,4 +81,12 @@ public sealed class AggregateTelemetry : AggregateRoot, IEntity
 
         IncrementVersion();
     }
+
+    public void UpdateSummary(TelemetrySummary summary)
+    {
+        Summary = summary;
+        IsAggregated = false;
+
+        IncrementVersion();
+    }
 }

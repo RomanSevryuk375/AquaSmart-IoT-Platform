@@ -5,10 +5,12 @@
 
 constexpr size_t MAX_SENSOR_COUNT = 12;
 constexpr size_t MAX_RELAY_COUNT = 8;
-constexpr size_t MAX_QUEUE_CAPACITY = 500;
+constexpr size_t MAX_QUEUE_CAPACITY = 100;
 constexpr size_t MAX_VALIDATION_ERRORS = 8;
 constexpr size_t MAX_COMMAND_HISTORY = 8;
 constexpr size_t MAX_DS18_ADDRESS_LENGTH = 24;
+
+constexpr char FIRMWARE_VERSION[] = "1.0.0";
 
 constexpr char DEFAULT_TELEMETRY_PATH[] = "/api/device/v1/sensors/telemetry";
 constexpr char DEFAULT_CONFIG_PATH[] = "/api/device/v1/controllers/me/config";
@@ -56,7 +58,8 @@ enum class InputEventType : uint8_t {
     NEXT,
     PREVIOUS,
     SELECT,
-    BACK
+    BACK,
+    FACTORY_RESET
 };
 
 enum class SensorRole : uint8_t {
@@ -204,7 +207,7 @@ struct ApiResult {
 struct InputEvent {
     InputEventType type;
     bool longPress;
-    InputEvent() : type(InputEventType::NONE) {} 
+    InputEvent() : type(InputEventType::NONE), longPress(false) {} 
     InputEvent(InputEventType t, bool isLongPress = false) : type(t), longPress(isLongPress) {}
 };
 

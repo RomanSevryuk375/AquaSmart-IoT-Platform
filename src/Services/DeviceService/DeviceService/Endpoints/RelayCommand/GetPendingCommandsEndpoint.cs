@@ -2,6 +2,7 @@ using BuildingBlocks.Domain.Results;
 using BuildingBlocks.Presentation.Constants;
 using BuildingBlocks.Presentation.Endpoints;
 using BuildingBlocks.Presentation.ResultExtensions;
+using Device.API.Filters;
 using Device.Application.Features.RelayCommands.Query.GetPending;
 using MediatR;
 
@@ -17,11 +18,7 @@ public sealed class GetPendingCommandsEndpoint : IEndpoint
             ISender sender,
             CancellationToken cancellationToken = default) =>
         {
-            var query = new GetPendingCommandsQuery
-            {
-                ControllerId = controllerId,
-                DeviceToken = deviceToken
-            };
+            var query = new GetPendingCommandsQuery { ControllerId = controllerId };
 
             Result<IReadOnlyList<RelayCommandDto>> result = await sender.Send(query, cancellationToken);
 
@@ -31,6 +28,6 @@ public sealed class GetPendingCommandsEndpoint : IEndpoint
         .Produces<IReadOnlyList<RelayCommandDto>>()
         .Produces(StatusCodes.Status401Unauthorized)
         .Produces(StatusCodes.Status404NotFound)
-        .AllowAnonymous();
+        .AddEndpointFilter<DeviceAuthenticationFilter>();
     }
 }

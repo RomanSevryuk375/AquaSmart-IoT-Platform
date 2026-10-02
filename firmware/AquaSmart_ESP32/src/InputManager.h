@@ -19,6 +19,7 @@ private:
     long _lastEncoderPosition = 0;
     bool _encoderLongPressHandled = false;
     bool _backLongPressHandled = false;
+    bool _backFactoryResetHandled = false;
 };
 
 #endif

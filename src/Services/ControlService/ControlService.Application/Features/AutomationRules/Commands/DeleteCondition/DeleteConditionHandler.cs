@@ -20,7 +20,7 @@ public sealed class DeleteConditionHandler(
             request.RuleId, cancellationToken);
         if (rule is null)
         {
-            return Result.Failure(Error.NotFound<RuleCondition>(
+            return Result.Failure(Error.NotFound<AutomationRule>(
                 $"Rule {request.RuleId} not found"));
         }
 

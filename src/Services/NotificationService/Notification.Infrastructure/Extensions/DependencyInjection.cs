@@ -12,6 +12,7 @@ using Notification.Infrastructure.GrpcClients;
 using Notification.Infrastructure.Messaging.Alert;
 using Notification.Infrastructure.Messaging.Ecosystem;
 using Notification.Infrastructure.Messaging.User;
+using Notification.Infrastructure.Options;
 using Notification.Infrastructure.Persistence;
 using Notification.Infrastructure.Persistence.Repositories;
 using Notification.Infrastructure.Providers;
@@ -47,7 +48,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddMessageProviders(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<TelegramOptions>(configuration.GetSection(TelegramOptions.SectionName));
+        services.Configure<TelegramBotOptions>(configuration.GetSection(TelegramBotOptions.SectionName));
         services.Configure<EmailOptions>(configuration.GetSection(EmailOptions.SectionName));
 
         services.AddHttpClient<ITgProvider, TgProvider>();

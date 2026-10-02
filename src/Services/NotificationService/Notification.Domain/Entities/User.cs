@@ -112,20 +112,16 @@ public sealed class User : AggregateRoot, IEntity
         return Result.Success();
     }
 
-    public Result SetNotificationPreferences(bool emailEnable, bool tgEnable, long? tgChatId)
+    public void LinkTelegramChat(long chatId)
     {
-        if (tgEnable && tgChatId is null)
+        if (TelegramChatId == chatId)
         {
-            return Result.Failure(Error.Validation<User>(
-                "Telegram Chat ID is required if Telegram notifications are enabled."));
+            return;
         }
 
-        EmailEnable = emailEnable;
-        TgEnable = tgEnable;
-        TelegramChatId = tgChatId;
+        TgEnable = true;
+        TelegramChatId = chatId;
 
         IncrementVersion();
-
-        return Result.Success();
     }
 }

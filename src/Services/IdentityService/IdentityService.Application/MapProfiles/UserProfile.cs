@@ -11,5 +11,7 @@ public sealed class UserProfile : Profile
         CreateMap<UserCreatedDomainEvent, UserCreatedEvent>();
 
         CreateMap<UserUpdatedDomainEvent, UserUpdatedEvent>();
+
+        CreateMap<SubscriptionDowngradedDomainEvent, SubscriptionDowngradedEvent>();
     }
 }

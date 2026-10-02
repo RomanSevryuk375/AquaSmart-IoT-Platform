@@ -2,6 +2,7 @@ using BuildingBlocks.Domain.Results;
 using BuildingBlocks.Presentation.Constants;
 using BuildingBlocks.Presentation.Endpoints;
 using BuildingBlocks.Presentation.ResultExtensions;
+using Device.API.Filters;
 using Device.Application.Features.RelayCommands.Command.MarkAsFailed;
 using MediatR;
 
@@ -21,7 +22,6 @@ public sealed class MarkCommandAsFailedEndpoint : IEndpoint
             var command = new MarkAsFailedCommand
             {
                 CommandId = commandId,
-                DeviceToken = deviceToken,
                 ErrorMessage = errorMessage
             };
 
@@ -33,6 +33,6 @@ public sealed class MarkCommandAsFailedEndpoint : IEndpoint
         .Produces(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status401Unauthorized)
         .Produces(StatusCodes.Status404NotFound)
-        .AllowAnonymous();
+        .AddEndpointFilter<DeviceAuthenticationFilter>();
     }
 }

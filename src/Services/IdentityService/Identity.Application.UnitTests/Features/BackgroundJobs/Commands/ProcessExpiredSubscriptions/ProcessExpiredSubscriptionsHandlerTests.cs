@@ -1,25 +1,23 @@
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
-using BuildingBlocks.IntegrationEvents.Events.Users;
 using IdentityService.Application.Features.BackgroundJobs.Commands.ProcessExpiredSubscriptions;
-using MassTransit;
+using IdentityService.Domain.Events;
 
 namespace Identity.Application.UnitTests.Features.BackgroundJobs.Commands.ProcessExpiredSubscriptions;
 
 public class ProcessExpiredSubscriptionsHandlerTests
 {
     private readonly IUserRepository _userRepositoryMock = Substitute.For<IUserRepository>();
-    private readonly IPublishEndpoint _publishEndpointMock = Substitute.For<IPublishEndpoint>();
     private readonly ProcessExpiredSubscriptionsHandler _handler;
 
     public ProcessExpiredSubscriptionsHandlerTests()
     {
-        _handler = new ProcessExpiredSubscriptionsHandler(_userRepositoryMock, _publishEndpointMock);
+        _handler = new ProcessExpiredSubscriptionsHandler(_userRepositoryMock);
     }
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Handle_WhenNoUsersWithExpiredSubscription_ReturnsSuccessAndPublishesNothing()
+    public async Task Handle_WhenNoUsersWithExpiredSubscription_ReturnsSuccess()
     {
         // Arrange
         _userRepositoryMock.GetWithExpiredSubscriptionAsync(Arg.Any<CancellationToken>())
@@ -32,16 +30,15 @@ public class ProcessExpiredSubscriptionsHandlerTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        await _publishEndpointMock.DidNotReceive().Publish(Arg.Any<SubscriptionDowngradedEvent>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task Handle_WhenUsersHaveExpiredSubscription_DowngradesToFreeAndPublishesEvents()
+    public async Task Handle_WhenUsersHaveExpiredSubscription_DowngradesToFreeAndRaisesDomainEvents()
     {
         // Arrange
-        Guid proId = Guid.Parse(SubscriptionType.Professional);
-        Guid freeId = Guid.Parse(SubscriptionType.Free);
+        var proId = Guid.Parse(SubscriptionType.Professional);
+        var freeId = Guid.Parse(SubscriptionType.Free);
 
         User user1 = new UserBuilder()
             .WithId(Guid.NewGuid())
@@ -49,6 +46,7 @@ public class ProcessExpiredSubscriptionsHandlerTests
             .WithSubscriptionId(proId)
             .Build();
         user1.SetSubscription(proId, -1);
+        user1.ClearDomainEvents();
 
         User user2 = new UserBuilder()
             .WithId(Guid.NewGuid())
@@ -56,6 +54,7 @@ public class ProcessExpiredSubscriptionsHandlerTests
             .WithSubscriptionId(proId)
             .Build();
         user2.SetSubscription(proId, -5);
+        user2.ClearDomainEvents();
 
         _userRepositoryMock.GetWithExpiredSubscriptionAsync(Arg.Any<CancellationToken>())
             .Returns([user1, user2]);
@@ -71,12 +70,12 @@ public class ProcessExpiredSubscriptionsHandlerTests
         user1.SubscriptionId.Should().Be(freeId);
         user2.SubscriptionId.Should().Be(freeId);
 
-        await _publishEndpointMock.Received(1).Publish(
-            Arg.Is<SubscriptionDowngradedEvent>(e => e.UserId == user1.Id && e.NewSubscriptionId == freeId),
-            Arg.Any<CancellationToken>());
+        user1.DomainEvents.Should().ContainSingle()
+            .Which.Should().BeOfType<SubscriptionDowngradedDomainEvent>()
+            .Which.NewSubscriptionId.Should().Be(freeId);
 
-        await _publishEndpointMock.Received(1).Publish(
-            Arg.Is<SubscriptionDowngradedEvent>(e => e.UserId == user2.Id && e.NewSubscriptionId == freeId),
-            Arg.Any<CancellationToken>());
+        user2.DomainEvents.Should().ContainSingle()
+            .Which.Should().BeOfType<SubscriptionDowngradedDomainEvent>()
+            .Which.NewSubscriptionId.Should().Be(freeId);
     }
 }

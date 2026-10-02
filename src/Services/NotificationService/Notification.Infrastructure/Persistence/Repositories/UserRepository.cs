@@ -26,4 +26,14 @@ public sealed class UserRepository(NotificationDbContext dbContext)
             .Where(x => userIds.Contains(x.Id))
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<bool> TelegramChatIdExistsAsync(
+        long chatId,
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.Users
+            .AsNoTracking()
+            .AnyAsync(x => x.TelegramChatId == chatId, cancellationToken);
+    }
+
 }

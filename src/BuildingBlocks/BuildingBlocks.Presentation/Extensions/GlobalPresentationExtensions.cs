@@ -2,6 +2,7 @@ using BuildingBlocks.Presentation.Authorization;
 using BuildingBlocks.Presentation.Constants;
 using BuildingBlocks.Presentation.Endpoints;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -23,6 +24,11 @@ public static class GlobalPresentationExtensions
     public static WebApplication AddGlobalConfiguration(this WebApplication application)
     {
         application.UseGlobalExceptionHandler();
+        application.Use((context, next) =>
+        {
+            context.Request.EnableBuffering();
+            return next();
+        });
         application.UseSwagger();
         application.UseSwaggerUI();
         application.UseAuthentication();

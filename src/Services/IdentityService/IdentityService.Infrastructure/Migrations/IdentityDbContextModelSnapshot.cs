@@ -176,7 +176,7 @@ namespace IdentityService.Infrastructure.Migrations
                             Name = "Free",
                             Permissions = "[\"tank:read\",\"tank:create\",\"tank:update\",\"tank:delete\",\"tank:limit:1\",\"device:control\",\"auto:rule:create\",\"auto:rule:limit:5\",\"auto:schedule:create\",\"data:view\",\"notify:log:read\",\"notify:log:write\",\"account:update\",\"account:view\"]",
                             Price = 0m,
-                            Version = new Guid("fb13f157-0552-4cb5-b00c-d07d866d387c")
+                            Version = new Guid("5c994977-84b2-4335-bad2-8dcd0a7f9a59")
                         },
                         new
                         {
@@ -186,7 +186,7 @@ namespace IdentityService.Infrastructure.Migrations
                             Name = "Professional",
                             Permissions = "[\"tank:read\",\"tank:create\",\"tank:update\",\"tank:delete\",\"tank:limit:10\",\"device:control\",\"auto:rule:create\",\"auto:rule:limit:10\",\"auto:schedule:create\",\"data:view\",\"data:history\",\"notify:tg\",\"notify:log:read\",\"notify:log:write\",\"notify:reminder\",\"account:update\",\"account:view\"]",
                             Price = 9.99m,
-                            Version = new Guid("c7cf844d-991a-4f28-9c0a-da9aaf3a42dc")
+                            Version = new Guid("6f02a937-debb-4ad8-bc75-0a306bfd4ffe")
                         },
                         new
                         {
@@ -196,7 +196,7 @@ namespace IdentityService.Infrastructure.Migrations
                             Name = "Elite",
                             Permissions = "[\"tank:read\",\"tank:create\",\"tank:update\",\"tank:delete\",\"tank:limit:unlim\",\"device:control\",\"device:manual\",\"auto:rule:create\",\"auto:rule:limit:unlim\",\"auto:schedule:create\",\"auto:vacation\",\"data:view\",\"data:history\",\"data:diag\",\"data:rt\",\"notify:log:read\",\"notify:log:write\",\"notify:reminder\",\"notify:email\",\"notify:tg\"]",
                             Price = 19.99m,
-                            Version = new Guid("4fe111a9-72c4-42dc-8df9-6725cc503be9")
+                            Version = new Guid("41195810-e36b-43a9-ad8a-c2cfe6b0fde7")
                         });
                 });
 
@@ -278,6 +278,10 @@ namespace IdentityService.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("subscription_id");
 
+                    b.Property<long?>("TelegramChatId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("telegram_chat_id");
+
                     b.Property<string>("TimeZone")
                         .IsRequired()
                         .HasMaxLength(128)
@@ -305,6 +309,11 @@ namespace IdentityService.Infrastructure.Migrations
 
                     b.HasIndex("SubscriptionId")
                         .HasDatabaseName("ix_users_subscription_id");
+
+                    b.HasIndex("TelegramChatId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_telegram_chat_id")
+                        .HasFilter("telegram_chat_id IS NOT NULL");
 
                     b.ToTable("users", (string)null);
                 });

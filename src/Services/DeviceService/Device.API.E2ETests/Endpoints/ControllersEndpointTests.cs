@@ -85,7 +85,7 @@ public class ControllersEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETes
 
         // Act
         HttpResponseMessage response = await Client.GetAsync(
-            $"{ApiConstants.Routes.Controllers}{hackerController.Id}");
+            $"{ApiConstants.Routes.Controllers}/{hackerController.Id}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -98,8 +98,11 @@ public class ControllersEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETes
         // Arrange
         var hasher = new MyHasher();
         string rawToken = "my_secret_token";
+        var controllerId = Guid.NewGuid();
 
         Controller controller = new ControllerBuilder()
+            .WithId(controllerId)
+            .WithMacAddress("00:11:22:33:44:A1")
             .WithDeviceTokenHash(hasher.Generate(rawToken))
             .Build();
 
@@ -123,11 +126,65 @@ public class ControllersEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETes
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+    public async Task GetControllerConfig_WithoutDeviceToken_Returns401Unauthorized()
+    {
+        // Arrange
+        var controllerId = Guid.NewGuid();
+        Controller controller = new ControllerBuilder()
+            .WithId(controllerId)
+            .WithMacAddress("00:11:22:33:44:A2")
+            .Build();
+
+        DbContext.Controllers.Add(controller);
+        await DbContext.SaveChangesAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiConstants.Routes.Controllers}/me/config");
+        request.Headers.Add(ApiConstants.Headers.MacAddress, controller.MacAddress.Value);
+
+        // Act
+        HttpResponseMessage response = await Client.SendAsync(request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+    public async Task GetControllerConfig_WithInvalidDeviceToken_Returns401Unauthorized()
+    {
+        // Arrange
+        var hasher = new MyHasher();
+        var controllerId = Guid.NewGuid();
+        Controller controller = new ControllerBuilder()
+            .WithId(controllerId)
+            .WithMacAddress("00:11:22:33:44:A3")
+            .WithDeviceTokenHash(hasher.Generate("real_token"))
+            .Build();
+
+        DbContext.Controllers.Add(controller);
+        await DbContext.SaveChangesAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiConstants.Routes.Controllers}/me/config");
+        request.Headers.Add(ApiConstants.Headers.MacAddress, controller.MacAddress.Value);
+        request.Headers.Add(ApiConstants.Headers.DeviceToken, "wrong_token");
+
+        // Act
+        HttpResponseMessage response = await Client.SendAsync(request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     public async Task Ping_WithInvalidDeviceToken_Returns401Unauthorized()
     {
         // Arrange
         var hasher = new MyHasher();
+        var controllerId = Guid.NewGuid();
         Controller controller = new ControllerBuilder()
+            .WithId(controllerId)
+            .WithMacAddress("00:11:22:33:44:A4")
             .WithDeviceTokenHash(hasher.Generate("real_token"))
             .Build();
 
@@ -137,6 +194,30 @@ public class ControllersEndpointTests(E2ETestWebAppFactory factory) : BaseE2ETes
         var request = new HttpRequestMessage(HttpMethod.Post,
             $"{ApiConstants.Routes.Controllers}/{controller.Id}/ping");
         request.Headers.Add(ApiConstants.Headers.DeviceToken, "hacker_token");
+
+        // Act
+        HttpResponseMessage response = await Client.SendAsync(request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+    public async Task Ping_WithoutDeviceToken_Returns401Unauthorized()
+    {
+        // Arrange
+        var controllerId = Guid.NewGuid();
+        Controller controller = new ControllerBuilder()
+            .WithId(controllerId)
+            .WithMacAddress("00:11:22:33:44:A5")
+            .Build();
+
+        DbContext.Controllers.Add(controller);
+        await DbContext.SaveChangesAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Post,
+            $"{ApiConstants.Routes.Controllers}/{controller.Id}/ping");
 
         // Act
         HttpResponseMessage response = await Client.SendAsync(request);

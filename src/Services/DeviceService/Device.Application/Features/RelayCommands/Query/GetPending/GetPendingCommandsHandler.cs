@@ -4,11 +4,10 @@ using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
 using Dapper;
-using Device.Application.Interfaces;
 
 namespace Device.Application.Features.RelayCommands.Query.GetPending;
 
-internal sealed class GetPendingCommandsHandler(ISqlConnectionFactory sqlConnectionFactory, IDeviceTokenHasher tokenHasher)
+internal sealed class GetPendingCommandsHandler(ISqlConnectionFactory sqlConnectionFactory)
     : IRequestHandler<GetPendingCommandsQuery, Result<IReadOnlyList<RelayCommandDto>>>
 {
     public async Task<Result<IReadOnlyList<RelayCommandDto>>> Handle(
@@ -16,21 +15,6 @@ internal sealed class GetPendingCommandsHandler(ISqlConnectionFactory sqlConnect
         CancellationToken cancellationToken)
     {
         using IDbConnection connection = sqlConnectionFactory.CreateConnection();
-
-        const string AuthSql = """
-            SELECT device_token_hash
-            FROM controllers
-            WHERE id = @ControllerId
-            LIMIT 1
-            """;
-
-        string? tokenHash = await connection.QueryFirstOrDefaultAsync<string>(
-            AuthSql, new { request.ControllerId });
-        if (tokenHash is null || !tokenHasher.Verify(request.DeviceToken, tokenHash))
-        {
-            return Result<IReadOnlyList<RelayCommandDto>>.Failure(Error.NotFound<Controller>(
-                ErrorMessages.InvalidCredentialsOrControllerNotFound));
-        }
 
         DateTime now = DateTime.UtcNow;
         DateTime retryThreshold = now.AddMinutes(-RelayCommandConstants.RetryCooldownMinutes);
@@ -51,8 +35,12 @@ internal sealed class GetPendingCommandsHandler(ISqlConnectionFactory sqlConnect
                 ORDER BY created_at
                 FOR UPDATE SKIP LOCKED)
             RETURNING
-                id, controller_id, relay_id, target_state, status,
-                expire_at, attempt_count, processed_at, error_message, created_at;
+                id, controller_id, relay_id, 
+                CASE WHEN target_state
+                  THEN 1
+                  ELSE 2
+                END AS action,
+                status, expire_at, attempt_count, processed_at, error_message, created_at;
             """;
 
         IEnumerable<RelayCommandDto> commands = await connection.QueryAsync<RelayCommandDto>(PopSql, new

@@ -26,5 +26,8 @@ public static class ApiConstants
     {
         public const string MacAddress = "X-Mac-Address";
         public const string DeviceToken = "X-Device-Token";
+        public const string TelegramBotSecret = "X-Bot-Secret";
+        public const string HmacSignature = "X-Signature";
+        public const string Timestamp = "X-Timestamp";
     }
 }

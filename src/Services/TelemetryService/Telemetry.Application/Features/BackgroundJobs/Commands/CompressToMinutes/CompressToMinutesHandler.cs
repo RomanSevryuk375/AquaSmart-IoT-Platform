@@ -11,30 +11,41 @@ public sealed class CompressToMinutesHandler(
     ITelemetryRawDataRepository telemetryRaw,
     ICompressorHelper compressorHelper) : IRequestHandler<CompressToMinutesCommand, Result>
 {
-    private const int MinuteInterval = -1;
+    private const int MaxBatchWindows = 120;
 
     public async Task<Result> Handle(CompressToMinutesCommand request, CancellationToken cancellationToken)
     {
-        var to = new DateTime(
+        var ceilingUtc = new DateTime(
             DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day,
             DateTime.UtcNow.Hour, DateTime.UtcNow.Minute, 0, DateTimeKind.Utc);
-        DateTime from = to.AddMinutes(MinuteInterval);
 
-        IReadOnlyDictionary<Guid, TelemetrySummary> data =
-            await telemetryRaw.GetSummaryForPeriodAsync(from, to, cancellationToken);
-        if (data.Count == 0)
+        IReadOnlyList<DateTime> windows = await telemetryRaw.GetUnaggregatedMinuteWindowsAsync(
+            ceilingUtc, MaxBatchWindows, cancellationToken);
+
+        if (windows.Count == 0)
         {
             return Result.Success();
         }
 
-        foreach (KeyValuePair<Guid, TelemetrySummary> kvp in data)
+        foreach (DateTime windowStart in windows)
         {
-            await compressorHelper.CreateAndSaveAggregatedTelemetryAsync(
-                kvp.Key, kvp.Value, from, PeriodType.Minute, cancellationToken);
-        }
+            DateTime windowEnd = windowStart.AddMinutes(1);
 
-        var sensorIds = data.Keys.ToList();
-        await telemetryRaw.MarkAsAggregatedAsync(sensorIds, from, to, cancellationToken);
+            IReadOnlyDictionary<Guid, TelemetrySummary> data =
+                await telemetryRaw.GetSummaryForPeriodAsync(windowStart, windowEnd, cancellationToken);
+
+            if (data.Count > 0)
+            {
+                foreach (KeyValuePair<Guid, TelemetrySummary> kvp in data)
+                {
+                    await compressorHelper.CreateAndSaveAggregatedTelemetryAsync(
+                        kvp.Key, kvp.Value, windowStart, PeriodType.Minute, cancellationToken);
+                }
+
+                var sensorIds = data.Keys.ToList();
+                await telemetryRaw.MarkAsAggregatedAsync(sensorIds, windowStart, windowEnd, cancellationToken);
+            }
+        }
 
         return Result.Success();
     }

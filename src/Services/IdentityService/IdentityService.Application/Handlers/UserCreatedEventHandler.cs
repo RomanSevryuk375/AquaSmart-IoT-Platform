@@ -6,14 +6,13 @@ using MediatR;
 
 namespace IdentityService.Application.Handlers;
 
-public sealed class UserCreatedEventHandler(
+internal sealed class UserCreatedEventHandler(
     IPublishEndpoint publishEndpoint,
     IMapper mapper) : INotificationHandler<UserCreatedDomainEvent>
 {
     public async Task Handle(UserCreatedDomainEvent notification, CancellationToken cancellationToken)
     {
-        UserCreatedEvent integrationEvent = mapper.Map<UserCreatedEvent>(notification);
-
-        await publishEndpoint.Publish(integrationEvent, cancellationToken);
+        await publishEndpoint.Publish(
+            mapper.Map<UserCreatedEvent>(notification), cancellationToken);
     }
 }

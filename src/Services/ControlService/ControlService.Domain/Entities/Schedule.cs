@@ -59,6 +59,12 @@ public sealed class Schedule : AggregateRoot, IEntity
             return Result<Schedule>.Failure(cronResult.Error);
         }
 
+        if (durationMin <= ControlConstants.MinDuration)
+        {
+            return Result<Schedule>.Failure(Error.Validation<Schedule>(
+                ControlValidationMessages.DurationMinMustBeGreaterThanZero));
+        }
+
         var schedule = new Schedule(
             scheduleId, ecosystemId, relayId,
             cronResult.Value, durationMin,

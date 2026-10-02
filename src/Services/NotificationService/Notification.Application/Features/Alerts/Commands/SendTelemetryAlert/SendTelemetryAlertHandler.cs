@@ -25,12 +25,12 @@ public sealed class SendTelemetryAlertHandler(
                 $"User {request.UserId} not found"));
         }
 
-        Ecosystem? existingEcosystem = await ecosystemRepository.GetByUserIdAsync(
-            request.UserId, cancellationToken);
+        Ecosystem? existingEcosystem = await ecosystemRepository.GetByIdAsync(
+            request.EcosystemId, cancellationToken);
         if (existingEcosystem is null)
         {
             return Result.Failure(Error.NotFound<Ecosystem>(
-                $"Ecosystem {request.UserId} not found"));
+                $"Ecosystem {request.EcosystemId} not found"));
         }
 
         Result<DeviceMetadataDto> enrichedMetadataResult = await metadataEnricher.EnrichAsync(

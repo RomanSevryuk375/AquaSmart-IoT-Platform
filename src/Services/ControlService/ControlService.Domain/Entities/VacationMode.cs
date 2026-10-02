@@ -48,6 +48,12 @@ public sealed class VacationMode : AggregateRoot, IEntity
             return Result<VacationMode>.Failure(dateRangeResult.Error);
         }
 
+        if (calculatedFeed < ControlConstants.MinCalculatedFeed)
+        {
+            return Result<VacationMode>.Failure(Error.Validation<VacationMode>(
+                ControlValidationMessages.CalculatedFeedCannotBeNegative));
+        }
+
         var vacation = new VacationMode(
             vacationModeId, ecosystemId,
             dateRangeResult.Value, isActive, calculatedFeed,

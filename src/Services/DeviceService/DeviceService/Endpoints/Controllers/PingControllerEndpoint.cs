@@ -2,6 +2,7 @@ using BuildingBlocks.Domain.Results;
 using BuildingBlocks.Presentation.Constants;
 using BuildingBlocks.Presentation.Endpoints;
 using BuildingBlocks.Presentation.ResultExtensions;
+using Device.API.Filters;
 using Device.Application.Features.Controllers.Command.PingController;
 using MediatR;
 
@@ -13,15 +14,10 @@ public sealed class PingControllerEndpoint : IEndpoint
     {
         app.MapPost($"{ApiConstants.Routes.Controllers}/{{id:guid}}/ping", async (
             Guid id,
-            [FromHeader(Name = ApiConstants.Headers.DeviceToken)] string deviceToken,
             ISender sender,
             CancellationToken cancellationToken = default) =>
         {
-            var command = new PingControllerCommand
-            {
-                ControllerId = id,
-                DeviceToken = deviceToken
-            };
+            var command = new PingControllerCommand { ControllerId = id };
 
             Result<ControllerPingResponse> result = await sender.Send(command, cancellationToken);
 
@@ -31,6 +27,6 @@ public sealed class PingControllerEndpoint : IEndpoint
         .Produces<ControllerPingResponse>()
         .Produces(StatusCodes.Status401Unauthorized)
         .Produces(StatusCodes.Status404NotFound)
-        .AllowAnonymous();
+        .AddEndpointFilter<DeviceAuthenticationFilter>();
     }
 }

@@ -31,7 +31,7 @@ public sealed class RelayCommandsQueueRepository(DeviceDbContext dbContext)
     {
         return await Context.RelayCommands
             .Where(x => x.Status == CommandStatus.Completed
-                     || x.ExpireAt < DateTime.UtcNow)
+                     || x.ExpireAt < DateTime.UtcNow.AddDays(-1))
             .ExecuteDeleteAsync(cancellationToken);
     }
 }

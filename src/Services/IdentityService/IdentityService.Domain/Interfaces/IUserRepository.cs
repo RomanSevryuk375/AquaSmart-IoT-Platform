@@ -7,4 +7,12 @@ public interface IUserRepository : IRepository<User>
 {
     public Task<IReadOnlyList<User>> GetWithExpiredSubscriptionAsync(
         CancellationToken cancellationToken = default);
+
+    public Task<bool> TelegramChatIdExistsAsync(
+        long chatId,
+        CancellationToken cancellationToken = default);
+
+    public Task<User?> GetByTelegramChatIdAsync(
+        long chatId,
+        CancellationToken cancellationToken = default);
 }

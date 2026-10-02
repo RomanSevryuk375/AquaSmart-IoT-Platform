@@ -28,6 +28,12 @@ public sealed class UnitOfWork<TDbContext>(TDbContext dbContext) : IUnitOfWork
 
             throw new ConcurrencyException(ex.Message);
         }
+        catch (DbUpdateException ex)
+        {
+            await RollbackTransactionAsync(cancellationToken);
+
+            throw new ConcurrencyException(ex.Message);
+        }
         catch
         {
             await RollbackTransactionAsync(cancellationToken);
@@ -53,6 +59,19 @@ public sealed class UnitOfWork<TDbContext>(TDbContext dbContext) : IUnitOfWork
         }
     }
 
-    public async Task SaveChangesAsync(CancellationToken cancellationToken = default) =>
-        await dbContext.SaveChangesAsync(cancellationToken);
+    public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            throw new ConcurrencyException(ex.Message);
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new ConcurrencyException(ex.Message);
+        }
+    }
 }

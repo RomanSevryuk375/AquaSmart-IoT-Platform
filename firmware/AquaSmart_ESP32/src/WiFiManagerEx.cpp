@@ -5,6 +5,19 @@ void WiFiManagerEx::begin(const DeviceConfig& config) {
     _password = config.wifiPass;
     WiFi.mode(WIFI_STA);
     WiFi.setAutoReconnect(true);
+    WiFi.persistent(true);
+
+    if (_ssid.length() > 0) {
+        Serial.printf("[WiFi] Initiating connection to %s...\n", _ssid.c_str());
+        WiFi.begin(_ssid.c_str(), _password.c_str());
+        _connectStarted = true;
+    } else {
+        Serial.println("[WiFi] No SSID configured.");
+    }
+
+    _connectStartedAtMs = millis();
+    _lastLogAtMs = millis();
+    _lastReconnectAtMs = millis();
 }
 
 bool WiFiManagerEx::update(SystemState& state, ErrorCode& errorCode) {
@@ -13,35 +26,38 @@ bool WiFiManagerEx::update(SystemState& state, ErrorCode& errorCode) {
             Serial.println("[WiFi] Connected!");
             Serial.print("[WiFi] IP: ");
             Serial.println(WiFi.localIP());
+            Serial.print("[WiFi] MAC: ");
+            Serial.println(WiFi.macAddress());
             _hasEverConnected = true;
         }
-        state = SystemState::SYNC_TIME;
+        if (state == SystemState::CONNECT_WIFI) {
+            state = SystemState::SYNC_TIME;
+        }
         return true;
     }
 
     const uint32_t nowMs = millis();
-    
-    // Если статус не WL_CONNECTED, выводим статус каждые 5 секунд
-    if (nowMs - _lastAttemptAtMs >= 5000) {
+
+    // Log status every 5 seconds when disconnected
+    if (nowMs - _lastLogAtMs >= 5000) {
         Serial.printf("[WiFi] Status: %d, SSID: %s\n", WiFi.status(), _ssid.c_str());
-        _lastAttemptAtMs = nowMs;
+        _lastLogAtMs = nowMs;
     }
 
-    if (!_connectStarted || nowMs - _lastAttemptAtMs >= 10000) {
-        _lastAttemptAtMs = nowMs;
-        if (!_connectStarted) {
-            Serial.println("[WiFi] Starting connection...");
-            _connectStartedAtMs = nowMs;
-        }
-        _connectStarted = true;
-        WiFi.disconnect(false, false);
-        WiFi.begin(_ssid.c_str(), _password.c_str());
+    // Safety fallback: if not connected after 45s, re-trigger WiFi.reconnect()
+    if (_connectStarted && nowMs - _lastReconnectAtMs >= 45000) {
+        _lastReconnectAtMs = nowMs;
+        Serial.println("[WiFi] Re-triggering connection...");
+        WiFi.reconnect();
     }
 
+    // Degradation timeout: allow offline operation if WiFi takes longer than 30s
     if (_connectStarted && nowMs - _connectStartedAtMs >= 30000 && WiFi.status() != WL_CONNECTED) {
-        Serial.println("[WiFi] Connection timeout!");
-        state = SystemState::DEGRADED_OFFLINE;
-        errorCode = ErrorCode::E002_WIFI_FAILED;
+        if (state == SystemState::CONNECT_WIFI) {
+            Serial.println("[WiFi] Connection timeout, transitioning to DEGRADED_OFFLINE");
+            state = SystemState::DEGRADED_OFFLINE;
+            errorCode = ErrorCode::E002_WIFI_FAILED;
+        }
     }
 
     return false;

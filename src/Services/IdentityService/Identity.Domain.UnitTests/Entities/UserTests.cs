@@ -193,7 +193,7 @@ public class UserTests
     }
 
     [Fact]
-    public void SetSubscription_WhenCalled_UpdatesSubscriptionFieldsAndChangesConcurrencyStamp()
+    public void SetSubscription_WhenCalled_UpdatesSubscriptionFieldsRaisesDowngradedEventAndChangesConcurrencyStamp()
     {
         // Arrange
         User user = new UserBuilder().Build();
@@ -209,6 +209,70 @@ public class UserTests
         user.SubscriptionId.Should().Be(newSubId);
         user.SubscriptionEndDate.Should().BeCloseTo(DateTime.UtcNow.AddDays(durationDays), tolerance);
         user.ConcurrencyStamp.Should().NotBe(initialStamp);
+
+        user.DomainEvents.Should().ContainSingle()
+            .Which.Should().BeOfType<SubscriptionDowngradedDomainEvent>();
+
+        SubscriptionDowngradedDomainEvent domainEvent = user.DomainEvents.OfType<SubscriptionDowngradedDomainEvent>().Single();
+        domainEvent.UserId.Should().Be(user.Id);
+        domainEvent.NewSubscriptionId.Should().Be(newSubId);
+        domainEvent.OccurredOn.Should().BeCloseTo(DateTime.UtcNow, tolerance);
+    }
+
+    [Fact]
+    public void LinkTelegramChat_WithNewChatId_UpdatesChatIdAndChangesConcurrencyStamp()
+    {
+        // Arrange
+        User user = new UserBuilder().Build();
+        string stampBefore = user.ConcurrencyStamp!;
+        long chatId = 987654321L;
+
+        // Act
+        user.LinkTelegramChat(chatId);
+
+        // Assert
+        user.TelegramChatId.Should().Be(chatId);
+        user.ConcurrencyStamp.Should().NotBe(stampBefore);
+    }
+
+    [Fact]
+    public void LinkTelegramChat_WithNewChatId_RaisesTelegramAccountLinkedDomainEvent()
+    {
+        // Arrange
+        User user = new UserBuilder().Build();
+        user.ClearDomainEvents();
+        long chatId = 111222333L;
+        var tolerance = TimeSpan.FromSeconds(2);
+
+        // Act
+        user.LinkTelegramChat(chatId);
+
+        // Assert
+        TelegramAccountLinkedDomainEvent domainEvent = user.DomainEvents
+            .OfType<TelegramAccountLinkedDomainEvent>()
+            .Single();
+
+        domainEvent.UserId.Should().Be(user.Id);
+        domainEvent.TelegramChatId.Should().Be(chatId);
+        domainEvent.OccurredOn.Should().BeCloseTo(DateTime.UtcNow, tolerance);
+    }
+
+    [Fact]
+    public void LinkTelegramChat_WithSameChatIdAsAlreadyLinked_DoesNotChangeConcurrencyStampOrRaiseEvent()
+    {
+        // Arrange
+        User user = new UserBuilder().Build();
+        long chatId = 555666777L;
+        user.LinkTelegramChat(chatId);
+        user.ClearDomainEvents();
+        string stampAfterFirstLink = user.ConcurrencyStamp!;
+
+        // Act
+        user.LinkTelegramChat(chatId); // same id — should be no-op
+
+        // Assert
+        user.TelegramChatId.Should().Be(chatId);
+        user.ConcurrencyStamp.Should().Be(stampAfterFirstLink);
         user.DomainEvents.Should().BeEmpty();
     }
 }

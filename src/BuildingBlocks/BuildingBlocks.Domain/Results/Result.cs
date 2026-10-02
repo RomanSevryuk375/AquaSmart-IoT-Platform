@@ -1,13 +1,17 @@
+using System.Text.Json.Serialization;
 using BuildingBlocks.Domain.Constants;
+using BuildingBlocks.Domain.Results.Converters;
 
 namespace BuildingBlocks.Domain.Results;
 
+[JsonConverter(typeof(ResultJsonConverter))]
 public class Result
 {
     public bool IsSuccess { get; }
     public bool IsFailure => !IsSuccess;
     public Error Error { get; }
 
+    [JsonConstructor]
     protected Result(bool isSuccess, Error error)
     {
         if (ErrorInvalid(isSuccess, error))
@@ -28,6 +32,7 @@ public class Result
     public static Result Failure(Error error) => new(false, error);
 }
 
+[JsonConverter(typeof(ResultJsonConverterFactory))]
 public class Result<T> : Result
 {
     private readonly T? _value;
@@ -36,6 +41,7 @@ public class Result<T> : Result
         ? _value!
         : throw new InvalidOperationException(ResultErrors.ResultIsFailure);
 
+    [JsonConstructor]
     private Result(T? value, bool isSuccess, Error error) : base(isSuccess, error)
     {
         _value = value;

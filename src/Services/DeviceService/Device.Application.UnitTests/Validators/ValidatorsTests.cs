@@ -69,18 +69,10 @@ public class ValidatorsTests
     {
         var validator = new PingControllerValidator();
 
-        var valid = new PingControllerCommand
-        {
-            ControllerId = Guid.NewGuid(),
-            DeviceToken = "valid_token"
-        };
+        var valid = new PingControllerCommand { ControllerId = Guid.NewGuid() };
         validator.Validate(valid).IsValid.Should().BeTrue();
 
-        var invalid = new PingControllerCommand
-        {
-            ControllerId = Guid.Empty,
-            DeviceToken = ""
-        };
+        var invalid = new PingControllerCommand { ControllerId = Guid.Empty };
         validator.Validate(invalid).IsValid.Should().BeFalse();
     }
 
@@ -213,10 +205,10 @@ public class ValidatorsTests
     {
         var validator = new MarkAsCompletedValidator();
 
-        var valid = new MarkAsCompletedCommand { CommandId = Guid.NewGuid(), DeviceToken = "token" };
+        var valid = new MarkAsCompletedCommand { CommandId = Guid.NewGuid() };
         validator.Validate(valid).IsValid.Should().BeTrue();
 
-        var invalid = new MarkAsCompletedCommand { CommandId = Guid.Empty, DeviceToken = "" };
+        var invalid = new MarkAsCompletedCommand { CommandId = Guid.Empty };
         validator.Validate(invalid).IsValid.Should().BeFalse();
     }
 
@@ -228,7 +220,6 @@ public class ValidatorsTests
         var valid = new MarkAsFailedCommand
         {
             CommandId = Guid.NewGuid(),
-            DeviceToken = "token",
             ErrorMessage = "timeout"
         };
         validator.Validate(valid).IsValid.Should().BeTrue();
@@ -236,7 +227,6 @@ public class ValidatorsTests
         var invalid = new MarkAsFailedCommand
         {
             CommandId = Guid.Empty,
-            DeviceToken = "",
             ErrorMessage = ""
         };
         validator.Validate(invalid).IsValid.Should().BeFalse();
@@ -254,8 +244,7 @@ public class ValidatorsTests
             Name = "Water Temp",
             ConnectionProtocol = ConnectionProtocol.I2C,
             ConnectionAddress = TestConstants.ValidI2cAddress,
-            Type = SensorType.Temperature,
-            Unit = "C"
+            Type = SensorType.Temperature
         };
         validator.Validate(valid).IsValid.Should().BeTrue();
 

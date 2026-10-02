@@ -41,6 +41,25 @@ public sealed class TelemetryRawDataRepository(TelemetryDbContext dbContext)
             x => TelemetrySummary.Create(x.MinValue, x.AvgValue, x.MaxValue, x.Count).Value);
     }
 
+    public async Task<IReadOnlyList<DateTime>> GetUnaggregatedMinuteWindowsAsync(
+        DateTime maxCeilingUtc,
+        int limit,
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.Database.SqlQueryRaw<DateTime>(
+            """
+            SELECT DISTINCT date_trunc('minute', recorded_at) AS "Value"
+            FROM telemetry_raw_data
+            WHERE is_aggregated = false
+              AND recorded_at < {0}
+            ORDER BY "Value" ASC
+            LIMIT {1}
+            """,
+            maxCeilingUtc,
+            limit)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task MarkAsAggregatedAsync(
         List<Guid> sensorIds,
         DateTime from,
@@ -50,7 +69,8 @@ public sealed class TelemetryRawDataRepository(TelemetryDbContext dbContext)
         await Context.TelemetryRawData
             .Where(x => sensorIds.Contains(x.SensorId) &&
                         x.RecordedAt >= from &&
-                        x.RecordedAt < to)
+                        x.RecordedAt < to &&
+                        !x.IsAggregated)
             .ExecuteUpdateAsync(x => x.SetProperty(p => p.IsAggregated, true), cancellationToken);
     }
 }

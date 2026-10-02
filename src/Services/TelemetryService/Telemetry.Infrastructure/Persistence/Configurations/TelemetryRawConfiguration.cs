@@ -24,6 +24,11 @@ public sealed class TelemetryRawConfiguration
         builder.HasIndex(x => x.IsAggregated);
         builder.HasIndex(x => new
         {
+            x.IsAggregated,
+            x.RecordedAt
+        });
+        builder.HasIndex(x => new
+        {
             x.SensorId,
             x.RecordedAt
         });

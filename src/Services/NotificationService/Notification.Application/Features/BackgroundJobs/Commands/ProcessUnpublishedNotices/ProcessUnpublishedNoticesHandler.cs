@@ -97,7 +97,8 @@ public sealed class ProcessUnpublishedNoticesHandler(
 
             foreach (UnpublishedNotificationDto notification in rawNotifications)
             {
-                if (!usersDict.TryGetValue(notification.UserId, out UserNotificationSettingsDto? user) || !user.IsNotifyEnabled)
+                if (!usersDict.TryGetValue(notification.UserId, out UserNotificationSettingsDto? user)
+                    || !user.IsNotifyEnabled)
                 {
                     failedNotifications.Add(new FailedNotificationDto(notification.Id, ErrorMessages.NotificationProvider.UserDisabledOrNotFound));
                     continue;
@@ -106,6 +107,12 @@ public sealed class ProcessUnpublishedNoticesHandler(
                 if (!user.TgEnable && !user.EmailEnable)
                 {
                     failedNotifications.Add(new FailedNotificationDto(notification.Id, ErrorMessages.NotificationProvider.NoActiveChannels));
+                    continue;
+                }
+
+                if (user.TgEnable && user.TelegramChatId is null)
+                {
+                    failedNotifications.Add(new FailedNotificationDto(notification.Id, ErrorMessages.NotificationProvider.TgChatIdMissing));
                     continue;
                 }
 

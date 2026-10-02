@@ -13,8 +13,22 @@ public interface ITelemetryAggregateDataRepository : IRepository<AggregateTeleme
         DateTime to,
         CancellationToken cancellationToken = default);
 
+    public Task<AggregateTelemetry?> GetBySensorAndPeriodAsync(
+        Guid sensorId,
+        PeriodType period,
+        DateTime periodStart,
+        CancellationToken cancellationToken = default);
+
+    public Task<IReadOnlyList<DateTime>> GetUnaggregatedWindowsAsync(
+        PeriodType sourcePeriod,
+        string dateTruncPart,
+        DateTime maxCeilingUtc,
+        int limit,
+        CancellationToken cancellationToken = default);
+
     public Task MarkAsAggregatedAsync(
         List<Guid> sensorIds,
+        PeriodType period,
         DateTime from,
         DateTime to,
         CancellationToken cancellationToken = default);

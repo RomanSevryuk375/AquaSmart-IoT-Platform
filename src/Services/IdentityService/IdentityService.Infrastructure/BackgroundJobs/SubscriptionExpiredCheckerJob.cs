@@ -5,6 +5,7 @@ using Quartz;
 
 namespace IdentityService.Infrastructure.BackgroundJobs;
 
+[DisallowConcurrentExecution]
 public class SubscriptionExpiredCheckerJob(
     ISender sender) : IJob
 {

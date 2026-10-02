@@ -1,6 +1,5 @@
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
-using Device.Application.Extesions;
 using Device.Application.Features.RelayCommands.Query.GetPending;
 
 namespace Device.Infrastructure.IntegrationTests.Features.RelayCommands;
@@ -10,15 +9,10 @@ public class GetPendingCommandsHandlerTests(
 {
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task GetPending_WithValidToken_ReturnsCommandsAndMarksAsSent()
+    public async Task GetPending_WithValidControllerId_ReturnsCommandsAndMarksAsSent()
     {
         // Arrange
-        var hasher = new MyHasher();
-        string rawToken = "super_secret_device_token";
-
-        Controller controller = new ControllerBuilder()
-            .WithDeviceTokenHash(hasher.Generate(rawToken))
-            .Build();
+        Controller controller = new ControllerBuilder().Build();
 
         Relay relay = new RelayBuilder()
             .WithControllerId(controller.Id)
@@ -43,8 +37,7 @@ public class GetPendingCommandsHandlerTests(
 
         var query = new GetPendingCommandsQuery
         {
-            ControllerId = controller.Id,
-            DeviceToken = rawToken
+            ControllerId = controller.Id
         };
 
         // Act
@@ -69,30 +62,22 @@ public class GetPendingCommandsHandlerTests(
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task GetPending_WithInvalidToken_ReturnsNotFound()
+    public async Task GetPending_WhenNoPendingCommands_ReturnsEmptyList()
     {
         // Arrange
-        var hasher = new MyHasher();
-
-        Controller controller = new ControllerBuilder()
-            .WithDeviceTokenHash(hasher.Generate("real_token"))
-            .Build();
+        Controller controller = new ControllerBuilder().Build();
 
         DbContext.Controllers.Add(controller);
         await DbContext.SaveChangesAsync();
 
-        var query = new GetPendingCommandsQuery
-        {
-            ControllerId = controller.Id,
-            DeviceToken = "hacker_token"
-        };
+        var query = new GetPendingCommandsQuery { ControllerId = controller.Id };
 
         // Act
         Result<IReadOnlyList<RelayCommandDto>> result = await Sender.Send(query);
 
         // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Controller.NotFound");
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().BeEmpty();
     }
 
     [Fact]
@@ -100,12 +85,7 @@ public class GetPendingCommandsHandlerTests(
     public async Task GetPending_WithSentButTimedOutCommand_PicksUpCommandForRetry()
     {
         // Arrange
-        var hasher = new MyHasher();
-        string rawToken = "super_secret_device_token";
-
-        Controller controller = new ControllerBuilder()
-            .WithDeviceTokenHash(hasher.Generate(rawToken))
-            .Build();
+        Controller controller = new ControllerBuilder().Build();
 
         Relay relay = new RelayBuilder()
             .WithControllerId(controller.Id)
@@ -128,8 +108,7 @@ public class GetPendingCommandsHandlerTests(
 
         var query = new GetPendingCommandsQuery
         {
-            ControllerId = controller.Id,
-            DeviceToken = rawToken
+            ControllerId = controller.Id
         };
 
         // Act

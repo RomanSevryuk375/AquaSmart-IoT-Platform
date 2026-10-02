@@ -27,9 +27,5 @@ internal sealed class AddSensorValidator
         RuleFor(x => x.Type)
             .NotEmpty()
             .IsInEnum();
-
-        RuleFor(x => x.Unit)
-            .NotEmpty()
-            .MaximumLength(SensorConstants.UnitLength);
     }
 }
