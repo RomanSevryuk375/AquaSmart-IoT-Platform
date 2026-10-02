@@ -27,7 +27,10 @@ void ConfigStore::load(DeviceConfig& config) {
 
     config.sendIntervalMs = preferences.getUInt("interval", 10000);
     config.maxBatchSize = static_cast<uint16_t>(preferences.getUInt("batch", 50));
-    config.maxQueueSize = static_cast<uint16_t>(preferences.getUInt("queue", 200));
+    config.maxQueueSize = static_cast<uint16_t>(preferences.getUInt("queue", 100));
+    if (config.maxQueueSize == 0 || config.maxQueueSize > MAX_QUEUE_CAPACITY) {
+        config.maxQueueSize = MAX_QUEUE_CAPACITY;
+    }
     config.commandPollIntervalMs = preferences.getUInt("cmdPoll", 3000);
     config.bootCounter = preferences.getUInt("bootCount", 0) + 1;
     config.soilDryCalibration = static_cast<uint16_t>(preferences.getUInt("soilDry", 3200));

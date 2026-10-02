@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
 using FluentAssertions;
 using MassTransit;
@@ -21,6 +22,7 @@ public class SendTelegramCommandConsumerTests
     }
 
     [Fact]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     public async Task Consume_WhenSendAsyncSucceeds_ShouldNotThrow()
     {
         // Arrange
@@ -28,7 +30,10 @@ public class SendTelegramCommandConsumerTests
         {
             NotificationId = Guid.NewGuid(),
             ChatId = 123456789,
-            Message = "Test message"
+            Message = "Test message",
+            NotificationLevel = NotificationLevel.Info,
+            EcosystemId = null,
+            ReminderId = null,
         };
 
         ConsumeContext<SendTelegramCommand> contextMock = Substitute.For<ConsumeContext<SendTelegramCommand>>();
@@ -38,6 +43,7 @@ public class SendTelegramCommandConsumerTests
         _tgProviderMock.SendAsync(
             Arg.Any<NotificationRecipient>(),
             Arg.Any<string>(),
+            Arg.Any<object?>(),
             Arg.Any<CancellationToken>())
             .Returns(Result.Success());
 
@@ -50,10 +56,12 @@ public class SendTelegramCommandConsumerTests
         await _tgProviderMock.Received(1).SendAsync(
             Arg.Is<NotificationRecipient>(r => r.TgChatId == command.ChatId && r.Email == null),
             command.Message,
+            Arg.Any<object?>(),
             Arg.Any<CancellationToken>());
     }
 
     [Fact]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     public async Task Consume_WhenSendAsyncFails_ShouldThrowInvalidOperationException()
     {
         // Arrange
@@ -61,7 +69,10 @@ public class SendTelegramCommandConsumerTests
         {
             NotificationId = Guid.NewGuid(),
             ChatId = 123456789,
-            Message = "Test message"
+            Message = "Test message",
+            NotificationLevel = NotificationLevel.Info,
+            EcosystemId = null,
+            ReminderId = null,
         };
 
         ConsumeContext<SendTelegramCommand> contextMock = Substitute.For<ConsumeContext<SendTelegramCommand>>();
@@ -69,9 +80,11 @@ public class SendTelegramCommandConsumerTests
         contextMock.CancellationToken.Returns(CancellationToken.None);
 
         var error = Error.Failure("TgProvider.Error", "API request timed out");
+
         _tgProviderMock.SendAsync(
             Arg.Any<NotificationRecipient>(),
             Arg.Any<string>(),
+            Arg.Any<object?>(),
             Arg.Any<CancellationToken>())
             .Returns(Result.Failure(error));
 

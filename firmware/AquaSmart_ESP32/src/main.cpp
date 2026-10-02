@@ -270,9 +270,13 @@ void sendQueuedTelemetry() {
     lastTelemetryAttemptAtMs = millis();
 
     TelemetryRecord batch[50];
-    const size_t maxBatchSize = runtimeConfigLoaded && runtimeConfig.maxBatchSize < deviceConfig.maxBatchSize
+    size_t targetBatch = (runtimeConfigLoaded && runtimeConfig.maxBatchSize > 0)
         ? runtimeConfig.maxBatchSize
         : deviceConfig.maxBatchSize;
+    if (targetBatch == 0) {
+        targetBatch = 10;
+    }
+    const size_t maxBatchSize = (targetBatch > 50) ? 50 : targetBatch;
     const size_t batchSize = telemetryQueue.peekBatch(batch, maxBatchSize);
     if (batchSize == 0) {
         return;
@@ -328,10 +332,8 @@ void initializeRuntimeIdentity() {
 
 void setup() {
     Serial.begin(115200);
-    ConfigStore::begin();
-    ConfigStore::reset(); 
     delay(200);
-    Serial.println("[BOOT] AquaSmart firmware");
+    Serial.printf("[BOOT] AquaSmart firmware v%s\n", FIRMWARE_VERSION);
 
     changeState(SystemState::LOAD_CONFIG);
 
@@ -378,7 +380,16 @@ void loop() {
     pulseActivity = false;
 
     bool toggleRelayRequested = false;
-    uiController.handleInput(inputManager.update(), runtimeConfig, toggleRelayRequested);
+    bool factoryResetRequested = false;
+    uiController.handleInput(inputManager.update(), runtimeConfig, toggleRelayRequested, factoryResetRequested);
+    if (factoryResetRequested) {
+        Serial.println("[RESET] Factory reset triggered via UI/Button!");
+        changeState(SystemState::FACTORY_RESET);
+        ConfigStore::reset();
+        delay(500);
+        ESP.restart();
+    }
+
     if (toggleRelayRequested && runtimeConfig.relayCount > 0) {
         relayManager.toggleRelayByChannel(static_cast<uint8_t>(uiController.selectedRelayIndex() + 1));
         pulseActivity = true;
@@ -392,7 +403,7 @@ void loop() {
         wifiManager.update(systemState, lastError);
     }
 
-    if (wifiManager.isConnected()) {
+    if (systemState == SystemState::CONNECT_WIFI && wifiManager.isConnected()) {
         changeState(SystemState::SYNC_TIME);
     }
 

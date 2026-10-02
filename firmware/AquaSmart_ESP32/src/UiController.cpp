@@ -4,10 +4,14 @@ void UiController::begin() {
     _currentPage = DisplayPage::STATUS;
 }
 
-void UiController::handleInput(const InputEvent& event, const BackendRuntimeConfig& runtimeConfig, bool& toggleRelayRequested) {
+void UiController::handleInput(const InputEvent& event, const BackendRuntimeConfig& runtimeConfig, bool& toggleRelayRequested, bool& factoryResetRequested) {
     toggleRelayRequested = false;
+    factoryResetRequested = false;
 
     switch (event.type) {
+        case InputEventType::FACTORY_RESET:
+            factoryResetRequested = true;
+            break;
         case InputEventType::NEXT:
             if (_currentPage == DisplayPage::SENSOR && runtimeConfig.sensorCount > 0) {
                 _selectedSensorIndex = (_selectedSensorIndex + 1) % runtimeConfig.sensorCount;

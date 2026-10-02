@@ -17,7 +17,8 @@ private:
     String _ssid;
     String _password;
     uint32_t _connectStartedAtMs = 0;
-    uint32_t _lastAttemptAtMs = 0;
+    uint32_t _lastLogAtMs = 0;
+    uint32_t _lastReconnectAtMs = 0;
     bool _connectStarted = false;
     bool _hasEverConnected = false;
 };

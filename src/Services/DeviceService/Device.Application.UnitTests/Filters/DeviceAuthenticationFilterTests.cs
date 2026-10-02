@@ -229,4 +229,49 @@ public class DeviceAuthenticationFilterTests
             Arg.Any<FusionCacheEntryOptions>(),
             Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+    public async Task InvokeAsync_WithMismatchedMacAddressHeader_ReturnsForbidden()
+    {
+        // Arrange
+        var filter = CreateFilter();
+        var controllerId = Guid.NewGuid();
+        const string RawToken = "valid_token";
+        const string StoredHash = "valid_stored_hash";
+        const string BoundMacAddress = "AA:BB:CC:DD:EE:FF";
+        const string DifferentMacAddress = "11:22:33:44:55:66";
+        string expectedCacheKey = $"controller:mac:{DifferentMacAddress.ToUpperInvariant()}";
+
+        var cacheItem = new ControllerAuthCacheItem(controllerId, BoundMacAddress, StoredHash);
+
+        HttpContext httpContext = CreateHttpContext(
+            headers: new()
+            {
+                [ApiConstants.Headers.DeviceToken] = RawToken,
+                [ApiConstants.Headers.MacAddress] = DifferentMacAddress
+            },
+            routeValues: new()
+            {
+                ["controllerId"] = controllerId.ToString()
+            });
+
+        _cacheMock.GetOrSetAsync<ControllerAuthCacheItem?>(
+                expectedCacheKey,
+                Arg.Any<Func<FusionCacheFactoryExecutionContext<ControllerAuthCacheItem?>, CancellationToken, Task<ControllerAuthCacheItem?>>>(),
+                Arg.Any<FusionCacheEntryOptions>(),
+                Arg.Any<CancellationToken>())
+            .Returns(cacheItem);
+
+        _tokenHasherMock.Verify(RawToken, StoredHash).Returns(true);
+
+        var ctx = CreateContext(httpContext);
+
+        // Act
+        object? result = await filter.InvokeAsync(ctx, _ => ValueTask.FromResult<object?>(Results.Ok()));
+
+        // Assert
+        result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.StatusCodeHttpResult>()
+            .Which.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+    }
 }

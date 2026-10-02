@@ -200,10 +200,15 @@ bool ApiClient::prepareRequest(HTTPClient& http, const String& url) {
 
     Serial.printf("[DEBUG] URL: %s\n", url.c_str());
     Serial.printf("[DEBUG] Mac: %s\n", _macAddress.c_str());
-    Serial.printf("[DEBUG] Token: %s\n", _deviceToken.c_str());
+    if (_deviceToken.length() >= 8) {
+        Serial.printf("[DEBUG] Token: %.8s****\n", _deviceToken.c_str());
+    } else {
+        Serial.println("[DEBUG] Token: ****");
+    }
 
     http.addHeader("X-Device-Token", _deviceToken);
     http.addHeader("X-Mac-Address", _macAddress);
+    http.addHeader("X-Firmware-Version", FIRMWARE_VERSION);
     http.setTimeout(5000);
     return true;
 }

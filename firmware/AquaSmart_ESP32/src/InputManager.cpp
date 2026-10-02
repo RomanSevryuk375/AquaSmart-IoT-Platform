@@ -30,6 +30,7 @@ InputEvent InputManager::update() {
     }
     if (_backButton.released()) {
         _backLongPressHandled = false;
+        _backFactoryResetHandled = false;
     }
 
     const long position = _encoder.getPosition();
@@ -49,6 +50,11 @@ InputEvent InputManager::update() {
     if (!_encoderLongPressHandled && _encoderButton.currentDuration() >= 1200 && _encoderButton.isPressed()) {
         _encoderLongPressHandled = true;
         return {InputEventType::SELECT, true};
+    }
+
+    if (!_backFactoryResetHandled && _backButton.currentDuration() >= 5000 && _backButton.isPressed()) {
+        _backFactoryResetHandled = true;
+        return {InputEventType::FACTORY_RESET, true};
     }
 
     if (_backButton.pressed()) {

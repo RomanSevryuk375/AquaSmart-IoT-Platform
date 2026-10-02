@@ -76,7 +76,6 @@ public class ProcessExpiredSubscriptionsHandlerTests(IntegrationTestWebAppFactor
         updatedValidUser!.SubscriptionId.Should().Be(Guid.Parse(SubscriptionType.Professional));
         updatedValidUser.SubscriptionEndDate.Should().BeCloseTo(validUser.SubscriptionEndDate, TimeSpan.FromSeconds(2));
 
-        // 1. Проверяем создание OutboxMessage
         List<OutboxMessage> outboxMessages = await DbContext.OutboxMessages
             .AsNoTracking()
             .ToListAsync();
@@ -86,13 +85,11 @@ public class ProcessExpiredSubscriptionsHandlerTests(IntegrationTestWebAppFactor
         outboxMessage.Content.Should().Contain(expiredUser.Id.ToString());
         outboxMessage.Content.Should().Contain(Guid.Parse(SubscriptionType.Free).ToString());
 
-        // 2. Обрабатываем OutboxMessage через сервис процессора
         OutboxMessageProcessorService<IdentityDbContext> outboxProcessor =
             GetRequiredService<OutboxMessageProcessorService<IdentityDbContext>>();
         Result processResult = await outboxProcessor.ProcessAsync(CancellationToken.None);
         processResult.IsSuccess.Should().BeTrue();
-
-        // 3. Проверяем публикацию интеграционного события в MassTransit
+        
         bool anyPublished = await harness.Published.Any<SubscriptionDowngradedEvent>();
         anyPublished.Should().BeTrue();
 

@@ -61,6 +61,18 @@ public class DeviceAuthenticationFilter(
             return Results.Unauthorized();
         }
 
+        if (DeviceAuthenticationFilterHelpers.TryGetMacAddress(httpContext, out string requestMac) &&
+            !string.Equals(controller.MacAddress, requestMac, StringComparison.OrdinalIgnoreCase))
+        {
+            logger.LogWarning(
+                "Device auth failed: MAC address mismatch for Controller {ControllerId}. Expected: {ExpectedMac}, Received: {ReceivedMac}.",
+                controller.Id,
+                controller.MacAddress,
+                requestMac);
+
+            return Results.StatusCode(StatusCodes.Status403Forbidden);
+        }
+
         httpContext.Items[HttpContextItemKey] = controller;
 
         return await next(context);

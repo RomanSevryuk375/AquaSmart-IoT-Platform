@@ -6,7 +6,7 @@
 class UiController {
 public:
     void begin();
-    void handleInput(const InputEvent& event, const BackendRuntimeConfig& runtimeConfig, bool& toggleRelayRequested);
+    void handleInput(const InputEvent& event, const BackendRuntimeConfig& runtimeConfig, bool& toggleRelayRequested, bool& factoryResetRequested);
     DisplayPage currentPage() const;
     size_t selectedSensorIndex() const;
     size_t selectedRelayIndex() const;

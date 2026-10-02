@@ -279,34 +279,56 @@ bool SensorManager::readSoilMoisture(SensorRuntimeConfig& sensor) {
 SensorRole SensorManager::inferRole(const SensorRuntimeConfig& sensor) const {
     const String name = toLower(sensor.name);
     const String address = toLower(sensor.connectionAddress);
+    const String unit = toLower(sensor.unit);
 
-    if (name.indexOf("humidity") >= 0 || sensor.sensorType == 3) {
-        return SensorRole::AIR_HUMIDITY;
-    }
+    // 1. Water Level
     if (name.indexOf("water level") >= 0 || name.indexOf("level") >= 0) {
         return SensorRole::WATER_LEVEL;
     }
+
+    // 2. Soil Moisture
     if (name.indexOf("soil") >= 0 || name.indexOf("moisture") >= 0) {
         return SensorRole::SOIL_MOISTURE;
     }
-    if (name.indexOf("surface") >= 0) {
+
+    // 3. Air Humidity
+    if (name.indexOf("humidity") >= 0 || (unit == "%" && name.indexOf("soil") < 0)) {
+        return SensorRole::AIR_HUMIDITY;
+    }
+
+    // 4. Specific Temperatures by name
+    if (name.indexOf("surface") >= 0 && (name.indexOf("temp") >= 0 || unit.indexOf("c") >= 0)) {
         return SensorRole::SURFACE_TEMPERATURE;
     }
-    if (name.indexOf("water") >= 0 && name.indexOf("temp") >= 0) {
+    if (name.indexOf("water") >= 0 && (name.indexOf("temp") >= 0 || unit.indexOf("c") >= 0)) {
         return SensorRole::WATER_TEMPERATURE;
     }
-    if (name.indexOf("air") >= 0 && name.indexOf("temp") >= 0) {
+    if (name.indexOf("air") >= 0 && (name.indexOf("temp") >= 0 || unit.indexOf("c") >= 0)) {
         return SensorRole::AIR_TEMPERATURE;
     }
-    if (address.indexOf("0x38") >= 0) {
-        return sensor.sensorType == 3 ? SensorRole::AIR_HUMIDITY : SensorRole::AIR_TEMPERATURE;
-    }
+
+    // 5. Hardware address mappings (DS18B20 1-Wire)
     if (address.indexOf("28-") >= 0 || address.indexOf("28:") >= 0) {
-        if (normalizeAddress(address) == normalizeAddress(_deviceConfig->ds18SurfaceAddress)) {
+        if (_deviceConfig && _deviceConfig->ds18SurfaceAddress[0] != '\0' &&
+            normalizeAddress(address) == normalizeAddress(_deviceConfig->ds18SurfaceAddress)) {
             return SensorRole::SURFACE_TEMPERATURE;
         }
         return SensorRole::WATER_TEMPERATURE;
     }
+
+    // 6. Hardware address mappings (AHT20 I2C 0x38)
+    if (address.indexOf("0x38") >= 0) {
+        if (sensor.sensorType == 3 || unit == "%" || name.indexOf("humid") >= 0) {
+            return SensorRole::AIR_HUMIDITY;
+        }
+        return SensorRole::AIR_TEMPERATURE;
+    }
+
+    // 7. General temperature fallback
+    if (name.indexOf("temp") >= 0 || unit.indexOf("c") >= 0) {
+        return SensorRole::AIR_TEMPERATURE;
+    }
+
     return SensorRole::UNKNOWN;
 }
 
