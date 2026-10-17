@@ -2,25 +2,46 @@ namespace Mobile;
 
 public partial class MainPage : ContentPage
 {
-    private readonly Random _random = new();
-
     public MainPage()
     {
         InitializeComponent();
     }
 
-    private void OnRefreshClicked(object? sender, EventArgs e)
+    protected override async void OnAppearing()
     {
-        double temp = 24.5 + (_random.NextDouble() * 1.5);
-        double ph = 7.0 + (_random.NextDouble() * 0.4);
-        int waterLevel = _random.Next(90, 98);
-        int tds = _random.Next(135, 155);
+        base.OnAppearing();
 
-        TempLabel.Text = $"{temp:F1} °C";
-        PhLabel.Text = $"{ph:F2} pH";
-        WaterLevelLabel.Text = $"{waterLevel}%";
-        TdsLabel.Text = $"{tds} ppm";
+        // Smooth initial entrance animation (Preloader -> Welcome Screen)
+        await Task.WhenAll(
+            LogoImage.FadeTo(1.0, 650, Easing.CubicOut),
+            LogoImage.ScaleTo(1.0, 650, Easing.CubicOut)
+        );
 
-        SemanticScreenReader.Announce($"Telemetry refreshed. Temperature is now {TempLabel.Text}");
+        await Task.WhenAll(
+            ActionsContainer.FadeTo(1.0, 450, Easing.CubicOut),
+            ActionsContainer.TranslateTo(0, 0, 450, Easing.CubicOut)
+        );
+    }
+
+    private async void OnOnboardingClicked(object? sender, EventArgs e)
+    {
+        if (sender is Button btn)
+        {
+            await btn.ScaleTo(0.97, 70);
+            await btn.ScaleTo(1.0, 70);
+        }
+
+        await DisplayAlert("Знакомство", "Переход к онбордингу приложения", "ОК");
+    }
+
+    private async void OnAuthorizationClicked(object? sender, EventArgs e)
+    {
+        if (sender is Button btn)
+        {
+            await btn.ScaleTo(0.97, 70);
+            await btn.ScaleTo(1.0, 70);
+        }
+
+        await DisplayAlert("Авторизация", "Переход к экрану авторизации", "ОК");
     }
 }

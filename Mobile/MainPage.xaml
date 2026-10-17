@@ -2,163 +2,73 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Mobile.MainPage"
-             Title="AquaSmart Dashboard"
-             BackgroundColor="#0B132B">
+             BackgroundColor="#4152B0"
+             Shell.NavBarIsVisible="False">
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="16" Padding="20">
-            <!-- Header Card -->
-            <Border Stroke="#1C2541"
-                    StrokeThickness="1"
-                    Background="#1C2541"
-                    StrokeShape="RoundRectangle 16"
-                    Padding="16">
-                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
-                    <VerticalStackLayout Grid.Column="0">
-                        <Label Text="AquaSmart IoT"
-                               FontSize="22"
-                               FontAttributes="Bold"
-                               TextColor="#FFFFFF" />
-                        <Label Text="Aquarium &amp; Terrarium Automation"
-                               FontSize="13"
-                               TextColor="#8D99AE" />
-                    </VerticalStackLayout>
-                    <Border Grid.Column="1"
-                            BackgroundColor="#1F4E5B"
-                            Stroke="#00B4D8"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 12"
-                            Padding="10,4"
-                            VerticalOptions="Center">
-                        <Label Text="● ONLINE"
-                               FontSize="11"
-                               FontAttributes="Bold"
-                               TextColor="#90E0EF" />
-                    </Border>
-                </Grid>
-            </Border>
+    <Grid RowDefinitions="*,Auto"
+          Padding="0">
 
-            <!-- Metrics Section -->
-            <Label Text="Live Telemetry"
-                   FontSize="16"
-                   FontAttributes="Bold"
-                   TextColor="#EDF2F4"
-                   Margin="4,4,0,0" />
-
-            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
-                <!-- Temperature -->
-                <Border Grid.Row="0" Grid.Column="0"
-                        Stroke="#1C2541"
-                        StrokeThickness="1"
-                        BackgroundColor="#131B2E"
-                        StrokeShape="RoundRectangle 14"
-                        Padding="14">
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Water Temp" FontSize="12" TextColor="#8D99AE" />
-                        <Label x:Name="TempLabel" Text="25.4 °C" FontSize="24" FontAttributes="Bold" TextColor="#00B4D8" />
-                        <Label Text="Target: 25.0 °C" FontSize="11" TextColor="#64DFDF" />
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- pH Level -->
-                <Border Grid.Row="0" Grid.Column="1"
-                        Stroke="#1C2541"
-                        StrokeThickness="1"
-                        BackgroundColor="#131B2E"
-                        StrokeShape="RoundRectangle 14"
-                        Padding="14">
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="pH Level" FontSize="12" TextColor="#8D99AE" />
-                        <Label x:Name="PhLabel" Text="7.18 pH" FontSize="24" FontAttributes="Bold" TextColor="#48CAE4" />
-                        <Label Text="Range: 6.8 - 7.5" FontSize="11" TextColor="#64DFDF" />
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- Water Level -->
-                <Border Grid.Row="1" Grid.Column="0"
-                        Stroke="#1C2541"
-                        StrokeThickness="1"
-                        BackgroundColor="#131B2E"
-                        StrokeShape="RoundRectangle 14"
-                        Padding="14">
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Water Level" FontSize="12" TextColor="#8D99AE" />
-                        <Label x:Name="WaterLevelLabel" Text="94%" FontSize="24" FontAttributes="Bold" TextColor="#52B788" />
-                        <Label Text="Optimal Range" FontSize="11" TextColor="#74C69D" />
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- TDS / Purity -->
-                <Border Grid.Row="1" Grid.Column="1"
-                        Stroke="#1C2541"
-                        StrokeThickness="1"
-                        BackgroundColor="#131B2E"
-                        StrokeShape="RoundRectangle 14"
-                        Padding="14">
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="TDS Purity" FontSize="12" TextColor="#8D99AE" />
-                        <Label x:Name="TdsLabel" Text="142 ppm" FontSize="24" FontAttributes="Bold" TextColor="#FFB703" />
-                        <Label Text="Clean Water" FontSize="11" TextColor="#FDE047" />
-                    </VerticalStackLayout>
-                </Border>
-            </Grid>
-
-            <!-- Control & Relays -->
-            <Label Text="Equipment Control"
-                   FontSize="16"
-                   FontAttributes="Bold"
-                   TextColor="#EDF2F4"
-                   Margin="4,8,0,0" />
-
-            <Border Stroke="#1C2541"
-                    StrokeThickness="1"
-                    BackgroundColor="#131B2E"
-                    StrokeShape="RoundRectangle 14"
-                    Padding="14">
-                <VerticalStackLayout Spacing="12">
-                    <!-- Filter Pump Relay -->
-                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
-                        <VerticalStackLayout Grid.Column="0">
-                            <Label Text="Main Filter Pump" FontSize="14" FontAttributes="Bold" TextColor="#FFFFFF" />
-                            <Label Text="Continuous Circulation" FontSize="11" TextColor="#8D99AE" />
-                        </VerticalStackLayout>
-                        <Switch Grid.Column="1" IsToggled="True" OnColor="#00B4D8" ThumbColor="#FFFFFF" />
-                    </Grid>
-
-                    <BoxView HeightRequest="1" Color="#1C2541" />
-
-                    <!-- UV Sterilizer Relay -->
-                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
-                        <VerticalStackLayout Grid.Column="0">
-                            <Label Text="UV Sterilizer" FontSize="14" FontAttributes="Bold" TextColor="#FFFFFF" />
-                            <Label Text="Scheduled (Quartz: 4h/day)" FontSize="11" TextColor="#8D99AE" />
-                        </VerticalStackLayout>
-                        <Switch Grid.Column="1" IsToggled="True" OnColor="#00B4D8" ThumbColor="#FFFFFF" />
-                    </Grid>
-
-                    <BoxView HeightRequest="1" Color="#1C2541" />
-
-                    <!-- Heater Relay -->
-                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
-                        <VerticalStackLayout Grid.Column="0">
-                            <Label Text="Titanium Heater" FontSize="14" FontAttributes="Bold" TextColor="#FFFFFF" />
-                            <Label Text="Auto Thermostat Rule" FontSize="11" TextColor="#8D99AE" />
-                        </VerticalStackLayout>
-                        <Switch Grid.Column="1" IsToggled="False" OnColor="#00B4D8" ThumbColor="#FFFFFF" />
-                    </Grid>
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- Refresh Telemetry Button -->
-            <Button x:Name="RefreshBtn"
-                    Text="Refresh Telemetry"
-                    BackgroundColor="#0077B6"
-                    TextColor="#FFFFFF"
-                    CornerRadius="12"
-                    HeightRequest="48"
-                    FontAttributes="Bold"
-                    Clicked="OnRefreshClicked"
-                    Margin="0,10,0,20" />
+        <!-- Center Section: Brand Logo (SMART AQUA + Fish) -->
+        <VerticalStackLayout Grid.Row="0"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="0"
+                             Padding="24,0">
+            <Image x:Name="LogoImage"
+                   Source="smart_aqua_logo.png"
+                   WidthRequest="320"
+                   Aspect="AspectFit"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   Opacity="0"
+                   Scale="0.85" />
         </VerticalStackLayout>
-    </ScrollView>
+
+        <!-- Bottom Actions Section: Onboarding & Authorization Buttons -->
+        <VerticalStackLayout Grid.Row="1"
+                             x:Name="ActionsContainer"
+                             VerticalOptions="End"
+                             Spacing="12"
+                             Padding="24,0,24,48"
+                             Opacity="0"
+                             TranslationY="30">
+
+            <!-- "Знакомство с приложением" Button -->
+            <Button x:Name="OnboardingBtn"
+                    Text="Знакомство с приложением"
+                    BackgroundColor="#EDEFFB"
+                    TextColor="#4152B0"
+                    FontFamily="OpenSansSemibold"
+                    FontSize="16"
+                    CornerRadius="12"
+                    HeightRequest="52"
+                    Clicked="OnOnboardingClicked">
+                <Button.Shadow>
+                    <Shadow Brush="#1A000000"
+                            Offset="0,4"
+                            Radius="8"
+                            Opacity="0.8" />
+                </Button.Shadow>
+            </Button>
+
+            <!-- "Авторизация" Button -->
+            <Button x:Name="AuthBtn"
+                    Text="Авторизация"
+                    BackgroundColor="#EDEFFB"
+                    TextColor="#4152B0"
+                    FontFamily="OpenSansSemibold"
+                    FontSize="16"
+                    CornerRadius="12"
+                    HeightRequest="52"
+                    Clicked="OnAuthorizationClicked">
+                <Button.Shadow>
+                    <Shadow Brush="#1A000000"
+                            Offset="0,4"
+                            Radius="8"
+                            Opacity="0.8" />
+                </Button.Shadow>
+            </Button>
+        </VerticalStackLayout>
+    </Grid>
+
 </ContentPage>

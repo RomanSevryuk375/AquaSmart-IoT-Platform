@@ -5,10 +5,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:Mobile"
     Shell.FlyoutBehavior="Disabled"
-    Title="AquaSmart IoT">
+    Shell.NavBarIsVisible="False"
+    Title="Mobile">
 
     <ShellContent
-        Title="Dashboard"
+        Title="Start"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
 
