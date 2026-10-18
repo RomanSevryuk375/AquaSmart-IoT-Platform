@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Mobile.Views.Controls.SelectControllerBottomSheet">
+    <Grid BackgroundColor="#80000000" IsVisible="{Binding IsVisible, Source={RelativeSource Self}}">
+        <Border VerticalOptions="End"
+                StrokeShape="RoundRectangle 24 24 0 0"
+                BackgroundColor="#FFFFFF"
+                StrokeThickness="0"
+                Padding="24,20,24,28">
+            <VerticalStackLayout Spacing="16">
+                <!-- Title -->
+                <Label Text="Выбор контроллера"
+                       TextColor="#141414"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="18"
+                       FontAttributes="Bold" />
+
+                <!-- Controller items list -->
+                <VerticalStackLayout Spacing="0">
+                    <Grid HeightRequest="50">
+                        <Label Text="Контроллер №123" TextColor="#141414" FontSize="15" VerticalOptions="Center" />
+                    </Grid>
+                    <BoxView HeightRequest="1" Color="#F0F2F9" />
+
+                    <Grid HeightRequest="50">
+                        <Label Text="Хаб-02" TextColor="#141414" FontSize="15" VerticalOptions="Center" />
+                    </Grid>
+                    <BoxView HeightRequest="1" Color="#F0F2F9" />
+
+                    <Grid HeightRequest="50">
+                        <Label Text="Хаб-04" TextColor="#141414" FontSize="15" VerticalOptions="Center" />
+                    </Grid>
+                    <BoxView HeightRequest="1" Color="#F0F2F9" />
+
+                    <Grid HeightRequest="50">
+                        <Label Text="Хаб-04" TextColor="#141414" FontSize="15" VerticalOptions="Center" />
+                    </Grid>
+                    <BoxView HeightRequest="1" Color="#F0F2F9" />
+
+                    <!-- Cancel item in Red text as in Figma -->
+                    <Grid HeightRequest="50">
+                        <Label Text="Отмена" TextColor="#E53935" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                    </Grid>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentView>

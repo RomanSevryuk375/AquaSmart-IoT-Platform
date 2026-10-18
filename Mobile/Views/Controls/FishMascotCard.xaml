@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Mobile.Views.Controls.FishMascotCard"
+             x:Name="ThisControl">
+
+    <Border StrokeThickness="0"
+            StrokeShape="RoundRectangle 24"
+            BackgroundColor="#DCE2F9"
+            Padding="24"
+            HeightRequest="{Binding HeightOverride, Source={x:Reference ThisControl}}">
+        <Grid HorizontalOptions="Center" VerticalOptions="Center">
+            <!-- Fish Graphic Container -->
+            <Grid WidthRequest="180" HeightRequest="120" HorizontalOptions="Center" VerticalOptions="Center">
+                <!-- Fish Mascot Image from Figma -->
+                <Image Source="fish_mascot.png"
+                       Aspect="AspectFit"
+                       WidthRequest="140"
+                       HeightRequest="86"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+
+                <!-- Green Badge (Context icon / text) -->
+                <Border HorizontalOptions="End"
+                        VerticalOptions="Start"
+                        Margin="0,6,12,0"
+                        WidthRequest="32"
+                        HeightRequest="32"
+                        StrokeShape="RoundRectangle 8"
+                        BackgroundColor="{Binding BadgeColor, Source={x:Reference ThisControl}}"
+                        StrokeThickness="0">
+                    <Label Text="{Binding BadgeText, Source={x:Reference ThisControl}}"
+                           TextColor="#FFFFFF"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Border>
+            </Grid>
+        </Grid>
+    </Border>
+</ContentView>
