@@ -4,13 +4,114 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:Mobile"
-    Shell.FlyoutBehavior="Disabled"
-    Shell.NavBarIsVisible="False"
-    Title="Mobile">
+    xmlns:views="clr-namespace:Mobile.Views"
+    xmlns:vm="clr-namespace:Mobile.ViewModels"
+    x:DataType="vm:AppShellViewModel"
+    Shell.FlyoutBehavior="Flyout"
+    FlyoutBackgroundColor="#FFFFFF"
+    FlyoutWidth="280"
+    Title="AquaSmart">
 
-    <ShellContent
-        Title="Start"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <Shell.FlyoutHeader>
+        <Grid BackgroundColor="#4152B0"
+              Padding="24,40,24,24"
+              RowDefinitions="Auto,Auto,Auto,Auto"
+              RowSpacing="6">
+            <Border StrokeThickness="2"
+                    Stroke="#FFFFFF"
+                    StrokeShape="RoundRectangle 28"
+                    BackgroundColor="#2E3A7E"
+                    HeightRequest="56"
+                    WidthRequest="56"
+                    HorizontalOptions="Start">
+                <Label Text="AS"
+                       TextColor="#FFFFFF"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </Border>
 
+            <Label Grid.Row="1"
+                   Text="{Binding UserName}"
+                   TextColor="#FFFFFF"
+                   FontFamily="OpenSansSemibold"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   Margin="0,8,0,0" />
+
+            <Label Grid.Row="2"
+                   Text="{Binding UserEmail}"
+                   TextColor="#D9DFF7"
+                   FontSize="13" />
+
+            <Border Grid.Row="3"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 8"
+                    BackgroundColor="#5364C7"
+                    Padding="10,3"
+                    HorizontalOptions="Start"
+                    Margin="0,4,0,0">
+                <Label Text="{Binding UserRole}"
+                       TextColor="#FFFFFF"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="11" />
+            </Border>
+        </Grid>
+    </Shell.FlyoutHeader>
+
+    <Shell.FlyoutFooter>
+        <VerticalStackLayout Padding="20,16" Spacing="10" BackgroundColor="#F6F7FC">
+            <Button Text="Выход"
+                    Command="{Binding LogoutCommand}"
+                    TextColor="#D93829"
+                    BackgroundColor="#FDEEEC"
+                    CornerRadius="10"
+                    HeightRequest="42"
+                    FontFamily="OpenSansSemibold"
+                    FontSize="13" />
+            <Label Text="AquaSmart IoT Platform v1.0.0"
+                   TextColor="#8C93A8"
+                   FontSize="11"
+                   HorizontalTextAlignment="Center" />
+        </VerticalStackLayout>
+    </Shell.FlyoutFooter>
+
+    <!-- Welcome / Splash Screen as Initial Route -->
+    <FlyoutItem FlyoutItemIsVisible="False" Route="MainPage">
+        <ShellContent
+            Title="Вход"
+            ContentTemplate="{DataTemplate local:MainPage}"
+            Route="MainPage" />
+    </FlyoutItem>
+
+    <!-- Authenticated Flyout Items -->
+    <FlyoutItem Title="Главная"
+                Route="DashboardPage">
+        <ShellContent Title="Главная"
+                      ContentTemplate="{DataTemplate views:DashboardPage}"
+                      Route="DashboardPage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Ёмкости"
+                Route="AquariumsPage">
+        <ShellContent Title="Ёмкости"
+                      ContentTemplate="{DataTemplate views:AquariumsPage}"
+                      Route="AquariumsPage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="База знаний"
+                Route="KnowledgeBasePage">
+        <ShellContent Title="База знаний"
+                      ContentTemplate="{DataTemplate views:KnowledgeBasePage}"
+                      Route="KnowledgeBasePage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Профиль"
+                Route="ProfilePage">
+        <ShellContent Title="Профиль"
+                      ContentTemplate="{DataTemplate views:ProfilePage}"
+                      Route="ProfilePage" />
+    </FlyoutItem>
 </Shell>

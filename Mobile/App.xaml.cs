@@ -2,10 +2,15 @@ namespace Mobile;
 
 public partial class App : Application
 {
-	public App()
-	{
-		InitializeComponent();
+    public App(AppShell appShell)
+    {
+        InitializeComponent();
+        MainPage = appShell;
+    }
 
-		MainPage = new AppShell();
-	}
+    public App()
+    {
+        InitializeComponent();
+        MainPage = new AppShell();
+    }
 }
