@@ -22,7 +22,7 @@
 		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
 
 		<!-- Display name -->
-		<ApplicationTitle>Mobile</ApplicationTitle>
+		<ApplicationTitle>AquaSmart</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.aquasmart.mobile</ApplicationId>
@@ -45,7 +45,7 @@
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#4152B0" />
 
 		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#4152B0" BaseSize="128,128" />
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#4152B0" BaseSize="182,72" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
