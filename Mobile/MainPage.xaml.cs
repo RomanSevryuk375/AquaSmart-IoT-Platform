@@ -31,7 +31,7 @@ public partial class MainPage : ContentPage
             await btn.ScaleTo(1.0, 70);
         }
 
-        await DisplayAlert("Знакомство", "Переход к онбордингу приложения", "ОК");
+        await Shell.Current.GoToAsync("OnboardingPage");
     }
 
     private async void OnAuthorizationClicked(object? sender, EventArgs e)
@@ -42,6 +42,6 @@ public partial class MainPage : ContentPage
             await btn.ScaleTo(1.0, 70);
         }
 
-        await DisplayAlert("Авторизация", "Переход к экрану авторизации", "ОК");
+        await Shell.Current.GoToAsync("LoginPage");
     }
 }
