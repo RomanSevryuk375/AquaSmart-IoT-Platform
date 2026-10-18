@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Mobile.ViewModels"
+             x:Class="Mobile.Views.AddControllerPage"
+             x:DataType="vm:AddControllerViewModel"
+             BackgroundColor="#F6F7FC"
+             Title="Новый контроллер">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="20,16,20,30">
+            <!-- Header Banner -->
+            <Border x:Name="HeaderCard"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 16"
+                    BackgroundColor="#4152B0"
+                    Padding="20">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Подключение IoT-контроллера"
+                           TextColor="#FFFFFF"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="20"
+                           FontAttributes="Bold" />
+                    <Label Text="Сопряжение аппаратного модуля AquaSmart для управления реле и сбора телеметрии"
+                           TextColor="#EDEFFB"
+                           FontSize="13" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Form Card -->
+            <Border x:Name="FormCard"
+                    StrokeThickness="1"
+                    Stroke="#E4E7F4"
+                    StrokeShape="RoundRectangle 16"
+                    BackgroundColor="#FFFFFF"
+                    Padding="20">
+                <VerticalStackLayout Spacing="16">
+                    <!-- Controller Name -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Имя контроллера *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Entry Text="{Binding ControllerName}"
+                                   Placeholder="Например, Контроллер Саммпа №1"
+                                   PlaceholderColor="#8C93A8"
+                                   TextColor="#2E3A7E"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Model Type Picker -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Модель оборудования *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Picker SelectedItem="{Binding ModelType}"
+                                    TextColor="#2E3A7E"
+                                    VerticalOptions="Center">
+                                <Picker.ItemsSource>
+                                    <x:Array Type="{x:Type x:String}">
+                                        <x:String>ESP32-AquaHub v2</x:String>
+                                        <x:String>AquaSmart ESP32 Pro</x:String>
+                                        <x:String>AquaSmart LED Controller</x:String>
+                                        <x:String>AquaSmart Feeder Module</x:String>
+                                    </x:Array>
+                                </Picker.ItemsSource>
+                            </Picker>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- MAC Address / Serial -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="MAC-адрес / Серийный номер *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Entry Text="{Binding MacAddress}"
+                                   Placeholder="24:6F:28:B4:72:01"
+                                   PlaceholderColor="#8C93A8"
+                                   TextColor="#2E3A7E"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Attached Aquarium -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Привязанный аквариум" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Entry Text="{Binding AttachedAquarium}"
+                                   Placeholder="Биотоп Танганьика №1"
+                                   PlaceholderColor="#8C93A8"
+                                   TextColor="#2E3A7E"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Action Buttons -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Button Grid.Column="0"
+                        Text="Отмена"
+                        Command="{Binding CancelCommand}"
+                        BackgroundColor="#FFFFFF"
+                        TextColor="#6A738A"
+                        BorderColor="#E4E7F4"
+                        BorderWidth="1"
+                        CornerRadius="14"
+                        HeightRequest="52"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="15" />
+
+                <Button Grid.Column="1"
+                        Text="Сохранить"
+                        Command="{Binding SaveCommand}"
+                        BackgroundColor="#4152B0"
+                        TextColor="#FFFFFF"
+                        CornerRadius="14"
+                        HeightRequest="52"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="15" />
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -10,6 +10,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IAuthService, AuthService>();
         services.AddSingleton<IAquariumService, AquariumService>();
         services.AddSingleton<IKnowledgeService, KnowledgeService>();
+        services.AddSingleton<IControllerService, ControllerService>();
 
         return services;
     }

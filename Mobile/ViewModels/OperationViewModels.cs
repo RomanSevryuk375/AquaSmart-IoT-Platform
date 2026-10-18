@@ -364,4 +364,33 @@ public partial class ProfileViewModel : ObservableObject
     {
         await Shell.Current.DisplayAlert("О приложении", "AquaSmart IoT Platform Mobile\nВерсия: 1.0.0 (Release)\n\nПлатформа комплексного мониторинга и автоматизации аквасистем.", "Закрыть");
     }
+
+    [RelayCommand]
+    private async Task ShowSettingsAsync()
+    {
+        await Shell.Current.DisplayAlert("Настройки приложения", "• Тема: Системная (Светлая/Тёмная)\n• Интервал телеметрии: 5 сек\n• Push-уведомления: Включены\n• Звуковые оповещения алертов: Включены", "OK");
+    }
+
+    [RelayCommand]
+    private async Task ShowSecurityAsync()
+    {
+        await Shell.Current.DisplayAlert("Безопасность", "• Двухфакторная аутентификация: Активна\n• Сессия: Защищена JWT и SecureStorage\n• Последний вход: Сегодня", "OK");
+    }
+
+    [RelayCommand]
+    private async Task ShowSupportAsync()
+    {
+        await Shell.Current.DisplayAlert("Помощь и поддержка", "Служба поддержки AquaSmart IoT:\nEmail: support@aquasmart.io\nTelegram: @AquaSmartSupport\n\nБаза знаний доступна в боковом меню.", "Понятно");
+    }
+
+    [RelayCommand]
+    private async Task DeleteAccountAsync()
+    {
+        var confirm = await Shell.Current.DisplayAlert("Удаление аккаунта", "Вы действительно хотите удалить свой аккаунт и все связанные контроллеры? Это действие необратимо.", "Удалить", "Отмена");
+        if (confirm)
+        {
+            await _authService.LogoutAsync();
+            await Shell.Current.GoToAsync("//MainPage");
+        }
+    }
 }

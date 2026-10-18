@@ -36,3 +36,36 @@ public class InverseBoolConverter : IValueConverter
         return false;
     }
 }
+
+public class InvertedBoolConverter : InverseBoolConverter
+{
+}
+
+public class TabActiveColorConverter : IValueConverter
+{
+    public Color ActiveColor { get; set; } = Color.FromArgb("#4152B0");
+    public Color InactiveColor { get; set; } = Color.FromArgb("#EDEFFB");
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is bool b && b) return ActiveColor;
+        return InactiveColor;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
+}
+
+public class TabActiveTextColorConverter : IValueConverter
+{
+    public Color ActiveColor { get; set; } = Color.FromArgb("#FFFFFF");
+    public Color InactiveColor { get; set; } = Color.FromArgb("#4152B0");
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is bool b && b) return ActiveColor;
+        return InactiveColor;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
+}
+

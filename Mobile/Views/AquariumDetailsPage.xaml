@@ -54,8 +54,8 @@
                         Text="Датчики"
                         Command="{Binding SelectTabCommand}"
                         CommandParameter="0"
-                        BackgroundColor="#4152B0"
-                        TextColor="#FFFFFF"
+                        BackgroundColor="{Binding IsSensorsTabSelected, Converter={StaticResource TabActiveBgConverter}}"
+                        TextColor="{Binding IsSensorsTabSelected, Converter={StaticResource TabActiveTextConverter}}"
                         CornerRadius="8"
                         HeightRequest="40"
                         FontFamily="OpenSansSemibold"
@@ -66,8 +66,8 @@
                         Text="Реле"
                         Command="{Binding SelectTabCommand}"
                         CommandParameter="1"
-                        BackgroundColor="#EDEFFB"
-                        TextColor="#4152B0"
+                        BackgroundColor="{Binding IsRelaysTabSelected, Converter={StaticResource TabActiveBgConverter}}"
+                        TextColor="{Binding IsRelaysTabSelected, Converter={StaticResource TabActiveTextConverter}}"
                         CornerRadius="8"
                         HeightRequest="40"
                         FontFamily="OpenSansSemibold"
@@ -78,8 +78,8 @@
                         Text="Сценарии"
                         Command="{Binding SelectTabCommand}"
                         CommandParameter="2"
-                        BackgroundColor="#EDEFFB"
-                        TextColor="#4152B0"
+                        BackgroundColor="{Binding IsScenariosTabSelected, Converter={StaticResource TabActiveBgConverter}}"
+                        TextColor="{Binding IsScenariosTabSelected, Converter={StaticResource TabActiveTextConverter}}"
                         CornerRadius="8"
                         HeightRequest="40"
                         FontFamily="OpenSansSemibold"
@@ -91,14 +91,29 @@
         <ScrollView Grid.Row="2" x:Name="ContentScroll">
             <VerticalStackLayout Spacing="14">
 
-                <!-- Sensors List -->
-                <VerticalStackLayout Spacing="10">
+                <!-- Sensors List (Tab 0) -->
+                <VerticalStackLayout x:Name="SensorsSection"
+                                     Spacing="10"
+                                     IsVisible="{Binding IsSensorsTabSelected}">
                     <Grid ColumnDefinitions="*,Auto">
                         <Label Grid.Column="0" Text="Подключенные датчики" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="16" VerticalOptions="Center" />
                         <Button Grid.Column="1" Text="+ Датчик" Command="{Binding AddSensorCommand}" TextColor="#4152B0" BackgroundColor="Transparent" FontFamily="OpenSansSemibold" FontSize="13" />
                     </Grid>
 
-                    <CollectionView ItemsSource="{Binding Sensors}" SelectionMode="None">
+                    <!-- Empty State (Figma: Емкость. Датчики. Пусто) -->
+                    <Border IsVisible="{Binding HasNoSensors}"
+                            StrokeThickness="1" Stroke="#E1E4F2" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" Padding="20">
+                        <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                            <Label Text="🧪" FontSize="32" HorizontalOptions="Center" />
+                            <Label Text="Датчики не привязаны" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" HorizontalTextAlignment="Center" />
+                            <Label Text="Добавьте термометр, pH-зонд или оксиметр для сбора телеметрии." TextColor="#6E6E6E" FontSize="12" HorizontalTextAlignment="Center" />
+                            <Button Text="+ Добавить датчик" Command="{Binding AddSensorCommand}" BackgroundColor="#EDEFFB" TextColor="#4152B0" CornerRadius="8" HeightRequest="38" FontFamily="OpenSansSemibold" FontSize="13" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <CollectionView ItemsSource="{Binding Sensors}"
+                                    IsVisible="{Binding HasNoSensors, Converter={StaticResource InvertedBoolConverter}}"
+                                    SelectionMode="None">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:SensorModel">
                                 <Border StrokeThickness="1" Stroke="#E1E4F2" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" Padding="14" Margin="0,0,0,8">
@@ -116,14 +131,29 @@
                     </CollectionView>
                 </VerticalStackLayout>
 
-                <!-- Relays List -->
-                <VerticalStackLayout Spacing="10" Margin="0,12,0,0">
+                <!-- Relays List (Tab 1) -->
+                <VerticalStackLayout x:Name="RelaysSection"
+                                     Spacing="10"
+                                     IsVisible="{Binding IsRelaysTabSelected}">
                     <Grid ColumnDefinitions="*,Auto">
                         <Label Grid.Column="0" Text="Управляемые устройства" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="16" VerticalOptions="Center" />
                         <Button Grid.Column="1" Text="+ Реле" Command="{Binding AddRelayCommand}" TextColor="#4152B0" BackgroundColor="Transparent" FontFamily="OpenSansSemibold" FontSize="13" />
                     </Grid>
 
-                    <CollectionView ItemsSource="{Binding Relays}" SelectionMode="None">
+                    <!-- Empty State (Figma: Емкость. Реле. Пусто) -->
+                    <Border IsVisible="{Binding HasNoRelays}"
+                            StrokeThickness="1" Stroke="#E1E4F2" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" Padding="20">
+                        <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                            <Label Text="⚡" FontSize="32" HorizontalOptions="Center" />
+                            <Label Text="Устройства не подключены" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" HorizontalTextAlignment="Center" />
+                            <Label Text="Подключите обогреватель, аэратор, фильтр или кормушку." TextColor="#6E6E6E" FontSize="12" HorizontalTextAlignment="Center" />
+                            <Button Text="+ Добавить реле" Command="{Binding AddRelayCommand}" BackgroundColor="#EDEFFB" TextColor="#4152B0" CornerRadius="8" HeightRequest="38" FontFamily="OpenSansSemibold" FontSize="13" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <CollectionView ItemsSource="{Binding Relays}"
+                                    IsVisible="{Binding HasNoRelays, Converter={StaticResource InvertedBoolConverter}}"
+                                    SelectionMode="None">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:RelayModel">
                                 <Border StrokeThickness="1" Stroke="#E1E4F2" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" Padding="14" Margin="0,0,0,8">
@@ -141,14 +171,29 @@
                     </CollectionView>
                 </VerticalStackLayout>
 
-                <!-- Scenarios List -->
-                <VerticalStackLayout Spacing="10" Margin="0,12,0,0">
+                <!-- Scenarios List (Tab 2) -->
+                <VerticalStackLayout x:Name="ScenariosSection"
+                                     Spacing="10"
+                                     IsVisible="{Binding IsScenariosTabSelected}">
                     <Grid ColumnDefinitions="*,Auto">
                         <Label Grid.Column="0" Text="Автоматические сценарии" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="16" VerticalOptions="Center" />
                         <Button Grid.Column="1" Text="+ Сценарий" Command="{Binding AddScenarioCommand}" TextColor="#4152B0" BackgroundColor="Transparent" FontFamily="OpenSansSemibold" FontSize="13" />
                     </Grid>
 
-                    <CollectionView ItemsSource="{Binding Scenarios}" SelectionMode="None">
+                    <!-- Empty State (Figma: Емкость. Сценарии. Пусто) -->
+                    <Border IsVisible="{Binding HasNoScenarios}"
+                            StrokeThickness="1" Stroke="#E1E4F2" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" Padding="20">
+                        <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                            <Label Text="⚙️" FontSize="32" HorizontalOptions="Center" />
+                            <Label Text="Сценарии не настроены" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" HorizontalTextAlignment="Center" />
+                            <Label Text="Настройте автоматическое включение нагревателя или освещения по триггеру." TextColor="#6E6E6E" FontSize="12" HorizontalTextAlignment="Center" />
+                            <Button Text="+ Создать сценарий" Command="{Binding AddScenarioCommand}" BackgroundColor="#EDEFFB" TextColor="#4152B0" CornerRadius="8" HeightRequest="38" FontFamily="OpenSansSemibold" FontSize="13" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <CollectionView ItemsSource="{Binding Scenarios}"
+                                    IsVisible="{Binding HasNoScenarios, Converter={StaticResource InvertedBoolConverter}}"
+                                    SelectionMode="None">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:ScenarioModel">
                                 <Border StrokeThickness="1" Stroke="#E1E4F2" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" Padding="14" Margin="0,0,0,8">

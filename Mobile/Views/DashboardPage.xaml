@@ -60,6 +60,36 @@
                 </Grid>
             </Border>
 
+            <!-- Warning State Alert Banner (Figma: Главная. Есть проблемы) -->
+            <Border x:Name="AlertCard"
+                    IsVisible="{Binding HasProblems}"
+                    StrokeThickness="1.5"
+                    Stroke="#F57C00"
+                    StrokeShape="RoundRectangle 16"
+                    BackgroundColor="#FFF8E1"
+                    Padding="16">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                    <Border Grid.Column="0"
+                            WidthRequest="40" HeightRequest="40"
+                            StrokeShape="RoundRectangle 20"
+                            BackgroundColor="#FFE082"
+                            StrokeThickness="0"
+                            VerticalOptions="Start">
+                        <Label Text="⚠️" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                        <Label Text="{Binding ProblemTitle}"
+                               TextColor="#E65100"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="15"
+                               FontAttributes="Bold" />
+                        <Label Text="{Binding ProblemDescription}"
+                               TextColor="#5D4037"
+                               FontSize="13" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
             <!-- Section 1: Ёмкости (Aquarium Cards Horizontal Carousel) -->
             <VerticalStackLayout x:Name="AquariumsSection" Spacing="12">
                 <Grid ColumnDefinitions="*,Auto">

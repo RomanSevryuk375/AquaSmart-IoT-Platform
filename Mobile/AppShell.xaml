@@ -101,6 +101,13 @@
                       Route="AquariumsPage" />
     </FlyoutItem>
 
+    <FlyoutItem Title="Контроллеры"
+                Route="ControllersPage">
+        <ShellContent Title="Контроллеры"
+                      ContentTemplate="{DataTemplate views:ControllersPage}"
+                      Route="ControllersPage" />
+    </FlyoutItem>
+
     <FlyoutItem Title="База знаний"
                 Route="KnowledgeBasePage">
         <ShellContent Title="База знаний"

@@ -37,5 +37,9 @@ public partial class AppShell : Shell
 
         Routing.RegisterRoute("KnowledgeBasePage", typeof(KnowledgeBasePage));
         Routing.RegisterRoute("ProfilePage", typeof(ProfilePage));
+
+        Routing.RegisterRoute("ControllersPage", typeof(ControllersPage));
+        Routing.RegisterRoute("AddControllerPage", typeof(AddControllerPage));
+        Routing.RegisterRoute("ControllerDetailsPage", typeof(ControllerDetailsPage));
     }
 }

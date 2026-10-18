@@ -25,10 +25,16 @@ public partial class DashboardPage : ContentPage
             await new VisualElement[]
             {
                 HeaderCard,
+                AlertCard,
                 AquariumsSection,
                 TelemetrySection,
                 RelaysSection
-            }.CascadeEntranceAsync(300, 70);
+            }.CascadeEntranceAsync(280, 60);
+
+            if (_viewModel.HasProblems)
+            {
+                await AlertCard.PulseAsync(1.04, 220);
+            }
         }
     }
 }

@@ -24,6 +24,10 @@ public static class ViewsCollectionExtensions
         services.AddTransient<KnowledgeBasePage>();
         services.AddTransient<ProfilePage>();
 
+        services.AddTransient<ControllersPage>();
+        services.AddTransient<AddControllerPage>();
+        services.AddTransient<ControllerDetailsPage>();
+
         return services;
     }
 }

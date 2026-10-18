@@ -25,6 +25,10 @@ public static class ViewModelsCollectionExtensions
         services.AddTransient<KnowledgeBaseViewModel>();
         services.AddTransient<ProfileViewModel>();
 
+        services.AddTransient<ControllersViewModel>();
+        services.AddTransient<AddControllerViewModel>();
+        services.AddTransient<ControllerDetailsViewModel>();
+
         return services;
     }
 }

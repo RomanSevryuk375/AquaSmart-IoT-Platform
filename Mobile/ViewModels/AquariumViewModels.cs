@@ -21,6 +21,15 @@ public partial class DashboardViewModel : ObservableObject
     private bool _isAllNormal = true;
 
     [ObservableProperty]
+    private bool _hasProblems = true;
+
+    [ObservableProperty]
+    private string _problemTitle = "Внимание: Требуется проверка";
+
+    [ObservableProperty]
+    private string _problemDescription = "Температура в аквариуме «Биотоп Танганьика №1» достигла 26.2 °C (выше целевой нормы на 0.2 °C).";
+
+    [ObservableProperty]
     private ObservableCollection<AquariumModel> _aquariums = new();
 
     [ObservableProperty]
@@ -169,7 +178,14 @@ public partial class AquariumDetailsViewModel : ObservableObject
     private AquariumModel? _aquarium;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSensorsTabSelected))]
+    [NotifyPropertyChangedFor(nameof(IsRelaysTabSelected))]
+    [NotifyPropertyChangedFor(nameof(IsScenariosTabSelected))]
     private int _selectedTabIndex = 0; // 0: Sensors, 1: Relays, 2: Scenarios
+
+    public bool IsSensorsTabSelected => SelectedTabIndex == 0;
+    public bool IsRelaysTabSelected => SelectedTabIndex == 1;
+    public bool IsScenariosTabSelected => SelectedTabIndex == 2;
 
     [ObservableProperty]
     private ObservableCollection<SensorModel> _sensors = new();
@@ -179,6 +195,15 @@ public partial class AquariumDetailsViewModel : ObservableObject
 
     [ObservableProperty]
     private ObservableCollection<ScenarioModel> _scenarios = new();
+
+    [ObservableProperty]
+    private bool _hasNoSensors;
+
+    [ObservableProperty]
+    private bool _hasNoRelays;
+
+    [ObservableProperty]
+    private bool _hasNoScenarios;
 
     [ObservableProperty]
     private bool _isBusy;
@@ -204,22 +229,32 @@ public partial class AquariumDetailsViewModel : ObservableObject
         var sList = await _aquariumService.GetSensorsAsync(id);
         Sensors.Clear();
         foreach (var s in sList) Sensors.Add(s);
+        HasNoSensors = Sensors.Count == 0;
 
         var rList = await _aquariumService.GetRelaysAsync(id);
         Relays.Clear();
         foreach (var r in rList) Relays.Add(r);
+        HasNoRelays = Relays.Count == 0;
 
         var scList = await _aquariumService.GetScenariosAsync(id);
         Scenarios.Clear();
         foreach (var sc in scList) Scenarios.Add(sc);
+        HasNoScenarios = Scenarios.Count == 0;
 
         IsBusy = false;
     }
 
     [RelayCommand]
-    private void SelectTab(int index)
+    private void SelectTab(object? parameter)
     {
-        SelectedTabIndex = index;
+        if (parameter is int idx)
+        {
+            SelectedTabIndex = idx;
+        }
+        else if (parameter is string s && int.TryParse(s, out var parsed))
+        {
+            SelectedTabIndex = parsed;
+        }
     }
 
     [RelayCommand]
