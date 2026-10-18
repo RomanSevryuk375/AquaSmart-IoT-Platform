@@ -3,101 +3,131 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Mobile.ViewModels"
              xmlns:models="clr-namespace:Mobile.Models"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
              x:Class="Mobile.Views.DashboardPage"
              x:DataType="vm:DashboardViewModel"
-             BackgroundColor="#F6F7FC"
+             BackgroundColor="#FFFFFF"
+             Shell.NavBarIsVisible="False"
              Title="AquaSmart">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20,16,20,32" Spacing="24">
+        <VerticalStackLayout Padding="20,24,20,32" Spacing="20">
 
-            <!-- Top Header Card: Greeting & System Status -->
-            <Border x:Name="HeaderCard"
-                    StrokeThickness="0"
-                    StrokeShape="RoundRectangle 16"
-                    BackgroundColor="#4152B0"
-                    Padding="20">
-                <Border.Shadow>
-                    <Shadow Brush="#404152B0" Offset="0,6" Radius="12" Opacity="0.9" />
-                </Border.Shadow>
-                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto">
-                    <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="4">
-                        <Label Text="{Binding Greeting}"
-                               TextColor="#FFFFFF"
-                               FontFamily="OpenSansSemibold"
-                               FontSize="20"
-                               FontAttributes="Bold" />
-                        <Label Text="Интеллектуальный контроль аквасистем"
-                               TextColor="#D9DFF7"
-                               FontSize="13" />
-                    </VerticalStackLayout>
+            <!-- Top Header: Greeting & Plus / Bell Action Buttons (Figma: Главная) -->
+            <Grid x:Name="HeaderCard" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12" Margin="0,4,0,4">
+                <Label Grid.Column="0"
+                       Text="{Binding Greeting, FallbackValue='Добро пожаловать, Роман!'}"
+                       TextColor="#141414"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center" />
 
-                    <!-- Avatar / Fish Icon -->
-                    <Border Grid.Row="0" Grid.Column="1"
-                            WidthRequest="46" HeightRequest="46"
-                            StrokeShape="RoundRectangle 23"
-                            BackgroundColor="#5364C7"
-                            StrokeThickness="0">
-                        <Label Text="🐠" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" />
-                    </Border>
+                <!-- Add Button (+) -->
+                <Border Grid.Column="1"
+                        WidthRequest="38" HeightRequest="38"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="#F6F7FC"
+                        StrokeThickness="0">
+                    <ImageButton Source="icon_plus.png"
+                                 Command="{Binding AddAquariumCommand}"
+                                 BackgroundColor="Transparent"
+                                 WidthRequest="20" HeightRequest="20"
+                                 Padding="0"
+                                 HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
 
-                    <!-- Status Pill -->
-                    <Border Grid.Row="1" Grid.ColumnSpan="2"
-                            Margin="0,16,0,0"
-                            BackgroundColor="#5364C7"
-                            StrokeShape="RoundRectangle 10"
-                            Padding="12,8"
-                            StrokeThickness="0">
-                        <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
-                            <BoxView WidthRequest="10" HeightRequest="10" CornerRadius="5" Color="#66BB6A" VerticalOptions="Center" />
-                            <Label Text="{Binding SystemStatusText}"
-                                   TextColor="#FFFFFF"
-                                   FontFamily="OpenSansSemibold"
-                                   FontSize="14"
-                                   VerticalOptions="Center" />
-                        </HorizontalStackLayout>
-                    </Border>
-                </Grid>
-            </Border>
+                <!-- Notifications Button (Bell) -->
+                <Border Grid.Column="2"
+                        WidthRequest="38" HeightRequest="38"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="#F6F7FC"
+                        StrokeThickness="0">
+                    <ImageButton Source="icon_bell.png"
+                                 BackgroundColor="Transparent"
+                                 WidthRequest="20" HeightRequest="20"
+                                 Padding="0"
+                                 HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+            </Grid>
 
-            <!-- Warning State Alert Banner (Figma: Главная. Есть проблемы) -->
+            <!-- Zero State: Для нового пользователя (Figma: Главная. Для нового пользователя) -->
+            <VerticalStackLayout Spacing="16" IsVisible="False">
+                <controls:FishMascotCard HeightOverride="220"
+                                         BadgeText="⚙️"
+                                         BadgeColor="#7BA028" />
+
+                <Label Text="Добавьте первый контроллер"
+                       TextColor="#141414"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="20"
+                       FontAttributes="Bold" />
+
+                <Label Text="Контроллер соединяет приложение с вашей ёмкостью — отсканируйте QR-код на устройстве, чтобы начать"
+                       TextColor="#6E6E6E"
+                       FontFamily="OpenSansRegular"
+                       FontSize="14"
+                       LineHeight="1.3" />
+
+                <Button Text="Сканировать QR-код"
+                        BackgroundColor="#4152B0"
+                        TextColor="#FFFFFF"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="15"
+                        CornerRadius="12"
+                        HeightRequest="48"
+                        Margin="0,8,0,0" />
+
+                <Button Text="Изучить базу знаний"
+                        BackgroundColor="Transparent"
+                        BorderColor="#4152B0"
+                        BorderWidth="1.5"
+                        TextColor="#4152B0"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="14"
+                        CornerRadius="12"
+                        HeightRequest="48" />
+            </VerticalStackLayout>
+
+            <!-- Status Banner (Amber: Есть проблемы / Green: Всё хорошо) -->
             <Border x:Name="AlertCard"
-                    IsVisible="{Binding HasProblems}"
-                    StrokeThickness="1.5"
-                    Stroke="#F57C00"
-                    StrokeShape="RoundRectangle 16"
-                    BackgroundColor="#FFF8E1"
-                    Padding="16">
-                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12"
+                    BackgroundColor="{Binding HasProblems, Converter={StaticResource InvertedBoolConverter}, ConverterParameter='#FFF9E6', FallbackValue='#FFF9E6'}"
+                    Padding="14,12">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                    <!-- Warning / Success Icon Badge -->
                     <Border Grid.Column="0"
-                            WidthRequest="40" HeightRequest="40"
-                            StrokeShape="RoundRectangle 20"
+                            WidthRequest="26" HeightRequest="26"
+                            StrokeShape="RoundRectangle 13"
                             BackgroundColor="#FFE082"
                             StrokeThickness="0"
-                            VerticalOptions="Start">
-                        <Label Text="⚠️" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center" />
+                            VerticalOptions="Center">
+                        <Label Text="⚠️" FontSize="13" HorizontalOptions="Center" VerticalOptions="Center" />
                     </Border>
-                    <VerticalStackLayout Grid.Column="1" Spacing="4">
-                        <Label Text="{Binding ProblemTitle}"
-                               TextColor="#E65100"
-                               FontFamily="OpenSansSemibold"
-                               FontSize="15"
-                               FontAttributes="Bold" />
-                        <Label Text="{Binding ProblemDescription}"
-                               TextColor="#5D4037"
-                               FontSize="13" />
-                    </VerticalStackLayout>
+
+                    <Label Grid.Column="1"
+                           Text="Обнаружены проблемы: 2"
+                           TextColor="#E65100"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="14"
+                           VerticalOptions="Center" />
+
+                    <Image Grid.Column="2"
+                           Source="icon_chevron_down.png"
+                           WidthRequest="16" HeightRequest="16"
+                           VerticalOptions="Center" />
                 </Grid>
             </Border>
 
-            <!-- Section 1: Ёмкости (Aquarium Cards Horizontal Carousel) -->
-            <VerticalStackLayout x:Name="AquariumsSection" Spacing="12">
+            <!-- Section 1: Все ёмкости (Figma: Все ёмкости - MainStateCard variants) -->
+            <VerticalStackLayout x:Name="AquariumsSection" Spacing="10">
                 <Grid ColumnDefinitions="*,Auto">
                     <Label Grid.Column="0"
-                           Text="Ваши ёмкости"
+                           Text="Все ёмкости"
                            TextColor="#141414"
                            FontFamily="OpenSansSemibold"
-                           FontSize="18"
+                           FontSize="16"
                            FontAttributes="Bold"
                            VerticalOptions="Center" />
 
@@ -107,161 +137,104 @@
                             TextColor="#4152B0"
                             BackgroundColor="Transparent"
                             FontFamily="OpenSansSemibold"
-                            FontSize="14"
+                            FontSize="13"
                             Padding="4,0" />
                 </Grid>
 
-                <CollectionView ItemsSource="{Binding Aquariums}"
-                                SelectionMode="None">
-                    <CollectionView.ItemsLayout>
-                        <LinearItemsLayout Orientation="Horizontal" ItemSpacing="14" />
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Aquariums}" Spacing="8">
+                    <BindableLayout.ItemTemplate>
                         <DataTemplate x:DataType="models:AquariumModel">
-                            <Border WidthRequest="260"
-                                    StrokeThickness="1"
-                                    Stroke="#E1E4F2"
-                                    StrokeShape="RoundRectangle 16"
+                            <Border StrokeThickness="1"
+                                    Stroke="#E4E7F4"
+                                    StrokeShape="RoundRectangle 12"
                                     BackgroundColor="#FFFFFF"
-                                    Padding="16">
-                                <Border.Shadow>
-                                    <Shadow Brush="#10000000" Offset="0,4" Radius="8" Opacity="0.5" />
-                                </Border.Shadow>
+                                    Padding="14,10">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DashboardViewModel}}, Path=GoToAquariumDetailsCommand}"
                                                           CommandParameter="{Binding .}" />
                                 </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12">
+                                    <!-- Species Icon Avatar -->
+                                    <Border Grid.Column="0"
+                                            WidthRequest="36" HeightRequest="36"
+                                            StrokeShape="RoundRectangle 8"
+                                            BackgroundColor="{Binding CardThemeColor}"
+                                            StrokeThickness="0">
+                                        <Label Text="{Binding Icon}" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </Border>
 
-                                <VerticalStackLayout Spacing="10">
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <Label Grid.Column="0"
-                                               Text="{Binding Name}"
-                                               TextColor="#141414"
-                                               FontFamily="OpenSansSemibold"
-                                               FontSize="16"
-                                               FontAttributes="Bold"
-                                               MaxLines="1"
-                                               LineBreakMode="TailTruncation" />
-                                        <Border Grid.Column="1"
-                                                BackgroundColor="#EDEFFB"
-                                                StrokeShape="RoundRectangle 6"
-                                                Padding="6,2"
-                                                StrokeThickness="0">
-                                            <Label Text="{Binding WaterTypeDisplay}" TextColor="#4152B0" FontSize="11" FontFamily="OpenSansSemibold" />
-                                        </Border>
-                                    </Grid>
+                                    <!-- Tank Name -->
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Name}"
+                                           TextColor="#141414"
+                                           FontFamily="OpenSansSemibold"
+                                           FontSize="14"
+                                           VerticalOptions="Center" />
 
-                                    <Label Text="{Binding SpeciesInfo}" TextColor="#6E6E6E" FontSize="12" MaxLines="1" LineBreakMode="TailTruncation" />
+                                    <!-- Telemetry Metric -->
+                                    <Label Grid.Column="2"
+                                           Text="{Binding TemperatureDisplay}"
+                                           TextColor="#6E6E6E"
+                                           FontFamily="OpenSansSemibold"
+                                           FontSize="13"
+                                           VerticalOptions="Center" />
 
-                                    <!-- Quick Metrics -->
-                                    <Grid ColumnDefinitions="*,*,*" Margin="0,6,0,0">
-                                        <VerticalStackLayout Grid.Column="0" Spacing="2">
-                                            <Label Text="Темп." TextColor="#919191" FontSize="11" />
-                                            <Label Text="{Binding Temperature, StringFormat='{0:F1}°C'}" TextColor="#4152B0" FontFamily="OpenSansSemibold" FontSize="15" />
-                                        </VerticalStackLayout>
-                                        <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                            <Label Text="pH" TextColor="#919191" FontSize="11" />
-                                            <Label Text="{Binding Ph, StringFormat='{0:F1}'}" TextColor="#4152B0" FontFamily="OpenSansSemibold" FontSize="15" />
-                                        </VerticalStackLayout>
-                                        <VerticalStackLayout Grid.Column="2" Spacing="2">
-                                            <Label Text="Объём" TextColor="#919191" FontSize="11" />
-                                            <Label Text="{Binding VolumeLiters, StringFormat='{0} л'}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
-                                        </VerticalStackLayout>
-                                    </Grid>
-
-                                    <!-- Footer Status -->
-                                    <Label Text="{Binding StatusText}" TextColor="{Binding StatusColor}" FontSize="12" FontFamily="OpenSansSemibold" Margin="0,4,0,0" />
-                                </VerticalStackLayout>
+                                    <!-- Status Dot (Green / Yellow / Red) -->
+                                    <BoxView Grid.Column="3"
+                                             WidthRequest="8" HeightRequest="8"
+                                             CornerRadius="4"
+                                             Color="{Binding StatusDotColor}"
+                                             VerticalOptions="Center" />
+                                </Grid>
                             </Border>
                         </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
             </VerticalStackLayout>
 
-            <!-- Section 2: Текущие датчики (Telemetry Grid) -->
-            <VerticalStackLayout x:Name="TelemetrySection" Spacing="12">
-                <Grid ColumnDefinitions="*,Auto">
-                    <Label Grid.Column="0"
-                           Text="Показатели датчиков"
-                           TextColor="#141414"
-                           FontFamily="OpenSansSemibold"
-                           FontSize="18"
-                           FontAttributes="Bold"
-                           VerticalOptions="Center" />
+            <!-- Section 2: Последние события (Figma Timeline Events) -->
+            <VerticalStackLayout x:Name="TelemetrySection" Spacing="10">
+                <Label Text="Последние события"
+                       TextColor="#141414"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="16"
+                       FontAttributes="Bold" />
 
-                    <Button Grid.Column="1"
-                            Text="+ Датчик"
-                            Command="{Binding AddSensorCommand}"
-                            TextColor="#4152B0"
-                            BackgroundColor="Transparent"
-                            FontFamily="OpenSansSemibold"
-                            FontSize="14"
-                            Padding="4,0" />
-                </Grid>
-
-                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
-                    <!-- Sensor 1: Temperature -->
-                    <Border Grid.Row="0" Grid.Column="0"
-                            StrokeThickness="1" Stroke="#E1E4F2" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="14">
-                        <VerticalStackLayout Spacing="6">
-                            <HorizontalStackLayout Spacing="6">
-                                <Label Text="🌡️" FontSize="20" />
-                                <Label Text="Температура" TextColor="#6E6E6E" FontSize="13" VerticalOptions="Center" />
-                            </HorizontalStackLayout>
-                            <Label Text="26.2 °C" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
-                            <Label Text="Норма: 24 - 28 °C" TextColor="#388E3C" FontSize="11" />
-                        </VerticalStackLayout>
+                <VerticalStackLayout Spacing="8">
+                    <!-- Event 1 -->
+                    <Border StrokeThickness="1" Stroke="#E4E7F4" BackgroundColor="#FFFFFF" StrokeShape="RoundRectangle 10" Padding="12">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Label Grid.Column="0" Text="14:30" TextColor="#8C93A8" FontSize="12" FontFamily="OpenSansSemibold" VerticalOptions="Start" />
+                            <Label Grid.Column="1" Text="Сценарий «Световой день»: освещение в палюдариуме «Домик Черепахи» включено" TextColor="#141414" FontSize="13" LineHeight="1.25" />
+                        </Grid>
                     </Border>
 
-                    <!-- Sensor 2: pH -->
-                    <Border Grid.Row="0" Grid.Column="1"
-                            StrokeThickness="1" Stroke="#E1E4F2" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="14">
-                        <VerticalStackLayout Spacing="6">
-                            <HorizontalStackLayout Spacing="6">
-                                <Label Text="🧪" FontSize="20" />
-                                <Label Text="Кислотность pH" TextColor="#6E6E6E" FontSize="13" VerticalOptions="Center" />
-                            </HorizontalStackLayout>
-                            <Label Text="6.8 pH" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
-                            <Label Text="Норма: 6.5 - 7.5" TextColor="#388E3C" FontSize="11" />
-                        </VerticalStackLayout>
+                    <!-- Event 2 -->
+                    <Border StrokeThickness="1" Stroke="#E4E7F4" BackgroundColor="#FFFFFF" StrokeShape="RoundRectangle 10" Padding="12">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Label Grid.Column="0" Text="13:05" TextColor="#8C93A8" FontSize="12" FontFamily="OpenSansSemibold" VerticalOptions="Start" />
+                            <Label Grid.Column="1" Text="Нагреватель в аквариуме «Мой первый аквариум» активирован автоматикой" TextColor="#141414" FontSize="13" LineHeight="1.25" />
+                        </Grid>
                     </Border>
 
-                    <!-- Sensor 3: Oxygen -->
-                    <Border Grid.Row="1" Grid.Column="0"
-                            StrokeThickness="1" Stroke="#E1E4F2" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="14">
-                        <VerticalStackLayout Spacing="6">
-                            <HorizontalStackLayout Spacing="6">
-                                <Label Text="🫧" FontSize="20" />
-                                <Label Text="Кислород O2" TextColor="#6E6E6E" FontSize="13" VerticalOptions="Center" />
-                            </HorizontalStackLayout>
-                            <Label Text="7.9 мг/л" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
-                            <Label Text="Норма: 6.0 - 10.0" TextColor="#388E3C" FontSize="11" />
-                        </VerticalStackLayout>
+                    <!-- Event 3: Warning event -->
+                    <Border StrokeThickness="1" Stroke="#FFE082" BackgroundColor="#FFF9E6" StrokeShape="RoundRectangle 10" Padding="12">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Label Grid.Column="0" Text="10:17" TextColor="#E65100" FontSize="12" FontFamily="OpenSansSemibold" VerticalOptions="Start" />
+                            <Label Grid.Column="1" Text="⚠️ Температура в палюдариуме «Домик Черепахи» упала ниже порога (19.5°C)" TextColor="#BF360C" FontSize="13" LineHeight="1.25" />
+                        </Grid>
                     </Border>
-
-                    <!-- Sensor 4: TDS -->
-                    <Border Grid.Row="1" Grid.Column="1"
-                            StrokeThickness="1" Stroke="#E1E4F2" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="14">
-                        <VerticalStackLayout Spacing="6">
-                            <HorizontalStackLayout Spacing="6">
-                                <Label Text="🧂" FontSize="20" />
-                                <Label Text="TDS / Соли" TextColor="#6E6E6E" FontSize="13" VerticalOptions="Center" />
-                            </HorizontalStackLayout>
-                            <Label Text="180 ppm" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
-                            <Label Text="Норма: 100 - 300" TextColor="#388E3C" FontSize="11" />
-                        </VerticalStackLayout>
-                    </Border>
-                </Grid>
+                </VerticalStackLayout>
             </VerticalStackLayout>
 
-            <!-- Section 3: Быстрое управление реле и оборудованием -->
-            <VerticalStackLayout x:Name="RelaysSection" Spacing="12">
+            <!-- Section 3: Быстрое управление реле (Quick Controls) -->
+            <VerticalStackLayout x:Name="RelaysSection" Spacing="10">
                 <Grid ColumnDefinitions="*,Auto">
                     <Label Grid.Column="0"
                            Text="Управление устройствами"
                            TextColor="#141414"
                            FontFamily="OpenSansSemibold"
-                           FontSize="18"
+                           FontSize="16"
                            FontAttributes="Bold"
                            VerticalOptions="Center" />
 
@@ -271,30 +244,30 @@
                             TextColor="#4152B0"
                             BackgroundColor="Transparent"
                             FontFamily="OpenSansSemibold"
-                            FontSize="14"
+                            FontSize="13"
                             Padding="4,0" />
                 </Grid>
 
-                <VerticalStackLayout BindableLayout.ItemsSource="{Binding QuickRelays}" Spacing="10">
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding QuickRelays}" Spacing="8">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate x:DataType="models:RelayModel">
                             <Border StrokeThickness="1"
-                                    Stroke="#E1E4F2"
-                                    StrokeShape="RoundRectangle 14"
+                                    Stroke="#E4E7F4"
+                                    StrokeShape="RoundRectangle 12"
                                     BackgroundColor="#FFFFFF"
-                                    Padding="16,12">
-                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14">
+                                    Padding="14,10">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                                     <Border Grid.Column="0"
-                                            WidthRequest="44" HeightRequest="44"
-                                            StrokeShape="RoundRectangle 10"
+                                            WidthRequest="36" HeightRequest="36"
+                                            StrokeShape="RoundRectangle 8"
                                             BackgroundColor="#EDEFFB"
                                             StrokeThickness="0">
-                                        <Label Text="{Binding Icon}" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center" />
+                                        <Label Text="{Binding Icon}" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
                                     </Border>
 
                                     <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
-                                        <Label Text="{Binding Name}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
-                                        <Label Text="{Binding ScheduleInfo}" TextColor="#6E6E6E" FontSize="12" />
+                                        <Label Text="{Binding Name}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                                        <Label Text="{Binding ScheduleInfo}" TextColor="#6E6E6E" FontSize="11" />
                                     </VerticalStackLayout>
 
                                     <!-- Switch -->

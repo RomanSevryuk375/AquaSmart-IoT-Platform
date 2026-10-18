@@ -34,49 +34,108 @@ public class AquariumService : IAquariumService
         var aq1 = new AquariumModel
         {
             Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-            Name = "Основной пресноводный аквариум",
-            VolumeLiters = 240,
+            Name = "Мой первый аквариум",
+            VolumeLiters = 20,
             WaterType = WaterType.Freshwater,
-            SpeciesInfo = "Дискусы, Неоны, Сомики коридорасы",
-            Dimensions = "120 × 40 × 50 см",
-            Temperature = 26.2,
+            SpeciesInfo = "Аквариум для рыб и водных обитателей",
+            TankTypeSubtitle = "Аквариум • 20л",
+            ControllerName = "Контроллер: №123",
+            Icon = "🐟",
+            Dimensions = "40 × 25 × 25 см",
+            Temperature = 28.0,
+            TemperatureDisplay = "28°C",
             Ph = 6.8,
             Oxygen = 7.9,
             SalinityTds = 180,
-            IsNormalStatus = true
+            CardThemeColor = "#F0F4FF",
+            CardBorderColor = "#C5D4F5",
+            IsOnline = true,
+            StatusSummary = "• В сети • Всё в порядке",
+            StatusDotColor = "#4CAF50",
+            IsNormalStatus = true,
+            SensorsCount = 3,
+            RelaysCount = 4
         };
 
         var aq2 = new AquariumModel
         {
             Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-            Name = "Морской рифовый резервуар",
-            VolumeLiters = 450,
-            WaterType = WaterType.Marine,
-            SpeciesInfo = "Рыбы-клоуны, Актинии, Кораллы LPS/SPS",
-            Dimensions = "150 × 60 × 60 см",
-            Temperature = 25.0,
-            Ph = 8.2,
-            Oxygen = 8.4,
-            SalinityTds = 35000,
-            IsNormalStatus = true
+            Name = "Флориус Идратус",
+            VolumeLiters = 5.5,
+            WaterType = WaterType.Freshwater,
+            SpeciesInfo = "Декоративная ёмкость для растений",
+            TankTypeSubtitle = "Флорариум • 5.5л",
+            ControllerName = "Хаб-02",
+            Icon = "🌿",
+            Dimensions = "20 × 20 × 25 см",
+            Temperature = 0,
+            TemperatureDisplay = "-- °C",
+            Ph = 7.0,
+            Oxygen = 0,
+            SalinityTds = 0,
+            CardThemeColor = "#EDF7EE",
+            CardBorderColor = "#C3E6C7",
+            IsOnline = false,
+            StatusSummary = "• Не в сети • Предупреждение",
+            StatusDotColor = "#FFA000",
+            IsNormalStatus = false,
+            SensorsCount = 4,
+            RelaysCount = 1
         };
 
         var aq3 = new AquariumModel
         {
             Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-            Name = "Мальковый карантинный бассейн",
-            VolumeLiters = 80,
+            Name = "Домик Черепахи",
+            VolumeLiters = 40,
             WaterType = WaterType.Freshwater,
-            SpeciesInfo = "Мальки скалярий",
-            Dimensions = "60 × 35 × 40 см",
-            Temperature = 28.1,
-            Ph = 7.0,
-            Oxygen = 6.9,
-            SalinityTds = 150,
-            IsNormalStatus = true
+            SpeciesInfo = "Совмещает водную и наземную зону",
+            TankTypeSubtitle = "Палюдариум • 40л",
+            ControllerName = "Хаб-03",
+            Icon = "🐢",
+            Dimensions = "50 × 30 × 30 см",
+            Temperature = 4.0,
+            TemperatureDisplay = "4°C",
+            Ph = 6.5,
+            Oxygen = 6.2,
+            SalinityTds = 140,
+            CardThemeColor = "#FFF9E6",
+            CardBorderColor = "#FFE082",
+            IsOnline = true,
+            StatusSummary = "• В сети • Есть проблема",
+            StatusDotColor = "#E53935",
+            IsNormalStatus = false,
+            SensorsCount = 3,
+            RelaysCount = 2
         };
 
-        _aquariums.AddRange(new[] { aq1, aq2, aq3 });
+        var aq4 = new AquariumModel
+        {
+            Id = Guid.Parse("44444444-4444-4444-4444-444444444444"),
+            Name = "Муравьиная ферма",
+            VolumeLiters = 2,
+            WaterType = WaterType.Freshwater,
+            SpeciesInfo = "Муравьиная ферма",
+            TankTypeSubtitle = "Формикарий • 2л",
+            ControllerName = "Хаб-04",
+            Icon = "🐜",
+            Dimensions = "25 × 15 × 15 см",
+            Temperature = 22.0,
+            TemperatureDisplay = "--",
+            Ph = 7.0,
+            Oxygen = 0,
+            SalinityTds = 0,
+            CardThemeColor = "#F8F9FA",
+            CardBorderColor = "#E4E7F4",
+            IsOnline = true,
+            StatusSummary = "• В сети • Всё в порядке",
+            StatusDotColor = "#4CAF50",
+            IsNormalStatus = true,
+            SensorsCount = 2,
+            RelaysCount = 0
+        };
+
+        _aquariums.AddRange(new[] { aq1, aq2, aq3, aq4 });
 
         // Sensors for aq1
         _sensors.AddRange(new[]

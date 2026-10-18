@@ -3,47 +3,121 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Mobile.ViewModels"
              xmlns:models="clr-namespace:Mobile.Models"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
              x:Class="Mobile.Views.AquariumDetailsPage"
              x:DataType="vm:AquariumDetailsViewModel"
-             BackgroundColor="#F6F7FC"
+             BackgroundColor="#FFFFFF"
+             Shell.NavBarIsVisible="False"
              Title="{Binding Aquarium.Name, FallbackValue='Детали ёмкости'}">
 
-    <Grid RowDefinitions="Auto,Auto,*" Padding="20,16,20,20">
-        <!-- Aquarium Header Card -->
-        <Border Grid.Row="0"
-                x:Name="HeaderCard"
-                StrokeThickness="0"
-                StrokeShape="RoundRectangle 16"
-                BackgroundColor="#4152B0"
-                Padding="18">
-            <VerticalStackLayout Spacing="8">
-                <Grid ColumnDefinitions="*,Auto">
-                    <Label Grid.Column="0" Text="{Binding Aquarium.Name}" TextColor="#FFFFFF" FontFamily="OpenSansSemibold" FontSize="20" FontAttributes="Bold" />
-                    <Label Grid.Column="1" Text="{Binding Aquarium.WaterTypeDisplay}" TextColor="#D9DFF7" FontSize="13" />
-                </Grid>
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="20,24,20,20">
+        <!-- Top Navigation Bar: Back Arrow, Tank Title & Actions (Figma: Емкость) -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12" Margin="0,4,0,14">
+            <!-- Back button -->
+            <Border WidthRequest="36" HeightRequest="36"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="#F6F7FC"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <ImageButton Source="icon_arrow_left.png"
+                             Command="{Binding GoBackCommand}"
+                             BackgroundColor="Transparent"
+                             WidthRequest="20" HeightRequest="20"
+                             Padding="0"
+                             HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
 
-                <Label Text="{Binding Aquarium.SpeciesInfo}" TextColor="#EDEFFB" FontSize="13" />
-
-                <Grid ColumnDefinitions="*,*,*" Margin="0,8,0,0">
-                    <VerticalStackLayout Grid.Column="0">
-                        <Label Text="Объём" TextColor="#D9DFF7" FontSize="11" />
-                        <Label Text="{Binding Aquarium.VolumeLiters, StringFormat='{0} л'}" TextColor="#FFFFFF" FontFamily="OpenSansSemibold" FontSize="16" />
-                    </VerticalStackLayout>
-                    <VerticalStackLayout Grid.Column="1">
-                        <Label Text="Габариты" TextColor="#D9DFF7" FontSize="11" />
-                        <Label Text="{Binding Aquarium.Dimensions}" TextColor="#FFFFFF" FontFamily="OpenSansSemibold" FontSize="14" />
-                    </VerticalStackLayout>
-                    <VerticalStackLayout Grid.Column="2">
-                        <Label Text="Статус" TextColor="#D9DFF7" FontSize="11" />
-                        <Label Text="В норме" TextColor="#66BB6A" FontFamily="OpenSansSemibold" FontSize="14" />
-                    </VerticalStackLayout>
-                </Grid>
+            <!-- Title & Subtitle -->
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                <HorizontalStackLayout Spacing="6">
+                    <BoxView WidthRequest="8" HeightRequest="8" CornerRadius="4" Color="#4CAF50" VerticalOptions="Center" />
+                    <Label Text="{Binding Aquarium.Name, FallbackValue='Мой первый аквариум'}"
+                           TextColor="#141414"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                <Label Text="{Binding Aquarium.TankTypeSubtitle, FallbackValue='Аквариум • 20л'}"
+                       TextColor="#8C93A8"
+                       FontSize="12" />
             </VerticalStackLayout>
+
+            <!-- Edit Button -->
+            <Border Grid.Column="2"
+                    WidthRequest="36" HeightRequest="36"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="#F6F7FC"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <ImageButton Source="icon_edit.png"
+                             BackgroundColor="Transparent"
+                             WidthRequest="18" HeightRequest="18"
+                             Padding="0"
+                             HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+
+            <!-- Notifications Button -->
+            <Border Grid.Column="3"
+                    WidthRequest="36" HeightRequest="36"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="#F6F7FC"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <ImageButton Source="icon_bell.png"
+                             BackgroundColor="Transparent"
+                             WidthRequest="18" HeightRequest="18"
+                             Padding="0"
+                             HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+        </Grid>
+
+        <!-- Controller Card (Figma: Контроллер №123) -->
+        <Border Grid.Row="1"
+                x:Name="HeaderCard"
+                StrokeThickness="1"
+                Stroke="#E4E7F4"
+                StrokeShape="RoundRectangle 16"
+                BackgroundColor="#FFFFFF"
+                Padding="16,14"
+                Margin="0,0,0,14">
+            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="6">
+                <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="2">
+                    <Label Text="{Binding Aquarium.ControllerName, FallbackValue='Контроллер №123'}"
+                           TextColor="#141414"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="15"
+                           FontAttributes="Bold" />
+                    <Label Text="00:1A:2B:3C:4D:5E"
+                           TextColor="#8C93A8"
+                           FontSize="12" />
+                </VerticalStackLayout>
+
+                <!-- Switch on right -->
+                <Switch Grid.Row="0" Grid.Column="1"
+                        IsToggled="True"
+                        OnColor="#4152B0"
+                        ThumbColor="#FFFFFF"
+                        VerticalOptions="Center" />
+
+                <!-- Status pill: • В сети -->
+                <Border Grid.Row="1" Grid.Column="0"
+                        HorizontalOptions="Start"
+                        BackgroundColor="#E8F5E9"
+                        StrokeShape="RoundRectangle 6"
+                        Padding="8,3"
+                        StrokeThickness="0">
+                    <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                        <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="#4CAF50" VerticalOptions="Center" />
+                        <Label Text="В сети" TextColor="#2E7D32" FontFamily="OpenSansSemibold" FontSize="11" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+            </Grid>
         </Border>
 
-        <!-- Segmented Tab Bar (Датчики | Реле | Сценарии) -->
-        <Border Grid.Row="1"
-                Margin="0,16,0,16"
+        <!-- Segmented Tab Bar (датчики | реле | сценарии) -->
+        <Border Grid.Row="2"
+                Margin="0,0,0,16"
                 BackgroundColor="#EDEFFB"
                 StrokeShape="RoundRectangle 12"
                 Padding="4"
@@ -51,44 +125,44 @@
             <Grid ColumnDefinitions="*,*,*">
                 <!-- Tab 0: Датчики -->
                 <Button Grid.Column="0"
-                        Text="Датчики"
+                        Text="датчики"
                         Command="{Binding SelectTabCommand}"
                         CommandParameter="0"
                         BackgroundColor="{Binding IsSensorsTabSelected, Converter={StaticResource TabActiveBgConverter}}"
                         TextColor="{Binding IsSensorsTabSelected, Converter={StaticResource TabActiveTextConverter}}"
                         CornerRadius="8"
-                        HeightRequest="40"
+                        HeightRequest="38"
                         FontFamily="OpenSansSemibold"
                         FontSize="13" />
 
                 <!-- Tab 1: Реле -->
                 <Button Grid.Column="1"
-                        Text="Реле"
+                        Text="реле"
                         Command="{Binding SelectTabCommand}"
                         CommandParameter="1"
                         BackgroundColor="{Binding IsRelaysTabSelected, Converter={StaticResource TabActiveBgConverter}}"
                         TextColor="{Binding IsRelaysTabSelected, Converter={StaticResource TabActiveTextConverter}}"
                         CornerRadius="8"
-                        HeightRequest="40"
+                        HeightRequest="38"
                         FontFamily="OpenSansSemibold"
                         FontSize="13" />
 
                 <!-- Tab 2: Сценарии -->
                 <Button Grid.Column="2"
-                        Text="Сценарии"
+                        Text="сценарии"
                         Command="{Binding SelectTabCommand}"
                         CommandParameter="2"
                         BackgroundColor="{Binding IsScenariosTabSelected, Converter={StaticResource TabActiveBgConverter}}"
                         TextColor="{Binding IsScenariosTabSelected, Converter={StaticResource TabActiveTextConverter}}"
                         CornerRadius="8"
-                        HeightRequest="40"
+                        HeightRequest="38"
                         FontFamily="OpenSansSemibold"
                         FontSize="13" />
             </Grid>
         </Border>
 
         <!-- Tab Content -->
-        <ScrollView Grid.Row="2" x:Name="ContentScroll">
+        <ScrollView Grid.Row="3" x:Name="ContentScroll">
             <VerticalStackLayout Spacing="14">
 
                 <!-- Sensors List (Tab 0) -->
@@ -96,34 +170,31 @@
                                      Spacing="10"
                                      IsVisible="{Binding IsSensorsTabSelected}">
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Grid.Column="0" Text="Подключенные датчики" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="16" VerticalOptions="Center" />
-                        <Button Grid.Column="1" Text="+ Датчик" Command="{Binding AddSensorCommand}" TextColor="#4152B0" BackgroundColor="Transparent" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Label Grid.Column="0" Text="Датчики" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Button Grid.Column="1" Text="+ Добавить" Command="{Binding AddSensorCommand}" TextColor="#4152B0" BackgroundColor="Transparent" FontFamily="OpenSansSemibold" FontSize="13" Padding="4,0" />
                     </Grid>
 
                     <!-- Empty State (Figma: Емкость. Датчики. Пусто) -->
-                    <Border IsVisible="{Binding HasNoSensors}"
-                            StrokeThickness="1" Stroke="#E1E4F2" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" Padding="20">
-                        <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
-                            <Label Text="🧪" FontSize="32" HorizontalOptions="Center" />
-                            <Label Text="Датчики не привязаны" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" HorizontalTextAlignment="Center" />
-                            <Label Text="Добавьте термометр, pH-зонд или оксиметр для сбора телеметрии." TextColor="#6E6E6E" FontSize="12" HorizontalTextAlignment="Center" />
-                            <Button Text="+ Добавить датчик" Command="{Binding AddSensorCommand}" BackgroundColor="#EDEFFB" TextColor="#4152B0" CornerRadius="8" HeightRequest="38" FontFamily="OpenSansSemibold" FontSize="13" />
-                        </VerticalStackLayout>
-                    </Border>
+                    <VerticalStackLayout IsVisible="{Binding HasNoSensors}" Spacing="16" Margin="0,8,0,0">
+                        <controls:FishMascotCard HeightOverride="180" BadgeText="🧪" BadgeColor="#7BA028" />
+                        <Label Text="Добавьте первый датчик" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                        <Label Text="Здесь будут отображаться ваши устройства. Добавьте первый датчик, чтобы контролировать параметры системы" TextColor="#6E6E6E" FontSize="13" LineHeight="1.3" HorizontalTextAlignment="Center" />
+                        <Button Text="Добавить датчик" Command="{Binding AddSensorCommand}" BackgroundColor="#4152B0" TextColor="#FFFFFF" CornerRadius="12" HeightRequest="46" FontFamily="OpenSansSemibold" FontSize="14" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
 
                     <CollectionView ItemsSource="{Binding Sensors}"
                                     IsVisible="{Binding HasNoSensors, Converter={StaticResource InvertedBoolConverter}}"
                                     SelectionMode="None">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:SensorModel">
-                                <Border StrokeThickness="1" Stroke="#E1E4F2" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" Padding="14" Margin="0,0,0,8">
+                                <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" Padding="14,12" Margin="0,0,0,8">
                                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
-                                        <Label Grid.Column="0" Text="{Binding Icon}" FontSize="24" VerticalOptions="Center" />
+                                        <Label Grid.Column="0" Text="{Binding Icon}" FontSize="22" VerticalOptions="Center" />
                                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                                             <Label Text="{Binding Name}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
-                                            <Label Text="{Binding StatusText}" TextColor="{Binding StatusColor}" FontSize="12" />
+                                            <Label Text="{Binding StatusText}" TextColor="#8C93A8" FontSize="11" />
                                         </VerticalStackLayout>
-                                        <Label Grid.Column="2" Text="{Binding Value, StringFormat='{0} '}" TextColor="#4152B0" FontFamily="OpenSansSemibold" FontSize="18" VerticalOptions="Center" />
+                                        <Label Grid.Column="2" Text="{Binding Value, StringFormat='{0} '}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -136,32 +207,29 @@
                                      Spacing="10"
                                      IsVisible="{Binding IsRelaysTabSelected}">
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Grid.Column="0" Text="Управляемые устройства" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="16" VerticalOptions="Center" />
-                        <Button Grid.Column="1" Text="+ Реле" Command="{Binding AddRelayCommand}" TextColor="#4152B0" BackgroundColor="Transparent" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Label Grid.Column="0" Text="Реле" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Button Grid.Column="1" Text="+ Добавить" Command="{Binding AddRelayCommand}" TextColor="#4152B0" BackgroundColor="Transparent" FontFamily="OpenSansSemibold" FontSize="13" Padding="4,0" />
                     </Grid>
 
                     <!-- Empty State (Figma: Емкость. Реле. Пусто) -->
-                    <Border IsVisible="{Binding HasNoRelays}"
-                            StrokeThickness="1" Stroke="#E1E4F2" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" Padding="20">
-                        <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
-                            <Label Text="⚡" FontSize="32" HorizontalOptions="Center" />
-                            <Label Text="Устройства не подключены" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" HorizontalTextAlignment="Center" />
-                            <Label Text="Подключите обогреватель, аэратор, фильтр или кормушку." TextColor="#6E6E6E" FontSize="12" HorizontalTextAlignment="Center" />
-                            <Button Text="+ Добавить реле" Command="{Binding AddRelayCommand}" BackgroundColor="#EDEFFB" TextColor="#4152B0" CornerRadius="8" HeightRequest="38" FontFamily="OpenSansSemibold" FontSize="13" />
-                        </VerticalStackLayout>
-                    </Border>
+                    <VerticalStackLayout IsVisible="{Binding HasNoRelays}" Spacing="16" Margin="0,8,0,0">
+                        <controls:FishMascotCard HeightOverride="180" BadgeText="⚡" BadgeColor="#7BA028" />
+                        <Label Text="Добавьте первое реле" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                        <Label Text="Здесь будет список ваших исполнительных устройств. Добавьте первое реле, чтобы взять контроль над оборудованием" TextColor="#6E6E6E" FontSize="13" LineHeight="1.3" HorizontalTextAlignment="Center" />
+                        <Button Text="Добавить реле" Command="{Binding AddRelayCommand}" BackgroundColor="#4152B0" TextColor="#FFFFFF" CornerRadius="12" HeightRequest="46" FontFamily="OpenSansSemibold" FontSize="14" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
 
                     <CollectionView ItemsSource="{Binding Relays}"
                                     IsVisible="{Binding HasNoRelays, Converter={StaticResource InvertedBoolConverter}}"
                                     SelectionMode="None">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:RelayModel">
-                                <Border StrokeThickness="1" Stroke="#E1E4F2" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" Padding="14" Margin="0,0,0,8">
+                                <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" Padding="14,12" Margin="0,0,0,8">
                                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
-                                        <Label Grid.Column="0" Text="{Binding Icon}" FontSize="24" VerticalOptions="Center" />
+                                        <Label Grid.Column="0" Text="{Binding Icon}" FontSize="22" VerticalOptions="Center" />
                                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                                             <Label Text="{Binding Name}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
-                                            <Label Text="{Binding ScheduleInfo}" TextColor="#6E6E6E" FontSize="12" />
+                                            <Label Text="{Binding ScheduleInfo}" TextColor="#8C93A8" FontSize="11" />
                                         </VerticalStackLayout>
                                         <Switch Grid.Column="2" IsToggled="{Binding IsOn, Mode=TwoWay}" OnColor="#4152B0" VerticalOptions="Center" />
                                     </Grid>
@@ -176,32 +244,29 @@
                                      Spacing="10"
                                      IsVisible="{Binding IsScenariosTabSelected}">
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Grid.Column="0" Text="Автоматические сценарии" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="16" VerticalOptions="Center" />
-                        <Button Grid.Column="1" Text="+ Сценарий" Command="{Binding AddScenarioCommand}" TextColor="#4152B0" BackgroundColor="Transparent" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Label Grid.Column="0" Text="Сценарии" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Button Grid.Column="1" Text="+ Добавить" Command="{Binding AddScenarioCommand}" TextColor="#4152B0" BackgroundColor="Transparent" FontFamily="OpenSansSemibold" FontSize="13" Padding="4,0" />
                     </Grid>
 
                     <!-- Empty State (Figma: Емкость. Сценарии. Пусто) -->
-                    <Border IsVisible="{Binding HasNoScenarios}"
-                            StrokeThickness="1" Stroke="#E1E4F2" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" Padding="20">
-                        <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
-                            <Label Text="⚙️" FontSize="32" HorizontalOptions="Center" />
-                            <Label Text="Сценарии не настроены" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" HorizontalTextAlignment="Center" />
-                            <Label Text="Настройте автоматическое включение нагревателя или освещения по триггеру." TextColor="#6E6E6E" FontSize="12" HorizontalTextAlignment="Center" />
-                            <Button Text="+ Создать сценарий" Command="{Binding AddScenarioCommand}" BackgroundColor="#EDEFFB" TextColor="#4152B0" CornerRadius="8" HeightRequest="38" FontFamily="OpenSansSemibold" FontSize="13" />
-                        </VerticalStackLayout>
-                    </Border>
+                    <VerticalStackLayout IsVisible="{Binding HasNoScenarios}" Spacing="16" Margin="0,8,0,0">
+                        <controls:FishMascotCard HeightOverride="180" BadgeText="🎛️" BadgeColor="#7BA028" />
+                        <Label Text="Добавьте первый сценарий" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                        <Label Text="Свяжите датчики и реле между собой, чтобы система сама управляла приборами по расписанию или при изменении показателей" TextColor="#6E6E6E" FontSize="13" LineHeight="1.3" HorizontalTextAlignment="Center" />
+                        <Button Text="Добавить сценарий" Command="{Binding AddScenarioCommand}" BackgroundColor="#4152B0" TextColor="#FFFFFF" CornerRadius="12" HeightRequest="46" FontFamily="OpenSansSemibold" FontSize="14" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
 
                     <CollectionView ItemsSource="{Binding Scenarios}"
                                     IsVisible="{Binding HasNoScenarios, Converter={StaticResource InvertedBoolConverter}}"
                                     SelectionMode="None">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:ScenarioModel">
-                                <Border StrokeThickness="1" Stroke="#E1E4F2" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" Padding="14" Margin="0,0,0,8">
+                                <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" Padding="14,12" Margin="0,0,0,8">
                                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                                         <VerticalStackLayout Grid.Column="0" Spacing="4">
                                             <Label Text="{Binding Name}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
                                             <Label Text="{Binding ConditionText}" TextColor="#4152B0" FontSize="12" />
-                                            <Label Text="{Binding ActionText}" TextColor="#6E6E6E" FontSize="12" />
+                                            <Label Text="{Binding ActionText}" TextColor="#8C93A8" FontSize="11" />
                                         </VerticalStackLayout>
                                         <Switch Grid.Column="1" IsToggled="{Binding IsActive, Mode=TwoWay}" OnColor="#4152B0" VerticalOptions="Center" />
                                     </Grid>

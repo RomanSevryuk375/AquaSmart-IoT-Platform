@@ -10,6 +10,10 @@
     Shell.FlyoutBehavior="Flyout"
     FlyoutBackgroundColor="#FFFFFF"
     FlyoutWidth="280"
+    Shell.TabBarBackgroundColor="#FFFFFF"
+    Shell.TabBarForegroundColor="#4152B0"
+    Shell.TabBarUnselectedColor="#8C93A8"
+    Shell.TabBarTitleColor="#4152B0"
     Title="AquaSmart">
 
     <Shell.FlyoutHeader>
@@ -86,39 +90,22 @@
             Route="MainPage" />
     </FlyoutItem>
 
-    <!-- Authenticated Flyout Items -->
-    <FlyoutItem Title="Главная"
-                Route="DashboardPage">
-        <ShellContent Title="Главная"
-                      ContentTemplate="{DataTemplate views:DashboardPage}"
-                      Route="DashboardPage" />
-    </FlyoutItem>
+    <!-- Main Bottom Tab Bar (Figma Navigation Bar) -->
+    <TabBar Route="MainTabs">
+        <Tab Title="Главная" Icon="icon_home.png" Route="DashboardPage">
+            <ShellContent Title="Главная" ContentTemplate="{DataTemplate views:DashboardPage}" Route="DashboardPage" />
+        </Tab>
+        <Tab Title="Ёмкости" Icon="icon_box.png" Route="AquariumsPage">
+            <ShellContent Title="Ёмкости" ContentTemplate="{DataTemplate views:AquariumsPage}" Route="AquariumsPage" />
+        </Tab>
+        <Tab Title="База знаний" Icon="icon_book.png" Route="KnowledgeBasePage">
+            <ShellContent Title="База знаний" ContentTemplate="{DataTemplate views:KnowledgeBasePage}" Route="KnowledgeBasePage" />
+        </Tab>
+        <Tab Title="Профиль" Icon="icon_user.png" Route="ProfilePage">
+            <ShellContent Title="Профиль" ContentTemplate="{DataTemplate views:ProfilePage}" Route="ProfilePage" />
+        </Tab>
+    </TabBar>
 
-    <FlyoutItem Title="Ёмкости"
-                Route="AquariumsPage">
-        <ShellContent Title="Ёмкости"
-                      ContentTemplate="{DataTemplate views:AquariumsPage}"
-                      Route="AquariumsPage" />
-    </FlyoutItem>
-
-    <FlyoutItem Title="Контроллеры"
-                Route="ControllersPage">
-        <ShellContent Title="Контроллеры"
-                      ContentTemplate="{DataTemplate views:ControllersPage}"
-                      Route="ControllersPage" />
-    </FlyoutItem>
-
-    <FlyoutItem Title="База знаний"
-                Route="KnowledgeBasePage">
-        <ShellContent Title="База знаний"
-                      ContentTemplate="{DataTemplate views:KnowledgeBasePage}"
-                      Route="KnowledgeBasePage" />
-    </FlyoutItem>
-
-    <FlyoutItem Title="Профиль"
-                Route="ProfilePage">
-        <ShellContent Title="Профиль"
-                      ContentTemplate="{DataTemplate views:ProfilePage}"
-                      Route="ProfilePage" />
-    </FlyoutItem>
+    <!-- Secondary Shell Routes -->
+    <ShellContent Route="ControllersPage" ContentTemplate="{DataTemplate views:ControllersPage}" />
 </Shell>

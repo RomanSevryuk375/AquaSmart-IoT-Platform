@@ -32,7 +32,18 @@ public class AquariumModel
         _ => "Пресноводный"
     };
 
-    public int SensorsCount { get; set; } = 4;
-    public int RelaysCount { get; set; } = 3;
-    public int ScenariosCount { get; set; } = 2;
+    public int SensorsCount { get; set; } = 3;
+    public int RelaysCount { get; set; } = 4;
+    public int ScenariosCount { get; set; } = 3;
+
+    // Figma visual and meta properties
+    public string Icon { get; set; } = "🐟";
+    public string ControllerName { get; set; } = "Контроллер: №123";
+    public string CardThemeColor { get; set; } = "#F0F4FF";
+    public string CardBorderColor { get; set; } = "#DCE4F7";
+    public bool IsOnline { get; set; } = true;
+    public string StatusSummary { get; set; } = "• В сети • Всё в порядке";
+    public string StatusDotColor { get; set; } = "#4CAF50";
+    public string TemperatureDisplay { get; set; } = "28°C";
+    public string TankTypeSubtitle { get; set; } = "Аквариум • 20л";
 }
