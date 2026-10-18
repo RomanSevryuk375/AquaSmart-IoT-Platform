@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Mobile.ViewModels"
+             x:Class="Mobile.Views.AddAquariumPage"
+             x:DataType="vm:AddAquariumViewModel"
+             BackgroundColor="#F6F7FC"
+             Title="Новая ёмкость">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="20,16,20,30">
+            <!-- Header Banner -->
+            <Border StrokeThickness="0"
+                    StrokeShape="RoundRectangle 16"
+                    BackgroundColor="#4152B0"
+                    Padding="20">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Добавить аквариум или бассейн"
+                           TextColor="#FFFFFF"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="20"
+                           FontAttributes="Bold" />
+                    <Label Text="Задайте параметры ёмкости для подключения телеметрии и сценариев управления"
+                           TextColor="#EDEFFB"
+                           FontSize="13" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Form Card -->
+            <Border StrokeThickness="1"
+                    Stroke="#E4E7F4"
+                    StrokeShape="RoundRectangle 16"
+                    BackgroundColor="#FFFFFF"
+                    Padding="20">
+                <VerticalStackLayout Spacing="16">
+                    <!-- Name Input -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Название ёмкости *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Entry Text="{Binding Name}"
+                                   Placeholder="Например, Биотоп Танганьика №1"
+                                   PlaceholderColor="#8C93A8"
+                                   TextColor="#2E3A7E"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Volume Input -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Объём воды (литры) *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Entry Text="{Binding VolumeString}"
+                                   Keyboard="Numeric"
+                                   Placeholder="200"
+                                   PlaceholderColor="#8C93A8"
+                                   TextColor="#2E3A7E"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Water Type Picker -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Тип водной среды *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Picker SelectedIndex="{Binding WaterTypeIndex}"
+                                    TextColor="#2E3A7E"
+                                    Title="Выберите тип воды"
+                                    TitleColor="#8C93A8"
+                                    VerticalOptions="Center">
+                                <Picker.ItemsSource>
+                                    <x:Array Type="{x:Type x:String}">
+                                        <x:String>Пресноводная (Freshwater)</x:String>
+                                        <x:String>Морская (Marine)</x:String>
+                                        <x:String>Солоноватая (Brackish)</x:String>
+                                    </x:Array>
+                                </Picker.ItemsSource>
+                            </Picker>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Species / Inhabitants -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Обитатели и фауна" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Entry Text="{Binding Species}"
+                                   Placeholder="Например: Неоны, скалярии, анубиасы"
+                                   PlaceholderColor="#8C93A8"
+                                   TextColor="#2E3A7E"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Dimensions -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Габариты (Д×Ш×В см)" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Entry Text="{Binding Dimensions}"
+                                   Placeholder="100 × 40 × 50 см"
+                                   PlaceholderColor="#8C93A8"
+                                   TextColor="#2E3A7E"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Action Buttons -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Button Grid.Column="0"
+                        Text="Отмена"
+                        Command="{Binding CancelCommand}"
+                        BackgroundColor="#FFFFFF"
+                        TextColor="#6A738A"
+                        BorderColor="#E4E7F4"
+                        BorderWidth="1"
+                        CornerRadius="14"
+                        HeightRequest="52"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="15" />
+
+                <Button Grid.Column="1"
+                        Text="Сохранить"
+                        Command="{Binding SaveCommand}"
+                        BackgroundColor="#4152B0"
+                        TextColor="#FFFFFF"
+                        CornerRadius="14"
+                        HeightRequest="52"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="15" />
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

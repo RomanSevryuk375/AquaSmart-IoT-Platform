@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Mobile.ViewModels"
+             x:Class="Mobile.Views.AddSensorPage"
+             x:DataType="vm:AddSensorViewModel"
+             BackgroundColor="#F6F7FC"
+             Title="Новый датчик">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="20,16,20,30">
+            <!-- Header Banner -->
+            <Border StrokeThickness="0"
+                    StrokeShape="RoundRectangle 16"
+                    BackgroundColor="#4152B0"
+                    Padding="20">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Подключение датчика телеметрии"
+                           TextColor="#FFFFFF"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="20"
+                           FontAttributes="Bold" />
+                    <Label Text="Задайте тип датчика и безопасные границы показателей для автоматических алертов"
+                           TextColor="#EDEFFB"
+                           FontSize="13" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Form Card -->
+            <Border StrokeThickness="1"
+                    Stroke="#E4E7F4"
+                    StrokeShape="RoundRectangle 16"
+                    BackgroundColor="#FFFFFF"
+                    Padding="20">
+                <VerticalStackLayout Spacing="16">
+                    <!-- Sensor Name -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Название датчика *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Entry Text="{Binding SensorName}"
+                                   Placeholder="Например, Термозонд DS18B20 #1"
+                                   PlaceholderColor="#8C93A8"
+                                   TextColor="#2E3A7E"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Sensor Type Picker -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Тип измерения *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Picker SelectedIndex="{Binding SensorTypeIndex}"
+                                    TextColor="#2E3A7E"
+                                    Title="Выберите тип датчика"
+                                    TitleColor="#8C93A8"
+                                    VerticalOptions="Center">
+                                <Picker.ItemsSource>
+                                    <x:Array Type="{x:Type x:String}">
+                                        <x:String>Температура воды (°C)</x:String>
+                                        <x:String>Кислотность воды (pH)</x:String>
+                                        <x:String>Растворенный кислород O2 (мг/л)</x:String>
+                                        <x:String>Минерализация / Солёность (ppm)</x:String>
+                                    </x:Array>
+                                </Picker.ItemsSource>
+                            </Picker>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Min Threshold -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Нижний порог нормы (Min)" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Entry Text="{Binding MinValueString}"
+                                   Keyboard="Numeric"
+                                   Placeholder="22.0"
+                                   PlaceholderColor="#8C93A8"
+                                   TextColor="#2E3A7E"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Max Threshold -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Верхний порог нормы (Max)" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Entry Text="{Binding MaxValueString}"
+                                   Keyboard="Numeric"
+                                   Placeholder="28.0"
+                                   PlaceholderColor="#8C93A8"
+                                   TextColor="#2E3A7E"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Action Buttons -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Button Grid.Column="0"
+                        Text="Отмена"
+                        Command="{Binding CancelCommand}"
+                        BackgroundColor="#FFFFFF"
+                        TextColor="#6A738A"
+                        BorderColor="#E4E7F4"
+                        BorderWidth="1"
+                        CornerRadius="14"
+                        HeightRequest="52"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="15" />
+
+                <Button Grid.Column="1"
+                        Text="Сохранить"
+                        Command="{Binding SaveCommand}"
+                        BackgroundColor="#4152B0"
+                        TextColor="#FFFFFF"
+                        CornerRadius="14"
+                        HeightRequest="52"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="15" />
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

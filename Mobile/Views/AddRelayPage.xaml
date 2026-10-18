@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Mobile.ViewModels"
+             x:Class="Mobile.Views.AddRelayPage"
+             x:DataType="vm:AddRelayViewModel"
+             BackgroundColor="#F6F7FC"
+             Title="Новое реле">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="20,16,20,30">
+            <!-- Header Banner -->
+            <Border StrokeThickness="0"
+                    StrokeShape="RoundRectangle 16"
+                    BackgroundColor="#4152B0"
+                    Padding="20">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Подключение управляющего реле"
+                           TextColor="#FFFFFF"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="20"
+                           FontAttributes="Bold" />
+                    <Label Text="Настройте исполнительное оборудование (нагреватель, компрессор, помпу, свет, кормушку)"
+                           TextColor="#EDEFFB"
+                           FontSize="13" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Form Card -->
+            <Border StrokeThickness="1"
+                    Stroke="#E4E7F4"
+                    StrokeShape="RoundRectangle 16"
+                    BackgroundColor="#FFFFFF"
+                    Padding="20">
+                <VerticalStackLayout Spacing="16">
+                    <!-- Relay Name -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Название оборудования *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Entry Text="{Binding RelayName}"
+                                   Placeholder="Например, Нагреватель Eheim 150W"
+                                   PlaceholderColor="#8C93A8"
+                                   TextColor="#2E3A7E"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Device Type Picker -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Тип исполнительного устройства *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Picker SelectedIndex="{Binding DeviceTypeIndex}"
+                                    TextColor="#2E3A7E"
+                                    Title="Выберите тип устройства"
+                                    TitleColor="#8C93A8"
+                                    VerticalOptions="Center">
+                                <Picker.ItemsSource>
+                                    <x:Array Type="{x:Type x:String}">
+                                        <x:String>Термонагреватель (Heater)</x:String>
+                                        <x:String>Аэратор / Компрессор (Aerator)</x:String>
+                                        <x:String>Фильтр / Помпа течения (Filter Pump)</x:String>
+                                        <x:String>Автокормушка (Auto Feeder)</x:String>
+                                        <x:String>Освещение / Фитолампа (Lighting)</x:String>
+                                    </x:Array>
+                                </Picker.ItemsSource>
+                            </Picker>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Pin Channel -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Канал контроллера (GPIO / Канал реле) *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Entry Text="{Binding PinChannel}"
+                                   Keyboard="Numeric"
+                                   Placeholder="1"
+                                   PlaceholderColor="#8C93A8"
+                                   TextColor="#2E3A7E"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Schedule Info -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Базовое расписание работы" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Entry Text="{Binding Schedule}"
+                                   Placeholder="09:00 - 21:00 или 24/7"
+                                   PlaceholderColor="#8C93A8"
+                                   TextColor="#2E3A7E"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Action Buttons -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Button Grid.Column="0"
+                        Text="Отмена"
+                        Command="{Binding CancelCommand}"
+                        BackgroundColor="#FFFFFF"
+                        TextColor="#6A738A"
+                        BorderColor="#E4E7F4"
+                        BorderWidth="1"
+                        CornerRadius="14"
+                        HeightRequest="52"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="15" />
+
+                <Button Grid.Column="1"
+                        Text="Сохранить"
+                        Command="{Binding SaveCommand}"
+                        BackgroundColor="#4152B0"
+                        TextColor="#FFFFFF"
+                        CornerRadius="14"
+                        HeightRequest="52"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="15" />
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
