@@ -1,3 +1,4 @@
+using Mobile.Extensions;
 using Mobile.ViewModels;
 
 namespace Mobile.Views;
@@ -16,5 +17,9 @@ public partial class ProfilePage : ContentPage
     {
         base.OnAppearing();
         await _viewModel.InitializeAsync();
+        await Task.WhenAll(
+            ProfileHeaderCard.FadeInUpAsync(300, 15),
+            SettingsCard.FadeInUpAsync(350, 20)
+        );
     }
 }

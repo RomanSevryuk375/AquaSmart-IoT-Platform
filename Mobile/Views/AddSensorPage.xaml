@@ -10,7 +10,8 @@
     <ScrollView>
         <VerticalStackLayout Spacing="20" Padding="20,16,20,30">
             <!-- Header Banner -->
-            <Border StrokeThickness="0"
+            <Border x:Name="HeaderCard"
+                    StrokeThickness="0"
                     StrokeShape="RoundRectangle 16"
                     BackgroundColor="#4152B0"
                     Padding="20">
@@ -27,7 +28,8 @@
             </Border>
 
             <!-- Form Card -->
-            <Border StrokeThickness="1"
+            <Border x:Name="FormCard"
+                    StrokeThickness="1"
                     Stroke="#E4E7F4"
                     StrokeShape="RoundRectangle 16"
                     BackgroundColor="#FFFFFF"

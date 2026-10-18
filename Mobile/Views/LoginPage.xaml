@@ -10,7 +10,7 @@
     <ScrollView>
         <Grid RowDefinitions="Auto,*,Auto" Padding="24,32,24,32" MinimumHeightRequest="600">
             <!-- Header Section -->
-            <VerticalStackLayout Grid.Row="0" Spacing="16">
+            <VerticalStackLayout Grid.Row="0" x:Name="HeaderContainer" Spacing="16">
                 <!-- Back button -->
                 <ImageButton Source="dotnet_bot.png"
                              IsVisible="False" />
@@ -35,7 +35,7 @@
             </VerticalStackLayout>
 
             <!-- Form Section -->
-            <VerticalStackLayout Grid.Row="1" Spacing="20" Margin="0,32,0,24">
+            <VerticalStackLayout Grid.Row="1" x:Name="FormContainer" Spacing="20" Margin="0,32,0,24">
                 <!-- Email / Login -->
                 <VerticalStackLayout Spacing="6">
                     <Label Text="Email или Логин"

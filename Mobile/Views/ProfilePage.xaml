@@ -10,7 +10,8 @@
     <ScrollView>
         <VerticalStackLayout Spacing="20" Padding="20,16,20,30">
             <!-- User Profile Header Card -->
-            <Border StrokeThickness="0"
+            <Border x:Name="ProfileHeaderCard"
+                    StrokeThickness="0"
                     StrokeShape="RoundRectangle 20"
                     BackgroundColor="#4152B0"
                     Padding="24">
@@ -58,7 +59,8 @@
             </Border>
 
             <!-- Settings / Actions Card -->
-            <Border StrokeThickness="1"
+            <Border x:Name="SettingsCard"
+                    StrokeThickness="1"
                     Stroke="#E4E7F4"
                     StrokeShape="RoundRectangle 16"
                     BackgroundColor="#FFFFFF"

@@ -9,7 +9,7 @@
              Title="Ёмкости">
 
     <Grid RowDefinitions="*,Auto">
-        <ScrollView Grid.Row="0">
+        <ScrollView Grid.Row="0" x:Name="ListScroll">
             <VerticalStackLayout Padding="20,16,20,32" Spacing="16">
                 <Label Text="Список подключенных ёмкостей"
                        TextColor="#6E6E6E"
@@ -81,6 +81,7 @@
 
         <!-- Floating Action Button: Add Aquarium -->
         <Button Grid.Row="1"
+                x:Name="AddButton"
                 Text="+ Добавить новую ёмкость"
                 Command="{Binding AddAquariumCommand}"
                 BackgroundColor="#4152B0"

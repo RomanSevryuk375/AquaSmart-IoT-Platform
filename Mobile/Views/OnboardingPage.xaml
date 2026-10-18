@@ -21,7 +21,8 @@
         </HorizontalStackLayout>
 
         <!-- Center: Carousel of Slides -->
-        <CarouselView Grid.Row="1"
+        <CarouselView x:Name="Carousel"
+                      Grid.Row="1"
                       ItemsSource="{Binding Slides}"
                       Position="{Binding CurrentPosition, Mode=TwoWay}"
                       IsSwipeEnabled="True"
@@ -61,14 +62,15 @@
         </CarouselView>
 
         <!-- Bottom: Indicator dots and Next/Finish button -->
-        <VerticalStackLayout Grid.Row="2" Spacing="24">
+        <VerticalStackLayout Grid.Row="2" x:Name="BottomContainer" Spacing="24">
             <IndicatorView x:Name="Indicator"
                            HorizontalOptions="Center"
                            IndicatorColor="#D9DFF7"
                            SelectedIndicatorColor="#4152B0"
                            IndicatorSize="8" />
 
-            <Button Text="Продолжить"
+            <Button x:Name="NextButton"
+                    Text="Продолжить"
                     Command="{Binding NextOrFinishCommand}"
                     BackgroundColor="#4152B0"
                     TextColor="#FFFFFF"

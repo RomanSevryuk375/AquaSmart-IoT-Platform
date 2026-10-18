@@ -11,6 +11,7 @@
     <Grid RowDefinitions="Auto,*" Padding="20,16,20,10">
         <!-- Search bar -->
         <Border Grid.Row="0"
+                x:Name="SearchBarBorder"
                 StrokeThickness="1"
                 Stroke="#E4E7F4"
                 StrokeShape="RoundRectangle 14"
@@ -43,6 +44,7 @@
 
         <!-- Articles List -->
         <RefreshView Grid.Row="1"
+                     x:Name="ArticlesRefresh"
                      IsRefreshing="{Binding IsBusy}"
                      Command="{Binding SearchCommand}">
             <CollectionView ItemsSource="{Binding Articles}"

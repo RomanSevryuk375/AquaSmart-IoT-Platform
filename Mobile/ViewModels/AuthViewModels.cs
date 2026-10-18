@@ -204,6 +204,9 @@ public partial class ForgotPasswordViewModel : ObservableObject
     [ObservableProperty]
     private bool _isBusy;
 
+    [ObservableProperty]
+    private string? _errorMessage;
+
     public ForgotPasswordViewModel(IAuthService authService)
     {
         _authService = authService;

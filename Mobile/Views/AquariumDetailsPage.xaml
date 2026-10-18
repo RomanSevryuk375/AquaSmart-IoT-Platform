@@ -11,6 +11,7 @@
     <Grid RowDefinitions="Auto,Auto,*" Padding="20,16,20,20">
         <!-- Aquarium Header Card -->
         <Border Grid.Row="0"
+                x:Name="HeaderCard"
                 StrokeThickness="0"
                 StrokeShape="RoundRectangle 16"
                 BackgroundColor="#4152B0"
@@ -87,7 +88,7 @@
         </Border>
 
         <!-- Tab Content -->
-        <ScrollView Grid.Row="2">
+        <ScrollView Grid.Row="2" x:Name="ContentScroll">
             <VerticalStackLayout Spacing="14">
 
                 <!-- Sensors List -->
