@@ -1,0 +1,34 @@
+namespace Mobile.Models;
+
+public enum SensorType
+{
+    Temperature,
+    Ph,
+    DissolvedOxygen,
+    TdsSalinity,
+    WaterLevel
+}
+
+public class SensorModel
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid AquariumId { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public SensorType Type { get; set; } = SensorType.Temperature;
+    public double Value { get; set; }
+    public string Unit { get; set; } = "°C";
+    public double MinThreshold { get; set; }
+    public double MaxThreshold { get; set; }
+    public bool IsAlert => Value < MinThreshold || Value > MaxThreshold;
+    public string StatusText => IsAlert ? "Отклонение от нормы" : "Норма";
+    public string StatusColor => IsAlert ? "#E53935" : "#388E3C";
+    public string Icon => Type switch
+    {
+        SensorType.Temperature => "🌡️",
+        SensorType.Ph => "🧪",
+        SensorType.DissolvedOxygen => "🫧",
+        SensorType.TdsSalinity => "🧂",
+        _ => "💧"
+    };
+    public DateTime LastUpdated { get; set; } = DateTime.Now;
+}
