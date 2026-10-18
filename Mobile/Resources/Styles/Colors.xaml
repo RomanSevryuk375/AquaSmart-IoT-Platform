@@ -18,6 +18,9 @@
     <Color x:Key="Secondary">#EDEFFB</Color>
     <Color x:Key="SecondaryDarkText">#4152B0</Color>
     <Color x:Key="Tertiary">#2E3A7E</Color>
+    
+    <Color x:Key="MidnightBlue">#2E3A7E</Color>
+    <Color x:Key="Magenta">#4152B0</Color>
 
     <Color x:Key="White">#FFFFFF</Color>
     <Color x:Key="Black">#000000</Color>
@@ -36,6 +39,8 @@
     <SolidColorBrush x:Key="Primary50Brush" Color="{StaticResource Primary50}"/>
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource Secondary}"/>
     <SolidColorBrush x:Key="TertiaryBrush" Color="{StaticResource Tertiary}"/>
+    <SolidColorBrush x:Key="MidnightBlueBrush" Color="{StaticResource MidnightBlue}"/>
+    <SolidColorBrush x:Key="MagentaBrush" Color="{StaticResource Magenta}"/>
     <SolidColorBrush x:Key="WhiteBrush" Color="{StaticResource White}"/>
     <SolidColorBrush x:Key="BlackBrush" Color="{StaticResource Black}"/>
 
