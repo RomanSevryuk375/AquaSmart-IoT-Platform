@@ -15,6 +15,18 @@
     <Color x:Key="PrimaryDark">#2E3A7E</Color>
     <Color x:Key="PrimaryDarkText">#242424</Color>
     
+    <!-- Figma Accent & Status Colors -->
+    <Color x:Key="MascotBg">#DCE2F9</Color>
+    <Color x:Key="MascotBadgeGreen">#7BA028</Color>
+    <Color x:Key="AmberWarningBg">#FEF3D6</Color>
+    <Color x:Key="AmberWarningText">#B45309</Color>
+    <Color x:Key="AmberWarningBorder">#FDE68A</Color>
+    <Color x:Key="SuccessBg">#E8F5E9</Color>
+    <Color x:Key="SuccessText">#2E7D32</Color>
+    <Color x:Key="ErrorRed">#E53935</Color>
+    <Color x:Key="ErrorRedBg">#FDE8E8</Color>
+    <Color x:Key="InputBorder">#E4E7F4</Color>
+    
     <Color x:Key="Secondary">#EDEFFB</Color>
     <Color x:Key="SecondaryDarkText">#4152B0</Color>
     <Color x:Key="Tertiary">#2E3A7E</Color>
