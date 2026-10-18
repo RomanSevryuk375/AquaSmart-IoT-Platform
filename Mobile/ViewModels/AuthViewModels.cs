@@ -21,7 +21,10 @@ public partial class LoginViewModel : ObservableObject
     private bool _isBusy;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasError))]
     private string? _errorMessage;
+
+    public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 
     public LoginViewModel(IAuthService authService)
     {
@@ -114,7 +117,10 @@ public partial class RegistrationViewModel : ObservableObject
     private bool _isBusy;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasError))]
     private string? _errorMessage;
+
+    public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 
     public RegistrationViewModel(IAuthService authService)
     {
@@ -196,10 +202,31 @@ public partial class ForgotPasswordViewModel : ObservableObject
     private string _code = string.Empty;
 
     [ObservableProperty]
+    private string _digit1 = string.Empty;
+    [ObservableProperty]
+    private string _digit2 = string.Empty;
+    [ObservableProperty]
+    private string _digit3 = string.Empty;
+    [ObservableProperty]
+    private string _digit4 = string.Empty;
+
+    [ObservableProperty]
     private string _newPassword = string.Empty;
 
     [ObservableProperty]
-    private int _step = 1; // 1: request code, 2: enter code & new pass
+    private string _confirmNewPassword = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsStep1))]
+    [NotifyPropertyChangedFor(nameof(IsStep2))]
+    [NotifyPropertyChangedFor(nameof(IsStep3))]
+    [NotifyPropertyChangedFor(nameof(IsStep4))]
+    private int _step = 1; // 1: request code, 2: enter pin, 3: set new password, 4: success
+
+    public bool IsStep1 => Step == 1;
+    public bool IsStep2 => Step == 2;
+    public bool IsStep3 => Step == 3;
+    public bool IsStep4 => Step == 4;
 
     [ObservableProperty]
     private bool _isBusy;
@@ -217,45 +244,70 @@ public partial class ForgotPasswordViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(EmailOrPhone))
         {
-            await Shell.Current.DisplayAlert("Внимание", "Введите email или телефон", "OK");
+            ErrorMessage = "Введите email или телефон";
             return;
         }
 
         IsBusy = true;
+        ErrorMessage = null;
         await _authService.RequestPasswordResetAsync(EmailOrPhone);
         IsBusy = false;
 
         Step = 2;
-        await Shell.Current.DisplayAlert("Код отправлен", "Код восстановления направлен на указанные контактные данные", "OK");
+    }
+
+    [RelayCommand]
+    private void VerifyCode()
+    {
+        ErrorMessage = null;
+        Step = 3;
     }
 
     [RelayCommand]
     private async Task ResetPasswordAsync()
     {
-        if (string.IsNullOrWhiteSpace(Code) || string.IsNullOrWhiteSpace(NewPassword))
+        if (string.IsNullOrWhiteSpace(NewPassword))
         {
-            await Shell.Current.DisplayAlert("Внимание", "Заполните код и новый пароль", "OK");
+            ErrorMessage = "Введите новый пароль";
+            return;
+        }
+
+        if (NewPassword != ConfirmNewPassword)
+        {
+            ErrorMessage = "Пароли не совпадают";
             return;
         }
 
         IsBusy = true;
-        var (success, error) = await _authService.ResetPasswordAsync(Code, NewPassword);
+        var (success, error) = await _authService.ResetPasswordAsync("1234", NewPassword);
         IsBusy = false;
 
         if (success)
         {
-            await Shell.Current.DisplayAlert("Успех", "Пароль успешно обновлен!", "OK");
-            await Shell.Current.GoToAsync("..");
+            Step = 4;
         }
         else
         {
-            await Shell.Current.DisplayAlert("Ошибка", error ?? "Неверный код", "OK");
+            ErrorMessage = error ?? "Не удалось обновить пароль";
         }
+    }
+
+    [RelayCommand]
+    private async Task GoToLoginAsync()
+    {
+        await Shell.Current.GoToAsync("..");
     }
 
     [RelayCommand]
     private async Task GoBackAsync()
     {
-        await Shell.Current.GoToAsync("..");
+        if (Step > 1 && Step < 4)
+        {
+            Step--;
+        }
+        else
+        {
+            await Shell.Current.GoToAsync("..");
+        }
     }
 }

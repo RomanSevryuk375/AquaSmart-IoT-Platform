@@ -18,14 +18,17 @@ public partial class ForgotPasswordPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await ForgotPasswordContainer.FadeInUpAsync(350, 20);
+        await Task.WhenAll(
+            HeaderContainer.FadeInUpAsync(300, 15),
+            FormContainer.FadeInUpAsync(350, 20)
+        );
     }
 
     private async void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ForgotPasswordViewModel.ErrorMessage) && !string.IsNullOrEmpty(_viewModel.ErrorMessage))
         {
-            await ForgotPasswordContainer.ShakeAsync();
+            await FormContainer.ShakeAsync();
         }
     }
 }

@@ -2,96 +2,106 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Mobile.ViewModels"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
              x:Class="Mobile.Views.LoginPage"
              x:DataType="vm:LoginViewModel"
              BackgroundColor="#FFFFFF"
              Shell.NavBarIsVisible="False">
 
     <ScrollView>
-        <Grid RowDefinitions="Auto,*,Auto" Padding="24,32,24,32" MinimumHeightRequest="600">
-            <!-- Header Section -->
+        <Grid RowDefinitions="Auto,*,Auto" Padding="20,28,20,24">
+            <!-- Header Section with Mascot Banner -->
             <VerticalStackLayout Grid.Row="0" x:Name="HeaderContainer" Spacing="16">
-                <!-- Back button -->
-                <ImageButton Source="dotnet_bot.png"
-                             IsVisible="False" />
-                <Button Text="← Назад"
-                        Command="{Binding GoBackCommand}"
-                        TextColor="#4152B0"
-                        BackgroundColor="Transparent"
-                        HorizontalOptions="Start"
-                        FontFamily="OpenSansSemibold"
-                        Padding="0" />
+                <!-- Fish Mascot Card with "hi" badge -->
+                <controls:FishMascotCard HeightOverride="160"
+                                         BadgeText="hi"
+                                         BadgeColor="#7BA028" />
 
-                <Label Text="Авторизация"
-                       TextColor="#141414"
-                       FontFamily="OpenSansSemibold"
-                       FontSize="28"
-                       FontAttributes="Bold" />
-
-                <Label Text="Войдите, чтобы управлять вашими аквасистемами и датчиками"
-                       TextColor="#6E6E6E"
-                       FontFamily="OpenSansRegular"
-                       FontSize="15" />
+                <!-- Welcome Title -->
+                <HorizontalStackLayout Spacing="4" Margin="0,4,0,0">
+                    <Label Text="Добро пожаловать в "
+                           TextColor="#141414"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="22"
+                           FontAttributes="Bold" />
+                    <Label Text="SmartAqua"
+                           TextColor="#4152B0"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="22"
+                           FontAttributes="Bold" />
+                </HorizontalStackLayout>
             </VerticalStackLayout>
 
             <!-- Form Section -->
-            <VerticalStackLayout Grid.Row="1" x:Name="FormContainer" Spacing="20" Margin="0,32,0,24">
-                <!-- Email / Login -->
+            <VerticalStackLayout Grid.Row="1" x:Name="FormContainer" Spacing="16" Margin="0,20,0,20">
+                <!-- Login / Phone / Email -->
                 <VerticalStackLayout Spacing="6">
-                    <Label Text="Email или Логин"
-                           TextColor="#404040"
+                    <Label Text="Логин"
+                           TextColor="#333333"
                            FontFamily="OpenSansSemibold"
-                           FontSize="14" />
-                    <Border Stroke="#D9DFF7"
-                            StrokeThickness="1.5"
-                            StrokeShape="RoundRectangle 12"
-                            BackgroundColor="#F8F9FE"
-                            Padding="14,2">
+                           FontSize="13" />
+                    <Border Stroke="#E4E7F4"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="#FFFFFF"
+                            Padding="14,0"
+                            HeightRequest="48">
                         <Entry Text="{Binding EmailOrLogin, Mode=TwoWay}"
-                               Placeholder="name@example.com"
-                               PlaceholderColor="#919191"
+                               Placeholder="Введите вашу почту или телефон"
+                               PlaceholderColor="#8C93A8"
                                TextColor="#141414"
-                               Keyboard="Email"
                                HeightRequest="48"
-                               FontFamily="OpenSansRegular" />
+                               VerticalOptions="Center"
+                               FontFamily="OpenSansRegular"
+                               FontSize="14" />
                     </Border>
                 </VerticalStackLayout>
 
                 <!-- Password -->
                 <VerticalStackLayout Spacing="6">
                     <Label Text="Пароль"
-                           TextColor="#404040"
+                           TextColor="#333333"
                            FontFamily="OpenSansSemibold"
-                           FontSize="14" />
-                    <Border Stroke="#D9DFF7"
-                            StrokeThickness="1.5"
-                            StrokeShape="RoundRectangle 12"
-                            BackgroundColor="#F8F9FE"
-                            Padding="14,2">
+                           FontSize="13" />
+                    <Border Stroke="#E4E7F4"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="#FFFFFF"
+                            Padding="14,0"
+                            HeightRequest="48">
                         <Grid ColumnDefinitions="*,Auto">
                             <Entry Grid.Column="0"
                                    Text="{Binding Password, Mode=TwoWay}"
-                                   Placeholder="Введите пароль"
-                                   PlaceholderColor="#919191"
+                                   Placeholder="Введите ваш пароль"
+                                   PlaceholderColor="#8C93A8"
                                    TextColor="#141414"
                                    IsPassword="{Binding IsPasswordHidden}"
                                    HeightRequest="48"
-                                   FontFamily="OpenSansRegular" />
-                            <Button Grid.Column="1"
-                                    Text="👁"
-                                    Command="{Binding TogglePasswordCommand}"
-                                    BackgroundColor="Transparent"
-                                    TextColor="#4152B0"
-                                    FontSize="16"
-                                    WidthRequest="44"
-                                    HeightRequest="44"
-                                    Padding="0" />
+                                   VerticalOptions="Center"
+                                   FontFamily="OpenSansRegular"
+                                   FontSize="14" />
+                            <ImageButton Grid.Column="1"
+                                         Source="icon_eye.png"
+                                         Command="{Binding TogglePasswordCommand}"
+                                         BackgroundColor="Transparent"
+                                         WidthRequest="22"
+                                         HeightRequest="22"
+                                         Padding="0"
+                                         VerticalOptions="Center" />
                         </Grid>
                     </Border>
                 </VerticalStackLayout>
 
-                <!-- Forgot Password Link -->
-                <HorizontalStackLayout HorizontalOptions="End">
+                <!-- Error Message (Figma error state) -->
+                <Label Text="{Binding ErrorMessage}"
+                       IsVisible="{Binding HasError}"
+                       TextColor="#E53935"
+                       FontFamily="OpenSansRegular"
+                       FontSize="12"
+                       Margin="0,-6,0,0" />
+
+                <!-- Forgot Password Link (Left-aligned as in Figma) -->
+                <HorizontalStackLayout HorizontalOptions="Start">
                     <Button Text="Забыли пароль?"
                             Command="{Binding GoToForgotPasswordCommand}"
                             TextColor="#4152B0"
@@ -107,12 +117,12 @@
                         BackgroundColor="#4152B0"
                         TextColor="#FFFFFF"
                         FontFamily="OpenSansSemibold"
-                        FontSize="16"
+                        FontSize="15"
                         CornerRadius="12"
-                        HeightRequest="52"
+                        HeightRequest="48"
                         Margin="0,8,0,0">
                     <Button.Shadow>
-                        <Shadow Brush="#334152B0" Offset="0,4" Radius="8" Opacity="0.8" />
+                        <Shadow Brush="#254152B0" Offset="0,4" Radius="8" Opacity="0.6" />
                     </Button.Shadow>
                 </Button>
 
@@ -124,17 +134,17 @@
 
             <!-- Bottom Register Link -->
             <HorizontalStackLayout Grid.Row="2" HorizontalOptions="Center" Spacing="4">
-                <Label Text="Нет аккаунта?"
+                <Label Text="Еще не зарегистрированы?"
                        TextColor="#6E6E6E"
                        VerticalOptions="Center"
                        FontFamily="OpenSansRegular"
-                       FontSize="14" />
+                       FontSize="13" />
                 <Button Text="Зарегистрироваться"
                         Command="{Binding GoToRegistrationCommand}"
                         TextColor="#4152B0"
                         BackgroundColor="Transparent"
                         FontFamily="OpenSansSemibold"
-                        FontSize="14"
+                        FontSize="13"
                         Padding="0" />
             </HorizontalStackLayout>
         </Grid>
