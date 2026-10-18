@@ -3,83 +3,85 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Mobile.ViewModels"
              xmlns:models="clr-namespace:Mobile.Models"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
              x:Class="Mobile.Views.OnboardingPage"
              x:DataType="vm:OnboardingViewModel"
              BackgroundColor="#FFFFFF"
              Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*,Auto" Padding="24,40,24,32">
-        <!-- Top bar: Skip button -->
-        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End">
-            <Button Text="Пропустить"
+    <Grid RowDefinitions="Auto,*,Auto" Padding="20,36,20,24">
+        <!-- Top bar: Segmented progress dashes + Skip button -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+            <!-- 5 Segmented dashes -->
+            <HorizontalStackLayout Grid.Column="0" Spacing="6" VerticalOptions="Center">
+                <Border x:Name="Dash0" WidthRequest="36" HeightRequest="4" StrokeShape="RoundRectangle 2" BackgroundColor="#4152B0" StrokeThickness="0" />
+                <Border x:Name="Dash1" WidthRequest="36" HeightRequest="4" StrokeShape="RoundRectangle 2" BackgroundColor="#DCE2F9" StrokeThickness="0" />
+                <Border x:Name="Dash2" WidthRequest="36" HeightRequest="4" StrokeShape="RoundRectangle 2" BackgroundColor="#DCE2F9" StrokeThickness="0" />
+                <Border x:Name="Dash3" WidthRequest="36" HeightRequest="4" StrokeShape="RoundRectangle 2" BackgroundColor="#DCE2F9" StrokeThickness="0" />
+                <Border x:Name="Dash4" WidthRequest="36" HeightRequest="4" StrokeShape="RoundRectangle 2" BackgroundColor="#DCE2F9" StrokeThickness="0" />
+            </HorizontalStackLayout>
+
+            <!-- Skip button -->
+            <Button Grid.Column="1"
+                    Text="Пропустить"
                     Command="{Binding SkipCommand}"
                     TextColor="#4152B0"
                     BackgroundColor="Transparent"
                     FontFamily="OpenSansSemibold"
-                    FontSize="14"
-                    Padding="10,6" />
-        </HorizontalStackLayout>
+                    FontSize="13"
+                    Padding="8,4" />
+        </Grid>
 
         <!-- Center: Carousel of Slides -->
         <CarouselView x:Name="Carousel"
                       Grid.Row="1"
                       ItemsSource="{Binding Slides}"
                       Position="{Binding CurrentPosition, Mode=TwoWay}"
-                      IsSwipeEnabled="True"
-                      IndicatorView="Indicator">
+                      IsSwipeEnabled="True">
             <CarouselView.ItemTemplate>
                 <DataTemplate x:DataType="models:OnboardingSlideModel">
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="24" Padding="16">
-                        <!-- Emoji/Icon badge card -->
-                        <Border WidthRequest="120"
-                                HeightRequest="120"
-                                StrokeShape="RoundRectangle 60"
-                                BackgroundColor="#EDEFFB"
-                                StrokeThickness="0"
-                                HorizontalOptions="Center">
-                            <Label Text="{Binding IconEmoji}"
-                                   FontSize="54"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center" />
-                        </Border>
+                    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="18">
+                        <!-- Mascot Banner Card -->
+                        <controls:FishMascotCard Grid.Row="0"
+                                                 BadgeText="{Binding BadgeText}"
+                                                 HeightOverride="240"
+                                                 HorizontalOptions="Fill" />
 
-                        <Label Text="{Binding Title}"
+                        <!-- Title -->
+                        <Label Grid.Row="1"
+                               Text="{Binding Title}"
                                TextColor="#141414"
                                FontFamily="OpenSansSemibold"
-                               FontSize="24"
+                               FontSize="22"
                                FontAttributes="Bold"
-                               HorizontalTextAlignment="Center" />
+                               HorizontalTextAlignment="Start" />
 
-                        <Label Text="{Binding Description}"
+                        <!-- Description -->
+                        <Label Grid.Row="2"
+                               Text="{Binding Description}"
                                TextColor="#6E6E6E"
                                FontFamily="OpenSansRegular"
-                               FontSize="16"
-                               LineHeight="1.3"
-                               HorizontalTextAlignment="Center" />
-                    </VerticalStackLayout>
+                               FontSize="14"
+                               LineHeight="1.35"
+                               HorizontalTextAlignment="Start" />
+                    </Grid>
                 </DataTemplate>
             </CarouselView.ItemTemplate>
         </CarouselView>
 
-        <!-- Bottom: Indicator dots and Next/Finish button -->
-        <VerticalStackLayout Grid.Row="2" x:Name="BottomContainer" Spacing="24">
-            <IndicatorView x:Name="Indicator"
-                           HorizontalOptions="Center"
-                           IndicatorColor="#D9DFF7"
-                           SelectedIndicatorColor="#4152B0"
-                           IndicatorSize="8" />
-
+        <!-- Bottom: Next / Finish button -->
+        <VerticalStackLayout Grid.Row="2" x:Name="BottomContainer" Spacing="16" Margin="0,12,0,0">
             <Button x:Name="NextButton"
-                    Text="Продолжить"
+                    Text="Далее"
                     Command="{Binding NextOrFinishCommand}"
                     BackgroundColor="#4152B0"
                     TextColor="#FFFFFF"
                     FontFamily="OpenSansSemibold"
-                    FontSize="16"
+                    FontSize="15"
                     CornerRadius="12"
-                    HeightRequest="52">
+                    HeightRequest="48">
                 <Button.Shadow>
-                    <Shadow Brush="#334152B0" Offset="0,4" Radius="8" Opacity="0.8" />
+                    <Shadow Brush="#254152B0" Offset="0,4" Radius="8" Opacity="0.6" />
                 </Button.Shadow>
             </Button>
         </VerticalStackLayout>

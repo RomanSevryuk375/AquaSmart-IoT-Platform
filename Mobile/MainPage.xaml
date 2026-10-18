@@ -3,17 +3,59 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Mobile.MainPage"
              BackgroundColor="#4152B0"
-             Shell.NavBarIsVisible="False">
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False">
 
     <Grid RowDefinitions="*,Auto"
           Padding="0">
 
-        <!-- Center Section: Brand Logo (SMART AQUA + Fish) -->
-        <VerticalStackLayout Grid.Row="0"
-                             VerticalOptions="Center"
-                             HorizontalOptions="Center"
-                             Spacing="0"
-                             Padding="24,0">
+        <!-- Center Section: Brand Logo (SMART AQUA + Fish) and Preloader -->
+        <Grid Grid.Row="0"
+              VerticalOptions="Center"
+              HorizontalOptions="Center">
+
+            <!-- Preloader Animation Container (Figma Preloader 8-stage component) -->
+            <Grid x:Name="PreloaderContainer"
+                  WidthRequest="320"
+                  HeightRequest="220"
+                  HorizontalOptions="Center"
+                  VerticalOptions="Center">
+
+                <!-- Swimming Fish Mascot -->
+                <Image x:Name="SwimmingFish"
+                       Source="fish_mascot_light.png"
+                       WidthRequest="130"
+                       HeightRequest="80"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       TranslationX="-300" />
+
+                <!-- Rising Bubble 1 -->
+                <Ellipse x:Name="Bubble1"
+                         WidthRequest="14" HeightRequest="14"
+                         Fill="#DCE2F9"
+                         Opacity="0"
+                         HorizontalOptions="Center" VerticalOptions="Center"
+                         Margin="70,-10,0,0" />
+
+                <!-- Rising Bubble 2 -->
+                <Ellipse x:Name="Bubble2"
+                         WidthRequest="10" HeightRequest="10"
+                         Fill="#DCE2F9"
+                         Opacity="0"
+                         HorizontalOptions="Center" VerticalOptions="Center"
+                         Margin="88,-32,0,0" />
+
+                <!-- Rising Bubble 3 -->
+                <Ellipse x:Name="Bubble3"
+                         WidthRequest="7" HeightRequest="7"
+                         Fill="#DCE2F9"
+                         Opacity="0"
+                         HorizontalOptions="Center" VerticalOptions="Center"
+                         Margin="80,-52,0,0" />
+            </Grid>
+
+            <!-- Final Brand Logo Image (SMART AQUA + Mascot) -->
             <Image x:Name="LogoImage"
                    Source="smart_aqua_logo.png"
                    WidthRequest="320"
@@ -21,8 +63,8 @@
                    HorizontalOptions="Center"
                    VerticalOptions="Center"
                    Opacity="0"
-                   Scale="0.85" />
-        </VerticalStackLayout>
+                   Scale="0.88" />
+        </Grid>
 
         <!-- Bottom Actions Section: Onboarding & Authorization Buttons -->
         <VerticalStackLayout Grid.Row="1"

@@ -28,15 +28,30 @@ public partial class OnboardingPage : ContentPage
     {
         if (e.PropertyName == nameof(OnboardingViewModel.CurrentPosition))
         {
+            UpdateDashes(_viewModel.CurrentPosition);
+
             if (_viewModel.CurrentPosition == _viewModel.Slides.Count - 1)
             {
-                NextButton.Text = "Начать работу";
+                NextButton.Text = "Начать";
                 await NextButton.PulseAsync(1.06, 140);
             }
             else
             {
-                NextButton.Text = "Продолжить";
+                NextButton.Text = "Далее";
             }
+        }
+    }
+
+    private void UpdateDashes(int position)
+    {
+        var dashes = new[] { Dash0, Dash1, Dash2, Dash3, Dash4 };
+        var activeColor = Color.FromArgb("#4152B0");
+        var inactiveColor = Color.FromArgb("#DCE2F9");
+
+        for (int i = 0; i < dashes.Length; i++)
+        {
+            dashes[i].BackgroundColor = (i == position) ? activeColor : inactiveColor;
+            dashes[i].WidthRequest = (i == position) ? 44 : 36;
         }
     }
 }
