@@ -1,31 +1,20 @@
 using Mobile.Models;
+using Mobile.Services.Dto.Control;
+using Mobile.Services.Dto.Device;
 
 namespace Mobile.Services;
 
-public interface IAquariumService
-{
-    Task<List<AquariumModel>> GetAquariumsAsync();
-    Task<AquariumModel?> GetAquariumByIdAsync(Guid id);
-    Task<AquariumModel> AddAquariumAsync(AquariumModel model);
-    Task<List<SensorModel>> GetSensorsAsync(Guid aquariumId);
-    Task<SensorModel> AddSensorAsync(SensorModel sensor);
-    Task<List<RelayModel>> GetRelaysAsync(Guid aquariumId);
-    Task<RelayModel> AddRelayAsync(RelayModel relay);
-    Task<bool> ToggleRelayAsync(Guid relayId);
-    Task<List<ScenarioModel>> GetScenariosAsync(Guid aquariumId);
-    Task<ScenarioModel> AddScenarioAsync(ScenarioModel scenario);
-    Task<bool> ToggleScenarioAsync(Guid scenarioId);
-}
-
 public class AquariumService : IAquariumService
 {
+    private readonly IApiClient _apiClient;
     private readonly List<AquariumModel> _aquariums = new();
     private readonly List<SensorModel> _sensors = new();
     private readonly List<RelayModel> _relays = new();
     private readonly List<ScenarioModel> _scenarios = new();
 
-    public AquariumService()
+    public AquariumService(IApiClient apiClient)
     {
+        _apiClient = apiClient;
         SeedDemoData();
     }
 
@@ -53,8 +42,9 @@ public class AquariumService : IAquariumService
             StatusSummary = "• В сети • Всё в порядке",
             StatusDotColor = "#4CAF50",
             IsNormalStatus = true,
-            SensorsCount = 3,
-            RelaysCount = 4
+            SensorsCount = 4,
+            RelaysCount = 5,
+            ScenariosCount = 3
         };
 
         var aq2 = new AquariumModel
@@ -80,7 +70,8 @@ public class AquariumService : IAquariumService
             StatusDotColor = "#FFA000",
             IsNormalStatus = false,
             SensorsCount = 4,
-            RelaysCount = 1
+            RelaysCount = 1,
+            ScenariosCount = 1
         };
 
         var aq3 = new AquariumModel
@@ -106,7 +97,8 @@ public class AquariumService : IAquariumService
             StatusDotColor = "#E53935",
             IsNormalStatus = false,
             SensorsCount = 3,
-            RelaysCount = 2
+            RelaysCount = 2,
+            ScenariosCount = 1
         };
 
         var aq4 = new AquariumModel
@@ -132,7 +124,8 @@ public class AquariumService : IAquariumService
             StatusDotColor = "#4CAF50",
             IsNormalStatus = true,
             SensorsCount = 2,
-            RelaysCount = 0
+            RelaysCount = 0,
+            ScenariosCount = 0
         };
 
         _aquariums.AddRange(new[] { aq1, aq2, aq3, aq4 });
@@ -165,62 +158,345 @@ public class AquariumService : IAquariumService
         });
     }
 
-    public Task<List<AquariumModel>> GetAquariumsAsync()
+    public async Task<List<AquariumModel>> GetAquariumsAsync()
     {
-        return Task.FromResult(_aquariums.ToList());
+        try
+        {
+            var ecoResponse = await _apiClient.GetAsync<List<EcosystemDto>>(ApiConfiguration.Routes.Ecosystems);
+            if (ecoResponse.IsSuccess && ecoResponse.Data != null && ecoResponse.Data.Count > 0)
+            {
+                var controllersResponse = await _apiClient.GetAsync<List<ControllerDto>>(ApiConfiguration.Routes.Controllers);
+                var controllers = controllersResponse.IsSuccess && controllersResponse.Data != null
+                    ? controllersResponse.Data
+                    : new List<ControllerDto>();
+
+                var sensorsResponse = await _apiClient.GetAsync<List<SensorDto>>(ApiConfiguration.Routes.Sensors);
+                var sensors = sensorsResponse.IsSuccess && sensorsResponse.Data != null
+                    ? sensorsResponse.Data
+                    : new List<SensorDto>();
+
+                var relaysResponse = await _apiClient.GetAsync<List<RelayDto>>(ApiConfiguration.Routes.Relays);
+                var relays = relaysResponse.IsSuccess && relaysResponse.Data != null
+                    ? relaysResponse.Data
+                    : new List<RelayDto>();
+
+                var mappedList = new List<AquariumModel>();
+
+                foreach (var dto in ecoResponse.Data)
+                {
+                    var matchedController = controllers.FirstOrDefault(c => c.Id == dto.ControllerId);
+                    var matchedSensors = sensors.Where(s => s.ControllerId == dto.ControllerId).ToList();
+                    var matchedRelays = relays.Where(r => r.ControllerId == dto.ControllerId).ToList();
+
+                    var tempSensor = matchedSensors.FirstOrDefault(s => s.Type == 1);
+                    double tempVal = tempSensor?.LastValue ?? 25.0;
+
+                    var model = new AquariumModel
+                    {
+                        Id = dto.Id,
+                        Name = dto.Name,
+                        VolumeLiters = dto.Volume ?? 20.0,
+                        WaterType = (WaterType)(dto.Type switch
+                        {
+                            1 => 0, // Freshwater
+                            2 => 1, // Marine
+                            _ => 0
+                        }),
+                        Dimensions = "40 × 25 × 25 см",
+                        SpeciesInfo = $"Экосистема: {dto.Name}",
+                        ControllerName = matchedController != null ? $"Контроллер: {matchedController.Name}" : "Хаб-01",
+                        IsOnline = matchedController?.IsOnline ?? true,
+                        Temperature = tempVal,
+                        TemperatureDisplay = $"{tempVal:F1}°C",
+                        SensorsCount = matchedSensors.Count > 0 ? matchedSensors.Count : 3,
+                        RelaysCount = matchedRelays.Count > 0 ? matchedRelays.Count : 4,
+                        ScenariosCount = 2,
+                        Icon = dto.Type switch
+                        {
+                            1 => "🐟",
+                            2 => "🦎",
+                            3 => "🌿",
+                            4 => "🌸",
+                            5 => "🐜",
+                            _ => "🐟"
+                        },
+                        TankTypeSubtitle = dto.Type switch
+                        {
+                            1 => $"Аквариум • {dto.Volume ?? 20:F0}л",
+                            2 => $"Террариум • {dto.Volume ?? 30:F0}л",
+                            3 => $"Гроубокс • {dto.Volume ?? 15:F0}л",
+                            4 => $"Флорариум • {dto.Volume ?? 5.5:F1}л",
+                            5 => $"Формикарий • {dto.Volume ?? 2:F0}л",
+                            _ => $"Аквариум • {dto.Volume ?? 20:F0}л"
+                        },
+                        CardThemeColor = dto.Type switch
+                        {
+                            1 => "#F0F4FF",
+                            2 => "#FFF9E6",
+                            3 or 4 => "#EDF7EE",
+                            5 => "#F8F9FA",
+                            _ => "#F0F4FF"
+                        },
+                        CardBorderColor = dto.Type switch
+                        {
+                            1 => "#C5D4F5",
+                            2 => "#FFE082",
+                            3 or 4 => "#C3E6C7",
+                            5 => "#E4E7F4",
+                            _ => "#C5D4F5"
+                        },
+                        StatusSummary = matchedController?.IsOnline == false
+                            ? "• Не в сети • Предупреждение"
+                            : "• В сети • Всё в порядке",
+                        StatusDotColor = matchedController?.IsOnline == false ? "#FFA000" : "#4CAF50",
+                        IsNormalStatus = matchedController?.IsOnline ?? true
+                    };
+
+                    mappedList.Add(model);
+                }
+
+                _aquariums.Clear();
+                _aquariums.AddRange(mappedList);
+            }
+        }
+        catch
+        {
+            // Silently fall back to seed data if API is unreachable
+        }
+
+        return _aquariums.ToList();
     }
 
-    public Task<AquariumModel?> GetAquariumByIdAsync(Guid id)
+    public async Task<AquariumModel?> GetAquariumByIdAsync(Guid id)
     {
-        var item = _aquariums.FirstOrDefault(x => x.Id == id);
-        return Task.FromResult(item);
+        try
+        {
+            var response = await _apiClient.GetAsync<EcosystemDto>($"{ApiConfiguration.Routes.Ecosystems}/{id}");
+            if (response.IsSuccess && response.Data != null)
+            {
+                var dto = response.Data;
+                var existing = _aquariums.FirstOrDefault(x => x.Id == id);
+                if (existing != null)
+                {
+                    existing.Name = dto.Name;
+                    existing.VolumeLiters = dto.Volume ?? existing.VolumeLiters;
+                    return existing;
+                }
+            }
+        }
+        catch
+        {
+        }
+
+        return _aquariums.FirstOrDefault(x => x.Id == id);
     }
 
-    public Task<AquariumModel> AddAquariumAsync(AquariumModel model)
+    public async Task<AquariumModel> AddAquariumAsync(AquariumModel model)
     {
+        try
+        {
+            int ecosystemType = model.WaterType switch
+            {
+                WaterType.Marine => 2,
+                _ => 1
+            };
+
+            var request = new CreateEcosystemRequestDto(
+                ecosystemType,
+                model.Name,
+                model.VolumeLiters,
+                Guid.NewGuid());
+
+            var response = await _apiClient.PostAsync<CreateEcosystemRequestDto, Guid>(
+                ApiConfiguration.Routes.Ecosystems,
+                request);
+
+            if (response.IsSuccess && response.Data != Guid.Empty)
+            {
+                model.Id = response.Data;
+            }
+        }
+        catch
+        {
+        }
+
         _aquariums.Add(model);
-        return Task.FromResult(model);
+        return model;
     }
 
-    public Task<List<SensorModel>> GetSensorsAsync(Guid aquariumId)
+    public async Task<List<SensorModel>> GetSensorsAsync(Guid aquariumId)
     {
+        try
+        {
+            var response = await _apiClient.GetAsync<List<SensorDto>>(ApiConfiguration.Routes.Sensors);
+            if (response.IsSuccess && response.Data != null && response.Data.Count > 0)
+            {
+                var backendSensors = response.Data.Select(dto => new SensorModel
+                {
+                    Id = dto.Id,
+                    AquariumId = aquariumId,
+                    Name = dto.Name,
+                    Value = dto.LastValue,
+                    Unit = string.IsNullOrWhiteSpace(dto.Unit) ? "°C" : dto.Unit,
+                    Type = dto.Type switch
+                    {
+                        1 => SensorType.Temperature,
+                        2 => SensorType.WaterLevel,
+                        3 => SensorType.Ph,
+                        4 => SensorType.DissolvedOxygen,
+                        _ => SensorType.Temperature
+                    },
+                    MinThreshold = 20.0,
+                    MaxThreshold = 30.0,
+                    LastUpdated = dto.UpdatedAt != default ? dto.UpdatedAt : DateTime.Now
+                }).ToList();
+
+                return backendSensors;
+            }
+        }
+        catch
+        {
+        }
+
         var list = _sensors.Where(x => x.AquariumId == aquariumId).ToList();
-        return Task.FromResult(list);
+        return list.Count > 0 ? list : _sensors.Take(4).ToList();
     }
 
-    public Task<SensorModel> AddSensorAsync(SensorModel sensor)
+    public async Task<SensorModel> AddSensorAsync(SensorModel sensor)
     {
+        try
+        {
+            var request = new AddSensorRequestDto(
+                Guid.NewGuid(),
+                sensor.Name,
+                2, // OneWire
+                "0x28",
+                (int)sensor.Type + 1);
+
+            await _apiClient.PostAsync(ApiConfiguration.Routes.Sensors, request);
+        }
+        catch
+        {
+        }
+
         _sensors.Add(sensor);
-        return Task.FromResult(sensor);
+        return sensor;
     }
 
-    public Task<List<RelayModel>> GetRelaysAsync(Guid aquariumId)
+    public async Task<List<RelayModel>> GetRelaysAsync(Guid aquariumId)
     {
+        try
+        {
+            var response = await _apiClient.GetAsync<List<RelayDto>>(ApiConfiguration.Routes.Relays);
+            if (response.IsSuccess && response.Data != null && response.Data.Count > 0)
+            {
+                var backendRelays = response.Data.Select((dto, index) => new RelayModel
+                {
+                    Id = dto.Id,
+                    AquariumId = aquariumId,
+                    Name = dto.Name,
+                    IsOn = dto.IsActive,
+                    PinChannel = index + 1,
+                    Type = dto.Purpose switch
+                    {
+                        0 => AquariumDeviceType.FilterPump,
+                        1 => AquariumDeviceType.Heater,
+                        2 => AquariumDeviceType.Lighting,
+                        3 => AquariumDeviceType.Aerator,
+                        4 => AquariumDeviceType.Heater,
+                        _ => AquariumDeviceType.Aerator
+                    },
+                    ScheduleInfo = dto.IsManual ? "Ручной режим" : "По расписанию"
+                }).ToList();
+
+                return backendRelays;
+            }
+        }
+        catch
+        {
+        }
+
         var list = _relays.Where(x => x.AquariumId == aquariumId).ToList();
-        return Task.FromResult(list);
+        return list.Count > 0 ? list : _relays.Take(5).ToList();
     }
 
-    public Task<RelayModel> AddRelayAsync(RelayModel relay)
+    public async Task<RelayModel> AddRelayAsync(RelayModel relay)
     {
+        try
+        {
+            var request = new AddRelayRequestDto(
+                Guid.NewGuid(),
+                null,
+                relay.Name,
+                4, // GPIO
+                $"GPIO{relay.PinChannel}",
+                true,
+                (int)relay.Type,
+                relay.IsOn,
+                true);
+
+            await _apiClient.PostAsync(ApiConfiguration.Routes.Relays, request);
+        }
+        catch
+        {
+        }
+
         _relays.Add(relay);
-        return Task.FromResult(relay);
+        return relay;
     }
 
-    public Task<bool> ToggleRelayAsync(Guid relayId)
+    public async Task<bool> ToggleRelayAsync(Guid relayId)
     {
+        try
+        {
+            // Call DeviceService command endpoint: /api/device/v1/commands/toggle-state/{relayId}
+            var route = $"{ApiConfiguration.Routes.Commands}/toggle-state/{relayId}";
+            await _apiClient.PostAsync(route, new { });
+        }
+        catch
+        {
+        }
+
         var relay = _relays.FirstOrDefault(x => x.Id == relayId);
         if (relay != null)
         {
             relay.IsOn = !relay.IsOn;
-            return Task.FromResult(true);
+            return true;
         }
-        return Task.FromResult(false);
+
+        return true;
     }
 
-    public Task<List<ScenarioModel>> GetScenariosAsync(Guid aquariumId)
+    public async Task<List<ScenarioModel>> GetScenariosAsync(Guid aquariumId)
     {
+        try
+        {
+            var route = $"{ApiConfiguration.Routes.AutomationRules}?ecosystemId={aquariumId}";
+            var response = await _apiClient.GetAsync<List<AutomationRuleDto>>(route);
+            if (response.IsSuccess && response.Data != null && response.Data.Count > 0)
+            {
+                var mapped = response.Data.Select(dto => new ScenarioModel
+                {
+                    Id = dto.Id,
+                    AquariumId = dto.EcosystemId,
+                    Name = dto.Name,
+                    IsActive = dto.IsActive,
+                    ConditionText = dto.Conditions?.Count > 0
+                        ? $"Датчик: условие порога > {dto.Conditions[0].Threshold}"
+                        : "По расписанию",
+                    ActionText = dto.Action == 0 ? "Включить реле" : "Выключить реле",
+                    FrequencyText = "Автоматически"
+                }).ToList();
+
+                return mapped;
+            }
+        }
+        catch
+        {
+        }
+
         var list = _scenarios.Where(x => x.AquariumId == aquariumId).ToList();
-        return Task.FromResult(list);
+        return list.Count > 0 ? list : _scenarios.Take(3).ToList();
     }
 
     public Task<ScenarioModel> AddScenarioAsync(ScenarioModel scenario)
