@@ -34,16 +34,54 @@ public partial class RegistrationViewModel : ObservableObject
     [ObservableProperty]
     private bool _isBusy;
 
+    // Field-level errors (displayed directly under each input element)
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasFullNameError))]
+    private string? _fullNameError;
+    public bool HasFullNameError => !string.IsNullOrEmpty(FullNameError);
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasEmailError))]
+    private string? _emailError;
+    public bool HasEmailError => !string.IsNullOrEmpty(EmailError);
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasPhoneError))]
+    private string? _phoneError;
+    public bool HasPhoneError => !string.IsNullOrEmpty(PhoneError);
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasPasswordError))]
+    private string? _passwordError;
+    public bool HasPasswordError => !string.IsNullOrEmpty(PasswordError);
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasConfirmPasswordError))]
+    private string? _confirmPasswordError;
+    public bool HasConfirmPasswordError => !string.IsNullOrEmpty(ConfirmPasswordError);
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasTermsError))]
+    private string? _termsError;
+    public bool HasTermsError => !string.IsNullOrEmpty(TermsError);
+
+    // General error (network issues, unexpected server error)
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasError))]
     private string? _errorMessage;
-
     public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 
     public RegistrationViewModel(IAuthService authService)
     {
         _authService = authService;
     }
+
+    partial void OnFullNameChanged(string value) => FullNameError = null;
+    partial void OnEmailChanged(string value) => EmailError = null;
+    partial void OnPhoneChanged(string value) => PhoneError = null;
+    partial void OnPasswordChanged(string value) => PasswordError = null;
+    partial void OnConfirmPasswordChanged(string value) => ConfirmPasswordError = null;
+    partial void OnAgreeToTermsChanged(bool value) => TermsError = null;
 
     [RelayCommand]
     private void TogglePassword()
@@ -57,80 +95,104 @@ public partial class RegistrationViewModel : ObservableObject
         IsConfirmPasswordHidden = !IsConfirmPasswordHidden;
     }
 
+    private void ClearAllErrors()
+    {
+        FullNameError = null;
+        EmailError = null;
+        PhoneError = null;
+        PasswordError = null;
+        ConfirmPasswordError = null;
+        TermsError = null;
+        ErrorMessage = null;
+    }
+
     [RelayCommand]
     private async Task RegisterAsync()
     {
         if (IsBusy) return;
 
-        // 1. Validate Full Name (backend: CommonConstants.NameLength = 128)
+        ClearAllErrors();
+
+        bool hasErrors = false;
+
+        // 1. Validate Full Name
         if (!Helpers.ValidationHelper.ValidateFullName(FullName, out var nameError))
         {
-            ErrorMessage = nameError;
-            await Shell.Current.DisplayAlert("Внимание", nameError, "OK");
-            return;
+            FullNameError = nameError;
+            hasErrors = true;
         }
 
-        // 2. Validate Email (backend: IdentityConstants.EmailNumberRegex and EmailLength = 256)
+        // 2. Validate Email
         if (!Helpers.ValidationHelper.ValidateEmail(Email, out var emailError))
         {
-            ErrorMessage = emailError;
-            await Shell.Current.DisplayAlert("Внимание", emailError, "OK");
-            return;
+            EmailError = emailError;
+            hasErrors = true;
         }
 
-        // 3. Validate Phone (backend: IdentityConstants.PhoneNumberRegex +375XXXXXXXXX or 80XXXXXXXXX)
+        // 3. Validate Phone
         if (!Helpers.ValidationHelper.ValidatePhone(Phone, out var phoneError))
         {
-            ErrorMessage = phoneError;
-            await Shell.Current.DisplayAlert("Внимание", phoneError, "OK");
-            return;
+            PhoneError = phoneError;
+            hasErrors = true;
         }
 
-        // 4. Validate Password (backend: IdentityConstants.PasswordLength >= 8)
+        // 4. Validate Password
         if (!Helpers.ValidationHelper.ValidatePassword(Password, out var passError))
         {
-            ErrorMessage = passError;
-            await Shell.Current.DisplayAlert("Внимание", passError, "OK");
-            return;
+            PasswordError = passError;
+            hasErrors = true;
         }
 
         // 5. Validate Confirm Password match
         if (!Helpers.ValidationHelper.ValidateConfirmPassword(Password, ConfirmPassword, out var confirmError))
         {
-            ErrorMessage = confirmError;
-            await Shell.Current.DisplayAlert("Внимание", confirmError, "OK");
-            return;
+            ConfirmPasswordError = confirmError;
+            hasErrors = true;
         }
 
         // 6. Check Terms Agreement
         if (!AgreeToTerms)
         {
-            ErrorMessage = "Необходимо согласиться с условиями использования сервиса";
-            await Shell.Current.DisplayAlert("Внимание", ErrorMessage, "OK");
+            TermsError = "Необходимо согласиться с условиями использования сервиса";
+            hasErrors = true;
+        }
+
+        if (hasErrors)
+        {
+            // Do not show modal popups - all errors are explained under the respective fields.
             return;
         }
 
         try
         {
             IsBusy = true;
-            ErrorMessage = null;
 
             var (success, error) = await _authService.RegisterAsync(FullName, Email, Phone, Password);
             if (success)
             {
-                await Shell.Current.DisplayAlert("Успешно", "Регистрация завершена! Добро пожаловать в Smart Aqua.", "OK");
                 await Shell.Current.GoToAsync("//DashboardPage");
             }
             else
             {
-                ErrorMessage = Helpers.ValidationHelper.LocalizeServerError(error);
-                await Shell.Current.DisplayAlert("Ошибка регистрации", ErrorMessage, "OK");
+                // Deconstruct server validation errors and place them under each field in Russian
+                Helpers.ValidationHelper.MapServerRegistrationErrors(
+                    error,
+                    out var fnError,
+                    out var emError,
+                    out var phError,
+                    out var pwError,
+                    out var genError);
+
+                FullNameError = fnError;
+                EmailError = emError;
+                PhoneError = phError;
+                PasswordError = pwError;
+                ErrorMessage = genError;
             }
         }
         catch (Exception ex)
         {
             ErrorMessage = Helpers.ValidationHelper.LocalizeServerError(ex.Message);
-            await Shell.Current.DisplayAlert("Ошибка", ErrorMessage, "OK");
         }
         finally
         {

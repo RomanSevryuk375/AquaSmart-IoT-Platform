@@ -30,31 +30,49 @@
 
             <!-- Form fields -->
             <!-- Full Name -->
-            <VerticalStackLayout Spacing="6">
+            <VerticalStackLayout Spacing="4">
                 <Label Text="Имя" TextColor="#333333" FontFamily="OpenSansSemibold" FontSize="13" />
                 <Border Stroke="#E4E7F4" StrokeThickness="1" StrokeShape="RoundRectangle 10" BackgroundColor="#FFFFFF" Padding="14,0" HeightRequest="48">
                     <Entry Text="{Binding FullName, Mode=TwoWay}" Placeholder="Введите ваше имя" PlaceholderColor="#8C93A8" TextColor="#141414" VerticalOptions="Center" FontSize="14" />
                 </Border>
+                <Label Text="{Binding FullNameError}"
+                       IsVisible="{Binding HasFullNameError}"
+                       TextColor="#E53935"
+                       FontFamily="OpenSansRegular"
+                       FontSize="11"
+                       Margin="2,0,0,0" />
             </VerticalStackLayout>
 
             <!-- Email -->
-            <VerticalStackLayout Spacing="6">
+            <VerticalStackLayout Spacing="4">
                 <Label Text="Почта" TextColor="#333333" FontFamily="OpenSansSemibold" FontSize="13" />
                 <Border Stroke="#E4E7F4" StrokeThickness="1" StrokeShape="RoundRectangle 10" BackgroundColor="#FFFFFF" Padding="14,0" HeightRequest="48">
                     <Entry Text="{Binding Email, Mode=TwoWay}" Placeholder="Введите вашу почту" PlaceholderColor="#8C93A8" TextColor="#141414" Keyboard="Email" VerticalOptions="Center" FontSize="14" />
                 </Border>
+                <Label Text="{Binding EmailError}"
+                       IsVisible="{Binding HasEmailError}"
+                       TextColor="#E53935"
+                       FontFamily="OpenSansRegular"
+                       FontSize="11"
+                       Margin="2,0,0,0" />
             </VerticalStackLayout>
 
             <!-- Phone -->
-            <VerticalStackLayout Spacing="6">
+            <VerticalStackLayout Spacing="4">
                 <Label Text="Телефон" TextColor="#333333" FontFamily="OpenSansSemibold" FontSize="13" />
                 <Border Stroke="#E4E7F4" StrokeThickness="1" StrokeShape="RoundRectangle 10" BackgroundColor="#FFFFFF" Padding="14,0" HeightRequest="48">
                     <Entry Text="{Binding Phone, Mode=TwoWay}" Placeholder="Введите ваш телефон" PlaceholderColor="#8C93A8" TextColor="#141414" Keyboard="Telephone" VerticalOptions="Center" FontSize="14" />
                 </Border>
+                <Label Text="{Binding PhoneError}"
+                       IsVisible="{Binding HasPhoneError}"
+                       TextColor="#E53935"
+                       FontFamily="OpenSansRegular"
+                       FontSize="11"
+                       Margin="2,0,0,0" />
             </VerticalStackLayout>
 
             <!-- Password -->
-            <VerticalStackLayout Spacing="6">
+            <VerticalStackLayout Spacing="4">
                 <Label Text="Пароль" TextColor="#333333" FontFamily="OpenSansSemibold" FontSize="13" />
                 <Border Stroke="#E4E7F4" StrokeThickness="1" StrokeShape="RoundRectangle 10" BackgroundColor="#FFFFFF" Padding="14,0" HeightRequest="48">
                     <Grid ColumnDefinitions="*,Auto">
@@ -62,10 +80,16 @@
                         <ImageButton Grid.Column="1" Source="icon_eye.png" Command="{Binding TogglePasswordCommand}" BackgroundColor="Transparent" WidthRequest="22" HeightRequest="22" Padding="0" VerticalOptions="Center" />
                     </Grid>
                 </Border>
+                <Label Text="{Binding PasswordError}"
+                       IsVisible="{Binding HasPasswordError}"
+                       TextColor="#E53935"
+                       FontFamily="OpenSansRegular"
+                       FontSize="11"
+                       Margin="2,0,0,0" />
             </VerticalStackLayout>
 
             <!-- Confirm Password -->
-            <VerticalStackLayout Spacing="6">
+            <VerticalStackLayout Spacing="4">
                 <Label Text="Повторите пароль" TextColor="#333333" FontFamily="OpenSansSemibold" FontSize="13" />
                 <Border Stroke="#E4E7F4" StrokeThickness="1" StrokeShape="RoundRectangle 10" BackgroundColor="#FFFFFF" Padding="14,0" HeightRequest="48">
                     <Grid ColumnDefinitions="*,Auto">
@@ -73,26 +97,42 @@
                         <ImageButton Grid.Column="1" Source="icon_eye.png" Command="{Binding ToggleConfirmPasswordCommand}" BackgroundColor="Transparent" WidthRequest="22" HeightRequest="22" Padding="0" VerticalOptions="Center" />
                     </Grid>
                 </Border>
+                <Label Text="{Binding ConfirmPasswordError}"
+                       IsVisible="{Binding HasConfirmPasswordError}"
+                       TextColor="#E53935"
+                       FontFamily="OpenSansRegular"
+                       FontSize="11"
+                       Margin="2,0,0,0" />
             </VerticalStackLayout>
 
             <!-- Checkbox Terms & Agreement -->
-            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" Margin="0,4,0,0">
-                <CheckBox Grid.Column="0" IsChecked="{Binding AgreeToTerms, Mode=TwoWay}" Color="#4152B0" VerticalOptions="Start" />
-                <Label Grid.Column="1"
-                       Text="Я ознакомился с Условиями использования и Политикой конфиденциальности и согласен с ними."
-                       TextColor="#6E6E6E"
+            <VerticalStackLayout Spacing="4" Margin="0,4,0,0">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <CheckBox Grid.Column="0" IsChecked="{Binding AgreeToTerms, Mode=TwoWay}" Color="#4152B0" VerticalOptions="Start" />
+                    <Label Grid.Column="1"
+                           Text="Я ознакомился с Условиями использования и Политикой конфиденциальности и согласен с ними."
+                           TextColor="#6E6E6E"
+                           FontFamily="OpenSansRegular"
+                           FontSize="12"
+                           LineHeight="1.25"
+                           VerticalOptions="Center" />
+                </Grid>
+                <Label Text="{Binding TermsError}"
+                       IsVisible="{Binding HasTermsError}"
+                       TextColor="#E53935"
                        FontFamily="OpenSansRegular"
-                       FontSize="12"
-                       LineHeight="1.25"
-                       VerticalOptions="Center" />
-            </Grid>
+                       FontSize="11"
+                       Margin="2,0,0,0" />
+            </VerticalStackLayout>
 
-            <!-- Error Message -->
+            <!-- General Error Message (Server / Network error) -->
             <Label Text="{Binding ErrorMessage}"
                    IsVisible="{Binding HasError}"
                    TextColor="#E53935"
                    FontFamily="OpenSansRegular"
-                   FontSize="12" />
+                   FontSize="12"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center" />
 
             <!-- Register Button -->
             <Button Text="Зарегистрироваться"
