@@ -1,14 +1,5 @@
 namespace Mobile.Models;
 
-public enum SensorType
-{
-    Temperature,
-    Ph,
-    DissolvedOxygen,
-    TdsSalinity,
-    WaterLevel
-}
-
 public class SensorModel
 {
     public Guid Id { get; set; } = Guid.NewGuid();

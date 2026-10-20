@@ -1,14 +1,5 @@
 namespace Mobile.Models;
 
-public enum AquariumDeviceType
-{
-    Heater,     // Нагреватель
-    Aerator,    // Аэратор (компрессор)
-    FilterPump, // Фильтр / помпа
-    Feeder,     // Автокормушка
-    Lighting    // Освещение
-}
-
 public class RelayModel
 {
     public Guid Id { get; set; } = Guid.NewGuid();

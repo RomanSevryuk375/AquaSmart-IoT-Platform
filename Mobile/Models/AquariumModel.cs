@@ -1,12 +1,5 @@
 namespace Mobile.Models;
 
-public enum WaterType
-{
-    Freshwater, // Пресноводный
-    Marine,     // Морской
-    Brackish    // Солоноватоводный
-}
-
 public class AquariumModel
 {
     public Guid Id { get; set; } = Guid.NewGuid();
