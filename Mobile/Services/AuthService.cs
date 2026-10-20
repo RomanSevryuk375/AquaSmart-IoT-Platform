@@ -45,19 +45,24 @@ public sealed class AuthService : IAuthService
                 return (false, response.ErrorMessage ?? "Неверный логин или пароль");
             }
 
-            // Offline fallback
-            await _identityService.SetTokenAsync($"offline_demo_token_{Guid.NewGuid():N}");
-            var profile = await _identityService.GetCurrentUserAsync(cancellationToken);
-            if (emailOrLogin.Contains('@'))
+            if (response.StatusCode >= 500)
             {
-                profile.Email = emailOrLogin;
+                return (false, "Проблемы с сервером. Пожалуйста, попробуйте позже.");
             }
-            return (true, null);
+
+            if (!response.IsSuccess)
+            {
+                var msg = !string.IsNullOrWhiteSpace(response.ErrorMessage)
+                    ? Helpers.ValidationHelper.LocalizeServerError(response.ErrorMessage)
+                    : "Проблемы с сервером или подключением к сети. Попробуйте позже.";
+                return (false, msg);
+            }
+
+            return (false, "Не удалось выполнить вход. Проверьте данные и подключение.");
         }
-        catch
+        catch (Exception)
         {
-            await _identityService.SetTokenAsync($"offline_demo_token_{Guid.NewGuid():N}");
-            return (true, null);
+            return (false, "Проблемы с сервером или подключением к сети. Проверьте соединение.");
         }
     }
 
@@ -97,18 +102,24 @@ public sealed class AuthService : IAuthService
                 return (false, response.ErrorMessage ?? "Пользователь с таким email уже существует");
             }
 
-            await _identityService.SetTokenAsync($"offline_demo_token_{Guid.NewGuid():N}");
-            var offlineProfile = await _identityService.GetCurrentUserAsync(cancellationToken);
-            offlineProfile.FullName = name;
-            offlineProfile.Email = email;
-            offlineProfile.Phone = phone;
-            await _identityService.UpdateCurrentUserAsync(offlineProfile, cancellationToken);
-            return (true, null);
+            if (response.StatusCode >= 500)
+            {
+                return (false, "Проблемы с сервером. Пожалуйста, попробуйте позже.");
+            }
+
+            if (!response.IsSuccess)
+            {
+                var msg = !string.IsNullOrWhiteSpace(response.ErrorMessage)
+                    ? Helpers.ValidationHelper.LocalizeServerError(response.ErrorMessage)
+                    : "Проблемы с сервером. Не удалось завершить регистрацию.";
+                return (false, msg);
+            }
+
+            return (false, "Не удалось завершить регистрацию. Проверьте данные.");
         }
-        catch
+        catch (Exception)
         {
-            await _identityService.SetTokenAsync($"offline_demo_token_{Guid.NewGuid():N}");
-            return (true, null);
+            return (false, "Проблемы с сервером или подключением к сети. Проверьте соединение.");
         }
     }
 

@@ -102,12 +102,15 @@ public partial class LoginViewModel : ObservableObject
             }
             else
             {
-                ErrorMessage = Helpers.ValidationHelper.LocalizeServerError(error);
+                var localized = Helpers.ValidationHelper.LocalizeServerError(error);
+                ErrorMessage = !string.IsNullOrWhiteSpace(localized)
+                    ? localized
+                    : "Проблемы с сервером. Пожалуйста, попробуйте позже или проверьте подключение к сети.";
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            ErrorMessage = Helpers.ValidationHelper.LocalizeServerError(ex.Message);
+            ErrorMessage = "Проблемы с сервером или подключением к сети. Пожалуйста, попробуйте позже.";
         }
         finally
         {

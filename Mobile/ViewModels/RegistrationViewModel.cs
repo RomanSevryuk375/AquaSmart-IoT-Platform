@@ -187,12 +187,24 @@ public partial class RegistrationViewModel : ObservableObject
                 EmailError = emError;
                 PhoneError = phError;
                 PasswordError = pwError;
-                ErrorMessage = genError;
+
+                // If error is not a field validation error, display a clear server issue message
+                if (!string.IsNullOrEmpty(genError))
+                {
+                    ErrorMessage = genError;
+                }
+                else if (string.IsNullOrEmpty(fnError) &&
+                         string.IsNullOrEmpty(emError) &&
+                         string.IsNullOrEmpty(phError) &&
+                         string.IsNullOrEmpty(pwError))
+                {
+                    ErrorMessage = "Проблемы с сервером. Пожалуйста, попробуйте позже или проверьте подключение к сети.";
+                }
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            ErrorMessage = Helpers.ValidationHelper.LocalizeServerError(ex.Message);
+            ErrorMessage = "Проблемы с сервером или подключением к сети. Пожалуйста, попробуйте позже.";
         }
         finally
         {

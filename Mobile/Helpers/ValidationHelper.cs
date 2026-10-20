@@ -214,7 +214,7 @@ public static partial class ValidationHelper
 
         if (string.IsNullOrWhiteSpace(rawError))
         {
-            generalError = "Не удалось выполнить регистрацию. Проверьте соединение с сервером.";
+            generalError = "Проблемы с сервером. Пожалуйста, попробуйте позже или проверьте подключение к сети.";
             return;
         }
 
@@ -228,25 +228,25 @@ public static partial class ValidationHelper
 
             if (lower.Contains("non alphanumeric"))
             {
-                passwordIssues.Add("спецсимвол (!@#$%^&*)");
+                passwordIssues.Add("спецсимвол (!@#$%^&* и др.)");
             }
             else if (lower.Contains("lowercase"))
             {
-                passwordIssues.Add("строчные буквы (a-z)");
+                passwordIssues.Add("строчную латинскую букву (a-z)");
             }
             else if (lower.Contains("uppercase"))
             {
-                passwordIssues.Add("заглавные буквы (A-Z)");
+                passwordIssues.Add("заглавную латинскую букву (A-Z)");
             }
             else if (lower.Contains("digit"))
             {
                 passwordIssues.Add("цифру (0-9)");
             }
-            else if (lower.Contains("password must be at least") || lower.Contains("passwordminlength"))
+            else if (lower.Contains("password must be at least") || lower.Contains("passwordminlength") || lower.Contains("passwordtooshort"))
             {
                 passwordIssues.Add("не менее 8 символов");
             }
-            else if (lower.Contains("email") || lower.Contains("emailinuse") || lower.Contains("already taken") || lower.Contains("already in use"))
+            else if (lower.Contains("email") || lower.Contains("emailinuse") || lower.Contains("already taken") || lower.Contains("already in use") || lower.Contains("duplicateemail"))
             {
                 emailError = "Пользователь с такой почтой уже зарегистрирован";
             }
@@ -254,9 +254,13 @@ public static partial class ValidationHelper
             {
                 phoneError = "Номер должен быть в формате +375XXXXXXXXX или 80XXXXXXXXX";
             }
-            else if (lower.Contains("name"))
+            else if (lower.Contains("name") && (lower.Contains("invalid") || lower.Contains("required") || lower.Contains("taken")))
             {
                 fullNameError = "Некорректное имя пользователя (до 128 символов)";
+            }
+            else if (lower.Contains("500") || lower.Contains("internal server") || lower.Contains("database") || lower.Contains("failed to connect") || lower.Contains("connection refused") || lower.Contains("service unavailable") || lower.Contains("bad gateway") || lower.Contains("timeout"))
+            {
+                generalError = "Проблемы с сервером. Пожалуйста, попробуйте позже или проверьте подключение к сети.";
             }
             else
             {
@@ -267,6 +271,12 @@ public static partial class ValidationHelper
         if (passwordIssues.Count > 0)
         {
             passwordError = $"Пароль должен содержать: {string.Join(", ", passwordIssues)}";
+        }
+
+        // If no field validation error was detected and generalError is empty, clearly state server issue
+        if (fullNameError == null && emailError == null && phoneError == null && passwordError == null && string.IsNullOrWhiteSpace(generalError))
+        {
+            generalError = "Проблемы с сервером. Пожалуйста, попробуйте позже или проверьте подключение к сети.";
         }
     }
 
