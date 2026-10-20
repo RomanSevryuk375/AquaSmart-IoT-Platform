@@ -1,4 +1,4 @@
-﻿services:
+services:
   postgres:
     image: postgres:16-alpine
     container_name: aqua-postgres
@@ -68,7 +68,7 @@
       - aqua-network
 
   minio:
-    image: minio/minio
+    image: ghcr.io/coollabsio/minio:latest
     container_name: aqua-minio
     ports:
       - "9000:9000" 
@@ -80,7 +80,7 @@
     volumes:
       - minio-data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/minio/health/live || wget --spider -q http://localhost:9000/minio/health/live || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -88,7 +88,7 @@
       - aqua-network
 
   minio-setup:
-    image: minio/mc
+    image: ghcr.io/coollabsio/minio:latest
     container_name: aqua-minio-setup
     depends_on:
       minio:
@@ -97,9 +97,9 @@
       - aqua-network
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc config host add myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} || /usr/bin/mc config host add myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
       /usr/bin/mc mb myminio/${MINIO_BUCKET_NAME} --ignore-existing;
-      /usr/bin/mc policy download myminio/${MINIO_BUCKET_NAME};
+      /usr/bin/mc anonymous set download myminio/${MINIO_BUCKET_NAME} || /usr/bin/mc policy set download myminio/${MINIO_BUCKET_NAME} || /usr/bin/mc policy download myminio/${MINIO_BUCKET_NAME} || true;
       exit 0;
       "
 
@@ -321,7 +321,7 @@
       - aqua-network
 
   firmware-migrations:
-    image: migrate/migrate
+    image: migrate/migrate:v4.17.0
     container_name: firmware-migrations
     depends_on:
       postgres-init:
