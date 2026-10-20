@@ -4,9 +4,10 @@ using Mobile.Services.Dto.Device;
 
 namespace Mobile.Services;
 
-public class AquariumService : IAquariumService
+public sealed class AquariumService : IAquariumService
 {
     private readonly IApiClient _apiClient;
+    private readonly object _syncLock = new();
     private readonly List<AquariumModel> _aquariums = new();
     private readonly List<SensorModel> _sensors = new();
     private readonly List<RelayModel> _relays = new();
@@ -128,57 +129,56 @@ public class AquariumService : IAquariumService
             ScenariosCount = 0
         };
 
-        _aquariums.AddRange(new[] { aq1, aq2, aq3, aq4 });
-
-        // Sensors for aq1
-        _sensors.AddRange(new[]
+        lock (_syncLock)
         {
-            new SensorModel { AquariumId = aq1.Id, Name = "Датчик температуры воды (DS18B20)", Type = SensorType.Temperature, Value = 26.2, Unit = "°C", MinThreshold = 24.0, MaxThreshold = 28.0 },
-            new SensorModel { AquariumId = aq1.Id, Name = "pH-метр лабораторный", Type = SensorType.Ph, Value = 6.8, Unit = "pH", MinThreshold = 6.5, MaxThreshold = 7.5 },
-            new SensorModel { AquariumId = aq1.Id, Name = "Датчик растворенного O2", Type = SensorType.DissolvedOxygen, Value = 7.9, Unit = "мг/л", MinThreshold = 6.0, MaxThreshold = 10.0 },
-            new SensorModel { AquariumId = aq1.Id, Name = "TDS / Минерализация", Type = SensorType.TdsSalinity, Value = 180, Unit = "ppm", MinThreshold = 100, MaxThreshold = 300 }
-        });
+            _aquariums.AddRange(new[] { aq1, aq2, aq3, aq4 });
 
-        // Relays for aq1
-        _relays.AddRange(new[]
-        {
-            new RelayModel { AquariumId = aq1.Id, Name = "Аэратор бесшумный", Type = AquariumDeviceType.Aerator, IsOn = true, PinChannel = 1, ScheduleInfo = "Круглосуточно" },
-            new RelayModel { AquariumId = aq1.Id, Name = "Титановый нагреватель 200W", Type = AquariumDeviceType.Heater, IsOn = false, PinChannel = 2, ScheduleInfo = "Авто при T < 25.5°C" },
-            new RelayModel { AquariumId = aq1.Id, Name = "Канистровый биофильтр", Type = AquariumDeviceType.FilterPump, IsOn = true, PinChannel = 3, ScheduleInfo = "Круглосуточно" },
-            new RelayModel { AquariumId = aq1.Id, Name = "Умная автокормушка", Type = AquariumDeviceType.Feeder, IsOn = false, PinChannel = 4, ScheduleInfo = "09:00 и 18:30" },
-            new RelayModel { AquariumId = aq1.Id, Name = "Фито-свет LED WRGB", Type = AquariumDeviceType.Lighting, IsOn = true, PinChannel = 5, ScheduleInfo = "10:00 — 20:00" }
-        });
+            // Sensors for aq1
+            _sensors.AddRange(new[]
+            {
+                new SensorModel { AquariumId = aq1.Id, Name = "Датчик температуры воды (DS18B20)", Type = SensorType.Temperature, Value = 26.2, Unit = "°C", MinThreshold = 24.0, MaxThreshold = 28.0 },
+                new SensorModel { AquariumId = aq1.Id, Name = "pH-метр лабораторный", Type = SensorType.Ph, Value = 6.8, Unit = "pH", MinThreshold = 6.5, MaxThreshold = 7.5 },
+                new SensorModel { AquariumId = aq1.Id, Name = "Датчик растворенного O2", Type = SensorType.DissolvedOxygen, Value = 7.9, Unit = "мг/л", MinThreshold = 6.0, MaxThreshold = 10.0 },
+                new SensorModel { AquariumId = aq1.Id, Name = "TDS / Минерализация", Type = SensorType.TdsSalinity, Value = 180, Unit = "ppm", MinThreshold = 100, MaxThreshold = 300 }
+            });
 
-        // Scenarios for aq1
-        _scenarios.AddRange(new[]
-        {
-            new ScenarioModel { AquariumId = aq1.Id, Name = "Терморегуляция обогрева", ConditionText = "Если Температура < 25.0 °C", ActionText = "Включить Нагреватель", IsActive = true, FrequencyText = "По датчику" },
-            new ScenarioModel { AquariumId = aq1.Id, Name = "Режим ночного покоя", ConditionText = "Время = 20:00", ActionText = "Выключить Свет, снизить аэрацию до 40%", IsActive = true, FrequencyText = "Каждый день" },
-            new ScenarioModel { AquariumId = aq1.Id, Name = "Автокормление утром и вечером", ConditionText = "Время = 09:00, 18:30", ActionText = "Подать 1 дозу корма (порция №2)", IsActive = true, FrequencyText = "Каждый день" }
-        });
+            // Relays for aq1
+            _relays.AddRange(new[]
+            {
+                new RelayModel { AquariumId = aq1.Id, Name = "Аэратор бесшумный", Type = AquariumDeviceType.Aerator, IsOn = true, PinChannel = 1, ScheduleInfo = "Круглосуточно" },
+                new RelayModel { AquariumId = aq1.Id, Name = "Титановый нагреватель 200W", Type = AquariumDeviceType.Heater, IsOn = false, PinChannel = 2, ScheduleInfo = "Авто при T < 25.5°C" },
+                new RelayModel { AquariumId = aq1.Id, Name = "Канистровый биофильтр", Type = AquariumDeviceType.FilterPump, IsOn = true, PinChannel = 3, ScheduleInfo = "Круглосуточно" },
+                new RelayModel { AquariumId = aq1.Id, Name = "Умная автокормушка", Type = AquariumDeviceType.Feeder, IsOn = false, PinChannel = 4, ScheduleInfo = "09:00 и 18:30" },
+                new RelayModel { AquariumId = aq1.Id, Name = "Фито-свет LED WRGB", Type = AquariumDeviceType.Lighting, IsOn = true, PinChannel = 5, ScheduleInfo = "10:00 — 20:00" }
+            });
+
+            // Scenarios for aq1
+            _scenarios.AddRange(new[]
+            {
+                new ScenarioModel { AquariumId = aq1.Id, Name = "Терморегуляция обогрева", ConditionText = "Если Температура < 25.0 °C", ActionText = "Включить Нагреватель", IsActive = true, FrequencyText = "По датчику" },
+                new ScenarioModel { AquariumId = aq1.Id, Name = "Режим ночного покоя", ConditionText = "Время = 20:00", ActionText = "Выключить Свет, снизить аэрацию до 40%", IsActive = true, FrequencyText = "Каждый день" },
+                new ScenarioModel { AquariumId = aq1.Id, Name = "Автокормление утром и вечером", ConditionText = "Время = 09:00, 18:30", ActionText = "Подать 1 дозу корма (порция №2)", IsActive = true, FrequencyText = "Каждый день" }
+            });
+        }
     }
 
-    public async Task<List<AquariumModel>> GetAquariumsAsync()
+    public async Task<List<AquariumModel>> GetAquariumsAsync(CancellationToken cancellationToken = default)
     {
         try
         {
-            var ecoResponse = await _apiClient.GetAsync<List<EcosystemDto>>(ApiConfiguration.Routes.Ecosystems);
+            var ecoResponse = await _apiClient.GetAsync<List<EcosystemDto>>(ApiConfiguration.Routes.Ecosystems, cancellationToken);
             if (ecoResponse.IsSuccess && ecoResponse.Data != null && ecoResponse.Data.Count > 0)
             {
-                var controllersResponse = await _apiClient.GetAsync<List<ControllerDto>>(ApiConfiguration.Routes.Controllers);
-                var controllers = controllersResponse.IsSuccess && controllersResponse.Data != null
-                    ? controllersResponse.Data
-                    : new List<ControllerDto>();
+                // Parallelize dependent queries via Task.WhenAll for maximum network performance
+                var controllersTask = _apiClient.GetAsync<List<ControllerDto>>(ApiConfiguration.Routes.Controllers, cancellationToken);
+                var sensorsTask = _apiClient.GetAsync<List<SensorDto>>(ApiConfiguration.Routes.Sensors, cancellationToken);
+                var relaysTask = _apiClient.GetAsync<List<RelayDto>>(ApiConfiguration.Routes.Relays, cancellationToken);
 
-                var sensorsResponse = await _apiClient.GetAsync<List<SensorDto>>(ApiConfiguration.Routes.Sensors);
-                var sensors = sensorsResponse.IsSuccess && sensorsResponse.Data != null
-                    ? sensorsResponse.Data
-                    : new List<SensorDto>();
+                await Task.WhenAll(controllersTask, sensorsTask, relaysTask);
 
-                var relaysResponse = await _apiClient.GetAsync<List<RelayDto>>(ApiConfiguration.Routes.Relays);
-                var relays = relaysResponse.IsSuccess && relaysResponse.Data != null
-                    ? relaysResponse.Data
-                    : new List<RelayDto>();
+                var controllers = (await controllersTask).Data ?? new List<ControllerDto>();
+                var sensors = (await sensorsTask).Data ?? new List<SensorDto>();
+                var relays = (await relaysTask).Data ?? new List<RelayDto>();
 
                 var mappedList = new List<AquariumModel>();
 
@@ -255,8 +255,11 @@ public class AquariumService : IAquariumService
                     mappedList.Add(model);
                 }
 
-                _aquariums.Clear();
-                _aquariums.AddRange(mappedList);
+                lock (_syncLock)
+                {
+                    _aquariums.Clear();
+                    _aquariums.AddRange(mappedList);
+                }
             }
         }
         catch
@@ -264,23 +267,29 @@ public class AquariumService : IAquariumService
             // Silently fall back to seed data if API is unreachable
         }
 
-        return _aquariums.ToList();
+        lock (_syncLock)
+        {
+            return _aquariums.ToList();
+        }
     }
 
-    public async Task<AquariumModel?> GetAquariumByIdAsync(Guid id)
+    public async Task<AquariumModel?> GetAquariumByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         try
         {
-            var response = await _apiClient.GetAsync<EcosystemDto>($"{ApiConfiguration.Routes.Ecosystems}/{id}");
+            var response = await _apiClient.GetAsync<EcosystemDto>($"{ApiConfiguration.Routes.Ecosystems}/{id}", cancellationToken);
             if (response.IsSuccess && response.Data != null)
             {
                 var dto = response.Data;
-                var existing = _aquariums.FirstOrDefault(x => x.Id == id);
-                if (existing != null)
+                lock (_syncLock)
                 {
-                    existing.Name = dto.Name;
-                    existing.VolumeLiters = dto.Volume ?? existing.VolumeLiters;
-                    return existing;
+                    var existing = _aquariums.FirstOrDefault(x => x.Id == id);
+                    if (existing != null)
+                    {
+                        existing.Name = dto.Name;
+                        existing.VolumeLiters = dto.Volume ?? existing.VolumeLiters;
+                        return existing;
+                    }
                 }
             }
         }
@@ -288,10 +297,13 @@ public class AquariumService : IAquariumService
         {
         }
 
-        return _aquariums.FirstOrDefault(x => x.Id == id);
+        lock (_syncLock)
+        {
+            return _aquariums.FirstOrDefault(x => x.Id == id);
+        }
     }
 
-    public async Task<AquariumModel> AddAquariumAsync(AquariumModel model)
+    public async Task<AquariumModel> AddAquariumAsync(AquariumModel model, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -309,7 +321,8 @@ public class AquariumService : IAquariumService
 
             var response = await _apiClient.PostAsync<CreateEcosystemRequestDto, Guid>(
                 ApiConfiguration.Routes.Ecosystems,
-                request);
+                request,
+                cancellationToken);
 
             if (response.IsSuccess && response.Data != Guid.Empty)
             {
@@ -320,15 +333,18 @@ public class AquariumService : IAquariumService
         {
         }
 
-        _aquariums.Add(model);
+        lock (_syncLock)
+        {
+            _aquariums.Add(model);
+        }
         return model;
     }
 
-    public async Task<List<SensorModel>> GetSensorsAsync(Guid aquariumId)
+    public async Task<List<SensorModel>> GetSensorsAsync(Guid aquariumId, CancellationToken cancellationToken = default)
     {
         try
         {
-            var response = await _apiClient.GetAsync<List<SensorDto>>(ApiConfiguration.Routes.Sensors);
+            var response = await _apiClient.GetAsync<List<SensorDto>>(ApiConfiguration.Routes.Sensors, cancellationToken);
             if (response.IsSuccess && response.Data != null && response.Data.Count > 0)
             {
                 var backendSensors = response.Data.Select(dto => new SensorModel
@@ -358,11 +374,14 @@ public class AquariumService : IAquariumService
         {
         }
 
-        var list = _sensors.Where(x => x.AquariumId == aquariumId).ToList();
-        return list.Count > 0 ? list : _sensors.Take(4).ToList();
+        lock (_syncLock)
+        {
+            var list = _sensors.Where(x => x.AquariumId == aquariumId).ToList();
+            return list.Count > 0 ? list : _sensors.Take(4).ToList();
+        }
     }
 
-    public async Task<SensorModel> AddSensorAsync(SensorModel sensor)
+    public async Task<SensorModel> AddSensorAsync(SensorModel sensor, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -373,21 +392,24 @@ public class AquariumService : IAquariumService
                 "0x28",
                 (int)sensor.Type + 1);
 
-            await _apiClient.PostAsync(ApiConfiguration.Routes.Sensors, request);
+            await _apiClient.PostAsync(ApiConfiguration.Routes.Sensors, request, cancellationToken);
         }
         catch
         {
         }
 
-        _sensors.Add(sensor);
+        lock (_syncLock)
+        {
+            _sensors.Add(sensor);
+        }
         return sensor;
     }
 
-    public async Task<List<RelayModel>> GetRelaysAsync(Guid aquariumId)
+    public async Task<List<RelayModel>> GetRelaysAsync(Guid aquariumId, CancellationToken cancellationToken = default)
     {
         try
         {
-            var response = await _apiClient.GetAsync<List<RelayDto>>(ApiConfiguration.Routes.Relays);
+            var response = await _apiClient.GetAsync<List<RelayDto>>(ApiConfiguration.Routes.Relays, cancellationToken);
             if (response.IsSuccess && response.Data != null && response.Data.Count > 0)
             {
                 var backendRelays = response.Data.Select((dto, index) => new RelayModel
@@ -416,11 +438,14 @@ public class AquariumService : IAquariumService
         {
         }
 
-        var list = _relays.Where(x => x.AquariumId == aquariumId).ToList();
-        return list.Count > 0 ? list : _relays.Take(5).ToList();
+        lock (_syncLock)
+        {
+            var list = _relays.Where(x => x.AquariumId == aquariumId).ToList();
+            return list.Count > 0 ? list : _relays.Take(5).ToList();
+        }
     }
 
-    public async Task<RelayModel> AddRelayAsync(RelayModel relay)
+    public async Task<RelayModel> AddRelayAsync(RelayModel relay, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -435,44 +460,49 @@ public class AquariumService : IAquariumService
                 relay.IsOn,
                 true);
 
-            await _apiClient.PostAsync(ApiConfiguration.Routes.Relays, request);
+            await _apiClient.PostAsync(ApiConfiguration.Routes.Relays, request, cancellationToken);
         }
         catch
         {
         }
 
-        _relays.Add(relay);
+        lock (_syncLock)
+        {
+            _relays.Add(relay);
+        }
         return relay;
     }
 
-    public async Task<bool> ToggleRelayAsync(Guid relayId)
+    public async Task<bool> ToggleRelayAsync(Guid relayId, CancellationToken cancellationToken = default)
     {
         try
         {
-            // Call DeviceService command endpoint: /api/device/v1/commands/toggle-state/{relayId}
             var route = $"{ApiConfiguration.Routes.Commands}/toggle-state/{relayId}";
-            await _apiClient.PostAsync(route, new { });
+            await _apiClient.PostAsync(route, new { }, cancellationToken);
         }
         catch
         {
         }
 
-        var relay = _relays.FirstOrDefault(x => x.Id == relayId);
-        if (relay != null)
+        lock (_syncLock)
         {
-            relay.IsOn = !relay.IsOn;
-            return true;
+            var relay = _relays.FirstOrDefault(x => x.Id == relayId);
+            if (relay != null)
+            {
+                relay.IsOn = !relay.IsOn;
+                return true;
+            }
         }
 
         return true;
     }
 
-    public async Task<List<ScenarioModel>> GetScenariosAsync(Guid aquariumId)
+    public async Task<List<ScenarioModel>> GetScenariosAsync(Guid aquariumId, CancellationToken cancellationToken = default)
     {
         try
         {
             var route = $"{ApiConfiguration.Routes.AutomationRules}?ecosystemId={aquariumId}";
-            var response = await _apiClient.GetAsync<List<AutomationRuleDto>>(route);
+            var response = await _apiClient.GetAsync<List<AutomationRuleDto>>(route, cancellationToken);
             if (response.IsSuccess && response.Data != null && response.Data.Count > 0)
             {
                 var mapped = response.Data.Select(dto => new ScenarioModel
@@ -495,23 +525,32 @@ public class AquariumService : IAquariumService
         {
         }
 
-        var list = _scenarios.Where(x => x.AquariumId == aquariumId).ToList();
-        return list.Count > 0 ? list : _scenarios.Take(3).ToList();
+        lock (_syncLock)
+        {
+            var list = _scenarios.Where(x => x.AquariumId == aquariumId).ToList();
+            return list.Count > 0 ? list : _scenarios.Take(3).ToList();
+        }
     }
 
-    public Task<ScenarioModel> AddScenarioAsync(ScenarioModel scenario)
+    public Task<ScenarioModel> AddScenarioAsync(ScenarioModel scenario, CancellationToken cancellationToken = default)
     {
-        _scenarios.Add(scenario);
+        lock (_syncLock)
+        {
+            _scenarios.Add(scenario);
+        }
         return Task.FromResult(scenario);
     }
 
-    public Task<bool> ToggleScenarioAsync(Guid scenarioId)
+    public Task<bool> ToggleScenarioAsync(Guid scenarioId, CancellationToken cancellationToken = default)
     {
-        var sc = _scenarios.FirstOrDefault(x => x.Id == scenarioId);
-        if (sc != null)
+        lock (_syncLock)
         {
-            sc.IsActive = !sc.IsActive;
-            return Task.FromResult(true);
+            var sc = _scenarios.FirstOrDefault(x => x.Id == scenarioId);
+            if (sc != null)
+            {
+                sc.IsActive = !sc.IsActive;
+                return Task.FromResult(true);
+            }
         }
         return Task.FromResult(false);
     }

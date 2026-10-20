@@ -8,6 +8,6 @@ public interface IIdentityService
     Task SetTokensAsync(string accessToken, string refreshToken);
     Task SetTokenAsync(string token);
     Task ClearTokenAsync();
-    Task<UserProfileModel> GetCurrentUserAsync();
-    Task UpdateCurrentUserAsync(UserProfileModel profile);
+    Task<UserProfileModel> GetCurrentUserAsync(CancellationToken cancellationToken = default);
+    Task UpdateCurrentUserAsync(UserProfileModel profile, CancellationToken cancellationToken = default);
 }

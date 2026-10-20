@@ -1,3 +1,4 @@
+using System.Net.Security;
 using Mobile.Services;
 
 namespace Mobile.Extensions;
@@ -11,9 +12,15 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<HttpClient>(sp =>
         {
             var authHandler = sp.GetRequiredService<AuthHeaderHandler>();
-            var innerHandler = new HttpClientHandler();
-            innerHandler.ServerCertificateCustomValidationCallback = (_, _, _, _) => true;
-            authHandler.InnerHandler = innerHandler;
+            var socketsHandler = new SocketsHttpHandler
+            {
+                PooledConnectionLifetime = TimeSpan.FromMinutes(15),
+                SslOptions = new SslClientAuthenticationOptions
+                {
+                    RemoteCertificateValidationCallback = (_, _, _, _) => true
+                }
+            };
+            authHandler.InnerHandler = socketsHandler;
 
             return new HttpClient(authHandler)
             {

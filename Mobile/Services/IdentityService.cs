@@ -3,12 +3,13 @@ using Mobile.Services.Dto.Identity;
 
 namespace Mobile.Services;
 
-public class IdentityService : IIdentityService
+public sealed class IdentityService : IIdentityService
 {
     private const string AccessTokenKey = "aquasmart_auth_token";
     private const string RefreshTokenKey = "aquasmart_refresh_token";
 
     private readonly IApiClient _apiClient;
+    private readonly object _syncLock = new();
     private UserProfileModel _currentUser = new()
     {
         FullName = "Алексей Смирнов",
@@ -94,22 +95,25 @@ public class IdentityService : IIdentityService
         return Task.CompletedTask;
     }
 
-    public async Task<UserProfileModel> GetCurrentUserAsync()
+    public async Task<UserProfileModel> GetCurrentUserAsync(CancellationToken cancellationToken = default)
     {
         try
         {
             var isAuth = await IsAuthenticatedAsync();
             if (isAuth)
             {
-                var response = await _apiClient.GetAsync<UserProfileResponseDto>(ApiConfiguration.Routes.Profile);
+                var response = await _apiClient.GetAsync<UserProfileResponseDto>(ApiConfiguration.Routes.Profile, cancellationToken);
                 if (response.IsSuccess && response.Data != null)
                 {
                     var dto = response.Data;
-                    _currentUser.FullName = string.IsNullOrWhiteSpace(dto.Name) ? _currentUser.FullName : dto.Name;
-                    _currentUser.Email = string.IsNullOrWhiteSpace(dto.Email) ? _currentUser.Email : dto.Email;
-                    if (!string.IsNullOrWhiteSpace(dto.PhoneNumber))
+                    lock (_syncLock)
                     {
-                        _currentUser.Phone = dto.PhoneNumber;
+                        _currentUser.FullName = string.IsNullOrWhiteSpace(dto.Name) ? _currentUser.FullName : dto.Name;
+                        _currentUser.Email = string.IsNullOrWhiteSpace(dto.Email) ? _currentUser.Email : dto.Email;
+                        if (!string.IsNullOrWhiteSpace(dto.PhoneNumber))
+                        {
+                            _currentUser.Phone = dto.PhoneNumber;
+                        }
                     }
                 }
             }
@@ -119,12 +123,18 @@ public class IdentityService : IIdentityService
             // Offline or backend not reachable: silently fallback to local cached profile
         }
 
-        return _currentUser;
+        lock (_syncLock)
+        {
+            return _currentUser;
+        }
     }
 
-    public async Task UpdateCurrentUserAsync(UserProfileModel profile)
+    public async Task UpdateCurrentUserAsync(UserProfileModel profile, CancellationToken cancellationToken = default)
     {
-        _currentUser = profile;
+        lock (_syncLock)
+        {
+            _currentUser = profile;
+        }
 
         try
         {
@@ -132,7 +142,7 @@ public class IdentityService : IIdentityService
             if (isAuth)
             {
                 var request = new UpdateProfileRequestDto(profile.FullName, profile.Phone);
-                await _apiClient.PutAsync(ApiConfiguration.Routes.Profile, request);
+                await _apiClient.PutAsync(ApiConfiguration.Routes.Profile, request, cancellationToken);
             }
         }
         catch

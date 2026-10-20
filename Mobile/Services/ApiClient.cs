@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace Mobile.Services;
 
-public class ApiClient : IApiClient
+public sealed class ApiClient : IApiClient
 {
     private readonly HttpClient _httpClient;
     private static readonly JsonSerializerOptions JsonOptions = new()

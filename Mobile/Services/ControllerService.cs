@@ -3,9 +3,10 @@ using Mobile.Services.Dto.Device;
 
 namespace Mobile.Services;
 
-public class ControllerService : IControllerService
+public sealed class ControllerService : IControllerService
 {
     private readonly IApiClient _apiClient;
+    private readonly object _syncLock = new();
     private readonly List<ControllerModel> _controllers = new();
 
     public ControllerService(IApiClient apiClient)
@@ -16,38 +17,41 @@ public class ControllerService : IControllerService
 
     private void SeedDemoControllers()
     {
-        _controllers.Add(new ControllerModel
+        lock (_syncLock)
         {
-            Id = Guid.Parse("aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-            Name = "Контроллер Сампа №1",
-            ModelType = "AquaSmart ESP32 Pro",
-            MacAddress = "A4:CF:12:89:C4:22",
-            IpAddress = "192.168.1.145",
-            FirmwareVersion = "v2.4.1",
-            IsOnline = true,
-            LastSeen = DateTime.UtcNow.AddMinutes(-2),
-            AttachedAquariumName = "Мой первый аквариум"
-        });
+            _controllers.Add(new ControllerModel
+            {
+                Id = Guid.Parse("aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                Name = "Контроллер Сампа №1",
+                ModelType = "AquaSmart ESP32 Pro",
+                MacAddress = "A4:CF:12:89:C4:22",
+                IpAddress = "192.168.1.145",
+                FirmwareVersion = "v2.4.1",
+                IsOnline = true,
+                LastSeen = DateTime.UtcNow.AddMinutes(-2),
+                AttachedAquariumName = "Мой первый аквариум"
+            });
 
-        _controllers.Add(new ControllerModel
-        {
-            Id = Guid.Parse("aaaaaaa2-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-            Name = "Модуль освещения WRGB",
-            ModelType = "AquaSmart LED Controller",
-            MacAddress = "DC:4F:22:11:AB:88",
-            IpAddress = "192.168.1.146",
-            FirmwareVersion = "v1.8.0",
-            IsOnline = true,
-            LastSeen = DateTime.UtcNow.AddMinutes(-1),
-            AttachedAquariumName = "Флориус Идратус"
-        });
+            _controllers.Add(new ControllerModel
+            {
+                Id = Guid.Parse("aaaaaaa2-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                Name = "Модуль освещения WRGB",
+                ModelType = "AquaSmart LED Controller",
+                MacAddress = "DC:4F:22:11:AB:88",
+                IpAddress = "192.168.1.146",
+                FirmwareVersion = "v1.8.0",
+                IsOnline = true,
+                LastSeen = DateTime.UtcNow.AddMinutes(-1),
+                AttachedAquariumName = "Флориус Идратус"
+            });
+        }
     }
 
-    public async Task<List<ControllerModel>> GetControllersAsync()
+    public async Task<List<ControllerModel>> GetControllersAsync(CancellationToken cancellationToken = default)
     {
         try
         {
-            var response = await _apiClient.GetAsync<List<ControllerDto>>(ApiConfiguration.Routes.Controllers);
+            var response = await _apiClient.GetAsync<List<ControllerDto>>(ApiConfiguration.Routes.Controllers, cancellationToken);
             if (response.IsSuccess && response.Data != null && response.Data.Count > 0)
             {
                 var mapped = response.Data.Select(dto => new ControllerModel
@@ -63,8 +67,11 @@ public class ControllerService : IControllerService
                     AttachedAquariumName = "Экосистема"
                 }).ToList();
 
-                _controllers.Clear();
-                _controllers.AddRange(mapped);
+                lock (_syncLock)
+                {
+                    _controllers.Clear();
+                    _controllers.AddRange(mapped);
+                }
                 return mapped;
             }
         }
@@ -72,23 +79,29 @@ public class ControllerService : IControllerService
         {
         }
 
-        return _controllers.ToList();
+        lock (_syncLock)
+        {
+            return _controllers.ToList();
+        }
     }
 
-    public async Task<ControllerModel?> GetControllerByIdAsync(Guid id)
+    public async Task<ControllerModel?> GetControllerByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         try
         {
-            var response = await _apiClient.GetAsync<ControllerDto>($"{ApiConfiguration.Routes.Controllers}/{id}");
+            var response = await _apiClient.GetAsync<ControllerDto>($"{ApiConfiguration.Routes.Controllers}/{id}", cancellationToken);
             if (response.IsSuccess && response.Data != null)
             {
                 var dto = response.Data;
-                var found = _controllers.FirstOrDefault(c => c.Id == id);
-                if (found != null)
+                lock (_syncLock)
                 {
-                    found.Name = dto.Name;
-                    found.IsOnline = dto.IsOnline;
-                    return found;
+                    var found = _controllers.FirstOrDefault(c => c.Id == id);
+                    if (found != null)
+                    {
+                        found.Name = dto.Name;
+                        found.IsOnline = dto.IsOnline;
+                        return found;
+                    }
                 }
             }
         }
@@ -96,10 +109,13 @@ public class ControllerService : IControllerService
         {
         }
 
-        return _controllers.FirstOrDefault(c => c.Id == id);
+        lock (_syncLock)
+        {
+            return _controllers.FirstOrDefault(c => c.Id == id);
+        }
     }
 
-    public async Task AddControllerAsync(ControllerModel controller)
+    public async Task AddControllerAsync(ControllerModel controller, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -108,36 +124,45 @@ public class ControllerService : IControllerService
                 controller.Name,
                 controller.IsOnline);
 
-            await _apiClient.PostAsync(ApiConfiguration.Routes.Controllers, request);
+            await _apiClient.PostAsync(ApiConfiguration.Routes.Controllers, request, cancellationToken);
         }
         catch
         {
         }
 
-        _controllers.Add(controller);
+        lock (_syncLock)
+        {
+            _controllers.Add(controller);
+        }
     }
 
-    public async Task<bool> DeleteControllerAsync(Guid id)
+    public async Task<bool> DeleteControllerAsync(Guid id, CancellationToken cancellationToken = default)
     {
         try
         {
-            await _apiClient.DeleteAsync($"{ApiConfiguration.Routes.Controllers}/{id}");
+            await _apiClient.DeleteAsync($"{ApiConfiguration.Routes.Controllers}/{id}", cancellationToken);
         }
         catch
         {
         }
 
-        var count = _controllers.RemoveAll(c => c.Id == id);
-        return count > 0;
+        lock (_syncLock)
+        {
+            var count = _controllers.RemoveAll(c => c.Id == id);
+            return count > 0;
+        }
     }
 
-    public Task<bool> RebootControllerAsync(Guid id)
+    public Task<bool> RebootControllerAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var c = _controllers.FirstOrDefault(x => x.Id == id);
-        if (c != null)
+        lock (_syncLock)
         {
-            c.LastSeen = DateTime.UtcNow;
-            return Task.FromResult(true);
+            var c = _controllers.FirstOrDefault(x => x.Id == id);
+            if (c != null)
+            {
+                c.LastSeen = DateTime.UtcNow;
+                return Task.FromResult(true);
+            }
         }
         return Task.FromResult(false);
     }

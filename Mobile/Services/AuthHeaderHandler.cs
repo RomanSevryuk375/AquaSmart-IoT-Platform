@@ -2,7 +2,7 @@ using System.Net.Http.Headers;
 
 namespace Mobile.Services;
 
-public class AuthHeaderHandler : DelegatingHandler
+public sealed class AuthHeaderHandler : DelegatingHandler
 {
     private const string TokenKey = "aquasmart_auth_token";
 

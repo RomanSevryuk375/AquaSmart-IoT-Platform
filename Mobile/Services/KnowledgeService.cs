@@ -2,7 +2,7 @@ using Mobile.Models;
 
 namespace Mobile.Services;
 
-public class KnowledgeService : IKnowledgeService
+public sealed class KnowledgeService : IKnowledgeService
 {
     private readonly List<KnowledgeArticleModel> _articles = new()
     {
@@ -17,45 +17,52 @@ public class KnowledgeService : IKnowledgeService
         },
         new KnowledgeArticleModel
         {
-            Title = "Борьба с водорослями и настройка фотопериода",
-            Category = "Освещение и растения",
-            Summary = "Как избежать вспышки чёрной бороды и сине-зелёных водорослей с помощью смарт-реле таймера.",
-            Content = "Световой день в аквариуме не должен превышать 8-10 часов. С помощью умного реле настройте ступенчатое включение или дневную световую паузу (4 часа свет - 2 часа пауза - 4 часа свет).",
+            Title = "Автоматизация светового дня WRGB светильников",
+            Category = "Освещение",
+            Summary = "Настройка фаз рассвета, зенита и заката для подавления водорослей и стимуляции роста растений.",
+            Content = "Резкое включение света вызывает шок у обитателей. Плавный рассвет за 30-40 минут имитирует природные условия. Длительность светового дня для травника не должна превышать 8-9 часов во избежание вспышки черной бороды и ксенококуса.",
             ReadTimeMinutes = 5,
-            Icon = "🌿"
+            Icon = "💡"
         },
         new KnowledgeArticleModel
         {
-            Title = "Умное автоматическое кормление: дозировка и график",
-            Category = "Кормление",
-            Summary = "Предотвращение перекорма и закисания грунта с помощью автоматизированных сценариев.",
-            Content = "Перекорм — причина №1 помутнения воды и скачка аммиака. Настройте автокормушку на выдачу минимальной дозы дважды в день, синхронизировав с отключением внешнего фильтра на 5 минут во время трапезы.",
+            Title = "Уход за биофильтром и циркуляция",
+            Category = "Фильтрация",
+            Summary = "Правильное обслуживание канистровых фильтров и сохранение колоний нитрифицирующих бактерий.",
+            Content = "Никогда не промывайте наполнители биофильтра водопроводной хлорированной водой — используйте только слитую воду из аквариума. Губки механической очистки промываются каждые 2 недели, биологические кольца — раз в 3-6 месяцев.",
             ReadTimeMinutes = 3,
-            Icon = "🥣"
+            Icon = "🔄"
         },
         new KnowledgeArticleModel
         {
-            Title = "Аэрация и насыщение кислородом O2 в жаркий период",
-            Category = "Оборудование",
-            Summary = "Почему при повышении температуры воды растворимость кислорода падает и как защитить рыб.",
-            Content = "При температуре выше 28°C растворимость кислорода критически падает. Включите сценарий автоматического форсирования компрессора при превышении температуры выше 26.5°C.",
-            ReadTimeMinutes = 4,
-            Icon = "🫧"
+            Title = "Карантин новых гидробионтов и адаптация",
+            Category = "Здоровье рыб",
+            Summary = "Метод капельной адаптации и профилактика болезней при подселении новых жителей.",
+            Content = "Капельная пересадка в течение 1.5–2 часов с выравниванием температуры и TDS снижает осмотический шок. Рекомендуется карантинный аквариум на 2–3 недели с наблюдением за кожными покровами и аппетитом.",
+            ReadTimeMinutes = 6,
+            Icon = "🛡️"
         }
     };
 
-    public Task<List<KnowledgeArticleModel>> GetArticlesAsync()
+    public Task<List<KnowledgeArticleModel>> GetArticlesAsync(CancellationToken cancellationToken = default)
     {
         return Task.FromResult(_articles.ToList());
     }
 
-    public Task<List<KnowledgeArticleModel>> SearchArticlesAsync(string query)
+    public Task<List<KnowledgeArticleModel>> SearchArticlesAsync(string query, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(query))
+        {
             return Task.FromResult(_articles.ToList());
+        }
 
-        var q = query.ToLowerInvariant();
-        var filtered = _articles.Where(a => a.Title.ToLowerInvariant().Contains(q) || a.Category.ToLowerInvariant().Contains(q)).ToList();
+        var lower = query.ToLowerInvariant();
+        var filtered = _articles.Where(a =>
+            a.Title.ToLowerInvariant().Contains(lower) ||
+            a.Summary.ToLowerInvariant().Contains(lower) ||
+            a.Category.ToLowerInvariant().Contains(lower)
+        ).ToList();
+
         return Task.FromResult(filtered);
     }
 }
