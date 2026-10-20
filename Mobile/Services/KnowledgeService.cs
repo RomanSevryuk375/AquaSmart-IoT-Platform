@@ -2,12 +2,6 @@ using Mobile.Models;
 
 namespace Mobile.Services;
 
-public interface IKnowledgeService
-{
-    Task<List<KnowledgeArticleModel>> GetArticlesAsync();
-    Task<List<KnowledgeArticleModel>> SearchArticlesAsync(string query);
-}
-
 public class KnowledgeService : IKnowledgeService
 {
     private readonly List<KnowledgeArticleModel> _articles = new()
