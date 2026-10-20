@@ -5,6 +5,8 @@ namespace Mobile;
 
 public partial class AppShell : Shell
 {
+    private static bool _routesRegistered;
+
     public AppShell(AppShellViewModel viewModel)
     {
         InitializeComponent();
@@ -18,28 +20,26 @@ public partial class AppShell : Shell
         RegisterRoutes();
     }
 
-    private void RegisterRoutes()
+    private static void RegisterRoutes()
     {
-        Routing.RegisterRoute("MainPage", typeof(MainPage));
-        Routing.RegisterRoute("OnboardingPage", typeof(OnboardingPage));
-        Routing.RegisterRoute("LoginPage", typeof(LoginPage));
-        Routing.RegisterRoute("RegistrationPage", typeof(RegistrationPage));
-        Routing.RegisterRoute("ForgotPasswordPage", typeof(ForgotPasswordPage));
+        if (_routesRegistered) return;
+        _routesRegistered = true;
 
-        Routing.RegisterRoute("DashboardPage", typeof(DashboardPage));
-        Routing.RegisterRoute("AquariumsPage", typeof(AquariumsPage));
-        Routing.RegisterRoute("AquariumDetailsPage", typeof(AquariumDetailsPage));
+        // Register secondary / sub-pages that are navigated to dynamically
+        // Note: Top-level pages defined in AppShell.xaml (MainPage, DashboardPage, AquariumsPage,
+        // KnowledgeBasePage, ProfilePage, ControllersPage) already have shell routes and must not be re-registered.
+        Routing.RegisterRoute(nameof(OnboardingPage), typeof(OnboardingPage));
+        Routing.RegisterRoute(nameof(LoginPage), typeof(LoginPage));
+        Routing.RegisterRoute(nameof(RegistrationPage), typeof(RegistrationPage));
+        Routing.RegisterRoute(nameof(ForgotPasswordPage), typeof(ForgotPasswordPage));
 
-        Routing.RegisterRoute("AddAquariumPage", typeof(AddAquariumPage));
-        Routing.RegisterRoute("AddSensorPage", typeof(AddSensorPage));
-        Routing.RegisterRoute("AddRelayPage", typeof(AddRelayPage));
-        Routing.RegisterRoute("AddScenarioPage", typeof(AddScenarioPage));
+        Routing.RegisterRoute(nameof(AquariumDetailsPage), typeof(AquariumDetailsPage));
+        Routing.RegisterRoute(nameof(AddAquariumPage), typeof(AddAquariumPage));
+        Routing.RegisterRoute(nameof(AddSensorPage), typeof(AddSensorPage));
+        Routing.RegisterRoute(nameof(AddRelayPage), typeof(AddRelayPage));
+        Routing.RegisterRoute(nameof(AddScenarioPage), typeof(AddScenarioPage));
 
-        Routing.RegisterRoute("KnowledgeBasePage", typeof(KnowledgeBasePage));
-        Routing.RegisterRoute("ProfilePage", typeof(ProfilePage));
-
-        Routing.RegisterRoute("ControllersPage", typeof(ControllersPage));
-        Routing.RegisterRoute("AddControllerPage", typeof(AddControllerPage));
-        Routing.RegisterRoute("ControllerDetailsPage", typeof(ControllerDetailsPage));
+        Routing.RegisterRoute(nameof(AddControllerPage), typeof(AddControllerPage));
+        Routing.RegisterRoute(nameof(ControllerDetailsPage), typeof(ControllerDetailsPage));
     }
 }

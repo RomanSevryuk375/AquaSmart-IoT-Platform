@@ -83,7 +83,7 @@
     </Shell.FlyoutFooter>
 
     <!-- Welcome / Splash Screen as Initial Route -->
-    <FlyoutItem FlyoutItemIsVisible="False" Route="MainPage">
+    <FlyoutItem FlyoutItemIsVisible="False">
         <ShellContent
             Title="Вход"
             ContentTemplate="{DataTemplate local:MainPage}"
