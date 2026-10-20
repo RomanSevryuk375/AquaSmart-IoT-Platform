@@ -36,8 +36,11 @@ public partial class AddAquariumViewModel : ObservableObject
             return;
         }
 
-        double.TryParse(VolumeString, out var volume);
-        if (volume <= 0) volume = 100;
+        if (!Helpers.ValidationHelper.ValidateAquariumVolume(VolumeString, out var volume, out var volError))
+        {
+            await Shell.Current.DisplayAlert("Внимание", volError, "OK");
+            return;
+        }
 
         var model = new AquariumModel
         {

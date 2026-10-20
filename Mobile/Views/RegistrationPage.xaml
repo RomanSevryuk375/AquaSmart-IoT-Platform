@@ -69,8 +69,8 @@
                 <Label Text="Повторите пароль" TextColor="#333333" FontFamily="OpenSansSemibold" FontSize="13" />
                 <Border Stroke="#E4E7F4" StrokeThickness="1" StrokeShape="RoundRectangle 10" BackgroundColor="#FFFFFF" Padding="14,0" HeightRequest="48">
                     <Grid ColumnDefinitions="*,Auto">
-                        <Entry Grid.Column="0" Text="{Binding ConfirmPassword, Mode=TwoWay}" Placeholder="Повторите пароль" PlaceholderColor="#8C93A8" TextColor="#141414" IsPassword="{Binding IsPasswordHidden}" VerticalOptions="Center" FontSize="14" />
-                        <ImageButton Grid.Column="1" Source="icon_eye.png" Command="{Binding TogglePasswordCommand}" BackgroundColor="Transparent" WidthRequest="22" HeightRequest="22" Padding="0" VerticalOptions="Center" />
+                        <Entry Grid.Column="0" Text="{Binding ConfirmPassword, Mode=TwoWay}" Placeholder="Повторите пароль" PlaceholderColor="#8C93A8" TextColor="#141414" IsPassword="{Binding IsConfirmPasswordHidden}" VerticalOptions="Center" FontSize="14" />
+                        <ImageButton Grid.Column="1" Source="icon_eye.png" Command="{Binding ToggleConfirmPasswordCommand}" BackgroundColor="Transparent" WidthRequest="22" HeightRequest="22" Padding="0" VerticalOptions="Center" />
                     </Grid>
                 </Border>
             </VerticalStackLayout>

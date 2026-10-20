@@ -29,6 +29,9 @@ public partial class RegistrationViewModel : ObservableObject
     private bool _isPasswordHidden = true;
 
     [ObservableProperty]
+    private bool _isConfirmPasswordHidden = true;
+
+    [ObservableProperty]
     private bool _isBusy;
 
     [ObservableProperty]
@@ -49,25 +52,61 @@ public partial class RegistrationViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void ToggleConfirmPassword()
+    {
+        IsConfirmPasswordHidden = !IsConfirmPasswordHidden;
+    }
+
+    [RelayCommand]
     private async Task RegisterAsync()
     {
         if (IsBusy) return;
 
-        if (string.IsNullOrWhiteSpace(FullName) || string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
+        // 1. Validate Full Name (backend: CommonConstants.NameLength = 128)
+        if (!Helpers.ValidationHelper.ValidateFullName(FullName, out var nameError))
         {
-            await Shell.Current.DisplayAlert("Внимание", "Заполните все обязательные поля", "OK");
+            ErrorMessage = nameError;
+            await Shell.Current.DisplayAlert("Внимание", nameError, "OK");
             return;
         }
 
-        if (Password != ConfirmPassword)
+        // 2. Validate Email (backend: IdentityConstants.EmailNumberRegex and EmailLength = 256)
+        if (!Helpers.ValidationHelper.ValidateEmail(Email, out var emailError))
         {
-            await Shell.Current.DisplayAlert("Внимание", "Пароли не совпадают", "OK");
+            ErrorMessage = emailError;
+            await Shell.Current.DisplayAlert("Внимание", emailError, "OK");
             return;
         }
 
+        // 3. Validate Phone (backend: IdentityConstants.PhoneNumberRegex +375XXXXXXXXX or 80XXXXXXXXX)
+        if (!Helpers.ValidationHelper.ValidatePhone(Phone, out var phoneError))
+        {
+            ErrorMessage = phoneError;
+            await Shell.Current.DisplayAlert("Внимание", phoneError, "OK");
+            return;
+        }
+
+        // 4. Validate Password (backend: IdentityConstants.PasswordLength >= 8)
+        if (!Helpers.ValidationHelper.ValidatePassword(Password, out var passError))
+        {
+            ErrorMessage = passError;
+            await Shell.Current.DisplayAlert("Внимание", passError, "OK");
+            return;
+        }
+
+        // 5. Validate Confirm Password match
+        if (!Helpers.ValidationHelper.ValidateConfirmPassword(Password, ConfirmPassword, out var confirmError))
+        {
+            ErrorMessage = confirmError;
+            await Shell.Current.DisplayAlert("Внимание", confirmError, "OK");
+            return;
+        }
+
+        // 6. Check Terms Agreement
         if (!AgreeToTerms)
         {
-            await Shell.Current.DisplayAlert("Внимание", "Необходимо согласиться с условиями использования сервиса", "OK");
+            ErrorMessage = "Необходимо согласиться с условиями использования сервиса";
+            await Shell.Current.DisplayAlert("Внимание", ErrorMessage, "OK");
             return;
         }
 
@@ -84,14 +123,14 @@ public partial class RegistrationViewModel : ObservableObject
             }
             else
             {
-                ErrorMessage = error;
-                await Shell.Current.DisplayAlert("Ошибка регистрации", error ?? "Не удалось зарегистрироваться", "OK");
+                ErrorMessage = Helpers.ValidationHelper.LocalizeServerError(error);
+                await Shell.Current.DisplayAlert("Ошибка регистрации", ErrorMessage, "OK");
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = ex.Message;
-            await Shell.Current.DisplayAlert("Ошибка", ex.Message, "OK");
+            ErrorMessage = Helpers.ValidationHelper.LocalizeServerError(ex.Message);
+            await Shell.Current.DisplayAlert("Ошибка", ErrorMessage, "OK");
         }
         finally
         {

@@ -41,6 +41,27 @@ public partial class LoginViewModel : ObservableObject
     {
         if (IsBusy) return;
 
+        if (string.IsNullOrWhiteSpace(EmailOrLogin))
+        {
+            ErrorMessage = "Укажите email или логин";
+            await Shell.Current.DisplayAlert("Внимание", ErrorMessage, "OK");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(Password))
+        {
+            ErrorMessage = "Введите пароль";
+            await Shell.Current.DisplayAlert("Внимание", ErrorMessage, "OK");
+            return;
+        }
+
+        if (Password.Length < Helpers.ValidationHelper.MinPasswordLength)
+        {
+            ErrorMessage = $"Пароль должен содержать не менее {Helpers.ValidationHelper.MinPasswordLength} символов";
+            await Shell.Current.DisplayAlert("Внимание", ErrorMessage, "OK");
+            return;
+        }
+
         try
         {
             IsBusy = true;
@@ -53,14 +74,14 @@ public partial class LoginViewModel : ObservableObject
             }
             else
             {
-                ErrorMessage = error;
-                await Shell.Current.DisplayAlert("Ошибка входа", error ?? "Неверные учетные данные", "OK");
+                ErrorMessage = Helpers.ValidationHelper.LocalizeServerError(error);
+                await Shell.Current.DisplayAlert("Ошибка входа", ErrorMessage, "OK");
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = ex.Message;
-            await Shell.Current.DisplayAlert("Ошибка", ex.Message, "OK");
+            ErrorMessage = Helpers.ValidationHelper.LocalizeServerError(ex.Message);
+            await Shell.Current.DisplayAlert("Ошибка", ErrorMessage, "OK");
         }
         finally
         {

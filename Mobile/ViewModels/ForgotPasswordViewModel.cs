@@ -78,19 +78,22 @@ public partial class ForgotPasswordViewModel : ObservableObject
     [RelayCommand]
     private async Task ResetPasswordAsync()
     {
-        if (string.IsNullOrWhiteSpace(NewPassword))
+        if (IsBusy) return;
+
+        if (!Helpers.ValidationHelper.ValidatePassword(NewPassword, out var passError))
         {
-            ErrorMessage = "Введите новый пароль";
+            ErrorMessage = passError;
             return;
         }
 
-        if (NewPassword != ConfirmNewPassword)
+        if (!Helpers.ValidationHelper.ValidateConfirmPassword(NewPassword, ConfirmNewPassword, out var confirmError))
         {
-            ErrorMessage = "Пароли не совпадают";
+            ErrorMessage = confirmError;
             return;
         }
 
         IsBusy = true;
+        ErrorMessage = null;
         var (success, error) = await _authService.ResetPasswordAsync("1234", NewPassword);
         IsBusy = false;
 
@@ -100,7 +103,7 @@ public partial class ForgotPasswordViewModel : ObservableObject
         }
         else
         {
-            ErrorMessage = error ?? "Не удалось обновить пароль";
+            ErrorMessage = Helpers.ValidationHelper.LocalizeServerError(error);
         }
     }
 

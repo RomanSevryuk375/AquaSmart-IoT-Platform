@@ -195,18 +195,18 @@ public sealed class ApiClient : IApiClient
             var root = doc.RootElement;
             if (root.TryGetProperty("detail", out var detail) && !string.IsNullOrWhiteSpace(detail.GetString()))
             {
-                return detail.GetString()!;
+                return Helpers.ValidationHelper.LocalizeServerError(detail.GetString()!);
             }
             if (root.TryGetProperty("message", out var message) && !string.IsNullOrWhiteSpace(message.GetString()))
             {
-                return message.GetString()!;
+                return Helpers.ValidationHelper.LocalizeServerError(message.GetString()!);
             }
             if (root.TryGetProperty("title", out var title) && !string.IsNullOrWhiteSpace(title.GetString()))
             {
-                return title.GetString()!;
+                return Helpers.ValidationHelper.LocalizeServerError(title.GetString()!);
             }
 
-            return content;
+            return Helpers.ValidationHelper.LocalizeServerError(content);
         }
         catch
         {

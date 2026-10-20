@@ -33,6 +33,12 @@ public partial class AddControllerViewModel : ObservableObject
             return;
         }
 
+        if (!Helpers.ValidationHelper.ValidateMacAddress(MacAddress, out var macError))
+        {
+            await Shell.Current.DisplayAlert("Внимание", macError, "OK");
+            return;
+        }
+
         var controller = new ControllerModel
         {
             Name = ControllerName,
