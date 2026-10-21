@@ -10,7 +10,7 @@ public partial class DashboardViewModel : ObservableObject
     private readonly IIdentityService _identityService;
 
     [ObservableProperty]
-    private string _greeting = "Добрый день, Алексей!";
+    private string _greeting = "Добро пожаловать!";
 
     [ObservableProperty]
     private string _systemStatusText = "Все аквасистемы в норме";
@@ -19,13 +19,19 @@ public partial class DashboardViewModel : ObservableObject
     private bool _isAllNormal = true;
 
     [ObservableProperty]
-    private bool _hasProblems = true;
+    private bool _hasProblems = false;
 
     [ObservableProperty]
-    private string _problemTitle = "Внимание: Требуется проверка";
+    private string _problemTitle = string.Empty;
 
     [ObservableProperty]
-    private string _problemDescription = "Температура в аквариуме «Биотоп Танганьика №1» достигла 26.2 °C (выше целевой нормы на 0.2 °C).";
+    private string _problemDescription = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasAquariums))]
+    private bool _hasNoAquariums = false;
+
+    public bool HasAquariums => !HasNoAquariums;
 
     [ObservableProperty]
     private ObservableCollection<AquariumModel> _aquariums = new();
@@ -35,6 +41,11 @@ public partial class DashboardViewModel : ObservableObject
 
     [ObservableProperty]
     private ObservableCollection<SensorModel> _activeSensors = new();
+
+    [ObservableProperty]
+    private ObservableCollection<DashboardEventModel> _recentEvents = new();
+
+    public bool HasRecentEvents => RecentEvents.Count > 0;
 
     [ObservableProperty]
     private ObservableCollection<RelayModel> _quickRelays = new();
@@ -52,7 +63,15 @@ public partial class DashboardViewModel : ObservableObject
     {
         IsBusy = true;
         var profile = await _identityService.GetCurrentUserAsync();
-        Greeting = $"Добрый день, {profile.FullName.Split(' ')[0]}!";
+        if (!string.IsNullOrWhiteSpace(profile.FullName))
+        {
+            var firstName = profile.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0];
+            Greeting = $"Добрый день, {firstName}!";
+        }
+        else
+        {
+            Greeting = "Добро пожаловать!";
+        }
 
         var list = await _aquariumService.GetAquariumsAsync();
         Aquariums.Clear();
@@ -61,13 +80,67 @@ public partial class DashboardViewModel : ObservableObject
             Aquariums.Add(item);
         }
 
+        HasNoAquariums = Aquariums.Count == 0;
         SelectedAquarium = Aquariums.FirstOrDefault();
+
+        RecentEvents.Clear();
 
         if (SelectedAquarium != null)
         {
             await LoadAquariumDetailsAsync(SelectedAquarium.Id);
+
+            var offline = Aquariums.FirstOrDefault(a => !a.IsOnline);
+            if (offline != null)
+            {
+                HasProblems = true;
+                IsAllNormal = false;
+                ProblemTitle = "Внимание: Требуется проверка";
+                ProblemDescription = $"Ёмкость «{offline.Name}» не на связи с контроллером.";
+                SystemStatusText = "Требуется внимание";
+            }
+            else
+            {
+                HasProblems = false;
+                IsAllNormal = true;
+                ProblemTitle = string.Empty;
+                ProblemDescription = string.Empty;
+                SystemStatusText = "Все аквасистемы в норме";
+            }
+
+            foreach (var aq in Aquariums)
+            {
+                if (!aq.IsOnline)
+                {
+                    RecentEvents.Add(new DashboardEventModel
+                    {
+                        TimeText = DateTime.Now.ToString("HH:mm"),
+                        Message = $"⚠️ Ёмкость «{aq.Name}»: устройство не на связи",
+                        IsWarning = true
+                    });
+                }
+                else
+                {
+                    RecentEvents.Add(new DashboardEventModel
+                    {
+                        TimeText = DateTime.Now.ToString("HH:mm"),
+                        Message = $"Ёмкость «{aq.Name}»: данные телеметрии обновлены ({aq.TemperatureDisplay})",
+                        IsWarning = false
+                    });
+                }
+            }
+        }
+        else
+        {
+            ActiveSensors.Clear();
+            QuickRelays.Clear();
+            HasProblems = false;
+            IsAllNormal = true;
+            ProblemTitle = string.Empty;
+            ProblemDescription = string.Empty;
+            SystemStatusText = "Подключите вашу первую ёмкость";
         }
 
+        OnPropertyChanged(nameof(HasRecentEvents));
         IsBusy = false;
     }
 
@@ -111,6 +184,18 @@ public partial class DashboardViewModel : ObservableObject
     private async Task AddAquariumAsync()
     {
         await Shell.Current.GoToAsync("AddAquariumPage");
+    }
+
+    [RelayCommand]
+    private async Task AddControllerAsync()
+    {
+        await Shell.Current.GoToAsync("AddControllerPage");
+    }
+
+    [RelayCommand]
+    private async Task GoToKnowledgeBaseAsync()
+    {
+        await Shell.Current.GoToAsync("//MainTabs/KnowledgeBasePage");
     }
 
     [RelayCommand]

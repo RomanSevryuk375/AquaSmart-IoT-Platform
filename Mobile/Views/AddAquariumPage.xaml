@@ -40,7 +40,7 @@
                         <Label Text="Название ёмкости *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
                         <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
                             <Entry Text="{Binding Name}"
-                                   Placeholder="Например, Биотоп Танганьика №1"
+                                   Placeholder="Например, Домашний аквариум"
                                    PlaceholderColor="#8C93A8"
                                    TextColor="#2E3A7E"
                                    VerticalOptions="Center" />

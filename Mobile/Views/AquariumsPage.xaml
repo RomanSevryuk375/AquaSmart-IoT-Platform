@@ -51,7 +51,51 @@
         <!-- Main Scrollable List of Tank Cards (CardContainer variants) -->
         <ScrollView Grid.Row="1" x:Name="ListScroll">
             <VerticalStackLayout Spacing="14" Margin="0,0,0,16">
-                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Aquariums}" Spacing="14">
+                <!-- Empty State -->
+                <Border IsVisible="{Binding HasNoAquariums}"
+                        StrokeThickness="1"
+                        Stroke="#E1E4F2"
+                        StrokeShape="RoundRectangle 16"
+                        BackgroundColor="#FFFFFF"
+                        Padding="28"
+                        Margin="0,20,0,0">
+                    <VerticalStackLayout Spacing="16" HorizontalOptions="Center">
+                        <Border WidthRequest="80" HeightRequest="80"
+                                StrokeShape="RoundRectangle 40"
+                                BackgroundColor="#EDEFFB"
+                                StrokeThickness="0"
+                                HorizontalOptions="Center">
+                            <Label Text="🐟" FontSize="36" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+
+                        <Label Text="Ёмкостей пока нет"
+                               TextColor="#141414"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" />
+
+                        <Label Text="Добавьте ваш аквариум, террариум или палюдариум, чтобы отслеживать показатели и автоматизировать уход."
+                               TextColor="#6E6E6E"
+                               FontSize="14"
+                               HorizontalTextAlignment="Center" />
+
+                        <Button Text="+ Добавить первую ёмкость"
+                                Command="{Binding AddAquariumCommand}"
+                                BackgroundColor="#4152B0"
+                                TextColor="#FFFFFF"
+                                CornerRadius="12"
+                                HeightRequest="48"
+                                Padding="20,0"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="14"
+                                Margin="0,8,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Aquariums}"
+                                     IsVisible="{Binding HasAquariums}"
+                                     Spacing="14">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate x:DataType="models:AquariumModel">
                             <!-- CardContainer with Figma Theme Color -->

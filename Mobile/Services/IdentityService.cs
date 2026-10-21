@@ -8,22 +8,32 @@ public sealed class IdentityService : IIdentityService
     private const string AccessTokenKey = "aquasmart_auth_token";
     private const string RefreshTokenKey = "aquasmart_refresh_token";
 
+    private const string SavedUserNameKey = "aquasmart_user_name";
+    private const string SavedUserEmailKey = "aquasmart_user_email";
+    private const string SavedUserPhoneKey = "aquasmart_user_phone";
+
     private readonly IApiClient _apiClient;
     private readonly object _syncLock = new();
-    private UserProfileModel _currentUser = new()
-    {
-        FullName = "Алексей Смирнов",
-        Email = "alex.smirnov@aquasmart.io",
-        Phone = "+7 (999) 123-45-67",
-        Role = "Владелец аквасистемы",
-        PushNotificationsEnabled = true,
-        CriticalAlertsOnly = false,
-        DarkThemeEnabled = false
-    };
+    private UserProfileModel _currentUser = new();
 
     public IdentityService(IApiClient apiClient)
     {
         _apiClient = apiClient;
+        LoadCachedProfile();
+    }
+
+    private void LoadCachedProfile()
+    {
+        lock (_syncLock)
+        {
+            var name = Preferences.Default.Get<string>(SavedUserNameKey, string.Empty);
+            var email = Preferences.Default.Get<string>(SavedUserEmailKey, string.Empty);
+            var phone = Preferences.Default.Get<string>(SavedUserPhoneKey, string.Empty);
+
+            if (!string.IsNullOrWhiteSpace(name)) _currentUser.FullName = name;
+            if (!string.IsNullOrWhiteSpace(email)) _currentUser.Email = email;
+            if (!string.IsNullOrWhiteSpace(phone)) _currentUser.Phone = phone;
+        }
     }
 
     public async Task<bool> IsAuthenticatedAsync()
@@ -88,6 +98,15 @@ public sealed class IdentityService : IIdentityService
         {
             SecureStorage.Default.Remove(AccessTokenKey);
             SecureStorage.Default.Remove(RefreshTokenKey);
+            Preferences.Default.Remove(SavedUserNameKey);
+            Preferences.Default.Remove(SavedUserEmailKey);
+            Preferences.Default.Remove(SavedUserPhoneKey);
+            lock (_syncLock)
+            {
+                _currentUser.FullName = string.Empty;
+                _currentUser.Email = string.Empty;
+                _currentUser.Phone = string.Empty;
+            }
         }
         catch
         {
@@ -108,19 +127,19 @@ public sealed class IdentityService : IIdentityService
                     var dto = response.Data;
                     lock (_syncLock)
                     {
-                        _currentUser.FullName = string.IsNullOrWhiteSpace(dto.Name) ? _currentUser.FullName : dto.Name;
-                        _currentUser.Email = string.IsNullOrWhiteSpace(dto.Email) ? _currentUser.Email : dto.Email;
-                        if (!string.IsNullOrWhiteSpace(dto.PhoneNumber))
-                        {
-                            _currentUser.Phone = dto.PhoneNumber;
-                        }
+                        if (!string.IsNullOrWhiteSpace(dto.Name)) _currentUser.FullName = dto.Name;
+                        if (!string.IsNullOrWhiteSpace(dto.Email)) _currentUser.Email = dto.Email;
+                        if (!string.IsNullOrWhiteSpace(dto.PhoneNumber)) _currentUser.Phone = dto.PhoneNumber;
+
+                        Preferences.Default.Set(SavedUserNameKey, _currentUser.FullName);
+                        Preferences.Default.Set(SavedUserEmailKey, _currentUser.Email);
+                        Preferences.Default.Set(SavedUserPhoneKey, _currentUser.Phone);
                     }
                 }
             }
         }
         catch
         {
-            // Offline or backend not reachable: silently fallback to local cached profile
         }
 
         lock (_syncLock)
@@ -134,6 +153,9 @@ public sealed class IdentityService : IIdentityService
         lock (_syncLock)
         {
             _currentUser = profile;
+            Preferences.Default.Set(SavedUserNameKey, _currentUser.FullName);
+            Preferences.Default.Set(SavedUserEmailKey, _currentUser.Email);
+            Preferences.Default.Set(SavedUserPhoneKey, _currentUser.Phone);
         }
 
         try

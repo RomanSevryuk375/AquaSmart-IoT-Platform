@@ -31,14 +31,14 @@
             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                 <HorizontalStackLayout Spacing="6">
                     <BoxView WidthRequest="8" HeightRequest="8" CornerRadius="4" Color="#4CAF50" VerticalOptions="Center" />
-                    <Label Text="{Binding Aquarium.Name, FallbackValue='Мой первый аквариум'}"
+                    <Label Text="{Binding Aquarium.Name, FallbackValue='Ёмкость'}"
                            TextColor="#141414"
                            FontFamily="OpenSansSemibold"
                            FontSize="18"
                            FontAttributes="Bold"
                            VerticalOptions="Center" />
                 </HorizontalStackLayout>
-                <Label Text="{Binding Aquarium.TankTypeSubtitle, FallbackValue='Аквариум • 20л'}"
+                <Label Text="{Binding Aquarium.TankTypeSubtitle}"
                        TextColor="#8C93A8"
                        FontSize="12" />
             </VerticalStackLayout>
@@ -72,7 +72,7 @@
             </Border>
         </Grid>
 
-        <!-- Controller Card (Figma: Контроллер №123) -->
+        <!-- Controller Card -->
         <Border Grid.Row="1"
                 x:Name="HeaderCard"
                 StrokeThickness="1"
@@ -83,33 +83,34 @@
                 Margin="0,0,0,14">
             <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="6">
                 <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="2">
-                    <Label Text="{Binding Aquarium.ControllerName, FallbackValue='Контроллер №123'}"
+                    <Label Text="{Binding Aquarium.ControllerName}"
                            TextColor="#141414"
                            FontFamily="OpenSansSemibold"
                            FontSize="15"
                            FontAttributes="Bold" />
-                    <Label Text="00:1A:2B:3C:4D:5E"
+                    <Label Text="{Binding Aquarium.SpeciesInfo}"
                            TextColor="#8C93A8"
                            FontSize="12" />
                 </VerticalStackLayout>
 
                 <!-- Switch on right -->
                 <Switch Grid.Row="0" Grid.Column="1"
-                        IsToggled="True"
+                        IsToggled="{Binding Aquarium.IsOnline}"
+                        IsEnabled="False"
                         OnColor="#4152B0"
                         ThumbColor="#FFFFFF"
                         VerticalOptions="Center" />
 
-                <!-- Status pill: • В сети -->
+                <!-- Status pill -->
                 <Border Grid.Row="1" Grid.Column="0"
                         HorizontalOptions="Start"
-                        BackgroundColor="#E8F5E9"
+                        BackgroundColor="{Binding Aquarium.CardThemeColor}"
                         StrokeShape="RoundRectangle 6"
                         Padding="8,3"
                         StrokeThickness="0">
                     <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
-                        <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="#4CAF50" VerticalOptions="Center" />
-                        <Label Text="В сети" TextColor="#2E7D32" FontFamily="OpenSansSemibold" FontSize="11" VerticalOptions="Center" />
+                        <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="{Binding Aquarium.StatusDotColor}" VerticalOptions="Center" />
+                        <Label Text="{Binding Aquarium.StatusSummary}" TextColor="{Binding Aquarium.StatusDotColor}" FontFamily="OpenSansSemibold" FontSize="11" VerticalOptions="Center" />
                     </HorizontalStackLayout>
                 </Border>
             </Grid>

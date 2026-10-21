@@ -12,6 +12,12 @@ public partial class AquariumsViewModel : ObservableObject
     private ObservableCollection<AquariumModel> _aquariums = new();
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasAquariums))]
+    private bool _hasNoAquariums;
+
+    public bool HasAquariums => !HasNoAquariums;
+
+    [ObservableProperty]
     private bool _isBusy;
 
     public AquariumsViewModel(IAquariumService aquariumService)
@@ -25,6 +31,7 @@ public partial class AquariumsViewModel : ObservableObject
         var list = await _aquariumService.GetAquariumsAsync();
         Aquariums.Clear();
         foreach (var a in list) Aquariums.Add(a);
+        HasNoAquariums = Aquariums.Count == 0;
         IsBusy = false;
     }
 

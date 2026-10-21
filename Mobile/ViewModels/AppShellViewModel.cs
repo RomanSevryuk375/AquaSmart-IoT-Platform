@@ -8,26 +8,41 @@ public partial class AppShellViewModel : ObservableObject
     private readonly IIdentityService _identityService;
 
     [ObservableProperty]
-    private string _userName = "Алексей Смирнов";
+    private string _userName = "Пользователь";
 
     [ObservableProperty]
-    private string _userEmail = "alex.smirnov@aquasmart.io";
+    private string _userEmail = string.Empty;
 
     [ObservableProperty]
-    private string _userRole = "Аквариумист";
+    private string _userRole = "Пользователь";
+
+    [ObservableProperty]
+    private string _userInitials = "👤";
 
     public AppShellViewModel(IIdentityService identityService)
     {
         _identityService = identityService;
-        LoadUserData();
+        RefreshUserData();
     }
 
-    private async void LoadUserData()
+    public void RefreshUserData()
     {
-        var profile = await _identityService.GetCurrentUserAsync();
-        UserName = profile.FullName;
-        UserEmail = profile.Email;
-        UserRole = profile.Role;
+        _ = LoadUserDataAsync();
+    }
+
+    private async Task LoadUserDataAsync()
+    {
+        try
+        {
+            var profile = await _identityService.GetCurrentUserAsync();
+            UserName = !string.IsNullOrWhiteSpace(profile.FullName) ? profile.FullName : "Пользователь";
+            UserEmail = profile.Email;
+            UserRole = !string.IsNullOrWhiteSpace(profile.Role) ? profile.Role : "Пользователь";
+            UserInitials = profile.Initials;
+        }
+        catch
+        {
+        }
     }
 
     [RelayCommand]

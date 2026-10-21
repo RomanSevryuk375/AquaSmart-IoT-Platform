@@ -12,39 +12,6 @@ public sealed class ControllerService : IControllerService
     public ControllerService(IApiClient apiClient)
     {
         _apiClient = apiClient;
-        SeedDemoControllers();
-    }
-
-    private void SeedDemoControllers()
-    {
-        lock (_syncLock)
-        {
-            _controllers.Add(new ControllerModel
-            {
-                Id = Guid.Parse("aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-                Name = "Контроллер Сампа №1",
-                ModelType = "AquaSmart ESP32 Pro",
-                MacAddress = "A4:CF:12:89:C4:22",
-                IpAddress = "192.168.1.145",
-                FirmwareVersion = "v2.4.1",
-                IsOnline = true,
-                LastSeen = DateTime.UtcNow.AddMinutes(-2),
-                AttachedAquariumName = "Мой первый аквариум"
-            });
-
-            _controllers.Add(new ControllerModel
-            {
-                Id = Guid.Parse("aaaaaaa2-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-                Name = "Модуль освещения WRGB",
-                ModelType = "AquaSmart LED Controller",
-                MacAddress = "DC:4F:22:11:AB:88",
-                IpAddress = "192.168.1.146",
-                FirmwareVersion = "v1.8.0",
-                IsOnline = true,
-                LastSeen = DateTime.UtcNow.AddMinutes(-1),
-                AttachedAquariumName = "Флориус Идратус"
-            });
-        }
     }
 
     public async Task<List<ControllerModel>> GetControllersAsync(CancellationToken cancellationToken = default)
@@ -52,7 +19,7 @@ public sealed class ControllerService : IControllerService
         try
         {
             var response = await _apiClient.GetAsync<List<ControllerDto>>(ApiConfiguration.Routes.Controllers, cancellationToken);
-            if (response.IsSuccess && response.Data != null && response.Data.Count > 0)
+            if (response.IsSuccess && response.Data != null)
             {
                 var mapped = response.Data.Select(dto => new ControllerModel
                 {
@@ -61,10 +28,10 @@ public sealed class ControllerService : IControllerService
                     MacAddress = dto.MacAddress,
                     IsOnline = dto.IsOnline,
                     LastSeen = dto.LastSeenAt != default ? dto.LastSeenAt : DateTime.UtcNow,
-                    ModelType = "AquaSmart ESP32 Pro",
-                    IpAddress = "192.168.1.x",
-                    FirmwareVersion = "v2.4.0",
-                    AttachedAquariumName = "Экосистема"
+                    ModelType = "AquaSmart ESP32",
+                    IpAddress = "—",
+                    FirmwareVersion = "—",
+                    AttachedAquariumName = "Не привязан"
                 }).ToList();
 
                 lock (_syncLock)

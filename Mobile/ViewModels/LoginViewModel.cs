@@ -8,10 +8,10 @@ public partial class LoginViewModel : ObservableObject
     private readonly IAuthService _authService;
 
     [ObservableProperty]
-    private string _emailOrLogin = "alex.smirnov@aquasmart.io";
+    private string _emailOrLogin = string.Empty;
 
     [ObservableProperty]
-    private string _password = "password123";
+    private string _password = string.Empty;
 
     [ObservableProperty]
     private bool _isPasswordHidden = true;

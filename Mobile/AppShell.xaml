@@ -28,7 +28,7 @@
                     HeightRequest="56"
                     WidthRequest="56"
                     HorizontalOptions="Start">
-                <Label Text="AS"
+                <Label Text="{Binding UserInitials}"
                        TextColor="#FFFFFF"
                        FontFamily="OpenSansSemibold"
                        FontSize="20"

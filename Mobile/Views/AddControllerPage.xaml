@@ -40,7 +40,7 @@
                         <Label Text="Имя контроллера *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
                         <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
                             <Entry Text="{Binding ControllerName}"
-                                   Placeholder="Например, Контроллер Саммпа №1"
+                                   Placeholder="Например, Контроллер №1"
                                    PlaceholderColor="#8C93A8"
                                    TextColor="#2E3A7E"
                                    VerticalOptions="Center" />
@@ -83,7 +83,7 @@
                         <Label Text="Привязанный аквариум" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
                         <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
                             <Entry Text="{Binding AttachedAquarium}"
-                                   Placeholder="Биотоп Танганьика №1"
+                                   Placeholder="Например, Домашний аквариум"
                                    PlaceholderColor="#8C93A8"
                                    TextColor="#2E3A7E"
                                    VerticalOptions="Center" />

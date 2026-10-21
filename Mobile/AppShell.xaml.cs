@@ -20,6 +20,15 @@ public partial class AppShell : Shell
         RegisterRoutes();
     }
 
+    protected override void OnNavigated(ShellNavigatedEventArgs args)
+    {
+        base.OnNavigated(args);
+        if (BindingContext is AppShellViewModel vm)
+        {
+            vm.RefreshUserData();
+        }
+    }
+
     private static void RegisterRoutes()
     {
         if (_routesRegistered) return;

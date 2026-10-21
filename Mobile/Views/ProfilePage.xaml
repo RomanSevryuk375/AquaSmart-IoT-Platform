@@ -24,7 +24,7 @@
                             HeightRequest="80"
                             WidthRequest="80"
                             HorizontalOptions="Center">
-                        <Label Text="AS"
+                        <Label Text="{Binding User.Initials}"
                                TextColor="#FFFFFF"
                                FontFamily="OpenSansSemibold"
                                FontSize="26"

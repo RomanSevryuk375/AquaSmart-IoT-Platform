@@ -52,7 +52,7 @@
             </Grid>
 
             <!-- Zero State: Для нового пользователя (Figma: Главная. Для нового пользователя) -->
-            <VerticalStackLayout Spacing="16" IsVisible="False">
+            <VerticalStackLayout Spacing="16" IsVisible="{Binding HasNoAquariums}">
                 <controls:FishMascotCard HeightOverride="220"
                                          BadgeText="⚙️"
                                          BadgeColor="#7BA028" />
@@ -63,13 +63,14 @@
                        FontSize="20"
                        FontAttributes="Bold" />
 
-                <Label Text="Контроллер соединяет приложение с вашей ёмкостью — отсканируйте QR-код на устройстве, чтобы начать"
+                <Label Text="Контроллер соединяет приложение с вашей ёмкостью — добавьте контроллер или создайте ёмкость, чтобы начать"
                        TextColor="#6E6E6E"
                        FontFamily="OpenSansRegular"
                        FontSize="14"
                        LineHeight="1.3" />
 
-                <Button Text="Сканировать QR-код"
+                <Button Text="Подключить контроллер"
+                        Command="{Binding AddControllerCommand}"
                         BackgroundColor="#4152B0"
                         TextColor="#FFFFFF"
                         FontFamily="OpenSansSemibold"
@@ -78,7 +79,8 @@
                         HeightRequest="48"
                         Margin="0,8,0,0" />
 
-                <Button Text="Изучить базу знаний"
+                <Button Text="Добавить ёмкость"
+                        Command="{Binding AddAquariumCommand}"
                         BackgroundColor="Transparent"
                         BorderColor="#4152B0"
                         BorderWidth="1.5"
@@ -87,13 +89,22 @@
                         FontSize="14"
                         CornerRadius="12"
                         HeightRequest="48" />
+
+                <Button Text="Изучить базу знаний"
+                        Command="{Binding GoToKnowledgeBaseCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="#6E6E6E"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="14"
+                        HeightRequest="44" />
             </VerticalStackLayout>
 
             <!-- Status Banner (Amber: Есть проблемы / Green: Всё хорошо) -->
             <Border x:Name="AlertCard"
+                    IsVisible="{Binding HasProblems}"
                     StrokeThickness="0"
                     StrokeShape="RoundRectangle 12"
-                    BackgroundColor="{Binding HasProblems, Converter={StaticResource InvertedBoolConverter}, ConverterParameter='#FFF9E6', FallbackValue='#FFF9E6'}"
+                    BackgroundColor="#FFF9E6"
                     Padding="14,12">
                 <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
                     <!-- Warning / Success Icon Badge -->
@@ -106,22 +117,20 @@
                         <Label Text="⚠️" FontSize="13" HorizontalOptions="Center" VerticalOptions="Center" />
                     </Border>
 
-                    <Label Grid.Column="1"
-                           Text="Обнаружены проблемы: 2"
-                           TextColor="#E65100"
-                           FontFamily="OpenSansSemibold"
-                           FontSize="14"
-                           VerticalOptions="Center" />
-
-                    <Image Grid.Column="2"
-                           Source="icon_chevron_down.png"
-                           WidthRequest="16" HeightRequest="16"
-                           VerticalOptions="Center" />
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                        <Label Text="{Binding ProblemTitle}"
+                               TextColor="#E65100"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="14" />
+                        <Label Text="{Binding ProblemDescription}"
+                               TextColor="#BF360C"
+                               FontSize="12" />
+                    </VerticalStackLayout>
                 </Grid>
             </Border>
 
             <!-- Section 1: Все ёмкости (Figma: Все ёмкости - MainStateCard variants) -->
-            <VerticalStackLayout x:Name="AquariumsSection" Spacing="10">
+            <VerticalStackLayout x:Name="AquariumsSection" Spacing="10" IsVisible="{Binding HasAquariums}">
                 <Grid ColumnDefinitions="*,Auto">
                     <Label Grid.Column="0"
                            Text="Все ёмкости"
@@ -193,42 +202,33 @@
             </VerticalStackLayout>
 
             <!-- Section 2: Последние события (Figma Timeline Events) -->
-            <VerticalStackLayout x:Name="TelemetrySection" Spacing="10">
+            <VerticalStackLayout x:Name="TelemetrySection" Spacing="10" IsVisible="{Binding HasRecentEvents}">
                 <Label Text="Последние события"
                        TextColor="#141414"
                        FontFamily="OpenSansSemibold"
                        FontSize="16"
                        FontAttributes="Bold" />
 
-                <VerticalStackLayout Spacing="8">
-                    <!-- Event 1 -->
-                    <Border StrokeThickness="1" Stroke="#E4E7F4" BackgroundColor="#FFFFFF" StrokeShape="RoundRectangle 10" Padding="12">
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                            <Label Grid.Column="0" Text="14:30" TextColor="#8C93A8" FontSize="12" FontFamily="OpenSansSemibold" VerticalOptions="Start" />
-                            <Label Grid.Column="1" Text="Сценарий «Световой день»: освещение в палюдариуме «Домик Черепахи» включено" TextColor="#141414" FontSize="13" LineHeight="1.25" />
-                        </Grid>
-                    </Border>
-
-                    <!-- Event 2 -->
-                    <Border StrokeThickness="1" Stroke="#E4E7F4" BackgroundColor="#FFFFFF" StrokeShape="RoundRectangle 10" Padding="12">
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                            <Label Grid.Column="0" Text="13:05" TextColor="#8C93A8" FontSize="12" FontFamily="OpenSansSemibold" VerticalOptions="Start" />
-                            <Label Grid.Column="1" Text="Нагреватель в аквариуме «Мой первый аквариум» активирован автоматикой" TextColor="#141414" FontSize="13" LineHeight="1.25" />
-                        </Grid>
-                    </Border>
-
-                    <!-- Event 3: Warning event -->
-                    <Border StrokeThickness="1" Stroke="#FFE082" BackgroundColor="#FFF9E6" StrokeShape="RoundRectangle 10" Padding="12">
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                            <Label Grid.Column="0" Text="10:17" TextColor="#E65100" FontSize="12" FontFamily="OpenSansSemibold" VerticalOptions="Start" />
-                            <Label Grid.Column="1" Text="⚠️ Температура в палюдариуме «Домик Черепахи» упала ниже порога (19.5°C)" TextColor="#BF360C" FontSize="13" LineHeight="1.25" />
-                        </Grid>
-                    </Border>
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding RecentEvents}" Spacing="8">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="models:DashboardEventModel">
+                            <Border StrokeThickness="1"
+                                    Stroke="{Binding BorderColor}"
+                                    BackgroundColor="{Binding BackgroundColor}"
+                                    StrokeShape="RoundRectangle 10"
+                                    Padding="12">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                    <Label Grid.Column="0" Text="{Binding TimeText}" TextColor="{Binding TimeColor}" FontSize="12" FontFamily="OpenSansSemibold" VerticalOptions="Start" />
+                                    <Label Grid.Column="1" Text="{Binding Message}" TextColor="#141414" FontSize="13" LineHeight="1.25" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
                 </VerticalStackLayout>
             </VerticalStackLayout>
 
             <!-- Section 3: Быстрое управление реле (Quick Controls) -->
-            <VerticalStackLayout x:Name="RelaysSection" Spacing="10">
+            <VerticalStackLayout x:Name="RelaysSection" Spacing="10" IsVisible="{Binding HasAquariums}">
                 <Grid ColumnDefinitions="*,Auto">
                     <Label Grid.Column="0"
                            Text="Управление устройствами"

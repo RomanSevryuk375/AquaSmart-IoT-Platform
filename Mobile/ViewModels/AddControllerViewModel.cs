@@ -14,10 +14,10 @@ public partial class AddControllerViewModel : ObservableObject
     private string _modelType = "ESP32-AquaHub v2";
 
     [ObservableProperty]
-    private string _macAddress = "24:6F:28:B4:72:01";
+    private string _macAddress = string.Empty;
 
     [ObservableProperty]
-    private string _attachedAquarium = "Биотоп Танганьика №1";
+    private string _attachedAquarium = string.Empty;
 
     public AddControllerViewModel(IControllerService controllerService)
     {
