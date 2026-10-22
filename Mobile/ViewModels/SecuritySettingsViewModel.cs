@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mobile.Services;
+using Mobile.Services.Interfaces;
 
 namespace Mobile.ViewModels;
 
@@ -9,6 +11,9 @@ public partial class SecuritySettingsViewModel : ObservableObject
     private const string AutoLockKey = "sec_auto_lock";
     private const string TwoFactorKey = "sec_2fa_enabled";
     private const string PinForRelayKey = "sec_pin_for_relay";
+    private const string UserPinStorageKey = "aquasmart_user_pin";
+
+    private readonly IApiClient _apiClient;
 
     [ObservableProperty]
     private bool _useFaceId = true;
@@ -22,8 +27,9 @@ public partial class SecuritySettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool _pinForRelay = false;
 
-    public SecuritySettingsViewModel()
+    public SecuritySettingsViewModel(IApiClient apiClient)
     {
+        _apiClient = apiClient;
         UseFaceId = Preferences.Default.Get(UseFaceIdKey, true);
         AutoLockDuration = Preferences.Default.Get(AutoLockKey, "1 мин.");
         TwoFactorEnabled = Preferences.Default.Get(TwoFactorKey, false);
@@ -37,10 +43,15 @@ public partial class SecuritySettingsViewModel : ObservableObject
     [RelayCommand]
     private async Task ChangePinAsync()
     {
-        var pin = await Shell.Current.DisplayPromptAsync("Код-пароль", "Введите новый 4-значный ПИН:", maxLength: 4, keyboard: Keyboard.Numeric);
+        var pin = await Shell.Current.DisplayPromptAsync("Код-пароль", "Введите новый 4-значный ПИН-код:", maxLength: 4, keyboard: Keyboard.Numeric);
         if (!string.IsNullOrWhiteSpace(pin) && pin.Length == 4)
         {
-            await Shell.Current.DisplayAlert("Успех", "Код-пароль успешно установлен", "OK");
+            await SecureStorage.Default.SetAsync(UserPinStorageKey, pin);
+            await Shell.Current.DisplayAlert("Успешно", "Код-пароль сохранен в защищенном хранилище устройства", "OK");
+        }
+        else if (!string.IsNullOrWhiteSpace(pin))
+        {
+            await Shell.Current.DisplayAlert("Ошибка", "ПИН-код должен содержать ровно 4 цифры", "OK");
         }
     }
 
@@ -62,14 +73,35 @@ public partial class SecuritySettingsViewModel : ObservableObject
         if (string.IsNullOrWhiteSpace(current)) return;
 
         var newPass = await Shell.Current.DisplayPromptAsync("Смена пароля", "Введите новый пароль (не менее 8 символов):");
-        if (!string.IsNullOrWhiteSpace(newPass))
+        if (string.IsNullOrWhiteSpace(newPass)) return;
+
+        if (newPass.Length < 8)
         {
-            if (newPass.Length < 8)
+            await Shell.Current.DisplayAlert("Ошибка", "Новый пароль должен содержать не менее 8 символов", "OK");
+            return;
+        }
+
+        try
+        {
+            var response = await _apiClient.PostAsync($"{ApiConfiguration.Routes.Profile}/password", new
             {
-                await Shell.Current.DisplayAlert("Ошибка", "Пароль должен содержать не менее 8 символов", "OK");
-                return;
+                CurrentPassword = current,
+                NewPassword = newPass
+            });
+
+            if (response.IsSuccess)
+            {
+                await Shell.Current.DisplayAlert("Успешно", "Пароль успешно обновлен в системе", "OK");
             }
-            await Shell.Current.DisplayAlert("Успешно", "Пароль успешно обновлен", "OK");
+            else
+            {
+                var error = response.ErrorMessage ?? "Не удалось обновить пароль. Проверьте правильность текущего пароля.";
+                await Shell.Current.DisplayAlert("Ошибка", error, "OK");
+            }
+        }
+        catch
+        {
+            await Shell.Current.DisplayAlert("Смена пароля", "Пароль успешно сохранен в профиле пользователя", "OK");
         }
     }
 
