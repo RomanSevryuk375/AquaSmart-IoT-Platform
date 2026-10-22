@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Mobile.ViewModels"
+             x:Class="Mobile.Views.AppSettingsPage"
+             x:DataType="vm:AppSettingsViewModel"
+             BackgroundColor="#F6F7FC"
+             Shell.NavBarIsVisible="False"
+             Title="Настройки приложения">
+
+    <Grid RowDefinitions="Auto,*" Padding="20,16,20,10">
+        <!-- Top Bar: Back Button, Title, Bell matching Figma 760:12086 -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Margin="0,4,0,16">
+            <Border Grid.Column="0"
+                    WidthRequest="38" HeightRequest="38"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="#FFFFFF"
+                    StrokeThickness="1"
+                    Stroke="#E4E7F4">
+                <ImageButton Source="icon_chevron_left.png"
+                             Command="{Binding GoBackCommand}"
+                             BackgroundColor="Transparent"
+                             WidthRequest="20" HeightRequest="20"
+                             Padding="0"
+                             HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+
+            <Label Grid.Column="1"
+                   Text="Настройки приложения"
+                   TextColor="#141414"
+                   FontFamily="OpenSansSemibold"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center" />
+
+            <Border Grid.Column="2"
+                    WidthRequest="38" HeightRequest="38"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="#FFFFFF"
+                    StrokeThickness="1"
+                    Stroke="#E4E7F4">
+                <ImageButton Source="icon_bell.png"
+                             BackgroundColor="Transparent"
+                             WidthRequest="18" HeightRequest="18"
+                             Padding="0"
+                             HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+        </Grid>
+
+        <!-- Scrollable Settings Sections -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="20" Padding="0,0,0,24">
+                <!-- 1. Внешний вид -->
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Внешний вид"
+                           TextColor="#141414"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="16"
+                           FontAttributes="Bold" />
+
+                    <Border StrokeThickness="1"
+                            Stroke="#E8EAF5"
+                            StrokeShape="RoundRectangle 16"
+                            BackgroundColor="#FFFFFF"
+                            Padding="16,6">
+                        <VerticalStackLayout Spacing="0">
+                            <!-- Тема интерфейса -->
+                            <Grid ColumnDefinitions="*,Auto" HeightRequest="56">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ChooseThemeCommand}" />
+                                </Grid.GestureRecognizers>
+                                <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                                    <Label Text="Тема интерфейса" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
+                                    <Label Text="{Binding CurrentTheme}" TextColor="#6E6E6E" FontSize="13" />
+                                </VerticalStackLayout>
+                                <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                            </Grid>
+
+                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+
+                            <!-- Язык приложения -->
+                            <Grid ColumnDefinitions="*,Auto" HeightRequest="56">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ChooseLanguageCommand}" />
+                                </Grid.GestureRecognizers>
+                                <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                                    <Label Text="Язык приложения" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
+                                    <Label Text="{Binding CurrentLanguage}" TextColor="#6E6E6E" FontSize="13" />
+                                </VerticalStackLayout>
+                                <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- 2. Уведомления -->
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Уведомления"
+                           TextColor="#141414"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="16"
+                           FontAttributes="Bold" />
+
+                    <Border StrokeThickness="1"
+                            Stroke="#E8EAF5"
+                            StrokeShape="RoundRectangle 16"
+                            BackgroundColor="#FFFFFF"
+                            Padding="16,6">
+                        <VerticalStackLayout Spacing="0">
+                            <!-- Аварийные сигналы -->
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" Padding="0,10">
+                                <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                                    <Label Text="Аварийные сигналы" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
+                                    <Label Text="Оповещения о выходе показателей датчиков за критические пределы или протечках"
+                                           TextColor="#6E6E6E" FontSize="12" LineBreakMode="WordWrap" />
+                                </VerticalStackLayout>
+                                <Switch Grid.Column="1"
+                                        IsToggled="{Binding EmergencyAlerts}"
+                                        OnColor="#4152B0"
+                                        VerticalOptions="Center" />
+                            </Grid>
+
+                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+
+                            <!-- Потеря связи с платой -->
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" Padding="0,10">
+                                <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                                    <Label Text="Потеря связи с платой" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
+                                    <Label Text="Уведомления, если контроллер потерял связь с сетью или снова вернулся в сеть"
+                                           TextColor="#6E6E6E" FontSize="12" LineBreakMode="WordWrap" />
+                                </VerticalStackLayout>
+                                <Switch Grid.Column="1"
+                                        IsToggled="{Binding ConnectionLossAlerts}"
+                                        OnColor="#4152B0"
+                                        VerticalOptions="Center" />
+                            </Grid>
+
+                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+
+                            <!-- Запуск сценариев -->
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" Padding="0,10">
+                                <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                                    <Label Text="Запуск сценариев" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
+                                    <Label Text="Короткие пуши о том, что реле успешно включилось по таймеру или датчику"
+                                           TextColor="#6E6E6E" FontSize="12" LineBreakMode="WordWrap" />
+                                </VerticalStackLayout>
+                                <Switch Grid.Column="1"
+                                        IsToggled="{Binding ScenarioAlerts}"
+                                        OnColor="#4152B0"
+                                        VerticalOptions="Center" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- 3. Данные -->
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Данные"
+                           TextColor="#141414"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="16"
+                           FontAttributes="Bold" />
+
+                    <Border StrokeThickness="1"
+                            Stroke="#E8EAF5"
+                            StrokeShape="RoundRectangle 16"
+                            BackgroundColor="#FFFFFF"
+                            Padding="16,6">
+                        <VerticalStackLayout Spacing="0">
+                            <!-- Обновление экранов -->
+                            <Grid ColumnDefinitions="*,Auto" HeightRequest="56">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ChooseRefreshIntervalCommand}" />
+                                </Grid.GestureRecognizers>
+                                <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                                    <Label Text="Обновление экранов" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
+                                    <Label Text="{Binding RefreshInterval}" TextColor="#6E6E6E" FontSize="13" />
+                                </VerticalStackLayout>
+                                <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                            </Grid>
+
+                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+
+                            <!-- Экономия трафика (Wi-Fi) -->
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" HeightRequest="52">
+                                <Label Text="Экономия трафика (Wi-Fi)" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                                <Switch Grid.Column="1"
+                                        IsToggled="{Binding TrafficSaving}"
+                                        OnColor="#4152B0"
+                                        VerticalOptions="Center" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>
