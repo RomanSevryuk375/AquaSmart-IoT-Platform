@@ -19,26 +19,31 @@ public partial class MainPage : ContentPage
         {
             // Figma Preloader Animation (8-stage sequence)
             // Stage 1-3: Fish enters from left and swims to center
-            await SwimmingFish.TranslateTo(0, 0, 750, Easing.CubicOut);
+            await PreloaderContainer.TranslateTo(0, 0, 750, Easing.CubicOut);
 
-            // Stage 4-6: Rising Bubbles
+            // Stage 4: Bubble 1 appears at mouth
             await Task.WhenAll(
-                Bubble1.FadeTo(0.9, 200),
-                Bubble1.TranslateTo(0, -18, 300, Easing.SinOut)
+                Bubble1.FadeTo(1.0, 150),
+                Bubble1.ScaleTo(1.0, 200, Easing.SpringOut)
             );
 
+            // Stage 5: Bubble 2 appears
             await Task.WhenAll(
-                Bubble2.FadeTo(0.9, 200),
-                Bubble2.TranslateTo(0, -26, 300, Easing.SinOut)
+                Bubble2.FadeTo(1.0, 150),
+                Bubble2.ScaleTo(1.0, 200, Easing.SpringOut)
             );
 
+            // Stage 6: Bubble 3 appears
             await Task.WhenAll(
-                Bubble3.FadeTo(0.9, 200),
-                Bubble3.TranslateTo(0, -32, 300, Easing.SinOut)
+                Bubble3.FadeTo(1.0, 150),
+                Bubble3.ScaleTo(1.0, 200, Easing.SpringOut)
             );
+
+            // Brief pause at complete 3-bubble state (matching Figma Frame 6)
+            await Task.Delay(350);
 
             // Stage 7: Fish exits gently right while logo appears
-            _ = SwimmingFish.TranslateTo(200, 0, 600, Easing.CubicIn);
+            _ = PreloaderContainer.TranslateTo(260, 0, 500, Easing.CubicIn);
             _ = PreloaderContainer.FadeTo(0, 450);
 
             // Stage 8: Reveal brand logo & CTA buttons

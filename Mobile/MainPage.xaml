@@ -16,43 +16,45 @@
 
             <!-- Preloader Animation Container (Figma Preloader 8-stage component) -->
             <Grid x:Name="PreloaderContainer"
-                  WidthRequest="320"
-                  HeightRequest="220"
+                  WidthRequest="144"
+                  HeightRequest="91"
                   HorizontalOptions="Center"
-                  VerticalOptions="Center">
+                  VerticalOptions="Center"
+                  TranslationX="-320">
 
-                <!-- Swimming Fish Mascot -->
+                <!-- Swimming Fish Mascot (without bubbles) -->
                 <Image x:Name="SwimmingFish"
-                       Source="fish_mascot_light.png"
-                       WidthRequest="130"
-                       HeightRequest="80"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center"
-                       TranslationX="-300" />
+                       Source="preloader_fish.png"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"
+                       Aspect="AspectFit" />
 
-                <!-- Rising Bubble 1 -->
-                <Ellipse x:Name="Bubble1"
-                         WidthRequest="14" HeightRequest="14"
-                         Fill="#DCE2F9"
-                         Opacity="0"
-                         HorizontalOptions="Center" VerticalOptions="Center"
-                         Margin="70,-10,0,0" />
+                <!-- Rising Bubble 1 (exact Figma vector position) -->
+                <Image x:Name="Bubble1"
+                       Source="preloader_bubble1.png"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"
+                       Aspect="AspectFit"
+                       Opacity="0"
+                       Scale="0.3" />
 
-                <!-- Rising Bubble 2 -->
-                <Ellipse x:Name="Bubble2"
-                         WidthRequest="10" HeightRequest="10"
-                         Fill="#DCE2F9"
-                         Opacity="0"
-                         HorizontalOptions="Center" VerticalOptions="Center"
-                         Margin="88,-32,0,0" />
+                <!-- Rising Bubble 2 (exact Figma vector position) -->
+                <Image x:Name="Bubble2"
+                       Source="preloader_bubble2.png"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"
+                       Aspect="AspectFit"
+                       Opacity="0"
+                       Scale="0.3" />
 
-                <!-- Rising Bubble 3 -->
-                <Ellipse x:Name="Bubble3"
-                         WidthRequest="7" HeightRequest="7"
-                         Fill="#DCE2F9"
-                         Opacity="0"
-                         HorizontalOptions="Center" VerticalOptions="Center"
-                         Margin="80,-52,0,0" />
+                <!-- Rising Bubble 3 (exact Figma vector position) -->
+                <Image x:Name="Bubble3"
+                       Source="preloader_bubble3.png"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"
+                       Aspect="AspectFit"
+                       Opacity="0"
+                       Scale="0.3" />
             </Grid>
 
             <!-- Final Brand Logo Image (SMART AQUA + Mascot) -->
