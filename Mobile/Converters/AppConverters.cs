@@ -41,6 +41,16 @@ public class InvertedBoolConverter : InverseBoolConverter
 {
 }
 
+public class StringIsNotNullOrEmptyConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is string s && !string.IsNullOrWhiteSpace(s);
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
+}
+
 public class TabActiveColorConverter : IValueConverter
 {
     public Color ActiveColor { get; set; } = Color.FromArgb("#4152B0");
@@ -68,4 +78,3 @@ public class TabActiveTextColorConverter : IValueConverter
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
 }
-

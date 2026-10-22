@@ -5,100 +5,216 @@
              xmlns:models="clr-namespace:Mobile.Models"
              x:Class="Mobile.Views.KnowledgeBasePage"
              x:DataType="vm:KnowledgeBaseViewModel"
-             BackgroundColor="#F6F7FC"
+             BackgroundColor="#FFFFFF"
+             Shell.NavBarIsVisible="False"
              Title="База знаний">
 
-    <Grid RowDefinitions="Auto,*" Padding="20,16,20,10">
-        <!-- Search bar -->
-        <Border Grid.Row="0"
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="20,16,20,10">
+        <!-- Top Bar matching Figma: Title & Bell Icon -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,4,0,16">
+            <Label Grid.Column="0"
+                   Text="База знаний"
+                   TextColor="#141414"
+                   FontFamily="OpenSansSemibold"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center" />
+
+            <Border Grid.Column="1"
+                    WidthRequest="38" HeightRequest="38"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="#F6F7FC"
+                    StrokeThickness="0">
+                <ImageButton Source="icon_bell.png"
+                             BackgroundColor="Transparent"
+                             WidthRequest="20" HeightRequest="20"
+                             Padding="0"
+                             HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+        </Grid>
+
+        <!-- Search Bar matching Figma: Rounded, with icon and placeholder 'Поиск статей' -->
+        <Border Grid.Row="1"
                 x:Name="SearchBarBorder"
                 StrokeThickness="1"
                 Stroke="#E4E7F4"
                 StrokeShape="RoundRectangle 14"
                 BackgroundColor="#FFFFFF"
-                HeightRequest="50"
+                HeightRequest="48"
                 Padding="14,0"
                 Margin="0,0,0,16">
-            <Grid ColumnDefinitions="*,Auto">
-                <Entry Grid.Column="0"
+            <Grid ColumnDefinitions="Auto,*">
+                <Image Grid.Column="0"
+                       Source="icon_search.png"
+                       WidthRequest="18" HeightRequest="18"
+                       VerticalOptions="Center"
+                       Margin="0,0,10,0" />
+                <Entry Grid.Column="1"
                        Text="{Binding SearchQuery}"
-                       Placeholder="Поиск рекомендаций, норм и видов..."
+                       Placeholder="Поиск статей"
                        PlaceholderColor="#8C93A8"
-                       TextColor="#2E3A7E"
+                       TextColor="#141414"
                        ReturnCommand="{Binding SearchCommand}"
                        VerticalOptions="Center" />
-
-                <Button Grid.Column="1"
-                        Text="Найти"
-                        Command="{Binding SearchCommand}"
-                        BackgroundColor="#4152B0"
-                        TextColor="#FFFFFF"
-                        CornerRadius="10"
-                        HeightRequest="36"
-                        Padding="14,0"
-                        FontSize="13"
-                        FontFamily="OpenSansSemibold"
-                        VerticalOptions="Center" />
             </Grid>
         </Border>
 
-        <!-- Articles List -->
-        <RefreshView Grid.Row="1"
+        <!-- Category Filter Chips matching Figma: ВСЕ, АКВАРИУМ, ТЕРРАРИУМ, ПАЛЮДАРИУМ -->
+        <ScrollView Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalScrollBarVisibility="Never"
+                    Margin="0,0,0,16">
+            <HorizontalStackLayout Spacing="8">
+                <!-- ВСЕ -->
+                <Button Text="ВСЕ"
+                        Command="{Binding SelectCategoryCommand}"
+                        CommandParameter="ВСЕ"
+                        HeightRequest="36"
+                        Padding="16,0"
+                        CornerRadius="10"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="12">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding SelectedCategory}" Value="ВСЕ">
+                            <Setter Property="BackgroundColor" Value="#4152B0" />
+                            <Setter Property="TextColor" Value="#FFFFFF" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="BackgroundColor" Value="#EDEFFB" />
+                            <Setter Property="TextColor" Value="#4152B0" />
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <!-- АКВАРИУМ -->
+                <Button Text="АКВАРИУМ"
+                        Command="{Binding SelectCategoryCommand}"
+                        CommandParameter="АКВАРИУМ"
+                        HeightRequest="36"
+                        Padding="16,0"
+                        CornerRadius="10"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="12">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding SelectedCategory}" Value="АКВАРИУМ">
+                            <Setter Property="BackgroundColor" Value="#4152B0" />
+                            <Setter Property="TextColor" Value="#FFFFFF" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="BackgroundColor" Value="#EDEFFB" />
+                            <Setter Property="TextColor" Value="#4152B0" />
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <!-- ТЕРРАРИУМ -->
+                <Button Text="ТЕРРАРИУМ"
+                        Command="{Binding SelectCategoryCommand}"
+                        CommandParameter="ТЕРРАРИУМ"
+                        HeightRequest="36"
+                        Padding="16,0"
+                        CornerRadius="10"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="12">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding SelectedCategory}" Value="ТЕРРАРИУМ">
+                            <Setter Property="BackgroundColor" Value="#4152B0" />
+                            <Setter Property="TextColor" Value="#FFFFFF" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="BackgroundColor" Value="#EDEFFB" />
+                            <Setter Property="TextColor" Value="#4152B0" />
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <!-- ПАЛЮДАРИУМ -->
+                <Button Text="ПАЛЮДАРИУМ"
+                        Command="{Binding SelectCategoryCommand}"
+                        CommandParameter="ПАЛЮДАРИУМ"
+                        HeightRequest="36"
+                        Padding="16,0"
+                        CornerRadius="10"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="12">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding SelectedCategory}" Value="ПАЛЮДАРИУМ">
+                            <Setter Property="BackgroundColor" Value="#4152B0" />
+                            <Setter Property="TextColor" Value="#FFFFFF" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="BackgroundColor" Value="#EDEFFB" />
+                            <Setter Property="TextColor" Value="#4152B0" />
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </HorizontalStackLayout>
+        </ScrollView>
+
+        <!-- Articles List matching Figma cards: 2-tone rounded cards with colored accent header -->
+        <RefreshView Grid.Row="3"
                      x:Name="ArticlesRefresh"
                      IsRefreshing="{Binding IsBusy}"
                      Command="{Binding SearchCommand}">
             <CollectionView ItemsSource="{Binding Articles}"
                             SelectionMode="None">
                 <CollectionView.ItemsLayout>
-                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="12" />
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="14" />
                 </CollectionView.ItemsLayout>
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:KnowledgeArticleModel">
-                        <Border StrokeThickness="1"
-                                Stroke="#E4E7F4"
+                        <Border StrokeThickness="1.5"
+                                Stroke="{Binding BorderColor}"
                                 StrokeShape="RoundRectangle 16"
                                 BackgroundColor="#FFFFFF"
-                                Padding="16">
+                                Padding="0">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:KnowledgeBaseViewModel}}, Path=SelectArticleCommand}"
                                                       CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
 
-                            <VerticalStackLayout Spacing="8">
-                                <Grid ColumnDefinitions="*,Auto">
-                                    <Label Grid.Column="0"
-                                           Text="{Binding Title}"
-                                           TextColor="#2E3A7E"
-                                           FontFamily="OpenSansSemibold"
-                                           FontSize="16"
-                                           FontAttributes="Bold"
-                                           LineBreakMode="WordWrap" />
+                            <VerticalStackLayout Spacing="0">
+                                <!-- Top Accent Banner with Icon & Title -->
+                                <Border StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 14,14,0,0"
+                                        BackgroundColor="{Binding HeaderBgColor}"
+                                        Padding="16,14">
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                        <Label Grid.Column="0"
+                                               Text="{Binding Icon}"
+                                               FontSize="22"
+                                               VerticalOptions="Center" />
 
-                                    <Border Grid.Column="1"
-                                            StrokeThickness="0"
-                                            StrokeShape="RoundRectangle 8"
-                                            BackgroundColor="#EDEFFB"
-                                            Padding="8,4"
-                                            VerticalOptions="Start">
-                                        <Label Text="{Binding Category}"
-                                               TextColor="#4152B0"
+                                        <Label Grid.Column="1"
+                                               Text="{Binding Title}"
+                                               TextColor="#141414"
                                                FontFamily="OpenSansSemibold"
-                                               FontSize="11" />
-                                    </Border>
-                                </Grid>
+                                               FontSize="15"
+                                               FontAttributes="Bold"
+                                               LineBreakMode="WordWrap"
+                                               VerticalOptions="Center" />
+                                    </Grid>
+                                </Border>
 
-                                <Label Text="{Binding Summary}"
-                                       TextColor="#6A738A"
-                                       FontSize="13"
-                                       LineBreakMode="TailTruncation"
-                                       MaxLines="3" />
-
-                                <Label Text="Подробнее →"
-                                       TextColor="#4152B0"
-                                       FontFamily="OpenSansSemibold"
-                                       FontSize="12"
-                                       Margin="0,4,0,0" />
+                                <!-- Bottom Description Section -->
+                                <VerticalStackLayout BackgroundColor="#FFFFFF"
+                                                     Padding="16,14"
+                                                     Spacing="8">
+                                    <Label Text="{Binding Summary}"
+                                           TextColor="#6E6E6E"
+                                           FontSize="13"
+                                           LineHeight="1.25"
+                                           LineBreakMode="WordWrap" />
+                                </VerticalStackLayout>
                             </VerticalStackLayout>
                         </Border>
                     </DataTemplate>

@@ -13,6 +13,7 @@
 
             <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
             <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <converters:StringIsNotNullOrEmptyConverter x:Key="StringIsNotNullOrEmptyConverter" />
             <converters:TabActiveColorConverter x:Key="TabActiveBgConverter" />
             <converters:TabActiveTextColorConverter x:Key="TabActiveTextConverter" />
         </ResourceDictionary>
