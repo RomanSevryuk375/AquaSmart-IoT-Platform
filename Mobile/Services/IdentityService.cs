@@ -164,7 +164,7 @@ public sealed class IdentityService : IIdentityService
             if (isAuth)
             {
                 var request = new UpdateProfileRequestDto(profile.FullName, profile.Phone);
-                await _apiClient.PutAsync(ApiConfiguration.Routes.Profile, request, cancellationToken);
+                await _apiClient.PutAsync($"{ApiConfiguration.Routes.Profile}/me", request, cancellationToken);
             }
         }
         catch

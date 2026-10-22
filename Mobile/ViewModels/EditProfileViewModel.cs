@@ -43,12 +43,21 @@ public partial class EditProfileViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveProfileAsync()
     {
+        if (string.IsNullOrWhiteSpace(FullName))
+        {
+            await Shell.Current.DisplayAlert("Ошибка", "Пожалуйста, укажите ваше имя", "OK");
+            return;
+        }
+
+        var normalizedPhone = Phone?.Trim() ?? string.Empty;
+        var cleanDigitsPhone = normalizedPhone.Replace(" ", "").Replace("(", "").Replace(")", "").Replace("-", "");
+
         IsBusy = true;
         var profile = new UserProfileModel
         {
-            FullName = FullName,
-            Email = Email,
-            Phone = Phone
+            FullName = FullName.Trim(),
+            Email = Email.Trim(),
+            Phone = !string.IsNullOrWhiteSpace(cleanDigitsPhone) ? cleanDigitsPhone : normalizedPhone
         };
 
         await _identityService.UpdateCurrentUserAsync(profile);
