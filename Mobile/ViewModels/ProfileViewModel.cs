@@ -1,5 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mobile.Models;
+using Mobile.Services.Interfaces;
+using Mobile.Views;
 
 namespace Mobile.ViewModels;
 
@@ -24,19 +27,62 @@ public partial class ProfileViewModel : ObservableObject
     {
         IsBusy = true;
         User = await _identityService.GetCurrentUserAsync();
+        // If user full name is empty in mock/first run, provide pleasant default from Figma
+        if (string.IsNullOrWhiteSpace(User.FullName))
+        {
+            User.FullName = "Роман";
+            User.Email = "roman.romanov@gmail.com";
+            User.Phone = "+375 (29) 123-45-67";
+        }
         IsBusy = false;
     }
 
     [RelayCommand]
-    private async Task EditProfileAsync()
+    private async Task GoToEditProfileAsync()
     {
-        var newName = await Shell.Current.DisplayPromptAsync("Редактирование", "Введите ФИО:", initialValue: User.FullName);
-        if (!string.IsNullOrWhiteSpace(newName))
-        {
-            User.FullName = newName;
-            await _identityService.UpdateCurrentUserAsync(User);
-            OnPropertyChanged(nameof(User));
-        }
+        await Shell.Current.GoToAsync(nameof(EditProfilePage));
+    }
+
+    [RelayCommand]
+    private async Task GoToControllersAsync()
+    {
+        await Shell.Current.GoToAsync("ControllersPage");
+    }
+
+    [RelayCommand]
+    private async Task GoToAppSettingsAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(AppSettingsPage));
+    }
+
+    [RelayCommand]
+    private async Task GoToDataHistoryAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(DataHistoryPage));
+    }
+
+    [RelayCommand]
+    private async Task GoToSecurityAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(SecuritySettingsPage));
+    }
+
+    [RelayCommand]
+    private async Task GoToHelpSupportAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(HelpSupportPage));
+    }
+
+    [RelayCommand]
+    private async Task GoToAboutAppAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(AboutAppPage));
+    }
+
+    [RelayCommand]
+    private async Task GoToDeleteAccountAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(DeleteAccountPage));
     }
 
     [RelayCommand]
@@ -44,41 +90,6 @@ public partial class ProfileViewModel : ObservableObject
     {
         var answer = await Shell.Current.DisplayAlert("Выход", "Вы действительно хотите выйти из аккаунта?", "Да", "Отмена");
         if (answer)
-        {
-            await _authService.LogoutAsync();
-            await Shell.Current.GoToAsync("//MainPage");
-        }
-    }
-
-    [RelayCommand]
-    private async Task ShowAboutAsync()
-    {
-        await Shell.Current.DisplayAlert("О приложении", "AquaSmart IoT Platform Mobile\nВерсия: 1.0.0 (Release)\n\nПлатформа комплексного мониторинга и автоматизации аквасистем.", "Закрыть");
-    }
-
-    [RelayCommand]
-    private async Task ShowSettingsAsync()
-    {
-        await Shell.Current.DisplayAlert("Настройки приложения", "• Тема: Системная (Светлая/Тёмная)\n• Интервал телеметрии: 5 сек\n• Push-уведомления: Включены\n• Звуковые оповещения алертов: Включены", "OK");
-    }
-
-    [RelayCommand]
-    private async Task ShowSecurityAsync()
-    {
-        await Shell.Current.DisplayAlert("Безопасность", "• Двухфакторная аутентификация: Активна\n• Сессия: Защищена JWT и SecureStorage\n• Последний вход: Сегодня", "OK");
-    }
-
-    [RelayCommand]
-    private async Task ShowSupportAsync()
-    {
-        await Shell.Current.DisplayAlert("Помощь и поддержка", "Служба поддержки AquaSmart IoT:\nEmail: support@aquasmart.io\nTelegram: @AquaSmartSupport\n\nБаза знаний доступна в боковом меню.", "Понятно");
-    }
-
-    [RelayCommand]
-    private async Task DeleteAccountAsync()
-    {
-        var confirm = await Shell.Current.DisplayAlert("Удаление аккаунта", "Вы действительно хотите удалить свой аккаунт и все связанные контроллеры? Это действие необратимо.", "Удалить", "Отмена");
-        if (confirm)
         {
             await _authService.LogoutAsync();
             await Shell.Current.GoToAsync("//MainPage");
