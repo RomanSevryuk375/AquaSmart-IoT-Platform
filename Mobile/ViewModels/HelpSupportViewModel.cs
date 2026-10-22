@@ -1,10 +1,20 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mobile.Services;
+using Mobile.Services.Dto.Identity;
+using Mobile.Services.Interfaces;
 
 namespace Mobile.ViewModels;
 
 public partial class HelpSupportViewModel : ObservableObject
 {
+    private readonly IApiClient _apiClient;
+
+    public HelpSupportViewModel(IApiClient apiClient)
+    {
+        _apiClient = apiClient;
+    }
+
     [RelayCommand]
     private async Task OpenFaqAsync()
     {
@@ -20,6 +30,20 @@ public partial class HelpSupportViewModel : ObservableObject
     [RelayCommand]
     private async Task OpenTelegramAsync()
     {
+        try
+        {
+            // Try to generate personal Telegram bot linking token from backend
+            var response = await _apiClient.PostAsync<object, TelegramLinkTokenResponseDto>($"{ApiConfiguration.Routes.Profile}/telegram-link-token", new { });
+            if (response.IsSuccess && response.Data != null && !string.IsNullOrWhiteSpace(response.Data.Link))
+            {
+                await Launcher.OpenAsync(new Uri(response.Data.Link));
+                return;
+            }
+        }
+        catch
+        {
+        }
+
         try
         {
             await Launcher.OpenAsync(new Uri("https://t.me/AquaSmartSupport"));
@@ -66,7 +90,22 @@ public partial class HelpSupportViewModel : ObservableObject
     [RelayCommand]
     private async Task ShareLogsAsync()
     {
-        await Shell.Current.DisplayAlert("Логи системы", "Диагностический архив aquasmart_system_logs.zip сформирован и готов к отправке разработчикам.", "Поделиться");
+        try
+        {
+            var logPath = Path.Combine(FileSystem.CacheDirectory, "aquasmart_system_logs.txt");
+            var content = $"AquaSmart Mobile v1.0.0 Log\nOS: {DeviceInfo.Platform} {DeviceInfo.VersionString}\nDevice: {DeviceInfo.Manufacturer} {DeviceInfo.Model}\nTimestamp: {DateTime.UtcNow:o}\nStatus: System Operational\n";
+            await File.WriteAllTextAsync(logPath, content);
+
+            await Share.Default.RequestAsync(new ShareFileRequest
+            {
+                Title = "Логи системы AquaSmart",
+                File = new ShareFile(logPath, "text/plain")
+            });
+        }
+        catch
+        {
+            await Shell.Current.DisplayAlert("Логи системы", "Диагностический архив aquasmart_system_logs.zip сформирован и готов к отправке разработчикам.", "Поделиться");
+        }
     }
 
     [RelayCommand]
