@@ -28,6 +28,15 @@ public static class ViewsCollectionExtensions
         services.AddTransient<AddControllerPage>();
         services.AddTransient<ControllerDetailsPage>();
 
+        services.AddTransient<EditProfilePage>();
+        services.AddTransient<AppSettingsPage>();
+        services.AddTransient<DataHistoryPage>();
+        services.AddTransient<SecuritySettingsPage>();
+        services.AddTransient<HelpSupportPage>();
+        services.AddTransient<AboutAppPage>();
+        services.AddTransient<DeleteAccountPage>();
+        services.AddTransient<ArticleDetailsPage>();
+
         return services;
     }
 }

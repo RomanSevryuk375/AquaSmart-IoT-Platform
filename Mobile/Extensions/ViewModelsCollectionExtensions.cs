@@ -29,6 +29,15 @@ public static class ViewModelsCollectionExtensions
         services.AddTransient<AddControllerViewModel>();
         services.AddTransient<ControllerDetailsViewModel>();
 
+        services.AddTransient<EditProfileViewModel>();
+        services.AddTransient<AppSettingsViewModel>();
+        services.AddTransient<DataHistoryViewModel>();
+        services.AddTransient<SecuritySettingsViewModel>();
+        services.AddTransient<HelpSupportViewModel>();
+        services.AddTransient<AboutAppViewModel>();
+        services.AddTransient<DeleteAccountViewModel>();
+        services.AddTransient<ArticleDetailsViewModel>();
+
         return services;
     }
 }

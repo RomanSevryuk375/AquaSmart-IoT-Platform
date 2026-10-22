@@ -50,5 +50,14 @@ public partial class AppShell : Shell
 
         Routing.RegisterRoute(nameof(AddControllerPage), typeof(AddControllerPage));
         Routing.RegisterRoute(nameof(ControllerDetailsPage), typeof(ControllerDetailsPage));
+
+        Routing.RegisterRoute(nameof(EditProfilePage), typeof(EditProfilePage));
+        Routing.RegisterRoute(nameof(AppSettingsPage), typeof(AppSettingsPage));
+        Routing.RegisterRoute(nameof(DataHistoryPage), typeof(DataHistoryPage));
+        Routing.RegisterRoute(nameof(SecuritySettingsPage), typeof(SecuritySettingsPage));
+        Routing.RegisterRoute(nameof(HelpSupportPage), typeof(HelpSupportPage));
+        Routing.RegisterRoute(nameof(AboutAppPage), typeof(AboutAppPage));
+        Routing.RegisterRoute(nameof(DeleteAccountPage), typeof(DeleteAccountPage));
+        Routing.RegisterRoute(nameof(ArticleDetailsPage), typeof(ArticleDetailsPage));
     }
 }
