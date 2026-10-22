@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Mobile.ViewModels"
+             x:Class="Mobile.Views.AboutAppPage"
+             x:DataType="vm:AboutAppViewModel"
+             BackgroundColor="#F6F7FC"
+             Shell.NavBarIsVisible="False"
+             Title="О приложении">
+
+    <Grid RowDefinitions="Auto,*" Padding="20,16,20,10">
+        <!-- Top Bar: Back Button, Title, Bell matching Figma 781:13141 -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Margin="0,4,0,16">
+            <Border Grid.Column="0"
+                    WidthRequest="38" HeightRequest="38"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="#FFFFFF"
+                    StrokeThickness="1"
+                    Stroke="#E4E7F4">
+                <ImageButton Source="icon_chevron_left.png"
+                             Command="{Binding GoBackCommand}"
+                             BackgroundColor="Transparent"
+                             WidthRequest="20" HeightRequest="20"
+                             Padding="0"
+                             HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+
+            <Label Grid.Column="1"
+                   Text="О приложении"
+                   TextColor="#141414"
+                   FontFamily="OpenSansSemibold"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center" />
+
+            <Border Grid.Column="2"
+                    WidthRequest="38" HeightRequest="38"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="#FFFFFF"
+                    StrokeThickness="1"
+                    Stroke="#E4E7F4">
+                <ImageButton Source="icon_bell.png"
+                             BackgroundColor="Transparent"
+                             WidthRequest="18" HeightRequest="18"
+                             Padding="0"
+                             HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+        </Grid>
+
+        <!-- Scrollable Content -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="20" Padding="0,0,0,24">
+                <!-- Top Brand Logo Banner -->
+                <VerticalStackLayout Spacing="8" HorizontalOptions="Center" Margin="0,10,0,10">
+                    <Image Source="smart_aqua_logo.png"
+                           WidthRequest="220"
+                           HeightRequest="75"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <!-- 1. Информация о приложении -->
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Информация о приложении"
+                           TextColor="#141414"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="16"
+                           FontAttributes="Bold" />
+
+                    <Border StrokeThickness="1"
+                            Stroke="#E8EAF5"
+                            StrokeShape="RoundRectangle 16"
+                            BackgroundColor="#FFFFFF"
+                            Padding="16,14">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="SmartAqua" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
+                            <Label Text="Версия 1.0.0" TextColor="#6E6E6E" FontSize="13" />
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- 2. Документы -->
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Документы"
+                           TextColor="#141414"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="16"
+                           FontAttributes="Bold" />
+
+                    <Border StrokeThickness="1"
+                            Stroke="#E8EAF5"
+                            StrokeShape="RoundRectangle 16"
+                            BackgroundColor="#FFFFFF"
+                            Padding="16,6">
+                        <VerticalStackLayout Spacing="0">
+                            <!-- Пользовательское соглашение -->
+                            <Grid ColumnDefinitions="*,Auto" HeightRequest="52">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenTermsCommand}" />
+                                </Grid.GestureRecognizers>
+                                <Label Text="Пользовательское соглашение" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                                <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                            </Grid>
+
+                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+
+                            <!-- Политика конфиденциальности -->
+                            <Grid ColumnDefinitions="*,Auto" HeightRequest="52">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenPrivacyCommand}" />
+                                </Grid.GestureRecognizers>
+                                <Label Text="Политика конфиденциальности" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                                <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                            </Grid>
+
+                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+
+                            <!-- Лицензии -->
+                            <Grid ColumnDefinitions="*,Auto" HeightRequest="52">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenLicensesCommand}" />
+                                </Grid.GestureRecognizers>
+                                <Label Text="Лицензии (Open Source)" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                                <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- 3. Мы в сети -->
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Мы в сети"
+                           TextColor="#141414"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="16"
+                           FontAttributes="Bold" />
+
+                    <Border StrokeThickness="1"
+                            Stroke="#E8EAF5"
+                            StrokeShape="RoundRectangle 16"
+                            BackgroundColor="#FFFFFF"
+                            Padding="16,6">
+                        <VerticalStackLayout Spacing="0">
+                            <!-- Официальный сайт -->
+                            <Grid ColumnDefinitions="*,Auto" HeightRequest="52">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenWebsiteCommand}" />
+                                </Grid.GestureRecognizers>
+                                <Label Text="Официальный сайт" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                                <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                            </Grid>
+
+                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+
+                            <!-- Оценить приложение -->
+                            <Grid ColumnDefinitions="*,Auto" HeightRequest="52">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding RateAppCommand}" />
+                                </Grid.GestureRecognizers>
+                                <Label Text="Оценить приложение" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                                <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>
