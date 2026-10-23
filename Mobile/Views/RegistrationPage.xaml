@@ -12,7 +12,7 @@
         <VerticalStackLayout x:Name="RegistrationContainer" Padding="20,24,20,24" Spacing="16">
             <!-- Fish Mascot Card with Clipboard Badge -->
             <controls:FishMascotCard HeightOverride="140"
-                                     BadgeText="📋"
+                                     BadgeIcon="icon_clipboard_white.png"
                                      BadgeColor="#7BA028" />
 
             <!-- Title & Subtitle -->
