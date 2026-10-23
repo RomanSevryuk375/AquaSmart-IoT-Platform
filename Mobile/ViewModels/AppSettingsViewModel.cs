@@ -48,19 +48,23 @@ public partial class AppSettingsViewModel : ObservableObject
         ConnectionLossAlerts = Preferences.Default.Get(ConnectionAlertsKey, true);
         ScenarioAlerts = Preferences.Default.Get(ScenarioAlertsKey, true);
         TrafficSaving = Preferences.Default.Get(TrafficSavingKey, true);
-
-        ApplyTheme(CurrentTheme);
     }
 
     private static void ApplyTheme(string theme)
     {
-        if (Application.Current == null) return;
-        Application.Current.UserAppTheme = theme switch
+        try
         {
-            "Светлая" => AppTheme.Light,
-            "Тёмная" => AppTheme.Dark,
-            _ => AppTheme.Unspecified
-        };
+            if (Application.Current == null) return;
+            Application.Current.UserAppTheme = theme switch
+            {
+                "Светлая" => AppTheme.Light,
+                "Тёмная" => AppTheme.Dark,
+                _ => AppTheme.Unspecified
+            };
+        }
+        catch
+        {
+        }
     }
 
     partial void OnEmergencyAlertsChanged(bool value) => Preferences.Default.Set(EmergencyAlertsKey, value);
@@ -76,7 +80,7 @@ public partial class AppSettingsViewModel : ObservableObject
         {
             CurrentTheme = result;
             Preferences.Default.Set(ThemeKey, result);
-            ApplyTheme(result);
+            MainThread.BeginInvokeOnMainThread(() => ApplyTheme(result));
         }
     }
 

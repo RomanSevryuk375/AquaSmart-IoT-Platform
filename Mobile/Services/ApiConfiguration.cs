@@ -24,7 +24,7 @@ public static class ApiConfiguration
                 if (DeviceInfo.DeviceType == DeviceType.Physical)
                 {
                     // Physical phone on local Wi-Fi network: connects to host PC IP
-                    return "http://192.168.1.10:5055/";
+                    return "http://172.20.10.8:5055/";
                 }
 
                 // Android emulator loops back to host machine via 10.0.2.2
