@@ -18,10 +18,7 @@ public partial class OnboardingPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await Task.WhenAll(
-            Carousel.FadeInUpAsync(350, 15),
-            BottomContainer.FadeInUpAsync(400, 20)
-        );
+        await BottomContainer.FadeInUpAsync(400, 20);
     }
 
     private async void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)

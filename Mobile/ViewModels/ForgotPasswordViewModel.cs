@@ -41,6 +41,14 @@ public partial class ForgotPasswordViewModel : ObservableObject
     public bool IsStep4 => Step == 4;
 
     [ObservableProperty]
+    private string _badgeText = "...";
+
+    partial void OnStepChanged(int value)
+    {
+        BadgeText = value == 4 ? "✓" : "...";
+    }
+
+    [ObservableProperty]
     private bool _isBusy;
 
     [ObservableProperty]
