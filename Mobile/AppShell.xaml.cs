@@ -48,6 +48,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(AddRelayPage), typeof(AddRelayPage));
         Routing.RegisterRoute(nameof(AddScenarioPage), typeof(AddScenarioPage));
 
+        Routing.RegisterRoute(nameof(ControllersPage), typeof(ControllersPage));
         Routing.RegisterRoute(nameof(AddControllerPage), typeof(AddControllerPage));
         Routing.RegisterRoute(nameof(ControllerDetailsPage), typeof(ControllerDetailsPage));
 

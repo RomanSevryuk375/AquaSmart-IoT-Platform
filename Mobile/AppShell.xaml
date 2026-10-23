@@ -109,7 +109,4 @@
             <ShellContent Title="Профиль" ContentTemplate="{DataTemplate views:ProfilePage}" Route="ProfilePage" />
         </Tab>
     </TabBar>
-
-    <!-- Secondary Shell Routes -->
-    <ShellContent Route="ControllersPage" ContentTemplate="{DataTemplate views:ControllersPage}" />
 </Shell>

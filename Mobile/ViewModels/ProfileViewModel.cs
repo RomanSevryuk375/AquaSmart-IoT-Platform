@@ -46,7 +46,7 @@ public partial class ProfileViewModel : ObservableObject
     [RelayCommand]
     private async Task GoToControllersAsync()
     {
-        await Shell.Current.GoToAsync("ControllersPage");
+        await Shell.Current.GoToAsync(nameof(ControllersPage));
     }
 
     [RelayCommand]

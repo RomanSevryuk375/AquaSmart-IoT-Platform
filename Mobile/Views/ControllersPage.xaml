@@ -60,13 +60,10 @@
                 </Border>
 
                 <!-- Non-Empty List (Figma: Контроллеры) -->
-                <CollectionView ItemsSource="{Binding Controllers}"
-                                IsVisible="{Binding HasNoControllers, Converter={StaticResource InvertedBoolConverter}}"
-                                SelectionMode="None">
-                    <CollectionView.ItemsLayout>
-                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="12" />
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Controllers}"
+                                     IsVisible="{Binding HasControllers}"
+                                     Spacing="12">
+                    <BindableLayout.ItemTemplate>
                         <DataTemplate x:DataType="models:ControllerModel">
                             <Border StrokeThickness="1"
                                     Stroke="#E1E4F2"
@@ -108,8 +105,8 @@
                                 </VerticalStackLayout>
                             </Border>
                         </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
             </VerticalStackLayout>
         </ScrollView>
 

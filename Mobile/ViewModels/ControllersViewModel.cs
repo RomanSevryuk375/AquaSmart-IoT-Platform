@@ -14,6 +14,13 @@ public partial class ControllersViewModel : ObservableObject
     [ObservableProperty]
     private bool _hasNoControllers;
 
+    public bool HasControllers => !HasNoControllers;
+
+    partial void OnHasNoControllersChanged(bool value)
+    {
+        OnPropertyChanged(nameof(HasControllers));
+    }
+
     [ObservableProperty]
     private bool _isBusy;
 
