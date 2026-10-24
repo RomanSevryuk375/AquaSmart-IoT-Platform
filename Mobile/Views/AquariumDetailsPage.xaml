@@ -126,7 +126,7 @@
             <Grid ColumnDefinitions="*,*,*">
                 <!-- Tab 0: Датчики -->
                 <Button Grid.Column="0"
-                        Text="датчики"
+                        Text="Датчики"
                         Command="{Binding SelectTabCommand}"
                         CommandParameter="0"
                         BackgroundColor="{Binding IsSensorsTabSelected, Converter={StaticResource TabActiveBgConverter}}"
@@ -138,7 +138,7 @@
 
                 <!-- Tab 1: Реле -->
                 <Button Grid.Column="1"
-                        Text="реле"
+                        Text="Реле"
                         Command="{Binding SelectTabCommand}"
                         CommandParameter="1"
                         BackgroundColor="{Binding IsRelaysTabSelected, Converter={StaticResource TabActiveBgConverter}}"
@@ -150,7 +150,7 @@
 
                 <!-- Tab 2: Сценарии -->
                 <Button Grid.Column="2"
-                        Text="сценарии"
+                        Text="Сценарии"
                         Command="{Binding SelectTabCommand}"
                         CommandParameter="2"
                         BackgroundColor="{Binding IsScenariosTabSelected, Converter={StaticResource TabActiveBgConverter}}"
@@ -193,7 +193,11 @@
                                         <Label Grid.Column="0" Text="{Binding Icon}" FontSize="22" VerticalOptions="Center" />
                                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                                             <Label Text="{Binding Name}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
-                                            <Label Text="{Binding StatusText}" TextColor="#8C93A8" FontSize="11" />
+                                            <HorizontalStackLayout Spacing="6">
+                                                <Label Text="{Binding StatusText}" TextColor="{Binding StatusColor}" FontSize="11" />
+                                                <Label Text="•" TextColor="#8C93A8" FontSize="11" IsVisible="{Binding HasPort}" />
+                                                <Label Text="{Binding PortDisplay}" TextColor="#8C93A8" FontSize="11" IsVisible="{Binding HasPort}" />
+                                            </HorizontalStackLayout>
                                         </VerticalStackLayout>
                                         <Label Grid.Column="2" Text="{Binding Value, StringFormat='{0} '}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
                                     </Grid>

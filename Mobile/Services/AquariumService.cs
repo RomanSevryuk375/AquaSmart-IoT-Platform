@@ -228,6 +228,7 @@ public sealed class AquariumService : IAquariumService
                     Name = dto.Name,
                     Value = dto.LastValue,
                     Unit = string.IsNullOrWhiteSpace(dto.Unit) ? "°C" : dto.Unit,
+                    Port = dto.ConnectionAddress ?? string.Empty,
                     Type = dto.Type switch
                     {
                         1 => SensorType.Temperature,
@@ -264,11 +265,23 @@ public sealed class AquariumService : IAquariumService
     {
         try
         {
+            var rawPort = string.IsNullOrWhiteSpace(sensor.Port) ? "GPIO 4" : sensor.Port.Trim();
+            var cleanPort = rawPort.Replace(" ", "");
+            int protocol = 1; // Digital (e.g. GPIO4, D4, 4)
+            if (cleanPort.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+            {
+                protocol = 3; // I2C
+            }
+            else if (cleanPort.StartsWith("A", StringComparison.OrdinalIgnoreCase) || cleanPort.StartsWith("ADC", StringComparison.OrdinalIgnoreCase))
+            {
+                protocol = 2; // Analog
+            }
+
             var request = new AddSensorRequestDto(
                 Guid.NewGuid(),
                 sensor.Name,
-                2, // OneWire
-                "0x28",
+                protocol,
+                cleanPort,
                 (int)sensor.Type + 1);
 
             await _apiClient.PostAsync(ApiConfiguration.Routes.Sensors, request, cancellationToken);

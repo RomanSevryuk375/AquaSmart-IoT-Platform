@@ -68,6 +68,57 @@
                         </Border>
                     </VerticalStackLayout>
 
+                    <!-- Sensor Port / Pin -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Порт подключения (GPIO / Пин) *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                            <Entry Text="{Binding Port}"
+                                   Placeholder="Например, GPIO 4 или D2"
+                                   PlaceholderColor="#8C93A8"
+                                   TextColor="#2E3A7E"
+                                   VerticalOptions="Center" />
+                        </Border>
+                        <!-- Quick Pin Chips -->
+                        <HorizontalStackLayout Spacing="8" Margin="0,2,0,0">
+                            <Button Text="GPIO 4"
+                                    Command="{Binding SelectPortPresetCommand}"
+                                    CommandParameter="GPIO 4"
+                                    BackgroundColor="#EDEFFB"
+                                    TextColor="#4152B0"
+                                    FontSize="12"
+                                    HeightRequest="32"
+                                    Padding="10,0"
+                                    CornerRadius="8" />
+                            <Button Text="GPIO 5"
+                                    Command="{Binding SelectPortPresetCommand}"
+                                    CommandParameter="GPIO 5"
+                                    BackgroundColor="#EDEFFB"
+                                    TextColor="#4152B0"
+                                    FontSize="12"
+                                    HeightRequest="32"
+                                    Padding="10,0"
+                                    CornerRadius="8" />
+                            <Button Text="D2"
+                                    Command="{Binding SelectPortPresetCommand}"
+                                    CommandParameter="D2"
+                                    BackgroundColor="#EDEFFB"
+                                    TextColor="#4152B0"
+                                    FontSize="12"
+                                    HeightRequest="32"
+                                    Padding="10,0"
+                                    CornerRadius="8" />
+                            <Button Text="A0"
+                                    Command="{Binding SelectPortPresetCommand}"
+                                    CommandParameter="A0"
+                                    BackgroundColor="#EDEFFB"
+                                    TextColor="#4152B0"
+                                    FontSize="12"
+                                    HeightRequest="32"
+                                    Padding="10,0"
+                                    CornerRadius="8" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+
                     <!-- Min Threshold -->
                     <VerticalStackLayout Spacing="6">
                         <Label Text="Нижний порог нормы (Min)" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />

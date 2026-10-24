@@ -18,6 +18,9 @@ public partial class AddSensorViewModel : ObservableObject
     private int _sensorTypeIndex = 0; // 0: Temp, 1: pH, 2: O2, 3: TDS
 
     [ObservableProperty]
+    private string _port = string.Empty;
+
+    [ObservableProperty]
     private string _minValueString = "22.0";
 
     [ObservableProperty]
@@ -29,11 +32,23 @@ public partial class AddSensorViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void SelectPortPreset(string preset)
+    {
+        Port = preset;
+    }
+
+    [RelayCommand]
     private async Task SaveAsync()
     {
         if (string.IsNullOrWhiteSpace(SensorName))
         {
             await Shell.Current.DisplayAlert("Внимание", "Укажите название датчика", "OK");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(Port))
+        {
+            await Shell.Current.DisplayAlert("Внимание", "Укажите порт подключения (например, GPIO 4 или D2)", "OK");
             return;
         }
 
@@ -61,6 +76,7 @@ public partial class AddSensorViewModel : ObservableObject
         {
             AquariumId = aqId,
             Name = SensorName,
+            Port = Port.Trim(),
             Type = type,
             Value = (min + max) / 2.0,
             Unit = unit,
@@ -69,7 +85,7 @@ public partial class AddSensorViewModel : ObservableObject
         };
 
         await _aquariumService.AddSensorAsync(sensor);
-        await Shell.Current.DisplayAlert("Успех", $"Датчик «{SensorName}» откалиброван и привязан!", "OK");
+        await Shell.Current.DisplayAlert("Успех", $"Датчик «{SensorName}» подключен к порту {Port.Trim()} и откалиброван!", "OK");
         await Shell.Current.GoToAsync("..");
     }
 

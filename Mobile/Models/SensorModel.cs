@@ -5,6 +5,9 @@ public class SensorModel
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid AquariumId { get; set; }
     public string Name { get; set; } = string.Empty;
+    public string Port { get; set; } = string.Empty;
+    public string PortDisplay => string.IsNullOrWhiteSpace(Port) ? string.Empty : $"Порт: {Port}";
+    public bool HasPort => !string.IsNullOrWhiteSpace(Port);
     public SensorType Type { get; set; } = SensorType.Temperature;
     public double Value { get; set; }
     public string Unit { get; set; } = "°C";
