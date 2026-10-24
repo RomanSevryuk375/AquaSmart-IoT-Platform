@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mobile.Models;
+using Mobile.Services.Interfaces;
 
 namespace Mobile.ViewModels;
 
@@ -18,6 +20,9 @@ public partial class AddSensorViewModel : ObservableObject
     private int _sensorTypeIndex = 0; // 0: Temp, 1: pH, 2: O2, 3: TDS
 
     [ObservableProperty]
+    private int _protocolIndex = 0; // 0: Digital, 1: Analog, 2: I2C, 3: OneWire
+
+    [ObservableProperty]
     private string _port = string.Empty;
 
     [ObservableProperty]
@@ -25,6 +30,23 @@ public partial class AddSensorViewModel : ObservableObject
 
     [ObservableProperty]
     private string _maxValueString = "28.0";
+
+    [ObservableProperty]
+    private bool _isCancelDialogVisible;
+
+    [ObservableProperty]
+    private bool _isSuccessVisible;
+
+    [ObservableProperty]
+    private string _createdSensorName = string.Empty;
+
+    [ObservableProperty]
+    private string _createdSensorSubtitle = string.Empty;
+
+    [ObservableProperty]
+    private string _createdSensorIcon = "🌡️";
+
+    public bool IsFormVisible => !IsSuccessVisible;
 
     public AddSensorViewModel(IAquariumService aquariumService)
     {
@@ -38,6 +60,25 @@ public partial class AddSensorViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void PromptCancel()
+    {
+        IsCancelDialogVisible = true;
+    }
+
+    [RelayCommand]
+    private void ResumeEditing()
+    {
+        IsCancelDialogVisible = false;
+    }
+
+    [RelayCommand]
+    private async Task ConfirmCancelAsync()
+    {
+        IsCancelDialogVisible = false;
+        await Shell.Current.GoToAsync("..");
+    }
+
+    [RelayCommand]
     private async Task SaveAsync()
     {
         if (string.IsNullOrWhiteSpace(SensorName))
@@ -48,7 +89,7 @@ public partial class AddSensorViewModel : ObservableObject
 
         if (string.IsNullOrWhiteSpace(Port))
         {
-            await Shell.Current.DisplayAlert("Внимание", "Укажите порт подключения (например, GPIO 4 или D2)", "OK");
+            await Shell.Current.DisplayAlert("Внимание", "Укажите адрес или порт подключения", "OK");
             return;
         }
 
@@ -56,26 +97,26 @@ public partial class AddSensorViewModel : ObservableObject
         double.TryParse(MinValueString, out var min);
         double.TryParse(MaxValueString, out var max);
 
-        var type = SensorTypeIndex switch
+        var (type, unit, icon, typeName) = SensorTypeIndex switch
         {
-            1 => SensorType.Ph,
-            2 => SensorType.DissolvedOxygen,
-            3 => SensorType.TdsSalinity,
-            _ => SensorType.Temperature
+            1 => (SensorType.Ph, "pH", "🧪", "Кислотность pH"),
+            2 => (SensorType.DissolvedOxygen, "мг/л", "🫧", "Кислород O2"),
+            3 => (SensorType.TdsSalinity, "ppm", "🧂", "Минерализация TDS"),
+            _ => (SensorType.Temperature, "°C", "🌡️", "Температура воды")
         };
 
-        var unit = type switch
+        var protocolName = ProtocolIndex switch
         {
-            SensorType.Ph => "pH",
-            SensorType.DissolvedOxygen => "мг/л",
-            SensorType.TdsSalinity => "ppm",
-            _ => "°C"
+            1 => "Analog",
+            2 => "I2C",
+            3 => "OneWire",
+            _ => "Digital"
         };
 
         var sensor = new SensorModel
         {
             AquariumId = aqId,
-            Name = SensorName,
+            Name = SensorName.Trim(),
             Port = Port.Trim(),
             Type = type,
             Value = (min + max) / 2.0,
@@ -85,13 +126,27 @@ public partial class AddSensorViewModel : ObservableObject
         };
 
         await _aquariumService.AddSensorAsync(sensor);
-        await Shell.Current.DisplayAlert("Успех", $"Датчик «{SensorName}» подключен к порту {Port.Trim()} и откалиброван!", "OK");
+
+        CreatedSensorName = SensorName.Trim();
+        CreatedSensorIcon = icon;
+        CreatedSensorSubtitle = $"{typeName} • {protocolName} • {Port.Trim()}";
+        IsSuccessVisible = true;
+        OnPropertyChanged(nameof(IsFormVisible));
+    }
+
+    [RelayCommand]
+    private async Task ReturnToAquariumAsync()
+    {
         await Shell.Current.GoToAsync("..");
     }
 
     [RelayCommand]
-    private async Task CancelAsync()
+    private void AddAnotherSensor()
     {
-        await Shell.Current.GoToAsync("..");
+        SensorName = string.Empty;
+        Port = string.Empty;
+        IsSuccessVisible = false;
+        IsCancelDialogVisible = false;
+        OnPropertyChanged(nameof(IsFormVisible));
     }
 }

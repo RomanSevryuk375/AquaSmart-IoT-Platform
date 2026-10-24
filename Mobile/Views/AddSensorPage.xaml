@@ -2,175 +2,320 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Mobile.ViewModels"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
              x:Class="Mobile.Views.AddSensorPage"
              x:DataType="vm:AddSensorViewModel"
-             BackgroundColor="#F6F7FC"
-             Title="Новый датчик">
+             BackgroundColor="#FFFFFF"
+             Shell.NavBarIsVisible="False"
+             Title="Добавление датчика">
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="20,16,20,30">
-            <!-- Header Banner -->
-            <Border x:Name="HeaderCard"
-                    StrokeThickness="0"
-                    StrokeShape="RoundRectangle 16"
-                    BackgroundColor="#4152B0"
-                    Padding="20">
-                <VerticalStackLayout Spacing="6">
-                    <Label Text="Подключение датчика телеметрии"
-                           TextColor="#FFFFFF"
+    <Grid>
+        <!-- 1. MAIN FORM (Figma: 1. Добавление датчика) -->
+        <ScrollView IsVisible="{Binding IsFormVisible}">
+            <VerticalStackLayout Spacing="16" Padding="20,16,20,30">
+                <!-- Top Navigation Bar (< Добавление датчика   X) -->
+                <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,10">
+                    <Border WidthRequest="36" HeightRequest="36"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="#F6F7FC"
+                            StrokeThickness="0"
+                            VerticalOptions="Center">
+                        <ImageButton Source="icon_arrow_left.png"
+                                     Command="{Binding PromptCancelCommand}"
+                                     BackgroundColor="Transparent"
+                                     WidthRequest="20" HeightRequest="20"
+                                     Padding="0"
+                                     HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+
+                    <Label Grid.Column="1"
+                           Text="Добавление датчика"
+                           TextColor="#141414"
                            FontFamily="OpenSansSemibold"
-                           FontSize="20"
-                           FontAttributes="Bold" />
-                    <Label Text="Задайте тип датчика и безопасные границы показателей для автоматических алертов"
-                           TextColor="#EDEFFB"
-                           FontSize="13" />
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center"
+                           Margin="12,0,0,0" />
+
+                    <Border Grid.Column="2"
+                            WidthRequest="36" HeightRequest="36"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="#F6F7FC"
+                            StrokeThickness="0"
+                            VerticalOptions="Center">
+                        <ImageButton Source="icon_close.png"
+                                     Command="{Binding PromptCancelCommand}"
+                                     BackgroundColor="Transparent"
+                                     WidthRequest="18" HeightRequest="18"
+                                     Padding="0"
+                                     HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                </Grid>
+
+                <!-- Sensor Name -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Название датчика" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="50" Padding="14,0">
+                        <Entry Text="{Binding SensorName}"
+                               Placeholder="Введите название датчика"
+                               PlaceholderColor="#8C93A8"
+                               TextColor="#141414"
+                               VerticalOptions="Center" />
+                    </Border>
                 </VerticalStackLayout>
-            </Border>
 
-            <!-- Form Card -->
-            <Border x:Name="FormCard"
-                    StrokeThickness="1"
-                    Stroke="#E4E7F4"
-                    StrokeShape="RoundRectangle 16"
-                    BackgroundColor="#FFFFFF"
-                    Padding="20">
-                <VerticalStackLayout Spacing="16">
-                    <!-- Sensor Name -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Название датчика *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
-                            <Entry Text="{Binding SensorName}"
-                                   Placeholder="Например, Термозонд DS18B20 #1"
-                                   PlaceholderColor="#8C93A8"
-                                   TextColor="#2E3A7E"
-                                   VerticalOptions="Center" />
-                        </Border>
-                    </VerticalStackLayout>
+                <!-- Sensor Type Picker -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Тип датчика" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="50" Padding="14,0">
+                        <Picker SelectedIndex="{Binding SensorTypeIndex}"
+                                TextColor="#141414"
+                                Title="Выберите тип датчика"
+                                TitleColor="#8C93A8"
+                                VerticalOptions="Center">
+                            <Picker.ItemsSource>
+                                <x:Array Type="{x:Type x:String}">
+                                    <x:String>Температура воды (°C)</x:String>
+                                    <x:String>Кислотность воды (pH)</x:String>
+                                    <x:String>Растворенный кислород O2 (мг/л)</x:String>
+                                    <x:String>Минерализация / Солёность (ppm)</x:String>
+                                    <x:String>Давление (hPa)</x:String>
+                                    <x:String>Напряжение (V)</x:String>
+                                </x:Array>
+                            </Picker.ItemsSource>
+                        </Picker>
+                    </Border>
+                </VerticalStackLayout>
 
-                    <!-- Sensor Type Picker -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Тип измерения *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
-                            <Picker SelectedIndex="{Binding SensorTypeIndex}"
-                                    TextColor="#2E3A7E"
-                                    Title="Выберите тип датчика"
-                                    TitleColor="#8C93A8"
-                                    VerticalOptions="Center">
-                                <Picker.ItemsSource>
-                                    <x:Array Type="{x:Type x:String}">
-                                        <x:String>Температура воды (°C)</x:String>
-                                        <x:String>Кислотность воды (pH)</x:String>
-                                        <x:String>Растворенный кислород O2 (мг/л)</x:String>
-                                        <x:String>Минерализация / Солёность (ppm)</x:String>
-                                    </x:Array>
-                                </Picker.ItemsSource>
-                            </Picker>
-                        </Border>
-                    </VerticalStackLayout>
+                <!-- Connection Protocol Picker -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Протокол подключения" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="50" Padding="14,0">
+                        <Picker SelectedIndex="{Binding ProtocolIndex}"
+                                TextColor="#141414"
+                                Title="Выберите протокол подключения"
+                                TitleColor="#8C93A8"
+                                VerticalOptions="Center">
+                            <Picker.ItemsSource>
+                                <x:Array Type="{x:Type x:String}">
+                                    <x:String>Digital (GPIO)</x:String>
+                                    <x:String>Analog (ADC)</x:String>
+                                    <x:String>I2C</x:String>
+                                    <x:String>OneWire</x:String>
+                                </x:Array>
+                            </Picker.ItemsSource>
+                        </Picker>
+                    </Border>
+                </VerticalStackLayout>
 
-                    <!-- Sensor Port / Pin -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Порт подключения (GPIO / Пин) *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
-                            <Entry Text="{Binding Port}"
-                                   Placeholder="Например, GPIO 4 или D2"
-                                   PlaceholderColor="#8C93A8"
-                                   TextColor="#2E3A7E"
-                                   VerticalOptions="Center" />
-                        </Border>
-                        <!-- Quick Pin Chips -->
-                        <HorizontalStackLayout Spacing="8" Margin="0,2,0,0">
-                            <Button Text="GPIO 4"
-                                    Command="{Binding SelectPortPresetCommand}"
-                                    CommandParameter="GPIO 4"
-                                    BackgroundColor="#EDEFFB"
-                                    TextColor="#4152B0"
-                                    FontSize="12"
-                                    HeightRequest="32"
-                                    Padding="10,0"
-                                    CornerRadius="8" />
-                            <Button Text="GPIO 5"
-                                    Command="{Binding SelectPortPresetCommand}"
-                                    CommandParameter="GPIO 5"
-                                    BackgroundColor="#EDEFFB"
-                                    TextColor="#4152B0"
-                                    FontSize="12"
-                                    HeightRequest="32"
-                                    Padding="10,0"
-                                    CornerRadius="8" />
-                            <Button Text="D2"
-                                    Command="{Binding SelectPortPresetCommand}"
-                                    CommandParameter="D2"
-                                    BackgroundColor="#EDEFFB"
-                                    TextColor="#4152B0"
-                                    FontSize="12"
-                                    HeightRequest="32"
-                                    Padding="10,0"
-                                    CornerRadius="8" />
-                            <Button Text="A0"
-                                    Command="{Binding SelectPortPresetCommand}"
-                                    CommandParameter="A0"
-                                    BackgroundColor="#EDEFFB"
-                                    TextColor="#4152B0"
-                                    FontSize="12"
-                                    HeightRequest="32"
-                                    Padding="10,0"
-                                    CornerRadius="8" />
-                        </HorizontalStackLayout>
-                    </VerticalStackLayout>
+                <!-- Connection Address / Port -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Адрес подключения" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="50" Padding="14,0">
+                        <Entry Text="{Binding Port}"
+                               Placeholder="Выберите или введите адрес подключения"
+                               PlaceholderColor="#8C93A8"
+                               TextColor="#141414"
+                               VerticalOptions="Center" />
+                    </Border>
+                    <!-- Quick Preset Badges -->
+                    <HorizontalStackLayout Spacing="8" Margin="0,2,0,0">
+                        <Button Text="GPIO 4"
+                                Command="{Binding SelectPortPresetCommand}"
+                                CommandParameter="GPIO 4"
+                                BackgroundColor="#EDEFFB"
+                                TextColor="#4152B0"
+                                FontSize="12"
+                                HeightRequest="32"
+                                Padding="10,0"
+                                CornerRadius="8" />
+                        <Button Text="D2"
+                                Command="{Binding SelectPortPresetCommand}"
+                                CommandParameter="D2"
+                                BackgroundColor="#EDEFFB"
+                                TextColor="#4152B0"
+                                FontSize="12"
+                                HeightRequest="32"
+                                Padding="10,0"
+                                CornerRadius="8" />
+                        <Button Text="A0"
+                                Command="{Binding SelectPortPresetCommand}"
+                                CommandParameter="A0"
+                                BackgroundColor="#EDEFFB"
+                                TextColor="#4152B0"
+                                FontSize="12"
+                                HeightRequest="32"
+                                Padding="10,0"
+                                CornerRadius="8" />
+                        <Button Text="0x2F"
+                                Command="{Binding SelectPortPresetCommand}"
+                                CommandParameter="0x2F"
+                                BackgroundColor="#EDEFFB"
+                                TextColor="#4152B0"
+                                FontSize="12"
+                                HeightRequest="32"
+                                Padding="10,0"
+                                CornerRadius="8" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
 
-                    <!-- Min Threshold -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Нижний порог нормы (Min)" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                <!-- Safe Thresholds (Min & Max) -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,4,0,10">
+                    <VerticalStackLayout Grid.Column="0" Spacing="6">
+                        <Label Text="Порог Min" TextColor="#6E6E6E" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="48" Padding="12,0">
                             <Entry Text="{Binding MinValueString}"
                                    Keyboard="Numeric"
                                    Placeholder="22.0"
                                    PlaceholderColor="#8C93A8"
-                                   TextColor="#2E3A7E"
+                                   TextColor="#141414"
                                    VerticalOptions="Center" />
                         </Border>
                     </VerticalStackLayout>
 
-                    <!-- Max Threshold -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Верхний порог нормы (Max)" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                    <VerticalStackLayout Grid.Column="1" Spacing="6">
+                        <Label Text="Порог Max" TextColor="#6E6E6E" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="48" Padding="12,0">
                             <Entry Text="{Binding MaxValueString}"
                                    Keyboard="Numeric"
                                    Placeholder="28.0"
                                    PlaceholderColor="#8C93A8"
-                                   TextColor="#2E3A7E"
+                                   TextColor="#141414"
                                    VerticalOptions="Center" />
                         </Border>
                     </VerticalStackLayout>
-                </VerticalStackLayout>
-            </Border>
+                </Grid>
 
-            <!-- Action Buttons -->
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                <Button Grid.Column="0"
-                        Text="Отмена"
-                        Command="{Binding CancelCommand}"
-                        BackgroundColor="#FFFFFF"
-                        TextColor="#6A738A"
-                        BorderColor="#E4E7F4"
-                        BorderWidth="1"
-                        CornerRadius="14"
-                        HeightRequest="52"
-                        FontFamily="OpenSansSemibold"
-                        FontSize="15" />
-
-                <Button Grid.Column="1"
-                        Text="Сохранить"
+                <!-- Single wide "Добавить датчик" Button as in Figma -->
+                <Button Text="Добавить датчик"
                         Command="{Binding SaveCommand}"
                         BackgroundColor="#4152B0"
                         TextColor="#FFFFFF"
                         CornerRadius="14"
                         HeightRequest="52"
                         FontFamily="OpenSansSemibold"
-                        FontSize="15" />
-            </Grid>
-        </VerticalStackLayout>
-    </ScrollView>
+                        FontSize="15"
+                        Margin="0,8,0,0" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- 2. SUCCESS SCREEN (Figma: Добавление датчика. Успешно) -->
+        <ScrollView IsVisible="{Binding IsSuccessVisible}">
+            <VerticalStackLayout Spacing="20" Padding="24,30,24,30" VerticalOptions="Center">
+                <!-- Fish Mascot Card with Checkmark badge -->
+                <controls:FishMascotCard HeightOverride="220" BadgeText="✓" BadgeColor="#7BA028" />
+
+                <!-- Created Sensor Summary Card -->
+                <Border StrokeThickness="1"
+                        Stroke="#E4E7F4"
+                        StrokeShape="RoundRectangle 14"
+                        BackgroundColor="#FFFFFF"
+                        Padding="16,14"
+                        Margin="0,6,0,0">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Label Grid.Column="0" Text="{Binding CreatedSensorIcon}" FontSize="24" VerticalOptions="Center" />
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                            <Label Text="{Binding CreatedSensorName}"
+                                   TextColor="#141414"
+                                   FontFamily="OpenSansSemibold"
+                                   FontSize="15"
+                                   FontAttributes="Bold" />
+                            <Label Text="{Binding CreatedSensorSubtitle}"
+                                   TextColor="#8C93A8"
+                                   FontSize="12" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Success Header & Description -->
+                <VerticalStackLayout Spacing="8" Margin="0,4,0,10">
+                    <Label Text="Датчик добавлен!"
+                           TextColor="#141414"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="Теперь устройство отображается в общем списке. Первые показания появятся в течение нескольких секунд"
+                           TextColor="#6E6E6E"
+                           FontSize="14"
+                           LineHeight="1.3"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <!-- Action Buttons: "Вернуться к ёмкости" & "Добавить ещё датчик" -->
+                <VerticalStackLayout Spacing="10">
+                    <Button Text="Вернуться к ёмкости"
+                            Command="{Binding ReturnToAquariumCommand}"
+                            BackgroundColor="#4152B0"
+                            TextColor="#FFFFFF"
+                            CornerRadius="14"
+                            HeightRequest="52"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15" />
+
+                    <Button Text="Добавить ещё датчик"
+                            Command="{Binding AddAnotherSensorCommand}"
+                            BackgroundColor="#FFFFFF"
+                            BorderColor="#4152B0"
+                            BorderWidth="1.5"
+                            TextColor="#4152B0"
+                            CornerRadius="14"
+                            HeightRequest="52"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- 3. CANCEL CONFIRMATION MODAL (Figma: Добавление датчика. Отмена) -->
+        <Grid BackgroundColor="#80000000" IsVisible="{Binding IsCancelDialogVisible}">
+            <Border VerticalOptions="End"
+                    StrokeShape="RoundRectangle 24 24 0 0"
+                    BackgroundColor="#FFFFFF"
+                    StrokeThickness="0"
+                    Padding="24,24,24,32">
+                <VerticalStackLayout Spacing="18">
+                    <!-- Fish Mascot Card with Question badge -->
+                    <controls:FishMascotCard HeightOverride="180" BadgeText="?" BadgeColor="#7BA028" />
+
+                    <!-- Titles -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Отменить добавление?"
+                               TextColor="#141414"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="Все введённые данные будут потеряны"
+                               TextColor="#6E6E6E"
+                               FontSize="14"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Buttons: "Продолжить заполнение" & "Да, отменить" -->
+                    <VerticalStackLayout Spacing="10" Margin="0,6,0,0">
+                        <Button Text="Продолжить заполнение"
+                                Command="{Binding ResumeEditingCommand}"
+                                BackgroundColor="#4152B0"
+                                TextColor="#FFFFFF"
+                                CornerRadius="14"
+                                HeightRequest="50"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+
+                        <Button Text="Да, отменить"
+                                Command="{Binding ConfirmCancelCommand}"
+                                BackgroundColor="#FFFFFF"
+                                BorderColor="#E4E7F4"
+                                BorderWidth="1"
+                                TextColor="#6A738A"
+                                CornerRadius="14"
+                                HeightRequest="50"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+    </Grid>
 </ContentPage>
