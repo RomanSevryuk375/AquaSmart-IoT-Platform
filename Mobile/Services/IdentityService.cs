@@ -11,6 +11,7 @@ public sealed class IdentityService : IIdentityService
     private const string SavedUserNameKey = "aquasmart_user_name";
     private const string SavedUserEmailKey = "aquasmart_user_email";
     private const string SavedUserPhoneKey = "aquasmart_user_phone";
+    private const string SavedUserAvatarKey = "aquasmart_user_avatar";
 
     private readonly IApiClient _apiClient;
     private readonly object _syncLock = new();
@@ -29,10 +30,12 @@ public sealed class IdentityService : IIdentityService
             var name = Preferences.Default.Get<string>(SavedUserNameKey, string.Empty);
             var email = Preferences.Default.Get<string>(SavedUserEmailKey, string.Empty);
             var phone = Preferences.Default.Get<string>(SavedUserPhoneKey, string.Empty);
+            var avatar = Preferences.Default.Get<string>(SavedUserAvatarKey, string.Empty);
 
             if (!string.IsNullOrWhiteSpace(name)) _currentUser.FullName = name;
             if (!string.IsNullOrWhiteSpace(email)) _currentUser.Email = email;
             if (!string.IsNullOrWhiteSpace(phone)) _currentUser.Phone = phone;
+            if (!string.IsNullOrWhiteSpace(avatar) && File.Exists(avatar)) _currentUser.AvatarPath = avatar;
         }
     }
 
@@ -101,11 +104,13 @@ public sealed class IdentityService : IIdentityService
             Preferences.Default.Remove(SavedUserNameKey);
             Preferences.Default.Remove(SavedUserEmailKey);
             Preferences.Default.Remove(SavedUserPhoneKey);
+            Preferences.Default.Remove(SavedUserAvatarKey);
             lock (_syncLock)
             {
                 _currentUser.FullName = string.Empty;
                 _currentUser.Email = string.Empty;
                 _currentUser.Phone = string.Empty;
+                _currentUser.AvatarPath = null;
             }
         }
         catch
@@ -156,6 +161,14 @@ public sealed class IdentityService : IIdentityService
             Preferences.Default.Set(SavedUserNameKey, _currentUser.FullName);
             Preferences.Default.Set(SavedUserEmailKey, _currentUser.Email);
             Preferences.Default.Set(SavedUserPhoneKey, _currentUser.Phone);
+            if (!string.IsNullOrWhiteSpace(_currentUser.AvatarPath) && File.Exists(_currentUser.AvatarPath))
+            {
+                Preferences.Default.Set(SavedUserAvatarKey, _currentUser.AvatarPath);
+            }
+            else
+            {
+                Preferences.Default.Remove(SavedUserAvatarKey);
+            }
         }
 
         try

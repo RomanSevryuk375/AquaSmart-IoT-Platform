@@ -64,13 +64,21 @@
                             HeightRequest="84"
                             WidthRequest="84"
                             HorizontalOptions="Center">
-                        <Label Text="{Binding User.Initials}"
-                               TextColor="#4152B0"
-                               FontFamily="OpenSansSemibold"
-                               FontSize="28"
-                               FontAttributes="Bold"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center" />
+                        <Grid>
+                            <Image Source="{Binding User.AvatarPath}"
+                                   Aspect="AspectFill"
+                                   IsVisible="{Binding User.HasAvatar}"
+                                   HorizontalOptions="Fill"
+                                   VerticalOptions="Fill" />
+                            <Label Text="{Binding User.Initials}"
+                                   IsVisible="{Binding User.HasAvatar, Converter={StaticResource InverseBoolConverter}}"
+                                   TextColor="#4152B0"
+                                   FontFamily="OpenSansSemibold"
+                                   FontSize="28"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Grid>
                     </Border>
 
                     <Label Text="{Binding User.FullName}"

@@ -6,6 +6,8 @@ public class UserProfileModel
     public string Email { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
     public string Role { get; set; } = "Пользователь";
+    public string? AvatarPath { get; set; }
+    public bool HasAvatar => !string.IsNullOrWhiteSpace(AvatarPath) && File.Exists(AvatarPath);
     public bool PushNotificationsEnabled { get; set; } = true;
     public bool CriticalAlertsOnly { get; set; } = false;
     public bool DarkThemeEnabled { get; set; } = false;
@@ -29,4 +31,3 @@ public class UserProfileModel
         }
     }
 }
-

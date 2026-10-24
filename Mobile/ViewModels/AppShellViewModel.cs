@@ -1,11 +1,13 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mobile.Services.Interfaces;
 
 namespace Mobile.ViewModels;
 
 public partial class AppShellViewModel : ObservableObject
 {
     private readonly IIdentityService _identityService;
+    private readonly IAuthService _authService;
 
     [ObservableProperty]
     private string _userName = "Пользователь";
@@ -19,9 +21,16 @@ public partial class AppShellViewModel : ObservableObject
     [ObservableProperty]
     private string _userInitials = "👤";
 
-    public AppShellViewModel(IIdentityService identityService)
+    [ObservableProperty]
+    private string? _userAvatarPath;
+
+    [ObservableProperty]
+    private bool _hasUserAvatar;
+
+    public AppShellViewModel(IIdentityService identityService, IAuthService authService)
     {
         _identityService = identityService;
+        _authService = authService;
         RefreshUserData();
     }
 
@@ -39,6 +48,8 @@ public partial class AppShellViewModel : ObservableObject
             UserEmail = profile.Email;
             UserRole = !string.IsNullOrWhiteSpace(profile.Role) ? profile.Role : "Пользователь";
             UserInitials = profile.Initials;
+            UserAvatarPath = profile.AvatarPath;
+            HasUserAvatar = profile.HasAvatar;
         }
         catch
         {
@@ -59,7 +70,7 @@ public partial class AppShellViewModel : ObservableObject
         if (answer)
         {
             Shell.Current.FlyoutIsPresented = false;
-            await _identityService.ClearTokenAsync();
+            await _authService.LogoutAsync();
             await Shell.Current.GoToAsync("//MainPage");
         }
     }
