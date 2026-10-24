@@ -2,113 +2,379 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Mobile.ViewModels"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
              x:Class="Mobile.Views.AddScenarioPage"
              x:DataType="vm:AddScenarioViewModel"
-             BackgroundColor="#F6F7FC"
-             Title="Новый сценарий">
+             BackgroundColor="#FFFFFF"
+             Shell.NavBarIsVisible="False"
+             Title="Добавление сценария">
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="20,16,20,30">
-            <!-- Header Banner -->
-            <Border x:Name="HeaderCard"
-                    StrokeThickness="0"
-                    StrokeShape="RoundRectangle 16"
-                    BackgroundColor="#4152B0"
-                    Padding="20">
-                <VerticalStackLayout Spacing="6">
-                    <Label Text="Автоматизация и сценарии"
-                           TextColor="#FFFFFF"
+    <Grid>
+        <!-- 1. MAIN FORM (Figma: Добавление сценария) -->
+        <ScrollView IsVisible="{Binding IsFormVisible}">
+            <VerticalStackLayout Spacing="16" Padding="20,16,20,30">
+                <!-- Top Navigation Bar (< Добавление сценария   X) -->
+                <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,10">
+                    <Border WidthRequest="36" HeightRequest="36"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="#F6F7FC"
+                            StrokeThickness="0"
+                            VerticalOptions="Center">
+                        <ImageButton Source="icon_arrow_left.png"
+                                     Command="{Binding PromptCancelCommand}"
+                                     BackgroundColor="Transparent"
+                                     WidthRequest="20" HeightRequest="20"
+                                     Padding="0"
+                                     HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+
+                    <Label Grid.Column="1"
+                           Text="Добавление сценария"
+                           TextColor="#141414"
                            FontFamily="OpenSansSemibold"
-                           FontSize="20"
-                           FontAttributes="Bold" />
-                    <Label Text="Создайте интеллектуальное правило реакции на изменения показателей воды"
-                           TextColor="#EDEFFB"
-                           FontSize="13" />
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center"
+                           Margin="12,0,0,0" />
+
+                    <Border Grid.Column="2"
+                            WidthRequest="36" HeightRequest="36"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="#F6F7FC"
+                            StrokeThickness="0"
+                            VerticalOptions="Center">
+                        <ImageButton Source="icon_close.png"
+                                     Command="{Binding PromptCancelCommand}"
+                                     BackgroundColor="Transparent"
+                                     WidthRequest="18" HeightRequest="18"
+                                     Padding="0"
+                                     HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                </Grid>
+
+                <!-- Scenario Name -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Название сценария" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="50" Padding="14,0">
+                        <Entry Text="{Binding ScenarioName}"
+                               Placeholder="Например, Поддержание тепла при падении t°"
+                               PlaceholderColor="#8C93A8"
+                               TextColor="#141414"
+                               VerticalOptions="Center" />
+                    </Border>
                 </VerticalStackLayout>
-            </Border>
 
-            <!-- Form Card -->
-            <Border x:Name="FormCard"
-                    StrokeThickness="1"
-                    Stroke="#E4E7F4"
-                    StrokeShape="RoundRectangle 16"
-                    BackgroundColor="#FFFFFF"
-                    Padding="20">
-                <VerticalStackLayout Spacing="16">
-                    <!-- Scenario Name -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Название сценария *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
-                            <Entry Text="{Binding ScenarioName}"
-                                   Placeholder="Например, Поддержание тепла при падении t°"
-                                   PlaceholderColor="#8C93A8"
-                                   TextColor="#2E3A7E"
-                                   VerticalOptions="Center" />
-                        </Border>
+                <!-- BLOCK 1: ЕСЛИ (Триггер) -->
+                <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 16" BackgroundColor="#F6F7FC" Padding="16">
+                    <VerticalStackLayout Spacing="14">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                            <Border BackgroundColor="#4152B0" StrokeThickness="0" StrokeShape="RoundRectangle 6" Padding="8,4">
+                                <Label Text="ЕСЛИ" TextColor="#FFFFFF" FontFamily="OpenSansSemibold" FontSize="11" FontAttributes="Bold" />
+                            </Border>
+                            <Label Grid.Column="1" Text="Условие срабатывания" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" VerticalOptions="Center" />
+                        </Grid>
+
+                        <!-- Sensor Picker -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Отслеживаемый показатель" TextColor="#6E6E6E" FontSize="13" />
+                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="48" Padding="14,0">
+                                <Picker SelectedItem="{Binding SelectedSensor}"
+                                        TextColor="#141414"
+                                        VerticalOptions="Center">
+                                    <Picker.ItemsSource>
+                                        <x:Array Type="{x:Type x:String}">
+                                            <x:String>Температура воды</x:String>
+                                            <x:String>Кислотность pH</x:String>
+                                            <x:String>Жесткость TDS</x:String>
+                                            <x:String>Уровень воды</x:String>
+                                            <x:String>Редокс ОВП</x:String>
+                                        </x:Array>
+                                    </Picker.ItemsSource>
+                                </Picker>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Operator Selection Chips -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Оператор сравнения" TextColor="#6E6E6E" FontSize="13" />
+                            <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="6">
+                                <Button Grid.Column="0" Text="&lt;"
+                                        Command="{Binding SelectOperatorCommand}" CommandParameter="&lt;"
+                                        BackgroundColor="#FFFFFF" BorderColor="#E4E7F4" BorderWidth="1"
+                                        TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" HeightRequest="42" CornerRadius="10" />
+                                <Button Grid.Column="1" Text="&lt;="
+                                        Command="{Binding SelectOperatorCommand}" CommandParameter="&lt;="
+                                        BackgroundColor="#FFFFFF" BorderColor="#E4E7F4" BorderWidth="1"
+                                        TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="13" HeightRequest="42" CornerRadius="10" />
+                                <Button Grid.Column="2" Text="="
+                                        Command="{Binding SelectOperatorCommand}" CommandParameter="="
+                                        BackgroundColor="#FFFFFF" BorderColor="#E4E7F4" BorderWidth="1"
+                                        TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" HeightRequest="42" CornerRadius="10" />
+                                <Button Grid.Column="3" Text="&gt;="
+                                        Command="{Binding SelectOperatorCommand}" CommandParameter="&gt;="
+                                        BackgroundColor="#FFFFFF" BorderColor="#E4E7F4" BorderWidth="1"
+                                        TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="13" HeightRequest="42" CornerRadius="10" />
+                                <Button Grid.Column="4" Text="&gt;"
+                                        Command="{Binding SelectOperatorCommand}" CommandParameter="&gt;"
+                                        BackgroundColor="#FFFFFF" BorderColor="#E4E7F4" BorderWidth="1"
+                                        TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" HeightRequest="42" CornerRadius="10" />
+                            </Grid>
+                        </VerticalStackLayout>
+
+                        <!-- Threshold Value Input -->
+                        <VerticalStackLayout Spacing="6">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="Пороговое значение" TextColor="#6E6E6E" FontSize="13" />
+                                <Label Grid.Column="1" Text="{Binding SelectedOperator, StringFormat='Текущий оператор: {0}'}" TextColor="#4152B0" FontFamily="OpenSansSemibold" FontSize="12" />
+                            </Grid>
+                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="48" Padding="14,0">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Entry Text="{Binding ThresholdValue}"
+                                           Keyboard="Numeric"
+                                           Placeholder="24.5"
+                                           PlaceholderColor="#8C93A8"
+                                           TextColor="#141414"
+                                           VerticalOptions="Center" />
+                                    <Label Grid.Column="1" Text="{Binding SensorUnit}" TextColor="#8C93A8" FontFamily="OpenSansSemibold" FontSize="14" VerticalOptions="Center" Margin="0,0,6,0" />
+                                </Grid>
+                            </Border>
+                            <!-- Quick Threshold Presets -->
+                            <HorizontalStackLayout Spacing="6" Margin="0,2,0,0">
+                                <Button Text="24.0" Command="{Binding SelectPresetThresholdCommand}" CommandParameter="24.0"
+                                        BackgroundColor="#EDEFFB" TextColor="#4152B0" FontSize="12" HeightRequest="30" Padding="10,0" CornerRadius="8" />
+                                <Button Text="25.0" Command="{Binding SelectPresetThresholdCommand}" CommandParameter="25.0"
+                                        BackgroundColor="#EDEFFB" TextColor="#4152B0" FontSize="12" HeightRequest="30" Padding="10,0" CornerRadius="8" />
+                                <Button Text="26.0" Command="{Binding SelectPresetThresholdCommand}" CommandParameter="26.0"
+                                        BackgroundColor="#EDEFFB" TextColor="#4152B0" FontSize="12" HeightRequest="30" Padding="10,0" CornerRadius="8" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
                     </VerticalStackLayout>
+                </Border>
 
-                    <!-- Condition -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Условие срабатывания (Триггер) *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
-                            <Entry Text="{Binding Condition}"
-                                   Placeholder="Если Температура &lt; 24.5°C"
-                                   PlaceholderColor="#8C93A8"
-                                   TextColor="#2E3A7E"
-                                   VerticalOptions="Center" />
-                        </Border>
+                <!-- BLOCK 2: ТОГДА (Действие) -->
+                <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 16" BackgroundColor="#F6F7FC" Padding="16">
+                    <VerticalStackLayout Spacing="14">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                            <Border BackgroundColor="#7BA028" StrokeThickness="0" StrokeShape="RoundRectangle 6" Padding="8,4">
+                                <Label Text="ТОГДА" TextColor="#FFFFFF" FontFamily="OpenSansSemibold" FontSize="11" FontAttributes="Bold" />
+                            </Border>
+                            <Label Grid.Column="1" Text="Действие исполнителя" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" VerticalOptions="Center" />
+                        </Grid>
+
+                        <!-- Action Chips -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Команда реле" TextColor="#6E6E6E" FontSize="13" />
+                            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                                <Button Grid.Column="0" Text="Включить"
+                                        Command="{Binding SelectActionCommand}" CommandParameter="Включить"
+                                        BackgroundColor="#FFFFFF" BorderColor="#E4E7F4" BorderWidth="1"
+                                        TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="13" HeightRequest="40" CornerRadius="10" />
+                                <Button Grid.Column="1" Text="Выключить"
+                                        Command="{Binding SelectActionCommand}" CommandParameter="Выключить"
+                                        BackgroundColor="#FFFFFF" BorderColor="#E4E7F4" BorderWidth="1"
+                                        TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="13" HeightRequest="40" CornerRadius="10" />
+                                <Button Grid.Column="2" Text="Переключить"
+                                        Command="{Binding SelectActionCommand}" CommandParameter="Переключить"
+                                        BackgroundColor="#FFFFFF" BorderColor="#E4E7F4" BorderWidth="1"
+                                        TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="12" HeightRequest="40" CornerRadius="10" />
+                            </Grid>
+                        </VerticalStackLayout>
+
+                        <!-- Relay Target Picker -->
+                        <VerticalStackLayout Spacing="6">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="Исполнительное устройство" TextColor="#6E6E6E" FontSize="13" />
+                                <Label Grid.Column="1" Text="{Binding SelectedAction, StringFormat='Действие: {0}'}" TextColor="#7BA028" FontFamily="OpenSansSemibold" FontSize="12" />
+                            </Grid>
+                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="48" Padding="14,0">
+                                <Picker SelectedItem="{Binding SelectedRelay}"
+                                        TextColor="#141414"
+                                        VerticalOptions="Center">
+                                    <Picker.ItemsSource>
+                                        <x:Array Type="{x:Type x:String}">
+                                            <x:String>Нагреватель</x:String>
+                                            <x:String>Фильтр основной</x:String>
+                                            <x:String>Светильник WRGB</x:String>
+                                            <x:String>Аэратор / Компрессор</x:String>
+                                            <x:String>CO2 клапан</x:String>
+                                            <x:String>Автокормушка (Auto Feeder)</x:String>
+                                        </x:Array>
+                                    </Picker.ItemsSource>
+                                </Picker>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Duration Chips -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Длительность работы" TextColor="#6E6E6E" FontSize="13" />
+                            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="6">
+                                <Button Grid.Column="0" Text="Постоянно"
+                                        Command="{Binding SelectDurationCommand}" CommandParameter="Постоянно"
+                                        BackgroundColor="#FFFFFF" BorderColor="#E4E7F4" BorderWidth="1"
+                                        TextColor="#141414" FontSize="11" HeightRequest="36" CornerRadius="8" />
+                                <Button Grid.Column="1" Text="15 мин."
+                                        Command="{Binding SelectDurationCommand}" CommandParameter="15 минут"
+                                        BackgroundColor="#FFFFFF" BorderColor="#E4E7F4" BorderWidth="1"
+                                        TextColor="#141414" FontSize="11" HeightRequest="36" CornerRadius="8" />
+                                <Button Grid.Column="2" Text="30 мин."
+                                        Command="{Binding SelectDurationCommand}" CommandParameter="30 минут"
+                                        BackgroundColor="#FFFFFF" BorderColor="#E4E7F4" BorderWidth="1"
+                                        TextColor="#141414" FontSize="11" HeightRequest="36" CornerRadius="8" />
+                                <Button Grid.Column="3" Text="1 час"
+                                        Command="{Binding SelectDurationCommand}" CommandParameter="1 час"
+                                        BackgroundColor="#FFFFFF" BorderColor="#E4E7F4" BorderWidth="1"
+                                        TextColor="#141414" FontSize="11" HeightRequest="36" CornerRadius="8" />
+                            </Grid>
+                        </VerticalStackLayout>
                     </VerticalStackLayout>
+                </Border>
 
-                    <!-- Action -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Действие исполнительного механизма *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
-                            <Entry Text="{Binding Action}"
-                                   Placeholder="Включить Нагреватель на 15 минут"
-                                   PlaceholderColor="#8C93A8"
-                                   TextColor="#2E3A7E"
-                                   VerticalOptions="Center" />
-                        </Border>
-                    </VerticalStackLayout>
+                <!-- Active Immediately Switch -->
+                <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" Padding="14,10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                            <Label Text="Активен сразу после создания" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                            <Label Text="Сценарий начнет выполняться автоматически" TextColor="#8C93A8" FontSize="12" />
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1" IsToggled="{Binding IsActive}" OnColor="#4152B0" VerticalOptions="Center" />
+                    </Grid>
+                </Border>
 
-                    <!-- Frequency / Mode -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Периодичность проверки" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
-                            <Entry Text="{Binding Frequency}"
-                                   Placeholder="Постоянно (по триггеру) или Ежедневно"
-                                   PlaceholderColor="#8C93A8"
-                                   TextColor="#2E3A7E"
-                                   VerticalOptions="Center" />
-                        </Border>
-                    </VerticalStackLayout>
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- Action Buttons -->
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                <Button Grid.Column="0"
-                        Text="Отмена"
-                        Command="{Binding CancelCommand}"
-                        BackgroundColor="#FFFFFF"
-                        TextColor="#6A738A"
-                        BorderColor="#E4E7F4"
-                        BorderWidth="1"
-                        CornerRadius="14"
-                        HeightRequest="52"
-                        FontFamily="OpenSansSemibold"
-                        FontSize="15" />
-
-                <Button Grid.Column="1"
-                        Text="Сохранить"
+                <!-- Save Button -->
+                <Button Text="Сохранить сценарий"
                         Command="{Binding SaveCommand}"
                         BackgroundColor="#4152B0"
                         TextColor="#FFFFFF"
                         CornerRadius="14"
                         HeightRequest="52"
                         FontFamily="OpenSansSemibold"
-                        FontSize="15" />
-            </Grid>
-        </VerticalStackLayout>
-    </ScrollView>
+                        FontSize="15"
+                        Margin="0,8,0,0" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- 2. SUCCESS STATE (Figma: Сценарий добавлен) -->
+        <ScrollView IsVisible="{Binding IsSuccessVisible}">
+            <VerticalStackLayout Spacing="20" Padding="20,24,20,30" VerticalOptions="Center">
+                <!-- Fish Mascot Card with Checkmark badge -->
+                <controls:FishMascotCard HeightOverride="200" BadgeText="✓" BadgeColor="#7BA028" />
+
+                <!-- Created Scenario Preview Card -->
+                <Border StrokeThickness="1"
+                        Stroke="#E4E7F4"
+                        StrokeShape="RoundRectangle 16"
+                        BackgroundColor="#FFFFFF"
+                        Padding="16,14">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Border WidthRequest="44" HeightRequest="44"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="#EDEFFB"
+                                StrokeThickness="0">
+                            <Label Text="⚡" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                            <Label Text="{Binding CreatedScenarioTitle}"
+                                   TextColor="#141414"
+                                   FontFamily="OpenSansSemibold"
+                                   FontSize="15"
+                                   FontAttributes="Bold" />
+                            <Label Text="{Binding CreatedScenarioSubtitle}"
+                                   TextColor="#8C93A8"
+                                   FontSize="12" />
+                        </VerticalStackLayout>
+                        <Label Grid.Column="2" Text="{Binding CreatedScenarioStatus}" TextColor="#4CAF50" FontFamily="OpenSansSemibold" FontSize="12" VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- Success Header & Description -->
+                <VerticalStackLayout Spacing="8" Margin="0,4,0,10">
+                    <Label Text="Сценарий добавлен!"
+                           TextColor="#141414"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="Сценарий автоматизации успешно активирован и отслеживает показатели вашей ёмкости"
+                           TextColor="#6E6E6E"
+                           FontSize="14"
+                           LineHeight="1.3"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <!-- Action Buttons: "Вернуться к ёмкости" & "Добавить ещё сценарий" -->
+                <VerticalStackLayout Spacing="10">
+                    <Button Text="Вернуться к ёмкости"
+                            Command="{Binding ReturnToAquariumCommand}"
+                            BackgroundColor="#4152B0"
+                            TextColor="#FFFFFF"
+                            CornerRadius="14"
+                            HeightRequest="52"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15" />
+
+                    <Button Text="Добавить ещё сценарий"
+                            Command="{Binding AddAnotherScenarioCommand}"
+                            BackgroundColor="#FFFFFF"
+                            BorderColor="#4152B0"
+                            BorderWidth="1.5"
+                            TextColor="#4152B0"
+                            CornerRadius="14"
+                            HeightRequest="52"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- 3. CANCEL CONFIRMATION MODAL (Figma: Добавление сценария. Отмена) -->
+        <Grid BackgroundColor="#80000000" IsVisible="{Binding IsCancelDialogOpen}">
+            <Border VerticalOptions="End"
+                    StrokeShape="RoundRectangle 24 24 0 0"
+                    BackgroundColor="#FFFFFF"
+                    StrokeThickness="0"
+                    Padding="24,24,24,32">
+                <VerticalStackLayout Spacing="18">
+                    <!-- Fish Mascot Card with Question badge -->
+                    <controls:FishMascotCard HeightOverride="180" BadgeText="?" BadgeColor="#7BA028" />
+
+                    <!-- Titles -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Отменить добавление?"
+                               TextColor="#141414"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="Все введённые параметры сценария будут потеряны"
+                               TextColor="#6E6E6E"
+                               FontSize="14"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Buttons: "Продолжить заполнение" & "Да, отменить" -->
+                    <VerticalStackLayout Spacing="10" Margin="0,6,0,0">
+                        <Button Text="Продолжить заполнение"
+                                Command="{Binding ResumeEditingCommand}"
+                                BackgroundColor="#4152B0"
+                                TextColor="#FFFFFF"
+                                CornerRadius="14"
+                                HeightRequest="50"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+
+                        <Button Text="Да, отменить"
+                                Command="{Binding ConfirmCancelCommand}"
+                                BackgroundColor="#FFFFFF"
+                                BorderColor="#E4E7F4"
+                                BorderWidth="1"
+                                TextColor="#6A738A"
+                                CornerRadius="14"
+                                HeightRequest="50"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+    </Grid>
 </ContentPage>
