@@ -16,6 +16,10 @@
             <converters:StringIsNotNullOrEmptyConverter x:Key="StringIsNotNullOrEmptyConverter" />
             <converters:TabActiveColorConverter x:Key="TabActiveBgConverter" />
             <converters:TabActiveTextColorConverter x:Key="TabActiveTextConverter" />
+            <converters:StepProgressColorConverter x:Key="StepProgressColorConverter" />
+            <converters:StepButtonTextConverter x:Key="StepButtonTextConverter" />
+            <converters:InhabitantBgConverter x:Key="InhabitantBgConverter" />
+            <converters:InhabitantTextConverter x:Key="InhabitantTextConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

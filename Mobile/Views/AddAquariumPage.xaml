@@ -2,134 +2,618 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Mobile.ViewModels"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
              x:Class="Mobile.Views.AddAquariumPage"
              x:DataType="vm:AddAquariumViewModel"
-             BackgroundColor="#F6F7FC"
-             Title="Новая ёмкость">
+             BackgroundColor="#FFFFFF"
+             Shell.NavBarIsVisible="False"
+             Title="Добавление ёмкости">
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="20,16,20,30">
-            <!-- Header Banner -->
-            <Border x:Name="HeaderCard"
-                    StrokeThickness="0"
-                    StrokeShape="RoundRectangle 16"
-                    BackgroundColor="#4152B0"
-                    Padding="20">
-                <VerticalStackLayout Spacing="6">
-                    <Label Text="Добавить аквариум или бассейн"
-                           TextColor="#FFFFFF"
-                           FontFamily="OpenSansSemibold"
-                           FontSize="20"
-                           FontAttributes="Bold" />
-                    <Label Text="Задайте параметры ёмкости для подключения телеметрии и сценариев управления"
-                           TextColor="#EDEFFB"
-                           FontSize="13" />
-                </VerticalStackLayout>
-            </Border>
+    <Grid>
+        <!-- MAIN WIZARD CONTENT -->
+        <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="20,16,20,20">
 
-            <!-- Form Card -->
-            <Border x:Name="FormCard"
-                    StrokeThickness="1"
-                    Stroke="#E4E7F4"
-                    StrokeShape="RoundRectangle 16"
-                    BackgroundColor="#FFFFFF"
-                    Padding="20">
-                <VerticalStackLayout Spacing="16">
-                    <!-- Name Input -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Название ёмкости *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
-                            <Entry Text="{Binding Name}"
-                                   Placeholder="Например, Домашний аквариум"
-                                   PlaceholderColor="#8C93A8"
-                                   TextColor="#2E3A7E"
-                                   VerticalOptions="Center" />
-                        </Border>
-                    </VerticalStackLayout>
+            <!-- Top Navigation Bar: Back Arrow, Title, Close (X) -->
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,14">
+                <Border Grid.Column="0"
+                        WidthRequest="38" HeightRequest="38"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="#F6F7FC"
+                        StrokeThickness="0"
+                        VerticalOptions="Center">
+                    <ImageButton Source="icon_arrow_left.png"
+                                 Command="{Binding PrevStepCommand}"
+                                 BackgroundColor="Transparent"
+                                 WidthRequest="20" HeightRequest="20"
+                                 Padding="0"
+                                 HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
 
-                    <!-- Volume Input -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Объём воды (литры) *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
-                            <Entry Text="{Binding VolumeString}"
-                                   Keyboard="Numeric"
-                                   Placeholder="200"
-                                   PlaceholderColor="#8C93A8"
-                                   TextColor="#2E3A7E"
-                                   VerticalOptions="Center" />
-                        </Border>
-                    </VerticalStackLayout>
+                <Label Grid.Column="1"
+                       Text="Добавление ёмкости"
+                       TextColor="#141414"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center"
+                       Margin="10,0,0,0" />
 
-                    <!-- Water Type Picker -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Тип водной среды *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
-                            <Picker SelectedIndex="{Binding WaterTypeIndex}"
-                                    TextColor="#2E3A7E"
-                                    Title="Выберите тип воды"
-                                    TitleColor="#8C93A8"
-                                    VerticalOptions="Center">
-                                <Picker.ItemsSource>
-                                    <x:Array Type="{x:Type x:String}">
-                                        <x:String>Пресноводная (Freshwater)</x:String>
-                                        <x:String>Морская (Marine)</x:String>
-                                        <x:String>Солоноватая (Brackish)</x:String>
-                                    </x:Array>
-                                </Picker.ItemsSource>
-                            </Picker>
-                        </Border>
-                    </VerticalStackLayout>
-
-                    <!-- Species / Inhabitants -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Обитатели и фауна" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
-                            <Entry Text="{Binding Species}"
-                                   Placeholder="Например: Неоны, скалярии, анубиасы"
-                                   PlaceholderColor="#8C93A8"
-                                   TextColor="#2E3A7E"
-                                   VerticalOptions="Center" />
-                        </Border>
-                    </VerticalStackLayout>
-
-                    <!-- Dimensions -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Габариты (Д×Ш×В см)" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
-                            <Entry Text="{Binding Dimensions}"
-                                   Placeholder="100 × 40 × 50 см"
-                                   PlaceholderColor="#8C93A8"
-                                   TextColor="#2E3A7E"
-                                   VerticalOptions="Center" />
-                        </Border>
-                    </VerticalStackLayout>
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- Action Buttons -->
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                <Button Grid.Column="0"
-                        Text="Отмена"
-                        Command="{Binding CancelCommand}"
-                        BackgroundColor="#FFFFFF"
-                        TextColor="#6A738A"
-                        BorderColor="#E4E7F4"
-                        BorderWidth="1"
-                        CornerRadius="14"
-                        HeightRequest="52"
-                        FontFamily="OpenSansSemibold"
-                        FontSize="15" />
-
-                <Button Grid.Column="1"
-                        Text="Сохранить"
-                        Command="{Binding SaveCommand}"
-                        BackgroundColor="#4152B0"
-                        TextColor="#FFFFFF"
-                        CornerRadius="14"
-                        HeightRequest="52"
-                        FontFamily="OpenSansSemibold"
-                        FontSize="15" />
+                <Border Grid.Column="2"
+                        WidthRequest="38" HeightRequest="38"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="#F6F7FC"
+                        StrokeThickness="0"
+                        VerticalOptions="Center">
+                    <ImageButton Source="icon_close.png"
+                                 Command="{Binding PromptCancelCommand}"
+                                 BackgroundColor="Transparent"
+                                 WidthRequest="18" HeightRequest="18"
+                                 Padding="0"
+                                 HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
             </Grid>
-        </VerticalStackLayout>
-    </ScrollView>
+
+            <!-- 7-Segment Step Progress Indicator matching Figma -->
+            <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*,*,*,*" ColumnSpacing="6" Margin="0,0,0,20">
+                <BoxView Grid.Column="0" HeightRequest="4" CornerRadius="2" Color="#4152B0" />
+                <BoxView Grid.Column="1" HeightRequest="4" CornerRadius="2" Color="{Binding CurrentStep, Converter={StaticResource StepProgressColorConverter}, ConverterParameter=2}" />
+                <BoxView Grid.Column="2" HeightRequest="4" CornerRadius="2" Color="{Binding CurrentStep, Converter={StaticResource StepProgressColorConverter}, ConverterParameter=3}" />
+                <BoxView Grid.Column="3" HeightRequest="4" CornerRadius="2" Color="{Binding CurrentStep, Converter={StaticResource StepProgressColorConverter}, ConverterParameter=4}" />
+                <BoxView Grid.Column="4" HeightRequest="4" CornerRadius="2" Color="{Binding CurrentStep, Converter={StaticResource StepProgressColorConverter}, ConverterParameter=5}" />
+                <BoxView Grid.Column="5" HeightRequest="4" CornerRadius="2" Color="{Binding CurrentStep, Converter={StaticResource StepProgressColorConverter}, ConverterParameter=6}" />
+                <BoxView Grid.Column="6" HeightRequest="4" CornerRadius="2" Color="{Binding CurrentStep, Converter={StaticResource StepProgressColorConverter}, ConverterParameter=7}" />
+            </Grid>
+
+            <!-- Scrollable Step Contents -->
+            <ScrollView Grid.Row="2">
+                <Grid>
+                    <!-- ================= STEP 1: Какая у вас ёмкость? ================= -->
+                    <VerticalStackLayout Spacing="16" IsVisible="False">
+                        <VerticalStackLayout.Triggers>
+                            <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding CurrentStep}" Value="1">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </VerticalStackLayout.Triggers>
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Шаг 1" TextColor="#8C93A8" FontSize="12" />
+                            <Label Text="Какая у вас ёмкость?" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
+                            <Label Text="Выберите тип — это поможет настроить параметры мониторинга" TextColor="#6E6E6E" FontSize="13" />
+                        </VerticalStackLayout>
+
+                        <!-- Tank Type Cards -->
+                        <VerticalStackLayout Spacing="10">
+                            <!-- 0. Аквариум -->
+                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}">
+                                        <TapGestureRecognizer.CommandParameter>
+                                            <x:Int32>0</x:Int32>
+                                        </TapGestureRecognizer.CommandParameter>
+                                    </TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Label Text="🐟" FontSize="22" VerticalOptions="Center" />
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="Аквариум" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
+                                        <Label Text="Ёмкость для рыб и водных обитателей" TextColor="#8C93A8" FontSize="12" />
+                                    </VerticalStackLayout>
+                                    <RadioButton Grid.Column="2" IsChecked="True" VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+
+                            <!-- 1. Террариум -->
+                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}">
+                                        <TapGestureRecognizer.CommandParameter>
+                                            <x:Int32>1</x:Int32>
+                                        </TapGestureRecognizer.CommandParameter>
+                                    </TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Label Text="🦎" FontSize="22" VerticalOptions="Center" />
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="Террариум" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
+                                        <Label Text="Среда для рептилий и амфибий" TextColor="#8C93A8" FontSize="12" />
+                                    </VerticalStackLayout>
+                                    <RadioButton Grid.Column="2" IsChecked="False" VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+
+                            <!-- 2. Палюдариум -->
+                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}">
+                                        <TapGestureRecognizer.CommandParameter>
+                                            <x:Int32>2</x:Int32>
+                                        </TapGestureRecognizer.CommandParameter>
+                                    </TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Label Text="🐢" FontSize="22" VerticalOptions="Center" />
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="Палюдариум" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
+                                        <Label Text="Совмещает водную и наземную зоны" TextColor="#8C93A8" FontSize="12" />
+                                    </VerticalStackLayout>
+                                    <RadioButton Grid.Column="2" IsChecked="False" VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+
+                            <!-- 3. Гроубокс -->
+                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}">
+                                        <TapGestureRecognizer.CommandParameter>
+                                            <x:Int32>3</x:Int32>
+                                        </TapGestureRecognizer.CommandParameter>
+                                    </TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Label Text="🌱" FontSize="22" VerticalOptions="Center" />
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="Гроубокс" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
+                                        <Label Text="Закрытая камера для растений" TextColor="#8C93A8" FontSize="12" />
+                                    </VerticalStackLayout>
+                                    <RadioButton Grid.Column="2" IsChecked="False" VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+
+                            <!-- 4. Флорариум -->
+                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}">
+                                        <TapGestureRecognizer.CommandParameter>
+                                            <x:Int32>4</x:Int32>
+                                        </TapGestureRecognizer.CommandParameter>
+                                    </TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Label Text="🌸" FontSize="22" VerticalOptions="Center" />
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="Флорариум" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
+                                        <Label Text="Декоративная ёмкость для растений" TextColor="#8C93A8" FontSize="12" />
+                                    </VerticalStackLayout>
+                                    <RadioButton Grid.Column="2" IsChecked="False" VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+
+                            <!-- 5. Формикарий -->
+                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}">
+                                        <TapGestureRecognizer.CommandParameter>
+                                            <x:Int32>5</x:Int32>
+                                        </TapGestureRecognizer.CommandParameter>
+                                    </TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Label Text="🐜" FontSize="22" VerticalOptions="Center" />
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="Формикарий" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
+                                        <Label Text="Муравьиная ферма" TextColor="#8C93A8" FontSize="12" />
+                                    </VerticalStackLayout>
+                                    <RadioButton Grid.Column="2" IsChecked="False" VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- ================= STEP 2: Как назовёте ёмкость? ================= -->
+                    <VerticalStackLayout Spacing="16" IsVisible="False">
+                        <VerticalStackLayout.Triggers>
+                            <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding CurrentStep}" Value="2">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </VerticalStackLayout.Triggers>
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Шаг 2" TextColor="#8C93A8" FontSize="12" />
+                            <Label Text="Как назовёте ёмкость?" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
+                            <Label Text="Придумайте название, чтобы легко находить ёмкость в списке" TextColor="#6E6E6E" FontSize="13" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="6" Margin="0,10,0,0">
+                            <Label Text="Название ёмкости" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="52" Padding="14,0">
+                                <Entry Text="{Binding Name}"
+                                       Placeholder="Введите название ёмкости"
+                                       PlaceholderColor="#8C93A8"
+                                       TextColor="#141414"
+                                       VerticalOptions="Center" />
+                            </Border>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- ================= STEP 3: Какой объём? ================= -->
+                    <VerticalStackLayout Spacing="16" IsVisible="False">
+                        <VerticalStackLayout.Triggers>
+                            <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding CurrentStep}" Value="3">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </VerticalStackLayout.Triggers>
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Шаг 3" TextColor="#8C93A8" FontSize="12" />
+                            <Label Text="Какой объём?" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
+                            <Label Text="Укажите объём в литрах — это поможет рассчитать дозировки" TextColor="#6E6E6E" FontSize="13" />
+                        </VerticalStackLayout>
+
+                        <!-- Counter with - and + matching Figma -->
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Margin="0,20,0,0" HeightRequest="56">
+                            <Button Grid.Column="0"
+                                    Text="−"
+                                    Command="{Binding DecrementVolumeCommand}"
+                                    BackgroundColor="#4152B0"
+                                    TextColor="#FFFFFF"
+                                    FontSize="22"
+                                    WidthRequest="56"
+                                    HeightRequest="56"
+                                    CornerRadius="14" />
+
+                            <Border Grid.Column="1" StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF">
+                                <Grid ColumnDefinitions="*,Auto" Padding="16,0">
+                                    <Entry Text="{Binding Volume}"
+                                           Keyboard="Numeric"
+                                           TextColor="#141414"
+                                           FontFamily="OpenSansSemibold"
+                                           FontSize="22"
+                                           HorizontalTextAlignment="Center"
+                                           VerticalOptions="Center" />
+                                    <Label Grid.Column="1" Text="л" TextColor="#8C93A8" FontSize="16" VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+
+                            <Button Grid.Column="2"
+                                    Text="+"
+                                    Command="{Binding IncrementVolumeCommand}"
+                                    BackgroundColor="#4152B0"
+                                    TextColor="#FFFFFF"
+                                    FontSize="22"
+                                    WidthRequest="56"
+                                    HeightRequest="56"
+                                    CornerRadius="14" />
+                        </Grid>
+                    </VerticalStackLayout>
+
+                    <!-- ================= STEP 4: Кто будет жить в ёмкости? ================= -->
+                    <VerticalStackLayout Spacing="16" IsVisible="False">
+                        <VerticalStackLayout.Triggers>
+                            <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding CurrentStep}" Value="4">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </VerticalStackLayout.Triggers>
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Шаг 4" TextColor="#8C93A8" FontSize="12" />
+                            <Label Text="Кто будет жить в ёмкости?" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
+                            <Label Text="Можно выбрать несколько вариантов" TextColor="#6E6E6E" FontSize="13" />
+                        </VerticalStackLayout>
+
+                        <!-- Inhabitants Chips FlexLayout matching Figma -->
+                        <FlexLayout BindableLayout.ItemsSource="{Binding InhabitantsList}"
+                                    Wrap="Wrap"
+                                    Direction="Row"
+                                    JustifyContent="Start"
+                                    AlignItems="Center"
+                                    Margin="0,10,0,0">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="vm:InhabitantChipModel">
+                                    <Border StrokeThickness="1"
+                                            Stroke="#E4E7F4"
+                                            StrokeShape="RoundRectangle 20"
+                                            BackgroundColor="{Binding IsSelected, Converter={StaticResource InhabitantBgConverter}}"
+                                            Padding="14,10"
+                                            Margin="0,0,8,10">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AddAquariumViewModel}}, Path=ToggleInhabitantCommand}"
+                                                                  CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                        <Label Text="{Binding Title}"
+                                               TextColor="{Binding IsSelected, Converter={StaticResource InhabitantTextConverter}}"
+                                               FontFamily="OpenSansSemibold"
+                                               FontSize="13" />
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </FlexLayout>
+                    </VerticalStackLayout>
+
+                    <!-- ================= STEP 5: Когда запустили ёмкость? ================= -->
+                    <VerticalStackLayout Spacing="16" IsVisible="False">
+                        <VerticalStackLayout.Triggers>
+                            <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding CurrentStep}" Value="5">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </VerticalStackLayout.Triggers>
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Шаг 5" TextColor="#8C93A8" FontSize="12" />
+                            <Label Text="Когда запустили ёмкость?" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
+                            <Label Text="Дата запуска помогает отслеживать возраст экосистемы" TextColor="#6E6E6E" FontSize="13" />
+                        </VerticalStackLayout>
+
+                        <!-- Date input with Calendar icon -->
+                        <VerticalStackLayout Spacing="6" Margin="0,14,0,0">
+                            <Label Text="Дата запуска" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="52" Padding="14,0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenCalendarCommand}" />
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="{Binding LaunchDate}" TextColor="#141414" FontSize="15" VerticalOptions="Center" />
+                                    <Image Grid.Column="1" Source="icon_calendar.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- ================= STEP 6: Выберите контроллер ================= -->
+                    <VerticalStackLayout Spacing="16" IsVisible="False">
+                        <VerticalStackLayout.Triggers>
+                            <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding CurrentStep}" Value="6">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </VerticalStackLayout.Triggers>
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Шаг 6" TextColor="#8C93A8" FontSize="12" />
+                            <Label Text="Выберите контроллер" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
+                            <Label Text="Контроллер будет управлять датчиками и оборудованием этой ёмкости" TextColor="#6E6E6E" FontSize="13" />
+                        </VerticalStackLayout>
+
+                        <!-- Controller dropdown selector -->
+                        <VerticalStackLayout Spacing="6" Margin="0,14,0,0">
+                            <Label Text="Контроллер" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="52" Padding="14,0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenControllerPickerCommand}" />
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="{Binding SelectedControllerName}" TextColor="#141414" FontSize="15" VerticalOptions="Center" />
+                                    <Image Grid.Column="1" Source="icon_chevron_down.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- ================= STEP 7: Настройте внешний вид ================= -->
+                    <VerticalStackLayout Spacing="16" IsVisible="False">
+                        <VerticalStackLayout.Triggers>
+                            <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding CurrentStep}" Value="7">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </VerticalStackLayout.Triggers>
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Шаг 7" TextColor="#8C93A8" FontSize="12" />
+                            <Label Text="Настройте внешний вид" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
+                            <Label Text="Так ёмкость будет легко узнать в списке" TextColor="#6E6E6E" FontSize="13" />
+                        </VerticalStackLayout>
+
+                        <!-- Color Palette Circles matching Figma -->
+                        <HorizontalStackLayout Spacing="14" HorizontalOptions="Center" Margin="0,12,0,16">
+                            <!-- Blue (0) -->
+                            <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="#4152B0" StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>0</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Label Text="✓" TextColor="#FFFFFF" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+
+                            <!-- Cyan (1) -->
+                            <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="#00BCD4" StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>1</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                            </Border>
+
+                            <!-- Green (2) -->
+                            <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="#4CAF50" StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>2</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                            </Border>
+
+                            <!-- Yellow (3) -->
+                            <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="#FFC107" StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>3</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                            </Border>
+
+                            <!-- Orange (4) -->
+                            <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="#FF9800" StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>4</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                            </Border>
+
+                            <!-- Gray (5) -->
+                            <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="#9E9E9E" StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>5</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </HorizontalStackLayout>
+
+                        <!-- Live Card Preview matching Figma -->
+                        <Border StrokeThickness="1"
+                                Stroke="{Binding PreviewBorderColor}"
+                                StrokeShape="RoundRectangle 16"
+                                BackgroundColor="{Binding PreviewThemeColor}"
+                                Padding="16,14">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                <Label Text="{Binding TankTypeIcon}" FontSize="24" VerticalOptions="Center" />
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                    <Label Text="{Binding Name}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
+                                    <Label Text="{Binding SpeciesInfo, FallbackValue='Аквариум • 20л • Контроллер №123'}" TextColor="#6E6E6E" FontSize="12" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+                </Grid>
+            </ScrollView>
+
+            <!-- Bottom Primary Wizard Button ("Далее" or "Готово") -->
+            <Button Grid.Row="3"
+                    Text="{Binding CurrentStep, Converter={StaticResource StepButtonTextConverter}}"
+                    Command="{Binding NextStepCommand}"
+                    BackgroundColor="#4152B0"
+                    TextColor="#FFFFFF"
+                    CornerRadius="14"
+                    HeightRequest="52"
+                    FontFamily="OpenSansSemibold"
+                    FontSize="15"
+                    Margin="0,12,0,0" />
+        </Grid>
+
+        <!-- CALENDAR BOTTOM SHEET OVERLAY -->
+        <Grid BackgroundColor="#80000000" IsVisible="{Binding IsCalendarOpen}">
+            <Border VerticalOptions="End"
+                    StrokeShape="RoundRectangle 24 24 0 0"
+                    BackgroundColor="#FFFFFF"
+                    StrokeThickness="0"
+                    Padding="24,20,24,28">
+                <VerticalStackLayout Spacing="16">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Июнь 2026" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Button Grid.Column="1" Text="Выбрать" Command="{Binding CloseCalendarCommand}" CommandParameter="11.06.2026" BackgroundColor="#4152B0" TextColor="#FFFFFF" CornerRadius="8" HeightRequest="36" Padding="12,0" />
+                    </Grid>
+                    <Label Text="Выберите дату запуска ёмкости" TextColor="#6E6E6E" FontSize="13" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- CONTROLLER PICKER BOTTOM SHEET OVERLAY -->
+        <Grid BackgroundColor="#80000000" IsVisible="{Binding IsControllerPickerOpen}">
+            <Border VerticalOptions="End"
+                    StrokeShape="RoundRectangle 24 24 0 0"
+                    BackgroundColor="#FFFFFF"
+                    StrokeThickness="0"
+                    Padding="24,20,24,28">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Выбор контроллера" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold" />
+                    <Button Text="Контроллер №123" Command="{Binding SelectControllerCommand}" CommandParameter="Контроллер №123" BackgroundColor="#F6F7FC" TextColor="#141414" CornerRadius="10" HeightRequest="46" HorizontalOptions="Fill" />
+                    <Button Text="Хаб-02" Command="{Binding SelectControllerCommand}" CommandParameter="Хаб-02" BackgroundColor="#F6F7FC" TextColor="#141414" CornerRadius="10" HeightRequest="46" HorizontalOptions="Fill" />
+                    <Button Text="Хаб-04" Command="{Binding SelectControllerCommand}" CommandParameter="Хаб-04" BackgroundColor="#F6F7FC" TextColor="#141414" CornerRadius="10" HeightRequest="46" HorizontalOptions="Fill" />
+                    <Button Text="Отмена" Command="{Binding SelectControllerCommand}" CommandParameter="{Binding SelectedControllerName}" BackgroundColor="Transparent" TextColor="#D93829" HeightRequest="42" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- SUCCESS SCREEN (Figma: Ёмкость создана!) -->
+        <Grid BackgroundColor="#FFFFFF" IsVisible="{Binding IsSuccessOpen}">
+            <ScrollView>
+                <VerticalStackLayout Spacing="20" Padding="24,30,24,30" VerticalOptions="Center">
+                    <!-- Mascot with Cube badge -->
+                    <controls:FishMascotCard HeightOverride="240" BadgeText="📦" BadgeColor="#7BA028" />
+
+                    <!-- Created Tank Card Preview -->
+                    <Border StrokeThickness="1"
+                            Stroke="{Binding PreviewBorderColor}"
+                            StrokeShape="RoundRectangle 16"
+                            BackgroundColor="{Binding PreviewThemeColor}"
+                            Padding="16,14">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Label Text="{Binding TankTypeIcon}" FontSize="24" VerticalOptions="Center" />
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                <Label Text="{Binding Name}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
+                                <Label Text="{Binding SpeciesInfo, FallbackValue='Аквариум • 20л • Контроллер №123'}" TextColor="#6E6E6E" FontSize="12" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+
+                    <!-- Title & Subtitle -->
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Ёмкость создана!"
+                               TextColor="#141414"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="Теперь вы можете настроить датчики и оборудование для мониторинга параметров"
+                               TextColor="#6E6E6E"
+                               FontSize="14"
+                               LineHeight="1.3"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Buttons: "Настроить датчики и оборудование" & "Вернуться на главную" -->
+                    <VerticalStackLayout Spacing="10" Margin="0,10,0,0">
+                        <Button Text="Настроить датчики и оборудование"
+                                Command="{Binding GoToEquipmentCommand}"
+                                BackgroundColor="#4152B0"
+                                TextColor="#FFFFFF"
+                                CornerRadius="14"
+                                HeightRequest="52"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+
+                        <Button Text="Вернуться на главную"
+                                Command="{Binding GoToMainCommand}"
+                                BackgroundColor="#FFFFFF"
+                                BorderColor="#E4E7F4"
+                                BorderWidth="1"
+                                TextColor="#6A738A"
+                                CornerRadius="14"
+                                HeightRequest="52"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+        </Grid>
+
+        <!-- CANCEL CONFIRMATION MODAL (Figma: Отменить создание?) -->
+        <Grid BackgroundColor="#80000000" IsVisible="{Binding IsCancelDialogOpen}">
+            <Border VerticalOptions="End"
+                    StrokeShape="RoundRectangle 24 24 0 0"
+                    BackgroundColor="#FFFFFF"
+                    StrokeThickness="0"
+                    Padding="24,24,24,32">
+                <VerticalStackLayout Spacing="18">
+                    <!-- Fish Mascot with Question Badge -->
+                    <controls:FishMascotCard HeightOverride="180" BadgeText="?" BadgeColor="#7BA028" />
+
+                    <!-- Titles -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Отменить создание?"
+                               TextColor="#141414"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="Все введённые данные будут потеряны"
+                               TextColor="#6E6E6E"
+                               FontSize="14"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Buttons: "Продолжить заполнение" & "Да, отменить" -->
+                    <VerticalStackLayout Spacing="10" Margin="0,6,0,0">
+                        <Button Text="Продолжить заполнение"
+                                Command="{Binding ResumeEditingCommand}"
+                                BackgroundColor="#4152B0"
+                                TextColor="#FFFFFF"
+                                CornerRadius="14"
+                                HeightRequest="50"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+
+                        <Button Text="Да, отменить"
+                                Command="{Binding ConfirmCancelCommand}"
+                                BackgroundColor="#FFFFFF"
+                                BorderColor="#E4E7F4"
+                                BorderWidth="1"
+                                TextColor="#6A738A"
+                                CornerRadius="14"
+                                HeightRequest="50"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+    </Grid>
 </ContentPage>
