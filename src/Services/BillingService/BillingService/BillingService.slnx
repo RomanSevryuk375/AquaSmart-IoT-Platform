@@ -1,0 +1,29 @@
+<Solution>
+  <Folder Name="/blocks/">
+    <Project Path="../../../BuildingBlocks/BuildingBlocks.Application/BuildingBlocks.Application.csproj" Id="63b7d81c-f6c0-4174-b0a1-5d8d4189a401" />
+    <Project Path="../../../BuildingBlocks/BuildingBlocks.Domain/BuildingBlocks.Domain.csproj" Id="04589dd0-3d04-4e39-93d1-dcac7ad59645" />
+    <Project Path="../../../BuildingBlocks/BuildingBlocks.GrpcContracts/BuildingBlocks.GrpcContracts.csproj" Id="200c4cc7-72c4-464b-873f-d7c434685408" />
+    <Project Path="../../../BuildingBlocks/BuildingBlocks.Infrastructure/BuildingBlocks.Infrastructure.csproj" Id="3275f4a2-ac8b-433d-9531-623c668f7f3b" />
+    <Project Path="../../../BuildingBlocks/BuildingBlocks.IntegrationEvents/BuildingBlocks.IntegrationEvents.csproj" Id="f0eceb02-801b-4b7c-8404-7278f99ba541" />
+    <Project Path="../../../BuildingBlocks/BuildingBlocks.Presentation/BuildingBlocks.Presentation.csproj" Id="b8c9d1ee-6804-4776-9e84-38aea049d490" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="../../../.editorconfig" />
+    <File Path="../../../Directory.Build.props" />
+    <File Path="../../../Directory.Build.targets" />
+    <File Path="../../../Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="Billing.API.csproj" />
+    <Project Path="../Billing.Application/Billing.Application.csproj" Id="8119f23f-a8bc-4460-9fb7-0991c1d772ea" />
+    <Project Path="../Billing.Domain/Billing.Domain.csproj" Id="e5ba86e6-c761-4971-a36f-21b91d8705ec" />
+    <Project Path="../Billing.Infrastructure/Billing.Infrastructure.csproj" Id="24acc5cf-ce10-4d74-abdf-b3ab8126b7d8" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="../Billing.API.E2ETests/Billing.API.E2ETests.csproj" Id="75cee609-e0af-4789-83c3-5d41f935b8b4" />
+    <Project Path="../Billing.Application.UnitTests/Billing.Application.UnitTests.csproj" Id="8c874f52-e406-4894-92e9-8af1c7e2dc30" />
+    <Project Path="../Billing.ArchitectureTests/Billing.ArchitectureTests.csproj" Id="9e211662-c029-4695-bd2b-b89bb5acf27e" />
+    <Project Path="../Billing.Domain.UnitTests/Billing.Domain.UnitTests.csproj" Id="77a91d49-0a44-44c3-9990-a79c2659944b" />
+    <Project Path="../Billing.Infrastructure.IntegrationTests/Billing.Infrastructure.IntegrationTests.csproj" Id="9a295bdc-1683-42c2-993c-b15243ff7b9b" />
+  </Folder>
+</Solution>
