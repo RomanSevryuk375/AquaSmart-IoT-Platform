@@ -29,6 +29,7 @@ public static class ViewsCollectionExtensions
         services.AddTransient<ControllerDetailsPage>();
 
         services.AddTransient<EditProfilePage>();
+        services.AddTransient<ChangeAvatarPage>();
         services.AddTransient<AppSettingsPage>();
         services.AddTransient<DataHistoryPage>();
         services.AddTransient<SecuritySettingsPage>();

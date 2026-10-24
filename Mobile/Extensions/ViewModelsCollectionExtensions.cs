@@ -30,6 +30,7 @@ public static class ViewModelsCollectionExtensions
         services.AddTransient<ControllerDetailsViewModel>();
 
         services.AddTransient<EditProfileViewModel>();
+        services.AddTransient<ChangeAvatarViewModel>();
         services.AddTransient<AppSettingsViewModel>();
         services.AddTransient<DataHistoryViewModel>();
         services.AddTransient<SecuritySettingsViewModel>();

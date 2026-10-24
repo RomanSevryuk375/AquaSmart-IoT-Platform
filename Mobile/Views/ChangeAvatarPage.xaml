@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Mobile.ViewModels"
+             x:Class="Mobile.Views.ChangeAvatarPage"
+             x:DataType="vm:ChangeAvatarViewModel"
+             BackgroundColor="#FFFFFF"
+             Shell.NavBarIsVisible="False"
+             Title="Изменение фото профиля">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="20,16,20,24">
+        <!-- Top Bar: Back Button & Title matching Figma 742:11645 -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" ColumnSpacing="12" Margin="0,4,0,16">
+            <Border Grid.Column="0"
+                    WidthRequest="38" HeightRequest="38"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="#F6F7FC"
+                    StrokeThickness="0">
+                <ImageButton Source="icon_chevron_left.png"
+                             Command="{Binding GoBackCommand}"
+                             BackgroundColor="Transparent"
+                             WidthRequest="20" HeightRequest="20"
+                             Padding="0"
+                             HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+
+            <Label Grid.Column="1"
+                   Text="Изменение фото профиля"
+                   TextColor="#141414"
+                   FontFamily="OpenSansSemibold"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center" />
+        </Grid>
+
+        <!-- Large Center Photo Card matching Figma -->
+        <Grid Grid.Row="1" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,10,0,20">
+            <Border StrokeThickness="0"
+                    StrokeShape="RoundRectangle 24"
+                    BackgroundColor="#DDE4F8"
+                    WidthRequest="300"
+                    HeightRequest="300"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center">
+                <Grid>
+                    <!-- User photo if available -->
+                    <Image Source="{Binding AvatarPath}"
+                           Aspect="AspectFill"
+                           IsVisible="{Binding HasAvatar}"
+                           HorizontalOptions="Fill"
+                           VerticalOptions="Fill" />
+
+                    <!-- Fallback mascot container if no avatar -->
+                    <VerticalStackLayout Spacing="12"
+                                         HorizontalOptions="Center"
+                                         VerticalOptions="Center"
+                                         IsVisible="{Binding HasAvatar, Converter={StaticResource InverseBoolConverter}}">
+                        <Image Source="fish_mascot.png"
+                               WidthRequest="140"
+                               HeightRequest="100"
+                               Aspect="AspectFit"
+                               HorizontalOptions="Center" />
+                        <Label Text="Фото не установлено"
+                               TextColor="#4152B0"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="15"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Action Buttons matching Figma -->
+        <VerticalStackLayout Grid.Row="2" Spacing="12">
+            <!-- Blue button: Выбрать из галереи -->
+            <Button Text="Выбрать из галереи"
+                    Command="{Binding PickFromGalleryCommand}"
+                    BackgroundColor="#4152B0"
+                    TextColor="#FFFFFF"
+                    FontFamily="OpenSansSemibold"
+                    FontSize="15"
+                    HeightRequest="52"
+                    CornerRadius="12" />
+
+            <!-- Red outline button: Удалить текущее фото -->
+            <Button Text="Удалить текущее фото"
+                    Command="{Binding DeletePhotoCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="#B72B2B"
+                    BorderColor="#B72B2B"
+                    BorderWidth="1"
+                    FontFamily="OpenSansSemibold"
+                    FontSize="15"
+                    HeightRequest="52"
+                    CornerRadius="12" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

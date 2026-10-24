@@ -70,7 +70,7 @@
                             WidthRequest="84"
                             HorizontalOptions="Center">
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding GoToEditProfileCommand}" />
+                            <TapGestureRecognizer Command="{Binding GoToChangeAvatarCommand}" />
                         </Border.GestureRecognizers>
                         <Grid>
                             <Image Source="{Binding User.AvatarPath}"

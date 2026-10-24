@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mobile.Models;
 using Mobile.Services.Interfaces;
+using Mobile.Views;
 
 namespace Mobile.ViewModels;
 
@@ -79,76 +80,7 @@ public partial class EditProfileViewModel : ObservableObject
     [RelayCommand]
     private async Task ChangePhotoAsync()
     {
-        try
-        {
-            string[] buttons = HasAvatar
-                ? new[] { "Выбрать из галереи", "Сделать снимок", "Удалить текущее фото" }
-                : new[] { "Выбрать из галереи", "Сделать снимок" };
-
-            var action = await Shell.Current.DisplayActionSheet("Фото профиля", "Отмена", null, buttons);
-            if (string.IsNullOrWhiteSpace(action) || action == "Отмена")
-            {
-                return;
-            }
-
-            if (action == "Выбрать из галереи")
-            {
-                var photo = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions
-                {
-                    Title = "Выберите фото профиля"
-                });
-
-                if (photo != null)
-                {
-                    await SaveSelectedAvatarAsync(photo);
-                }
-            }
-            else if (action == "Сделать снимок")
-            {
-                if (MediaPicker.Default.IsCaptureSupported)
-                {
-                    var status = await Permissions.CheckStatusAsync<Permissions.Camera>();
-                    if (status != PermissionStatus.Granted)
-                    {
-                        status = await Permissions.RequestAsync<Permissions.Camera>();
-                    }
-
-                    if (status == PermissionStatus.Granted)
-                    {
-                        var photo = await MediaPicker.Default.CapturePhotoAsync();
-                        if (photo != null)
-                        {
-                            await SaveSelectedAvatarAsync(photo);
-                        }
-                    }
-                    else
-                    {
-                        await Shell.Current.DisplayAlert("Доступ ограничен", "Для съемки фото предоставьте разрешение на камеру", "OK");
-                    }
-                }
-                else
-                {
-                    await Shell.Current.DisplayAlert("Камера", "Съемка фото не поддерживается на данном устройстве", "OK");
-                }
-            }
-            else if (action == "Удалить текущее фото")
-            {
-                if (!string.IsNullOrWhiteSpace(AvatarPath) && File.Exists(AvatarPath))
-                {
-                    try { File.Delete(AvatarPath); } catch { }
-                }
-                AvatarPath = null;
-                OnPropertyChanged(nameof(HasAvatar));
-
-                var user = await _identityService.GetCurrentUserAsync();
-                user.AvatarPath = null;
-                await _identityService.UpdateCurrentUserAsync(user);
-            }
-        }
-        catch (Exception ex)
-        {
-            await Shell.Current.DisplayAlert("Ошибка", $"Не удалось выбрать фото: {ex.Message}", "OK");
-        }
+        await Shell.Current.GoToAsync(nameof(ChangeAvatarPage));
     }
 
     private async Task SaveSelectedAvatarAsync(FileResult photo)

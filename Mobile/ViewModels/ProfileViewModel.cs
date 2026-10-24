@@ -48,6 +48,12 @@ public partial class ProfileViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task GoToChangeAvatarAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(ChangeAvatarPage));
+    }
+
+    [RelayCommand]
     private async Task OpenNotificationsAsync()
     {
         try
