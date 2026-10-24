@@ -1,4 +1,3 @@
-using Mobile.Extensions;
 using Mobile.ViewModels;
 
 namespace Mobile.Views;
@@ -17,9 +16,5 @@ public partial class ControllersPage : ContentPage
     {
         base.OnAppearing();
         await _viewModel.InitializeAsync();
-        await Task.WhenAll(
-            ContentScroll.FadeInUpAsync(350, 15),
-            AddButton.FadeInUpAsync(400, 25)
-        );
     }
 }

@@ -40,6 +40,24 @@ public partial class ControllersViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task GoBackAsync()
+    {
+        await Shell.Current.GoToAsync("..");
+    }
+
+    [RelayCommand]
+    private async Task OpenKnowledgeBaseAsync()
+    {
+        await Shell.Current.GoToAsync("//MainTabs/KnowledgeBasePage");
+    }
+
+    [RelayCommand]
+    private async Task OpenNotificationsAsync()
+    {
+        await Shell.Current.GoToAsync("NotificationsPage");
+    }
+
+    [RelayCommand]
     private async Task SelectControllerAsync(ControllerModel controller)
     {
         await Shell.Current.GoToAsync($"ControllerDetailsPage?controllerId={controller.Id}");

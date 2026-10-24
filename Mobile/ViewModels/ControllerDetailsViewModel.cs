@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mobile.Models;
+using Mobile.Services.Interfaces;
 
 namespace Mobile.ViewModels;
 
@@ -14,6 +16,21 @@ public partial class ControllerDetailsViewModel : ObservableObject
     [ObservableProperty]
     private ControllerModel? _controller;
 
+    [ObservableProperty]
+    private string _controllerCode = "020623465";
+
+    [ObservableProperty]
+    private string _name = string.Empty;
+
+    [ObservableProperty]
+    private string _macAddress = string.Empty;
+
+    [ObservableProperty]
+    private bool _isEnabled = true;
+
+    [ObservableProperty]
+    private bool _isDeleteDialogVisible;
+
     public ControllerDetailsViewModel(IControllerService controllerService)
     {
         _controllerService = controllerService;
@@ -24,30 +41,54 @@ public partial class ControllerDetailsViewModel : ObservableObject
         if (Guid.TryParse(value, out var id))
         {
             Controller = await _controllerService.GetControllerByIdAsync(id);
+            if (Controller != null)
+            {
+                Name = Controller.Name;
+                MacAddress = Controller.MacAddress;
+                IsEnabled = Controller.IsOnline;
+            }
         }
     }
 
     [RelayCommand]
-    private async Task RebootAsync()
+    private async Task GoBackAsync()
     {
-        if (Controller == null) return;
-        var confirm = await Shell.Current.DisplayAlert("Перезагрузка", $"Перезагрузить контроллер «{Controller.Name}»?", "Да", "Отмена");
-        if (confirm)
+        await Shell.Current.GoToAsync("..");
+    }
+
+    [RelayCommand]
+    private async Task SaveAsync()
+    {
+        if (Controller != null)
         {
-            await _controllerService.RebootControllerAsync(Controller.Id);
-            await Shell.Current.DisplayAlert("Готово", "Команда перезагрузки отправлена на контроллер", "OK");
+            Controller.Name = Name;
+            Controller.MacAddress = MacAddress;
+            Controller.IsOnline = IsEnabled;
         }
+        await Shell.Current.DisplayAlert("Успех", "Изменения контроллера сохранены!", "OK");
+        await Shell.Current.GoToAsync("..");
     }
 
     [RelayCommand]
-    private async Task DeleteAsync()
+    private void PromptDelete()
     {
-        if (Controller == null) return;
-        var confirm = await Shell.Current.DisplayAlert("Удаление", $"Удалить контроллер «{Controller.Name}» из системы?", "Удалить", "Отмена");
-        if (confirm)
+        IsDeleteDialogVisible = true;
+    }
+
+    [RelayCommand]
+    private void CancelDelete()
+    {
+        IsDeleteDialogVisible = false;
+    }
+
+    [RelayCommand]
+    private async Task ConfirmDeleteAsync()
+    {
+        IsDeleteDialogVisible = false;
+        if (Controller != null)
         {
             await _controllerService.DeleteControllerAsync(Controller.Id);
-            await Shell.Current.GoToAsync("..");
         }
+        await Shell.Current.GoToAsync("..");
     }
 }

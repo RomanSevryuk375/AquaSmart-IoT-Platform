@@ -3,128 +3,176 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Mobile.ViewModels"
              xmlns:models="clr-namespace:Mobile.Models"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
              x:Class="Mobile.Views.ControllersPage"
              x:DataType="vm:ControllersViewModel"
-             BackgroundColor="#F6F7FC"
-             Title="Контроллеры">
+             BackgroundColor="#FFFFFF"
+             Shell.NavBarIsVisible="False"
+             Title="Мои контроллеры">
 
-    <Grid RowDefinitions="*,Auto" Padding="20,16,20,20">
-        <!-- Main Content Area -->
-        <ScrollView Grid.Row="0" x:Name="ContentScroll">
-            <VerticalStackLayout Spacing="16">
-                <!-- Header Description -->
-                <Label Text="Аппаратные контроллеры и хабы AquaSmart"
-                       TextColor="#6E6E6E"
-                       FontSize="14" />
+    <Grid RowDefinitions="Auto,*" Padding="20,16,20,10">
+        <!-- Top Bar: Back, "Мои контроллеры", Add (+), Notifications (Bell) -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10" Margin="0,4,0,16">
+            <Border Grid.Column="0"
+                    WidthRequest="38" HeightRequest="38"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="#F6F7FC"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <ImageButton Source="icon_arrow_left.png"
+                             Command="{Binding GoBackCommand}"
+                             BackgroundColor="Transparent"
+                             WidthRequest="20" HeightRequest="20"
+                             Padding="0"
+                             HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
 
-                <!-- Empty State (Figma: Контроллеры. Контроллеров нет) -->
-                <Border IsVisible="{Binding HasNoControllers}"
-                        StrokeThickness="1"
-                        Stroke="#E1E4F2"
-                        StrokeShape="RoundRectangle 16"
-                        BackgroundColor="#FFFFFF"
-                        Padding="28"
-                        Margin="0,20,0,0">
-                    <VerticalStackLayout Spacing="16" HorizontalOptions="Center">
-                        <Border WidthRequest="80" HeightRequest="80"
-                                StrokeShape="RoundRectangle 40"
-                                BackgroundColor="#EDEFFB"
-                                StrokeThickness="0"
-                                HorizontalOptions="Center">
-                            <Label Text="📟" FontSize="36" HorizontalOptions="Center" VerticalOptions="Center" />
-                        </Border>
+            <Label Grid.Column="1"
+                   Text="Мои контроллеры"
+                   TextColor="#141414"
+                   FontFamily="OpenSansSemibold"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center"
+                   Margin="4,0,0,0" />
 
-                        <Label Text="Контроллеров пока нет"
+            <!-- Add Controller Button (+) -->
+            <Border Grid.Column="2"
+                    WidthRequest="38" HeightRequest="38"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="#F6F7FC"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <ImageButton Source="icon_plus.png"
+                             Command="{Binding AddControllerCommand}"
+                             BackgroundColor="Transparent"
+                             WidthRequest="18" HeightRequest="18"
+                             Padding="0"
+                             HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+
+            <!-- Bell Notifications -->
+            <Border Grid.Column="3"
+                    WidthRequest="38" HeightRequest="38"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="#F6F7FC"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <ImageButton Source="icon_bell.png"
+                             Command="{Binding OpenNotificationsCommand}"
+                             BackgroundColor="Transparent"
+                             WidthRequest="18" HeightRequest="18"
+                             Padding="0"
+                             HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+        </Grid>
+
+        <!-- Main Scrollable Area -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="16" Padding="0,0,0,24">
+
+                <!-- 1. EMPTY STATE (Figma: Контроллеры. Контроллеров нет) -->
+                <VerticalStackLayout IsVisible="{Binding HasNoControllers}" Spacing="18" Margin="0,10,0,0">
+                    <!-- Fish Mascot Card with Gear badge -->
+                    <controls:FishMascotCard HeightOverride="240" BadgeText="⚙" BadgeColor="#7BA028" />
+
+                    <!-- Titles -->
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Добавьте первый контроллер"
                                TextColor="#141414"
                                FontFamily="OpenSansSemibold"
-                               FontSize="18"
+                               FontSize="20"
                                FontAttributes="Bold"
                                HorizontalTextAlignment="Center" />
-
-                        <Label Text="Подключите микроконтроллер ESP32 или AquaHub для сбора телеметрии и автоматизации оборудования."
+                        <Label Text="Контроллер соединяет приложение с вашей ёмкостью — сканируйте QR-код на устройстве, чтобы начать"
                                TextColor="#6E6E6E"
                                FontSize="14"
+                               LineHeight="1.3"
                                HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
 
-                        <Button Text="+ Подключить контроллер"
+                    <!-- Buttons: "Сканировать QR-код" & "Изучить базу знаний" -->
+                    <VerticalStackLayout Spacing="12" Margin="0,10,0,0">
+                        <Button Text="Сканировать QR-код"
                                 Command="{Binding AddControllerCommand}"
                                 BackgroundColor="#4152B0"
                                 TextColor="#FFFFFF"
-                                CornerRadius="12"
-                                HeightRequest="48"
-                                Padding="20,0"
+                                CornerRadius="14"
+                                HeightRequest="52"
                                 FontFamily="OpenSansSemibold"
-                                FontSize="14"
-                                Margin="0,8,0,0" />
-                    </VerticalStackLayout>
-                </Border>
+                                FontSize="15" />
 
-                <!-- Non-Empty List (Figma: Контроллеры) -->
+                        <Button Text="Изучить базу знаний"
+                                Command="{Binding OpenKnowledgeBaseCommand}"
+                                BackgroundColor="#FFFFFF"
+                                BorderColor="#E4E7F4"
+                                BorderWidth="1"
+                                TextColor="#4152B0"
+                                CornerRadius="14"
+                                HeightRequest="52"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- 2. NON-EMPTY LIST (Figma: Контроллеры) -->
                 <VerticalStackLayout BindableLayout.ItemsSource="{Binding Controllers}"
                                      IsVisible="{Binding HasControllers}"
                                      Spacing="12">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate x:DataType="models:ControllerModel">
                             <Border StrokeThickness="1"
-                                    Stroke="#E1E4F2"
+                                    Stroke="#E4E7F4"
                                     StrokeShape="RoundRectangle 16"
                                     BackgroundColor="#FFFFFF"
-                                    Padding="18">
-                                <Border.Shadow>
-                                    <Shadow Brush="#10000000" Offset="0,4" Radius="8" Opacity="0.5" />
-                                </Border.Shadow>
+                                    Padding="16,14">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ControllersViewModel}}, Path=SelectControllerCommand}"
                                                           CommandParameter="{Binding .}" />
                                 </Border.GestureRecognizers>
 
-                                <VerticalStackLayout Spacing="10">
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <VerticalStackLayout Grid.Column="0" Spacing="2">
-                                            <Label Text="{Binding Name}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold" />
-                                            <Label Text="{Binding ModelType}" TextColor="#6E6E6E" FontSize="13" />
-                                        </VerticalStackLayout>
-                                        <Border Grid.Column="1" BackgroundColor="{Binding StatusBadgeBg}" StrokeShape="RoundRectangle 8" Padding="8,4" StrokeThickness="0">
-                                            <Label Text="{Binding StatusText}" TextColor="{Binding StatusColor}" FontSize="11" FontFamily="OpenSansSemibold" />
-                                        </Border>
-                                    </Grid>
+                                <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12">
+                                    <!-- Gear icon in circle -->
+                                    <Border Grid.Column="0"
+                                            WidthRequest="40" HeightRequest="40"
+                                            StrokeShape="RoundRectangle 20"
+                                            BackgroundColor="#F6F7FC"
+                                            StrokeThickness="0"
+                                            VerticalOptions="Center">
+                                        <Label Text="⚙" FontSize="18" TextColor="#4152B0" HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </Border>
 
-                                    <BoxView HeightRequest="1" Color="#F0F2F9" />
+                                    <!-- Controller Info -->
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{Binding Name}"
+                                               TextColor="#141414"
+                                               FontFamily="OpenSansSemibold"
+                                               FontSize="15"
+                                               FontAttributes="Bold" />
+                                        <Label Text="{Binding MacAddress}"
+                                               TextColor="#8C93A8"
+                                               FontSize="12" />
+                                    </VerticalStackLayout>
 
-                                    <Grid ColumnDefinitions="*,*">
-                                        <VerticalStackLayout Grid.Column="0" Spacing="2">
-                                            <Label Text="Привязка" TextColor="#919191" FontSize="11" />
-                                            <Label Text="{Binding AttachedAquariumName}" TextColor="#4152B0" FontFamily="OpenSansSemibold" FontSize="13" />
-                                        </VerticalStackLayout>
+                                    <!-- Online Status Pill with Dot -->
+                                    <HorizontalStackLayout Grid.Column="2" Spacing="4" VerticalOptions="Center" Margin="0,0,6,0">
+                                        <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="{Binding StatusColor}" VerticalOptions="Center" />
+                                        <Label Text="{Binding StatusText}" TextColor="{Binding StatusColor}" FontSize="12" FontFamily="OpenSansSemibold" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
 
-                                        <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                            <Label Text="IP-адрес / Прошивка" TextColor="#919191" FontSize="11" />
-                                            <Label Text="{Binding IpAddress}" TextColor="#141414" FontSize="13" />
-                                        </VerticalStackLayout>
-                                    </Grid>
-                                </VerticalStackLayout>
+                                    <!-- Switch on right -->
+                                    <Switch Grid.Column="3"
+                                            IsToggled="{Binding IsOnline, Mode=TwoWay}"
+                                            OnColor="#4152B0"
+                                            ThumbColor="#FFFFFF"
+                                            VerticalOptions="Center" />
+                                </Grid>
                             </Border>
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>
                 </VerticalStackLayout>
+
             </VerticalStackLayout>
         </ScrollView>
-
-        <!-- Floating Add Controller Button -->
-        <Button Grid.Row="1"
-                x:Name="AddButton"
-                Text="+ Добавить контроллер"
-                Command="{Binding AddControllerCommand}"
-                BackgroundColor="#4152B0"
-                TextColor="#FFFFFF"
-                FontFamily="OpenSansSemibold"
-                FontSize="16"
-                CornerRadius="14"
-                HeightRequest="52"
-                Margin="0,12,0,10">
-            <Button.Shadow>
-                <Shadow Brush="#404152B0" Offset="0,4" Radius="10" Opacity="0.9" />
-            </Button.Shadow>
-        </Button>
     </Grid>
 </ContentPage>
