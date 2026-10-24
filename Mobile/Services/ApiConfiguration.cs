@@ -68,5 +68,6 @@ public static class ApiConfiguration
         public const string Commands = "api/device/v1/commands";
 
         public const string TelemetryData = "api/telemetry/v1/data";
+        public const string Notifications = "api/notification/v1/notifications";
     }
 }

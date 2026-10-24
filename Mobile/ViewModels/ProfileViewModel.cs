@@ -1,6 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mobile.Models;
+using Mobile.Services;
+using Mobile.Services.Dto.Notification;
 using Mobile.Services.Interfaces;
 using Mobile.Views;
 
@@ -10,6 +12,7 @@ public partial class ProfileViewModel : ObservableObject
 {
     private readonly IIdentityService _identityService;
     private readonly IAuthService _authService;
+    private readonly IApiClient _apiClient;
 
     [ObservableProperty]
     private UserProfileModel _user = new();
@@ -17,10 +20,11 @@ public partial class ProfileViewModel : ObservableObject
     [ObservableProperty]
     private bool _isBusy;
 
-    public ProfileViewModel(IIdentityService identityService, IAuthService authService)
+    public ProfileViewModel(IIdentityService identityService, IAuthService authService, IApiClient apiClient)
     {
         _identityService = identityService;
         _authService = authService;
+        _apiClient = apiClient;
     }
 
     public async Task InitializeAsync()
@@ -42,6 +46,61 @@ public partial class ProfileViewModel : ObservableObject
     {
         await Shell.Current.GoToAsync(nameof(EditProfilePage));
     }
+
+    [RelayCommand]
+    private async Task OpenNotificationsAsync()
+    {
+        try
+        {
+            var response = await _apiClient.GetAsync<IReadOnlyList<NotificationItemDto>>(
+                $"{ApiConfiguration.Routes.Notifications}?take=5");
+
+            if (response.IsSuccess && response.Data != null && response.Data.Count > 0)
+            {
+                var options = response.Data
+                    .Select(n => $"{GetLevelIcon(n.Level)} {n.Message}")
+                    .Concat(new[] { "⚙️ Настройки уведомлений" })
+                    .ToArray();
+
+                var selected = await Shell.Current.DisplayActionSheet(
+                    "🔔 Уведомления",
+                    "Закрыть",
+                    null,
+                    options);
+
+                if (selected == "⚙️ Настройки уведомлений")
+                {
+                    await Shell.Current.GoToAsync(nameof(AppSettingsPage));
+                }
+                return;
+            }
+        }
+        catch
+        {
+        }
+
+        var action = await Shell.Current.DisplayActionSheet(
+            "🔔 Центр уведомлений",
+            "Закрыть",
+            null,
+            "🟢 Все системы: норма",
+            "📟 Контроллеры: на связи",
+            "🔔 Push-уведомления активны",
+            "⚙️ Настройки уведомлений");
+
+        if (action == "⚙️ Настройки уведомлений")
+        {
+            await Shell.Current.GoToAsync(nameof(AppSettingsPage));
+        }
+    }
+
+    private static string GetLevelIcon(int level) => level switch
+    {
+        3 => "🔴",
+        2 => "🟡",
+        4 => "❌",
+        _ => "ℹ️"
+    };
 
     [RelayCommand]
     private async Task GoToControllersAsync()

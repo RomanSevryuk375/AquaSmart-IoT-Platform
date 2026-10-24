@@ -42,6 +42,7 @@
                     StrokeThickness="1"
                     Stroke="#E4E7F4">
                 <ImageButton Source="icon_bell.png"
+                             Command="{Binding OpenNotificationsCommand}"
                              BackgroundColor="Transparent"
                              WidthRequest="18" HeightRequest="18"
                              Padding="0"
@@ -57,13 +58,20 @@
                                      Spacing="8"
                                      HorizontalOptions="Center"
                                      Margin="0,4,0,8">
-                    <!-- Circular Avatar -->
+                    <VerticalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToEditProfileCommand}" />
+                    </VerticalStackLayout.GestureRecognizers>
+
+                    <!-- Circular Avatar (Tap to edit) -->
                     <Border StrokeThickness="0"
                             StrokeShape="RoundRectangle 42"
                             BackgroundColor="#DDE4F8"
                             HeightRequest="84"
                             WidthRequest="84"
                             HorizontalOptions="Center">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToEditProfileCommand}" />
+                        </Border.GestureRecognizers>
                         <Grid>
                             <Image Source="{Binding User.AvatarPath}"
                                    Aspect="AspectFill"
@@ -81,17 +89,27 @@
                         </Grid>
                     </Border>
 
+                    <!-- Nickname / Full Name (Tap to edit) -->
                     <Label Text="{Binding User.FullName}"
                            TextColor="#141414"
                            FontFamily="OpenSansSemibold"
                            FontSize="20"
                            FontAttributes="Bold"
-                           HorizontalTextAlignment="Center" />
+                           HorizontalTextAlignment="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToEditProfileCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
 
+                    <!-- Email (Tap to edit) -->
                     <Label Text="{Binding User.Email}"
                            TextColor="#6E6E6E"
                            FontSize="14"
-                           HorizontalTextAlignment="Center" />
+                           HorizontalTextAlignment="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToEditProfileCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
                 </VerticalStackLayout>
 
                 <!-- Grouped Settings & Navigation Card matching Figma -->
