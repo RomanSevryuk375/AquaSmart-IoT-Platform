@@ -43,6 +43,12 @@ public partial class AboutAppViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task OpenNotificationsAsync()
+    {
+        await Shell.Current.GoToAsync("NotificationsPage");
+    }
+
+    [RelayCommand]
     private async Task GoBackAsync()
     {
         await Shell.Current.GoToAsync("..");
