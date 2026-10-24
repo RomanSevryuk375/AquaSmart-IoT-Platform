@@ -11,12 +11,8 @@ public partial class AddRelayPage : ContentPage
         BindingContext = viewModel;
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
-        await Task.WhenAll(
-            HeaderCard.FadeInUpAsync(300, 15),
-            FormCard.FadeInUpAsync(350, 20)
-        );
     }
 }
