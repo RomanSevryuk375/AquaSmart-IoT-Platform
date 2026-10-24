@@ -143,6 +143,67 @@ public sealed class AuthService : IAuthService
         return (true, null);
     }
 
+    public async Task<bool> TryAutoLoginAsync(CancellationToken cancellationToken = default)
+    {
+        var token = await _identityService.GetTokenAsync();
+        var refreshToken = await _identityService.GetRefreshTokenAsync();
+
+        if (string.IsNullOrWhiteSpace(token) && string.IsNullOrWhiteSpace(refreshToken))
+        {
+            return false;
+        }
+
+        try
+        {
+            // Verify current token by requesting profile
+            var response = await _apiClient.GetAsync<UserProfileResponseDto>(
+                ApiConfiguration.Routes.Profile,
+                cancellationToken);
+
+            if (response.IsSuccess && response.Data != null)
+            {
+                await _identityService.GetCurrentUserAsync(cancellationToken);
+                return true;
+            }
+
+            // If token expired (401), attempt to refresh
+            if (response.StatusCode == 401 && !string.IsNullOrWhiteSpace(refreshToken))
+            {
+                var refreshResponse = await _apiClient.PostAsync<RefreshTokenRequestDto, LoginResponseDto>(
+                    ApiConfiguration.Routes.AuthRefresh,
+                    new RefreshTokenRequestDto(refreshToken),
+                    cancellationToken);
+
+                if (refreshResponse.IsSuccess && refreshResponse.Data != null)
+                {
+                    await _identityService.SetTokensAsync(refreshResponse.Data.AccessToken, refreshResponse.Data.RefreshToken);
+                    await _identityService.GetCurrentUserAsync(cancellationToken);
+                    return true;
+                }
+            }
+
+            // Offline / network failure: allow offline session if credentials exist
+            if (!response.IsSuccess && (response.StatusCode == 0 || response.StatusCode >= 500))
+            {
+                var cached = await _identityService.GetCurrentUserAsync(cancellationToken);
+                if (!string.IsNullOrWhiteSpace(cached.FullName) || !string.IsNullOrWhiteSpace(token))
+                {
+                    return true;
+                }
+            }
+        }
+        catch
+        {
+            // Offline fallback
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public async Task LogoutAsync(CancellationToken cancellationToken = default)
     {
         try

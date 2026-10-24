@@ -1,67 +1,101 @@
+using Mobile.Services.Interfaces;
+
 namespace Mobile;
 
 public partial class MainPage : ContentPage
 {
+    private readonly IAuthService? _authService;
     private bool _animationFinished;
+
+    public MainPage(IAuthService authService)
+    {
+        InitializeComponent();
+        _authService = authService;
+    }
 
     public MainPage()
     {
         InitializeComponent();
+        _authService = IPlatformApplication.Current?.Services?.GetService<IAuthService>();
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
 
-        if (_animationFinished) return;
+        if (_animationFinished)
+        {
+            if (_authService != null && await _authService.TryAutoLoginAsync())
+            {
+                await Shell.Current.GoToAsync("//MainTabs/DashboardPage");
+                return;
+            }
+
+            LogoImage.Opacity = 1;
+            LogoImage.Scale = 1;
+            ActionsContainer.Opacity = 1;
+            ActionsContainer.TranslationY = 0;
+            PreloaderContainer.Opacity = 0;
+            return;
+        }
 
         try
         {
+            // Start checking authentication in the background while splash plays
+            var authCheckTask = _authService != null ? _authService.TryAutoLoginAsync() : Task.FromResult(false);
+
             // Figma Preloader Animation (8-stage sequence)
-            // Stage 1-3: Fish enters from left and swims to center
-            await PreloaderContainer.TranslateTo(0, 0, 750, Easing.CubicOut);
+            await PreloaderContainer.TranslateTo(0, 0, 650, Easing.CubicOut);
 
-            // Stage 4: Bubble 1 appears at mouth
             await Task.WhenAll(
-                Bubble1.FadeTo(1.0, 150),
-                Bubble1.ScaleTo(1.0, 200, Easing.SpringOut)
-            );
-
-            // Stage 5: Bubble 2 appears
-            await Task.WhenAll(
-                Bubble2.FadeTo(1.0, 150),
-                Bubble2.ScaleTo(1.0, 200, Easing.SpringOut)
-            );
-
-            // Stage 6: Bubble 3 appears
-            await Task.WhenAll(
-                Bubble3.FadeTo(1.0, 150),
-                Bubble3.ScaleTo(1.0, 200, Easing.SpringOut)
-            );
-
-            // Brief pause at complete 3-bubble state (matching Figma Frame 6)
-            await Task.Delay(350);
-
-            // Stage 7: Fish exits gently right while logo appears
-            _ = PreloaderContainer.TranslateTo(260, 0, 500, Easing.CubicIn);
-            _ = PreloaderContainer.FadeTo(0, 450);
-
-            // Stage 8: Reveal brand logo & CTA buttons
-            await Task.WhenAll(
-                LogoImage.FadeTo(1.0, 500, Easing.CubicOut),
-                LogoImage.ScaleTo(1.0, 500, Easing.CubicOut)
+                Bubble1.FadeTo(1.0, 140),
+                Bubble1.ScaleTo(1.0, 180, Easing.SpringOut)
             );
 
             await Task.WhenAll(
-                ActionsContainer.FadeTo(1.0, 400, Easing.CubicOut),
-                ActionsContainer.TranslateTo(0, 0, 400, Easing.CubicOut)
+                Bubble2.FadeTo(1.0, 140),
+                Bubble2.ScaleTo(1.0, 180, Easing.SpringOut)
+            );
+
+            await Task.WhenAll(
+                Bubble3.FadeTo(1.0, 140),
+                Bubble3.ScaleTo(1.0, 180, Easing.SpringOut)
+            );
+
+            var isAuthenticated = await authCheckTask;
+            if (isAuthenticated)
+            {
+                _animationFinished = true;
+                await Shell.Current.GoToAsync("//MainTabs/DashboardPage");
+                return;
+            }
+
+            // Brief pause at complete 3-bubble state
+            await Task.Delay(200);
+
+            _ = PreloaderContainer.TranslateTo(260, 0, 450, Easing.CubicIn);
+            _ = PreloaderContainer.FadeTo(0, 400);
+
+            await Task.WhenAll(
+                LogoImage.FadeTo(1.0, 450, Easing.CubicOut),
+                LogoImage.ScaleTo(1.0, 450, Easing.CubicOut)
+            );
+
+            await Task.WhenAll(
+                ActionsContainer.FadeTo(1.0, 350, Easing.CubicOut),
+                ActionsContainer.TranslateTo(0, 0, 350, Easing.CubicOut)
             );
 
             _animationFinished = true;
         }
         catch
         {
-            // Fallback: immediately show logo and buttons
+            if (_authService != null && await _authService.TryAutoLoginAsync())
+            {
+                await Shell.Current.GoToAsync("//MainTabs/DashboardPage");
+                return;
+            }
+
             LogoImage.Opacity = 1;
             LogoImage.Scale = 1;
             ActionsContainer.Opacity = 1;
