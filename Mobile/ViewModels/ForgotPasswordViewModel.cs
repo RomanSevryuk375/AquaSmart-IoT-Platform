@@ -29,6 +29,30 @@ public partial class ForgotPasswordViewModel : ObservableObject
     private string _confirmNewPassword = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PasswordEyeIcon))]
+    private bool _isPasswordHidden = true;
+
+    public string PasswordEyeIcon => IsPasswordHidden ? "icon_eye.png" : "icon_eye_off.png";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ConfirmPasswordEyeIcon))]
+    private bool _isConfirmPasswordHidden = true;
+
+    public string ConfirmPasswordEyeIcon => IsConfirmPasswordHidden ? "icon_eye.png" : "icon_eye_off.png";
+
+    [RelayCommand]
+    private void TogglePassword()
+    {
+        IsPasswordHidden = !IsPasswordHidden;
+    }
+
+    [RelayCommand]
+    private void ToggleConfirmPassword()
+    {
+        IsConfirmPasswordHidden = !IsConfirmPasswordHidden;
+    }
+
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsStep1))]
     [NotifyPropertyChangedFor(nameof(IsStep2))]
     [NotifyPropertyChangedFor(nameof(IsStep3))]

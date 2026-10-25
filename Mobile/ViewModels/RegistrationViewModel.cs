@@ -26,10 +26,16 @@ public partial class RegistrationViewModel : ObservableObject
     private bool _agreeToTerms = true;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PasswordEyeIcon))]
     private bool _isPasswordHidden = true;
 
+    public string PasswordEyeIcon => IsPasswordHidden ? "icon_eye.png" : "icon_eye_off.png";
+
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ConfirmPasswordEyeIcon))]
     private bool _isConfirmPasswordHidden = true;
+
+    public string ConfirmPasswordEyeIcon => IsConfirmPasswordHidden ? "icon_eye.png" : "icon_eye_off.png";
 
     [ObservableProperty]
     private bool _isBusy;

@@ -14,7 +14,10 @@ public partial class LoginViewModel : ObservableObject
     private string _password = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PasswordEyeIcon))]
     private bool _isPasswordHidden = true;
+
+    public string PasswordEyeIcon => IsPasswordHidden ? "icon_eye.png" : "icon_eye_off.png";
 
     [ObservableProperty]
     private bool _isBusy;
