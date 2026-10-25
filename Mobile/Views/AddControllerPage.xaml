@@ -2,120 +2,351 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Mobile.ViewModels"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
              x:Class="Mobile.Views.AddControllerPage"
              x:DataType="vm:AddControllerViewModel"
-             BackgroundColor="#F6F7FC"
+             BackgroundColor="#FFFFFF"
+             Shell.NavBarIsVisible="False"
              Title="Новый контроллер">
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="20,16,20,30">
-            <!-- Header Banner -->
-            <Border x:Name="HeaderCard"
-                    StrokeThickness="0"
-                    StrokeShape="RoundRectangle 16"
-                    BackgroundColor="#4152B0"
-                    Padding="20">
-                <VerticalStackLayout Spacing="6">
-                    <Label Text="Подключение IoT-контроллера"
-                           TextColor="#FFFFFF"
+    <Grid>
+        <!-- 1. MAIN FORM (Figma: Добавление контроллера) -->
+        <ScrollView IsVisible="{Binding IsFormVisible}">
+            <VerticalStackLayout Spacing="16" Padding="20,16,20,30">
+                <!-- Top Navigation Bar (< Новый контроллер   X) -->
+                <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,10">
+                    <Border WidthRequest="36" HeightRequest="36"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="#F6F7FC"
+                            StrokeThickness="0"
+                            VerticalOptions="Center">
+                        <ImageButton Source="icon_arrow_left.png"
+                                     Command="{Binding PromptCancelCommand}"
+                                     BackgroundColor="Transparent"
+                                     WidthRequest="20" HeightRequest="20"
+                                     Padding="0"
+                                     HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+
+                    <Label Grid.Column="1"
+                           Text="Новый контроллер"
+                           TextColor="#141414"
                            FontFamily="OpenSansSemibold"
-                           FontSize="20"
-                           FontAttributes="Bold" />
-                    <Label Text="Сопряжение аппаратного модуля AquaSmart для управления реле и сбора телеметрии"
-                           TextColor="#EDEFFB"
-                           FontSize="13" />
-                </VerticalStackLayout>
-            </Border>
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center"
+                           Margin="12,0,0,0" />
 
-            <!-- Form Card -->
-            <Border x:Name="FormCard"
-                    StrokeThickness="1"
-                    Stroke="#E4E7F4"
-                    StrokeShape="RoundRectangle 16"
-                    BackgroundColor="#FFFFFF"
-                    Padding="20">
-                <VerticalStackLayout Spacing="16">
-                    <!-- Controller Name -->
+                    <Border Grid.Column="2"
+                            WidthRequest="36" HeightRequest="36"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="#F6F7FC"
+                            StrokeThickness="0"
+                            VerticalOptions="Center">
+                        <ImageButton Source="icon_close.png"
+                                     Command="{Binding PromptCancelCommand}"
+                                     BackgroundColor="Transparent"
+                                     WidthRequest="18" HeightRequest="18"
+                                     Padding="0"
+                                     HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                </Grid>
+
+                <!-- Method Switcher: QR-код | Ввести вручную -->
+                <Border StrokeThickness="0" StrokeShape="RoundRectangle 14" BackgroundColor="#F6F7FC" Padding="4">
+                    <Grid ColumnDefinitions="*,*">
+                        <!-- QR Mode button -->
+                        <Border Grid.Column="0"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10"
+                                BackgroundColor="{Binding IsQrMode, Converter={StaticResource InhabitantBgConverter}}"
+                                HeightRequest="40">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SwitchToQrModeCommand}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="Сканировать QR"
+                                   TextColor="{Binding IsQrMode, Converter={StaticResource InhabitantTextConverter}}"
+                                   FontFamily="OpenSansSemibold"
+                                   FontSize="13"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+
+                        <!-- Manual Mode button -->
+                        <Border Grid.Column="1"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10"
+                                BackgroundColor="{Binding IsManualMode, Converter={StaticResource InhabitantBgConverter}}"
+                                HeightRequest="40">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SwitchToManualModeCommand}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="Ввести код вручную"
+                                   TextColor="{Binding IsManualMode, Converter={StaticResource InhabitantTextConverter}}"
+                                   FontFamily="OpenSansSemibold"
+                                   FontSize="13"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- QR Viewfinder Simulation Section -->
+                <VerticalStackLayout Spacing="10" IsVisible="{Binding IsQrMode}">
+                    <Border StrokeThickness="0" StrokeShape="RoundRectangle 20" BackgroundColor="#1E2337" HeightRequest="230" Padding="16">
+                        <Grid HorizontalOptions="Center" VerticalOptions="Center">
+                            <!-- Viewfinder Reticle Frame -->
+                            <Border Stroke="#4152B0" StrokeThickness="2" StrokeShape="RoundRectangle 16"
+                                    WidthRequest="180" HeightRequest="180" BackgroundColor="#111422">
+                                <VerticalStackLayout Spacing="10" HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Image Source="icon_search.png" WidthRequest="36" HeightRequest="36" />
+                                    <Label Text="Наведите камеру&#10;на QR-код платы"
+                                           TextColor="#EDEFFB"
+                                           FontSize="12"
+                                           HorizontalTextAlignment="Center" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- Scan Trigger Button -->
+                    <Button Text="📷 Сканировать QR-код на устройстве"
+                            Command="{Binding SimulateQrScanCommand}"
+                            BackgroundColor="#EDEFFB"
+                            TextColor="#4152B0"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="14"
+                            HeightRequest="46"
+                            CornerRadius="12" />
+
+                    <!-- Scanned Confirmation Notice -->
+                    <Border StrokeThickness="1" Stroke="#A5D6A7" StrokeShape="RoundRectangle 10" BackgroundColor="#E8F5E9" Padding="12,8"
+                            IsVisible="{Binding IsQrScanned}">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                            <Label Text="✓" TextColor="#2E7D32" FontFamily="OpenSansSemibold" FontSize="14" FontAttributes="Bold" />
+                            <Label Grid.Column="1" Text="QR-код контроллера успешно считан!" TextColor="#2E7D32" FontFamily="OpenSansSemibold" FontSize="13" VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Manual Input Section -->
+                <VerticalStackLayout Spacing="14" IsVisible="{Binding IsManualMode}">
+                    <!-- Controller Code -->
                     <VerticalStackLayout Spacing="6">
-                        <Label Text="Имя контроллера *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
-                            <Entry Text="{Binding ControllerName}"
-                                   Placeholder="Например, Контроллер №1"
+                        <Label Text="Код контроллера *" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="50" Padding="14,0">
+                            <Entry Text="{Binding ControllerCode}"
+                                   Placeholder="023623665 или AQ-ESP32-9842"
                                    PlaceholderColor="#8C93A8"
-                                   TextColor="#2E3A7E"
+                                   TextColor="#141414"
                                    VerticalOptions="Center" />
                         </Border>
                     </VerticalStackLayout>
 
-                    <!-- Model Type Picker -->
+                    <!-- MAC Address -->
                     <VerticalStackLayout Spacing="6">
-                        <Label Text="Модель оборудования *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
-                            <Picker SelectedItem="{Binding ModelType}"
-                                    TextColor="#2E3A7E"
-                                    VerticalOptions="Center">
-                                <Picker.ItemsSource>
-                                    <x:Array Type="{x:Type x:String}">
-                                        <x:String>ESP32-AquaHub v2</x:String>
-                                        <x:String>AquaSmart ESP32 Pro</x:String>
-                                        <x:String>AquaSmart LED Controller</x:String>
-                                        <x:String>AquaSmart Feeder Module</x:String>
-                                    </x:Array>
-                                </Picker.ItemsSource>
-                            </Picker>
-                        </Border>
-                    </VerticalStackLayout>
-
-                    <!-- MAC Address / Serial -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="MAC-адрес / Серийный номер *" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
+                        <Label Text="MAC-адрес контроллера *" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="50" Padding="14,0">
                             <Entry Text="{Binding MacAddress}"
-                                   Placeholder="24:6F:28:B4:72:01"
+                                   Placeholder="00:1A:2B:3C:4D:5E"
                                    PlaceholderColor="#8C93A8"
-                                   TextColor="#2E3A7E"
-                                   VerticalOptions="Center" />
-                        </Border>
-                    </VerticalStackLayout>
-
-                    <!-- Attached Aquarium -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Привязанный аквариум" TextColor="#2E3A7E" FontFamily="OpenSansSemibold" FontSize="13" />
-                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#F6F7FC" HeightRequest="48" Padding="12,0">
-                            <Entry Text="{Binding AttachedAquarium}"
-                                   Placeholder="Например, Домашний аквариум"
-                                   PlaceholderColor="#8C93A8"
-                                   TextColor="#2E3A7E"
+                                   TextColor="#141414"
                                    VerticalOptions="Center" />
                         </Border>
                     </VerticalStackLayout>
                 </VerticalStackLayout>
-            </Border>
 
-            <!-- Action Buttons -->
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                <Button Grid.Column="0"
-                        Text="Отмена"
-                        Command="{Binding CancelCommand}"
-                        BackgroundColor="#FFFFFF"
-                        TextColor="#6A738A"
-                        BorderColor="#E4E7F4"
-                        BorderWidth="1"
-                        CornerRadius="14"
-                        HeightRequest="52"
-                        FontFamily="OpenSansSemibold"
-                        FontSize="15" />
+                <!-- Common: Controller Name -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Название контроллера" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="50" Padding="14,0">
+                        <Entry Text="{Binding ControllerName}"
+                               Placeholder="Контроллер №123"
+                               PlaceholderColor="#8C93A8"
+                               TextColor="#141414"
+                               VerticalOptions="Center" />
+                    </Border>
+                </VerticalStackLayout>
 
-                <Button Grid.Column="1"
-                        Text="Сохранить"
-                        Command="{Binding SaveCommand}"
+                <!-- Common: Model Type -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Модель контроллера" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="50" Padding="14,0">
+                        <Picker SelectedItem="{Binding ModelType}"
+                                TextColor="#141414"
+                                VerticalOptions="Center">
+                            <Picker.ItemsSource>
+                                <x:Array Type="{x:Type x:String}">
+                                    <x:String>ESP32-AquaHub v2</x:String>
+                                    <x:String>AquaSmart ESP32 Pro</x:String>
+                                    <x:String>AquaSmart LED Controller</x:String>
+                                    <x:String>AquaSmart Feeder Module</x:String>
+                                </x:Array>
+                            </Picker.ItemsSource>
+                        </Picker>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Connect Button -->
+                <Button Text="Подключить контроллер"
+                        Command="{Binding ConnectControllerCommand}"
                         BackgroundColor="#4152B0"
                         TextColor="#FFFFFF"
                         CornerRadius="14"
                         HeightRequest="52"
                         FontFamily="OpenSansSemibold"
-                        FontSize="15" />
-            </Grid>
-        </VerticalStackLayout>
-    </ScrollView>
+                        FontSize="15"
+                        Margin="0,8,0,0" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- 2. FULLSCREEN CONNECTING STATE (Figma: Подключаем контроллер...) -->
+        <Grid BackgroundColor="#4152B0" IsVisible="{Binding IsConnectingVisible}" Padding="30">
+            <VerticalStackLayout Spacing="24" VerticalOptions="Center" HorizontalOptions="Center">
+                <!-- Glowing mascot container -->
+                <Border StrokeThickness="0" StrokeShape="RoundRectangle 40" BackgroundColor="#5465C5" WidthRequest="180" HeightRequest="180">
+                    <Grid HorizontalOptions="Center" VerticalOptions="Center">
+                        <Image Source="fish_mascot.png" WidthRequest="110" HeightRequest="80" Aspect="AspectFit" />
+                        <ActivityIndicator IsRunning="True" Color="#FFFFFF" WidthRequest="160" HeightRequest="160" />
+                    </Grid>
+                </Border>
+
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Подключаем контроллер..."
+                           TextColor="#FFFFFF"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="Устанавливаем безопасное соединение по Wi-Fi и синхронизируем датчики"
+                           TextColor="#EDEFFB"
+                           FontSize="14"
+                           LineHeight="1.3"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- 3. SUCCESS STATE (Figma: Контроллер подключён) -->
+        <ScrollView IsVisible="{Binding IsSuccessVisible}">
+            <VerticalStackLayout Spacing="20" Padding="20,24,20,30" VerticalOptions="Center">
+                <!-- Fish Mascot Card with Checkmark badge -->
+                <controls:FishMascotCard HeightOverride="200" BadgeText="✓" BadgeColor="#7BA028" />
+
+                <!-- Controller Preview Card -->
+                <Border StrokeThickness="1"
+                        Stroke="#E4E7F4"
+                        StrokeShape="RoundRectangle 16"
+                        BackgroundColor="#FFFFFF"
+                        Padding="16,14">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Border WidthRequest="44" HeightRequest="44"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="#F6F7FC"
+                                StrokeThickness="0">
+                            <Label Text="⚙" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                            <Label Text="{Binding CreatedControllerTitle}"
+                                   TextColor="#141414"
+                                   FontFamily="OpenSansSemibold"
+                                   FontSize="15"
+                                   FontAttributes="Bold" />
+                            <Label Text="{Binding CreatedControllerMac}"
+                                   TextColor="#8C93A8"
+                                   FontSize="12" />
+                        </VerticalStackLayout>
+                        <Label Grid.Column="2" Text="{Binding CreatedControllerStatus}" TextColor="#4CAF50" FontFamily="OpenSansSemibold" FontSize="12" VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- Success Header & Description -->
+                <VerticalStackLayout Spacing="8" Margin="0,4,0,10">
+                    <Label Text="Контроллер подключён!"
+                           TextColor="#141414"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="Устройство готово к работе и уже передаёт телеметрию и сигналы датчиков в систему"
+                           TextColor="#6E6E6E"
+                           FontSize="14"
+                           LineHeight="1.3"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <!-- Action Buttons: "Перейти к контроллерам" & "На главную" -->
+                <VerticalStackLayout Spacing="10">
+                    <Button Text="Перейти к контроллерам"
+                            Command="{Binding ReturnToControllersCommand}"
+                            BackgroundColor="#4152B0"
+                            TextColor="#FFFFFF"
+                            CornerRadius="14"
+                            HeightRequest="52"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15" />
+
+                    <Button Text="На главную"
+                            Command="{Binding GoHomeCommand}"
+                            BackgroundColor="#FFFFFF"
+                            BorderColor="#4152B0"
+                            BorderWidth="1.5"
+                            TextColor="#4152B0"
+                            CornerRadius="14"
+                            HeightRequest="52"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- 4. CANCEL CONFIRMATION MODAL (Figma: Добавление контроллера. Отмена) -->
+        <Grid BackgroundColor="#80000000" IsVisible="{Binding IsCancelDialogOpen}">
+            <Border VerticalOptions="End"
+                    StrokeShape="RoundRectangle 24 24 0 0"
+                    BackgroundColor="#FFFFFF"
+                    StrokeThickness="0"
+                    Padding="24,24,24,32">
+                <VerticalStackLayout Spacing="18">
+                    <!-- Fish Mascot Card with Question badge -->
+                    <controls:FishMascotCard HeightOverride="180" BadgeText="?" BadgeColor="#7BA028" />
+
+                    <!-- Titles -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Отменить подключение?"
+                               TextColor="#141414"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="Процесс настройки нового контроллера будет остановлен"
+                               TextColor="#6E6E6E"
+                               FontSize="14"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Buttons: "Продолжить подключение" & "Да, отменить" -->
+                    <VerticalStackLayout Spacing="10" Margin="0,6,0,0">
+                        <Button Text="Продолжить подключение"
+                                Command="{Binding ResumeEditingCommand}"
+                                BackgroundColor="#4152B0"
+                                TextColor="#FFFFFF"
+                                CornerRadius="14"
+                                HeightRequest="50"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+
+                        <Button Text="Да, отменить"
+                                Command="{Binding ConfirmCancelCommand}"
+                                BackgroundColor="#FFFFFF"
+                                BorderColor="#E4E7F4"
+                                BorderWidth="1"
+                                TextColor="#6A738A"
+                                CornerRadius="14"
+                                HeightRequest="50"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+    </Grid>
 </ContentPage>
