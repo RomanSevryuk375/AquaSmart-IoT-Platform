@@ -52,6 +52,32 @@ public partial class ProfileViewModel : ObservableObject
         await Shell.Current.GoToAsync(nameof(NotificationsPage));
     }
 
+    [RelayCommand]
+    private async Task LinkTelegramAsync()
+    {
+        try
+        {
+            IsBusy = true;
+            var link = await _identityService.GenerateTelegramLinkTokenAsync();
+            if (!string.IsNullOrWhiteSpace(link))
+            {
+                await Launcher.OpenAsync(new Uri(link));
+            }
+            else
+            {
+                await Shell.Current.DisplayAlert("Telegram", "Не удалось создать ссылку для привязки бота. Проверьте соединение с сервером.", "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Ошибка", ex.Message, "OK");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
     private static string GetLevelIcon(int level) => level switch
     {
         3 => "🔴",

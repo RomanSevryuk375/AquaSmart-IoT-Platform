@@ -1,10 +1,13 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mobile.Services.Interfaces;
 
 namespace Mobile.ViewModels;
 
 public partial class AppSettingsViewModel : ObservableObject
 {
+    private readonly IIdentityService _identityService;
+
     private const string ThemeKey = "setting_theme";
     private const string LanguageKey = "setting_language";
     private const string RefreshIntervalKey = "setting_refresh_interval";
@@ -12,6 +15,7 @@ public partial class AppSettingsViewModel : ObservableObject
     private const string ConnectionAlertsKey = "setting_connection_alerts";
     private const string ScenarioAlertsKey = "setting_scenario_alerts";
     private const string TrafficSavingKey = "setting_traffic_saving";
+    private const string TelegramAlertsKey = "setting_telegram_alerts";
 
     [ObservableProperty]
     private string _currentTheme = "Светлая";
@@ -34,8 +38,12 @@ public partial class AppSettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool _trafficSaving = true;
 
-    public AppSettingsViewModel()
+    [ObservableProperty]
+    private bool _telegramAlerts = true;
+
+    public AppSettingsViewModel(IIdentityService identityService)
     {
+        _identityService = identityService;
         LoadSettings();
     }
 
@@ -48,6 +56,7 @@ public partial class AppSettingsViewModel : ObservableObject
         ConnectionLossAlerts = Preferences.Default.Get(ConnectionAlertsKey, true);
         ScenarioAlerts = Preferences.Default.Get(ScenarioAlertsKey, true);
         TrafficSaving = Preferences.Default.Get(TrafficSavingKey, true);
+        TelegramAlerts = Preferences.Default.Get(TelegramAlertsKey, true);
     }
 
     private static void ApplyTheme(string theme)
@@ -71,6 +80,28 @@ public partial class AppSettingsViewModel : ObservableObject
     partial void OnConnectionLossAlertsChanged(bool value) => Preferences.Default.Set(ConnectionAlertsKey, value);
     partial void OnScenarioAlertsChanged(bool value) => Preferences.Default.Set(ScenarioAlertsKey, value);
     partial void OnTrafficSavingChanged(bool value) => Preferences.Default.Set(TrafficSavingKey, value);
+    partial void OnTelegramAlertsChanged(bool value) => Preferences.Default.Set(TelegramAlertsKey, value);
+
+    [RelayCommand]
+    private async Task LinkTelegramAsync()
+    {
+        try
+        {
+            var link = await _identityService.GenerateTelegramLinkTokenAsync();
+            if (!string.IsNullOrWhiteSpace(link))
+            {
+                await Launcher.OpenAsync(new Uri(link));
+            }
+            else
+            {
+                await Shell.Current.DisplayAlert("Telegram", "Не удалось создать ссылку для привязки. Проверьте подключение к серверу.", "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Ошибка", ex.Message, "OK");
+        }
+    }
 
     [RelayCommand]
     private async Task ChooseThemeAsync()

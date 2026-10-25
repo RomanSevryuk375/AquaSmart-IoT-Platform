@@ -150,6 +150,32 @@
                                         OnColor="#4152B0"
                                         VerticalOptions="Center" />
                             </Grid>
+
+                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+
+                            <!-- Оповещения в Telegram -->
+                            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12" Padding="0,10">
+                                <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                                    <Label Text="Оповещения в Telegram" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
+                                    <Label Text="Дублирование важных алертов и задач в Telegram-бот"
+                                           TextColor="#6E6E6E" FontSize="12" LineBreakMode="WordWrap" />
+                                </VerticalStackLayout>
+                                <Button Grid.Column="1"
+                                        Text="Бот"
+                                        Command="{Binding LinkTelegramCommand}"
+                                        BackgroundColor="#E8F4FC"
+                                        TextColor="#229ED9"
+                                        FontFamily="OpenSansSemibold"
+                                        FontSize="12"
+                                        CornerRadius="10"
+                                        HeightRequest="32"
+                                        Padding="10,0"
+                                        VerticalOptions="Center" />
+                                <Switch Grid.Column="2"
+                                        IsToggled="{Binding TelegramAlerts}"
+                                        OnColor="#4152B0"
+                                        VerticalOptions="Center" />
+                            </Grid>
                         </VerticalStackLayout>
                     </Border>
                 </VerticalStackLayout>

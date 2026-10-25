@@ -112,6 +112,50 @@
                     </Label>
                 </VerticalStackLayout>
 
+                <!-- Telegram Bot Integration Banner Card -->
+                <Border StrokeThickness="1"
+                        Stroke="#CDE5F6"
+                        StrokeShape="RoundRectangle 20"
+                        BackgroundColor="#FFFFFF"
+                        Padding="16,14">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalOptions="Center">
+                        <Border Grid.Column="0"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="#E8F4FC"
+                                WidthRequest="44" HeightRequest="44"
+                                VerticalOptions="Center">
+                            <Image Source="icon_telegram.png"
+                                   WidthRequest="24" HeightRequest="24"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                            <Label Text="Telegram-бот"
+                                   TextColor="#141414"
+                                   FontFamily="OpenSansSemibold"
+                                   FontSize="15"
+                                   FontAttributes="Bold" />
+                            <Label Text="Уведомления об авариях и напоминания в чат"
+                                   TextColor="#6E6E6E"
+                                   FontSize="12"
+                                   LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+
+                        <Button Grid.Column="2"
+                                Text="Войти"
+                                Command="{Binding LinkTelegramCommand}"
+                                BackgroundColor="#229ED9"
+                                TextColor="#FFFFFF"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="13"
+                                CornerRadius="12"
+                                HeightRequest="36"
+                                Padding="14,0"
+                                VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
                 <!-- Grouped Settings & Navigation Card matching Figma -->
                 <Border x:Name="SettingsCard"
                         StrokeThickness="1"

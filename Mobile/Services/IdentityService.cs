@@ -185,4 +185,28 @@ public sealed class IdentityService : IIdentityService
             // If offline, updated locally
         }
     }
+
+    public async Task<string?> GenerateTelegramLinkTokenAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var isAuth = await IsAuthenticatedAsync();
+            if (!isAuth) return null;
+
+            var response = await _apiClient.PostAsync<object, TelegramLinkTokenResponseDto>(
+                MobileApiEndpoints.TelegramLinkToken,
+                new { },
+                cancellationToken);
+
+            if (response.IsSuccess && response.Data != null && !string.IsNullOrWhiteSpace(response.Data.Link))
+            {
+                return response.Data.Link;
+            }
+        }
+        catch
+        {
+        }
+
+        return null;
+    }
 }

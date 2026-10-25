@@ -10,4 +10,5 @@ public interface IIdentityService
     Task ClearTokenAsync();
     Task<UserProfileModel> GetCurrentUserAsync(CancellationToken cancellationToken = default);
     Task UpdateCurrentUserAsync(UserProfileModel profile, CancellationToken cancellationToken = default);
+    Task<string?> GenerateTelegramLinkTokenAsync(CancellationToken cancellationToken = default);
 }
