@@ -3,18 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Mobile.ViewModels"
              xmlns:models="clr-namespace:Mobile.Models"
+             xmlns:loc="clr-namespace:Mobile.Converters"
              x:Class="Mobile.Views.AquariumsPage"
              x:DataType="vm:AquariumsViewModel"
-             BackgroundColor="#FFFFFF"
+             BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#12131A'}"
              Shell.NavBarIsVisible="False"
-             Title="Ёмкости">
+             Title="{loc:Translate Nav_Tanks}">
 
     <Grid RowDefinitions="Auto,*,Auto" Padding="20,24,20,20">
         <!-- Top Header: Title & Action Icons (Figma: 0. Емкости) -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12" Margin="0,4,0,16">
             <Label Grid.Column="0"
-                   Text="Мои ёмкости"
-                   TextColor="#141414"
+                   Text="{loc:Translate Tanks_Title}"
+                   TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                    FontFamily="OpenSansSemibold"
                    FontSize="22"
                    FontAttributes="Bold"
@@ -24,7 +25,7 @@
             <Border Grid.Column="1"
                     WidthRequest="38" HeightRequest="38"
                     StrokeShape="RoundRectangle 10"
-                    BackgroundColor="#F6F7FC"
+                    BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
                     StrokeThickness="0">
                 <ImageButton Source="icon_plus.png"
                              Command="{Binding AddAquariumCommand}"
@@ -38,7 +39,7 @@
             <Border Grid.Column="2"
                     WidthRequest="38" HeightRequest="38"
                     StrokeShape="RoundRectangle 10"
-                    BackgroundColor="#F6F7FC"
+                    BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
                     StrokeThickness="0">
                 <ImageButton Source="icon_bell.png"
                              Command="{Binding OpenNotificationsCommand}"
@@ -55,33 +56,33 @@
                 <!-- Empty State -->
                 <Border IsVisible="{Binding HasNoAquariums}"
                         StrokeThickness="1"
-                        Stroke="#E1E4F2"
+                        Stroke="{AppThemeBinding Light='#E1E4F2', Dark='#2C2F42'}"
                         StrokeShape="RoundRectangle 16"
-                        BackgroundColor="#FFFFFF"
+                        BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                         Padding="28"
                         Margin="0,20,0,0">
                     <VerticalStackLayout Spacing="16" HorizontalOptions="Center">
                         <Border WidthRequest="80" HeightRequest="80"
                                 StrokeShape="RoundRectangle 40"
-                                BackgroundColor="#EDEFFB"
+                                BackgroundColor="{AppThemeBinding Light='#EDEFFB', Dark='#2A2D3E'}"
                                 StrokeThickness="0"
                                 HorizontalOptions="Center">
                             <Label Text="🐟" FontSize="36" HorizontalOptions="Center" VerticalOptions="Center" />
                         </Border>
 
-                        <Label Text="Ёмкостей пока нет"
-                               TextColor="#141414"
+                        <Label Text="{loc:Translate Tanks_EmptyTitle}"
+                               TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                                FontFamily="OpenSansSemibold"
                                FontSize="18"
                                FontAttributes="Bold"
                                HorizontalTextAlignment="Center" />
 
-                        <Label Text="Добавьте ваш аквариум, террариум или палюдариум, чтобы отслеживать показатели и автоматизировать уход."
-                               TextColor="#6E6E6E"
+                        <Label Text="{loc:Translate Tanks_EmptyDesc}"
+                               TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}"
                                FontSize="14"
                                HorizontalTextAlignment="Center" />
 
-                        <Button Text="+ Добавить первую ёмкость"
+                        <Button Text="{loc:Translate Tanks_AddFirst}"
                                 Command="{Binding AddAquariumCommand}"
                                 BackgroundColor="#4152B0"
                                 TextColor="#FFFFFF"
@@ -99,11 +100,11 @@
                                      Spacing="14">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate x:DataType="models:AquariumModel">
-                            <!-- CardContainer with Figma Theme Color -->
+                            <!-- CardContainer with Theme Color -->
                             <Border StrokeThickness="1"
-                                    Stroke="{Binding CardBorderColor}"
+                                    Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
                                     StrokeShape="RoundRectangle 16"
-                                    BackgroundColor="{Binding CardThemeColor}"
+                                    BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                                     Padding="18,16">
                                 <Border.Shadow>
                                     <Shadow Brush="#0A000000" Offset="0,4" Radius="8" Opacity="0.5" />
@@ -116,20 +117,23 @@
                                 <VerticalStackLayout Spacing="10">
                                     <!-- Top Row: Icon + Name and Temperature -->
                                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
-                                        <Label Grid.Column="0"
-                                               Text="{Binding Icon}"
-                                               FontSize="20"
-                                               VerticalOptions="Center" />
+                                        <Border Grid.Column="0"
+                                                WidthRequest="36" HeightRequest="36"
+                                                StrokeShape="RoundRectangle 8"
+                                                BackgroundColor="{Binding CardThemeColor}"
+                                                StrokeThickness="0">
+                                            <Label Text="{Binding Icon}" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                                        </Border>
                                         <Label Grid.Column="1"
                                                Text="{Binding Name}"
-                                               TextColor="#141414"
+                                               TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                                                FontFamily="OpenSansSemibold"
                                                FontSize="16"
                                                FontAttributes="Bold"
                                                VerticalOptions="Center" />
                                         <Label Grid.Column="2"
                                                Text="{Binding TemperatureDisplay}"
-                                               TextColor="#141414"
+                                               TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                                                FontFamily="OpenSansSemibold"
                                                FontSize="16"
                                                FontAttributes="Bold"
@@ -137,7 +141,7 @@
                                     </Grid>
 
                                     <!-- Subtitle: Tank type, Volume, Controller -->
-                                    <Label TextColor="#6E6E6E" FontSize="12">
+                                    <Label TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="12">
                                         <Label.FormattedText>
                                             <FormattedString>
                                                 <Span Text="{Binding TankTypeSubtitle}" />
@@ -162,17 +166,16 @@
 
                                     <!-- Bottom Device Counts: Dat. / Relays -->
                                     <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
-                                        <Label Grid.Column="0" TextColor="#8C93A8" FontSize="12">
+                                        <Label Grid.Column="0" TextColor="{AppThemeBinding Light='#8C93A8', Dark='#7E839B'}" FontSize="12">
                                             <Label.FormattedText>
                                                 <FormattedString>
                                                     <Span Text="{Binding SensorsCount}" />
-                                                    <Span Text=" датч. • " />
+                                                    <Span Text=" • " />
                                                     <Span Text="{Binding RelaysCount}" />
-                                                    <Span Text=" реле" />
                                                 </FormattedString>
                                             </Label.FormattedText>
                                         </Label>
-                                        <Label Grid.Column="1" Text="Подробнее →" TextColor="#4152B0" FontFamily="OpenSansSemibold" FontSize="12" VerticalOptions="Center" />
+                                        <Label Grid.Column="1" Text="{loc:Translate Tanks_Details}" TextColor="#4152B0" FontFamily="OpenSansSemibold" FontSize="12" VerticalOptions="Center" />
                                     </Grid>
                                 </VerticalStackLayout>
                             </Border>
@@ -185,7 +188,7 @@
         <!-- Bottom Action Button: Add Aquarium -->
         <Button Grid.Row="2"
                 x:Name="AddButton"
-                Text="+ Добавить новую ёмкость"
+                Text="{loc:Translate Tanks_AddFirst}"
                 Command="{Binding AddAquariumCommand}"
                 BackgroundColor="#4152B0"
                 TextColor="#FFFFFF"

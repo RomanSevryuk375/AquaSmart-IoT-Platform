@@ -28,6 +28,7 @@ public static class ServiceCollectionExtensions
             };
         });
 
+        services.AddSingleton<ILocalizationService, LocalizationService>();
         services.AddSingleton<IApiClient, ApiClient>();
         services.AddSingleton<IIdentityService, IdentityService>();
         services.AddSingleton<IAuthService, AuthService>();

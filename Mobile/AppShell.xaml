@@ -7,6 +7,7 @@
     xmlns:views="clr-namespace:Mobile.Views"
     xmlns:vm="clr-namespace:Mobile.ViewModels"
     xmlns:converters="clr-namespace:Mobile.Converters"
+    xmlns:loc="clr-namespace:Mobile.Converters"
     x:DataType="vm:AppShellViewModel"
     Shell.FlyoutBehavior="Flyout"
     FlyoutBackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#161824'}"
@@ -85,8 +86,8 @@
     </Shell.FlyoutHeader>
 
     <Shell.FlyoutFooter>
-        <VerticalStackLayout Padding="20,16" Spacing="10" BackgroundColor="#F6F7FC">
-            <Button Text="Выход"
+        <VerticalStackLayout Padding="20,16" Spacing="10" BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#161824'}">
+            <Button Text="{loc:Translate Profile_Logout}"
                     Command="{Binding LogoutCommand}"
                     TextColor="#D93829"
                     BackgroundColor="#FDEEEC"
@@ -104,24 +105,24 @@
     <!-- Welcome / Splash Screen as Initial Route -->
     <FlyoutItem FlyoutItemIsVisible="False">
         <ShellContent
-            Title="Вход"
+            Title="{loc:Translate Nav_Login}"
             ContentTemplate="{DataTemplate local:MainPage}"
             Route="MainPage" />
     </FlyoutItem>
 
     <!-- Main Bottom Tab Bar (Figma Navigation Bar) -->
     <TabBar Route="MainTabs">
-        <Tab Title="Главная" Icon="icon_home.png" Route="DashboardPage">
-            <ShellContent Title="Главная" ContentTemplate="{DataTemplate views:DashboardPage}" Route="DashboardPage" />
+        <Tab Title="{loc:Translate Nav_Home}" Icon="icon_home.png" Route="DashboardPage">
+            <ShellContent Title="{loc:Translate Nav_Home}" ContentTemplate="{DataTemplate views:DashboardPage}" Route="DashboardPage" />
         </Tab>
-        <Tab Title="Ёмкости" Icon="icon_box.png" Route="AquariumsPage">
-            <ShellContent Title="Ёмкости" ContentTemplate="{DataTemplate views:AquariumsPage}" Route="AquariumsPage" />
+        <Tab Title="{loc:Translate Nav_Tanks}" Icon="icon_box.png" Route="AquariumsPage">
+            <ShellContent Title="{loc:Translate Nav_Tanks}" ContentTemplate="{DataTemplate views:AquariumsPage}" Route="AquariumsPage" />
         </Tab>
-        <Tab Title="База знаний" Icon="icon_book.png" Route="KnowledgeBasePage">
-            <ShellContent Title="База знаний" ContentTemplate="{DataTemplate views:KnowledgeBasePage}" Route="KnowledgeBasePage" />
+        <Tab Title="{loc:Translate Nav_Knowledge}" Icon="icon_book.png" Route="KnowledgeBasePage">
+            <ShellContent Title="{loc:Translate Nav_Knowledge}" ContentTemplate="{DataTemplate views:KnowledgeBasePage}" Route="KnowledgeBasePage" />
         </Tab>
-        <Tab Title="Профиль" Icon="icon_user.png" Route="ProfilePage">
-            <ShellContent Title="Профиль" ContentTemplate="{DataTemplate views:ProfilePage}" Route="ProfilePage" />
+        <Tab Title="{loc:Translate Nav_Profile}" Icon="icon_user.png" Route="ProfilePage">
+            <ShellContent Title="{loc:Translate Nav_Profile}" ContentTemplate="{DataTemplate views:ProfilePage}" Route="ProfilePage" />
         </Tab>
     </TabBar>
 </Shell>

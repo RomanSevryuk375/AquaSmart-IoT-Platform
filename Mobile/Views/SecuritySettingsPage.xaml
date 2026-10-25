@@ -2,11 +2,12 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Mobile.ViewModels"
+             xmlns:loc="clr-namespace:Mobile.Converters"
              x:Class="Mobile.Views.SecuritySettingsPage"
              x:DataType="vm:SecuritySettingsViewModel"
              BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#12131A'}"
              Shell.NavBarIsVisible="False"
-             Title="Безопасность">
+             Title="{loc:Translate Security_Title}">
 
     <Grid RowDefinitions="Auto,*" Padding="20,16,20,10">
         <!-- Top Bar: Back Button, Title, Bell matching Figma 781:12659 -->
@@ -26,7 +27,7 @@
             </Border>
 
             <Label Grid.Column="1"
-                   Text="Безопасность"
+                   Text="{loc:Translate Security_Title}"
                    TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                    FontFamily="OpenSansSemibold"
                    FontSize="18"
@@ -53,7 +54,7 @@
             <VerticalStackLayout Spacing="20" Padding="0,0,0,24">
                 <!-- 1. Вход в приложение -->
                 <VerticalStackLayout Spacing="8">
-                    <Label Text="Вход в приложение"
+                    <Label Text="{loc:Translate Security_AppLogin}"
                            TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                            FontFamily="OpenSansSemibold"
                            FontSize="16"
@@ -67,7 +68,7 @@
                         <VerticalStackLayout Spacing="0">
                             <!-- Использовать Face ID -->
                             <Grid ColumnDefinitions="*,Auto" HeightRequest="52">
-                                <Label Text="Использовать Face ID" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                                <Label Text="{loc:Translate Security_FaceId}" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
                                 <Switch Grid.Column="1"
                                         IsToggled="{Binding UseFaceId}"
                                         OnColor="#4152B0"
@@ -81,7 +82,7 @@
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding ChangePinCommand}" />
                                 </Grid.GestureRecognizers>
-                                <Label Text="Код-пароль (ПИН)" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                                <Label Text="{loc:Translate Security_Pin}" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
                                 <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                             </Grid>
 
@@ -93,7 +94,7 @@
                                     <TapGestureRecognizer Command="{Binding ChooseAutoLockCommand}" />
                                 </Grid.GestureRecognizers>
                                 <VerticalStackLayout VerticalOptions="Center" Spacing="2">
-                                    <Label Text="Автоблокировка" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" />
+                                    <Label Text="{loc:Translate Security_AutoLock}" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" />
                                     <Label Text="{Binding AutoLockDuration}" TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="13" />
                                 </VerticalStackLayout>
                                 <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
@@ -104,7 +105,7 @@
 
                 <!-- 2. Аккаунт -->
                 <VerticalStackLayout Spacing="8">
-                    <Label Text="Аккаунт"
+                    <Label Text="{loc:Translate Security_Account}"
                            TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                            FontFamily="OpenSansSemibold"
                            FontSize="16"
@@ -121,7 +122,7 @@
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding ChangePasswordCommand}" />
                                 </Grid.GestureRecognizers>
-                                <Label Text="Изменить пароль" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                                <Label Text="{loc:Translate Security_ChangePassword}" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
                                 <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                             </Grid>
 
@@ -129,7 +130,7 @@
 
                             <!-- Двухфакторный вход (2FA) -->
                             <Grid ColumnDefinitions="*,Auto" HeightRequest="52">
-                                <Label Text="Двухфакторный вход (2FA)" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                                <Label Text="{loc:Translate Security_2FA}" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
                                 <Switch Grid.Column="1"
                                         IsToggled="{Binding TwoFactorEnabled}"
                                         OnColor="#4152B0"
@@ -141,7 +142,7 @@
 
                 <!-- 3. Управление -->
                 <VerticalStackLayout Spacing="8">
-                    <Label Text="Управление"
+                    <Label Text="{loc:Translate Security_Management}"
                            TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                            FontFamily="OpenSansSemibold"
                            FontSize="16"
@@ -153,7 +154,7 @@
                             BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                             Padding="16,6">
                         <Grid ColumnDefinitions="*,Auto" HeightRequest="52">
-                            <Label Text="Запрос PIN при пуске реле" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                            <Label Text="{loc:Translate Security_PinForRelay}" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
                             <Switch Grid.Column="1"
                                     IsToggled="{Binding PinForRelay}"
                                     OnColor="#4152B0"

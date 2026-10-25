@@ -5,7 +5,7 @@
              xmlns:controls="clr-namespace:Mobile.Views.Controls"
              x:Class="Mobile.Views.LoginPage"
              x:DataType="vm:LoginViewModel"
-             BackgroundColor="#FFFFFF"
+             BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#12131A'}"
              Shell.NavBarIsVisible="False">
 
     <ScrollView>
@@ -25,7 +25,7 @@
                        Margin="0,4,0,0">
                     <Label.FormattedText>
                         <FormattedString>
-                            <Span Text="Добро пожаловать&#10;в " TextColor="#141414" />
+                            <Span Text="Добро пожаловать&#10;в " TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" />
                             <Span Text="SmartAqua" TextColor="#4152B0" />
                         </FormattedString>
                     </Label.FormattedText>
@@ -37,19 +37,19 @@
                 <!-- Login / Phone / Email -->
                 <VerticalStackLayout Spacing="4">
                     <Label Text="Логин"
-                           TextColor="#333333"
+                           TextColor="{AppThemeBinding Light='#333333', Dark='#D8DBEC'}"
                            FontFamily="OpenSansSemibold"
                            FontSize="13" />
-                    <Border Stroke="#E4E7F4"
+                    <Border Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
                             StrokeThickness="1"
                             StrokeShape="RoundRectangle 10"
-                            BackgroundColor="#FFFFFF"
+                            BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                             Padding="14,0"
                             HeightRequest="48">
                         <Entry Text="{Binding EmailOrLogin, Mode=TwoWay}"
                                Placeholder="Введите вашу почту или телефон"
                                PlaceholderColor="#8C93A8"
-                               TextColor="#141414"
+                               TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                                HeightRequest="48"
                                VerticalOptions="Center"
                                FontFamily="OpenSansRegular"
@@ -66,13 +66,13 @@
                 <!-- Password -->
                 <VerticalStackLayout Spacing="4">
                     <Label Text="Пароль"
-                           TextColor="#333333"
+                           TextColor="{AppThemeBinding Light='#333333', Dark='#D8DBEC'}"
                            FontFamily="OpenSansSemibold"
                            FontSize="13" />
-                    <Border Stroke="#E4E7F4"
+                    <Border Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
                             StrokeThickness="1"
                             StrokeShape="RoundRectangle 10"
-                            BackgroundColor="#FFFFFF"
+                            BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                             Padding="14,0"
                             HeightRequest="48">
                         <Grid ColumnDefinitions="*,Auto">
@@ -80,7 +80,7 @@
                                    Text="{Binding Password, Mode=TwoWay}"
                                    Placeholder="Введите ваш пароль"
                                    PlaceholderColor="#8C93A8"
-                                   TextColor="#141414"
+                                   TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                                    IsPassword="{Binding IsPasswordHidden}"
                                    HeightRequest="48"
                                    VerticalOptions="Center"
@@ -106,8 +106,8 @@
 
                 <!-- General Server / Connection Error Banner -->
                 <Border IsVisible="{Binding HasError}"
-                        BackgroundColor="#FDECEA"
-                        Stroke="#F5C6CB"
+                        BackgroundColor="{AppThemeBinding Light='#FDECEA', Dark='#3B1B1D'}"
+                        Stroke="{AppThemeBinding Light='#F5C6CB', Dark='#5C282C'}"
                         StrokeThickness="1"
                         StrokeShape="RoundRectangle 8"
                         Padding="12,10"
@@ -116,7 +116,7 @@
                         <Label Grid.Column="0" Text="⚠️" FontSize="14" VerticalOptions="Center" />
                         <Label Grid.Column="1"
                                Text="{Binding ErrorMessage}"
-                               TextColor="#D32F2F"
+                               TextColor="#E53935"
                                FontFamily="OpenSansRegular"
                                FontSize="12"
                                LineHeight="1.25"
@@ -156,8 +156,8 @@
                 <Button Text="Войти по Face ID / PIN"
                         Command="{Binding BiometricLoginCommand}"
                         IsVisible="{Binding CanUseBiometrics}"
-                        BackgroundColor="#F0F2FB"
-                        TextColor="#4152B0"
+                        BackgroundColor="{AppThemeBinding Light='#F0F2FB', Dark='#1E2235'}"
+                        TextColor="{AppThemeBinding Light='#4152B0', Dark='#B9C4F0'}"
                         FontFamily="OpenSansSemibold"
                         FontSize="14"
                         CornerRadius="12"
@@ -171,7 +171,7 @@
                 <!-- Bottom Register Link -->
                 <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
                     <Label Text="Еще не зарегистрированы?"
-                           TextColor="#6E6E6E"
+                           TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}"
                            VerticalOptions="Center"
                            FontFamily="OpenSansRegular"
                            FontSize="13" />

@@ -4,6 +4,7 @@
              xmlns:vm="clr-namespace:Mobile.ViewModels"
              xmlns:models="clr-namespace:Mobile.Models"
              xmlns:controls="clr-namespace:Mobile.Views.Controls"
+             xmlns:loc="clr-namespace:Mobile.Converters"
              x:Class="Mobile.Views.DashboardPage"
              x:DataType="vm:DashboardViewModel"
              BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#12131A'}"
@@ -16,7 +17,7 @@
             <!-- Top Header: Greeting & Plus / Bell Action Buttons (Figma: Главная) -->
             <Grid x:Name="HeaderCard" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12" Margin="0,4,0,4">
                 <Label Grid.Column="0"
-                       Text="{Binding Greeting, FallbackValue='Добро пожаловать, Роман!'}"
+                       Text="{Binding Greeting, FallbackValue='Добро пожаловать!'}"
                        TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                        FontFamily="OpenSansSemibold"
                        FontSize="20"
@@ -60,19 +61,19 @@
                                          BadgeText="⚙️"
                                          BadgeColor="#7BA028" />
 
-                <Label Text="Добавьте первый контроллер"
+                <Label Text="{loc:Translate Dash_AddFirstController}"
                        TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                        FontFamily="OpenSansSemibold"
                        FontSize="20"
                        FontAttributes="Bold" />
 
-                <Label Text="Контроллер соединяет приложение с вашей ёмкостью — добавьте контроллер или создайте ёмкость, чтобы начать"
+                <Label Text="{loc:Translate Dash_ZeroStateDesc}"
                        TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}"
                        FontFamily="OpenSansRegular"
                        FontSize="14"
                        LineHeight="1.3" />
 
-                <Button Text="Подключить контроллер"
+                <Button Text="{loc:Translate Dash_ConnectController}"
                        Command="{Binding AddControllerCommand}"
                        BackgroundColor="#4152B0"
                        TextColor="#FFFFFF"
@@ -82,7 +83,7 @@
                        HeightRequest="48"
                        Margin="0,8,0,0" />
 
-                <Button Text="Добавить ёмкость"
+                <Button Text="{loc:Translate Dash_AddTank}"
                        Command="{Binding AddAquariumCommand}"
                        BackgroundColor="Transparent"
                        BorderColor="#4152B0"
@@ -93,7 +94,7 @@
                        CornerRadius="12"
                        HeightRequest="48" />
 
-                <Button Text="Изучить базу знаний"
+                <Button Text="{loc:Translate Dash_ExploreKb}"
                        Command="{Binding GoToKnowledgeBaseCommand}"
                        BackgroundColor="Transparent"
                        TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}"
@@ -136,7 +137,7 @@
             <VerticalStackLayout x:Name="AquariumsSection" Spacing="10" IsVisible="{Binding HasAquariums}">
                 <Grid ColumnDefinitions="*,Auto">
                     <Label Grid.Column="0"
-                           Text="Все ёмкости"
+                           Text="{loc:Translate Dash_AllTanks}"
                            TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                            FontFamily="OpenSansSemibold"
                            FontSize="16"
@@ -144,7 +145,7 @@
                            VerticalOptions="Center" />
 
                     <Button Grid.Column="1"
-                            Text="+ Добавить"
+                            Text="{loc:Translate Dash_Add}"
                             Command="{Binding AddAquariumCommand}"
                             TextColor="#4152B0"
                             BackgroundColor="Transparent"
@@ -206,7 +207,7 @@
 
             <!-- Section 2: Последние события (Figma Timeline Events) -->
             <VerticalStackLayout x:Name="TelemetrySection" Spacing="10" IsVisible="{Binding HasRecentEvents}">
-                <Label Text="Последние события"
+                <Label Text="{loc:Translate Dash_RecentEvents}"
                        TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                        FontFamily="OpenSansSemibold"
                        FontSize="16"
@@ -234,7 +235,7 @@
             <VerticalStackLayout x:Name="RelaysSection" Spacing="10" IsVisible="{Binding HasAquariums}">
                 <Grid ColumnDefinitions="*,Auto">
                     <Label Grid.Column="0"
-                           Text="Управление устройствами"
+                           Text="{loc:Translate Dash_DeviceControl}"
                            TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                            FontFamily="OpenSansSemibold"
                            FontSize="16"
@@ -242,7 +243,7 @@
                            VerticalOptions="Center" />
 
                     <Button Grid.Column="1"
-                            Text="+ Реле"
+                            Text="{loc:Translate Dash_AddRelay}"
                             Command="{Binding AddRelayCommand}"
                             TextColor="#4152B0"
                             BackgroundColor="Transparent"

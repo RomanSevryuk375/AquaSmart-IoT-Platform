@@ -3,18 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Mobile.ViewModels"
              xmlns:models="clr-namespace:Mobile.Models"
+             xmlns:loc="clr-namespace:Mobile.Converters"
              x:Class="Mobile.Views.KnowledgeBasePage"
              x:DataType="vm:KnowledgeBaseViewModel"
-             BackgroundColor="#FFFFFF"
+             BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#12131A'}"
              Shell.NavBarIsVisible="False"
-             Title="База знаний">
+             Title="{loc:Translate Kb_Title}">
 
     <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="20,16,20,10">
         <!-- Top Bar matching Figma: Title & Bell Icon -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,4,0,16">
             <Label Grid.Column="0"
-                   Text="База знаний"
-                   TextColor="#141414"
+                   Text="{loc:Translate Kb_Title}"
+                   TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                    FontFamily="OpenSansSemibold"
                    FontSize="22"
                    FontAttributes="Bold"
@@ -23,7 +24,7 @@
             <Border Grid.Column="1"
                     WidthRequest="38" HeightRequest="38"
                     StrokeShape="RoundRectangle 10"
-                    BackgroundColor="#F6F7FC"
+                    BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
                     StrokeThickness="0">
                 <ImageButton Source="icon_bell.png"
                              Command="{Binding OpenNotificationsCommand}"
@@ -38,9 +39,9 @@
         <Border Grid.Row="1"
                 x:Name="SearchBarBorder"
                 StrokeThickness="1"
-                Stroke="#E4E7F4"
+                Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
                 StrokeShape="RoundRectangle 14"
-                BackgroundColor="#FFFFFF"
+                BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                 HeightRequest="48"
                 Padding="14,0"
                 Margin="0,0,0,16">
@@ -52,9 +53,9 @@
                        Margin="0,0,10,0" />
                 <Entry Grid.Column="1"
                        Text="{Binding SearchQuery}"
-                       Placeholder="Поиск статей"
+                       Placeholder="{loc:Translate Kb_SearchPlaceholder}"
                        PlaceholderColor="#8C93A8"
-                       TextColor="#141414"
+                       TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                        ReturnCommand="{Binding SearchCommand}"
                        VerticalOptions="Center" />
             </Grid>
@@ -83,8 +84,8 @@
                     </Button.Triggers>
                     <Button.Style>
                         <Style TargetType="Button">
-                            <Setter Property="BackgroundColor" Value="#EDEFFB" />
-                            <Setter Property="TextColor" Value="#4152B0" />
+                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light='#EDEFFB', Dark='#252837'}" />
+                            <Setter Property="TextColor" Value="{AppThemeBinding Light='#4152B0', Dark='#B9C4F0'}" />
                         </Style>
                     </Button.Style>
                 </Button>
@@ -106,8 +107,8 @@
                     </Button.Triggers>
                     <Button.Style>
                         <Style TargetType="Button">
-                            <Setter Property="BackgroundColor" Value="#EDEFFB" />
-                            <Setter Property="TextColor" Value="#4152B0" />
+                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light='#EDEFFB', Dark='#252837'}" />
+                            <Setter Property="TextColor" Value="{AppThemeBinding Light='#4152B0', Dark='#B9C4F0'}" />
                         </Style>
                     </Button.Style>
                 </Button>
@@ -129,8 +130,8 @@
                     </Button.Triggers>
                     <Button.Style>
                         <Style TargetType="Button">
-                            <Setter Property="BackgroundColor" Value="#EDEFFB" />
-                            <Setter Property="TextColor" Value="#4152B0" />
+                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light='#EDEFFB', Dark='#252837'}" />
+                            <Setter Property="TextColor" Value="{AppThemeBinding Light='#4152B0', Dark='#B9C4F0'}" />
                         </Style>
                     </Button.Style>
                 </Button>
@@ -152,8 +153,8 @@
                     </Button.Triggers>
                     <Button.Style>
                         <Style TargetType="Button">
-                            <Setter Property="BackgroundColor" Value="#EDEFFB" />
-                            <Setter Property="TextColor" Value="#4152B0" />
+                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light='#EDEFFB', Dark='#252837'}" />
+                            <Setter Property="TextColor" Value="{AppThemeBinding Light='#4152B0', Dark='#B9C4F0'}" />
                         </Style>
                     </Button.Style>
                 </Button>
@@ -173,10 +174,10 @@
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:KnowledgeArticleModel">
-                        <Border StrokeThickness="1.5"
-                                Stroke="{Binding BorderColor}"
+                        <Border StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
                                 StrokeShape="RoundRectangle 16"
-                                BackgroundColor="#FFFFFF"
+                                BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                                 Padding="0">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:KnowledgeBaseViewModel}}, Path=SelectArticleCommand}"
@@ -207,11 +208,11 @@
                                 </Border>
 
                                 <!-- Bottom Description Section -->
-                                <VerticalStackLayout BackgroundColor="#FFFFFF"
+                                <VerticalStackLayout BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                                                      Padding="16,14"
                                                      Spacing="8">
                                     <Label Text="{Binding Summary}"
-                                           TextColor="#6E6E6E"
+                                           TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}"
                                            FontSize="13"
                                            LineHeight="1.25"
                                            LineBreakMode="WordWrap" />
