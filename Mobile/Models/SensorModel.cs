@@ -1,6 +1,8 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace Mobile.Models;
 
-public class SensorModel
+public partial class SensorModel : ObservableObject
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid AquariumId { get; set; }
@@ -9,7 +11,13 @@ public class SensorModel
     public string PortDisplay => string.IsNullOrWhiteSpace(Port) ? string.Empty : $"Порт: {Port}";
     public bool HasPort => !string.IsNullOrWhiteSpace(Port);
     public SensorType Type { get; set; } = SensorType.Temperature;
-    public double Value { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsAlert))]
+    [NotifyPropertyChangedFor(nameof(StatusText))]
+    [NotifyPropertyChangedFor(nameof(StatusColor))]
+    private double _value;
+
     public string Unit { get; set; } = "°C";
     public double MinThreshold { get; set; }
     public double MaxThreshold { get; set; }
@@ -24,5 +32,7 @@ public class SensorModel
         SensorType.TdsSalinity => "🧂",
         _ => "💧"
     };
-    public DateTime LastUpdated { get; set; } = DateTime.Now;
+
+    [ObservableProperty]
+    private DateTime _lastUpdated = DateTime.Now;
 }

@@ -133,4 +133,24 @@ public sealed class ControllerService : IControllerService
         }
         return Task.FromResult(false);
     }
+
+    public async Task<OtaCheckResponseDto?> CheckOtaUpdateAsync(Guid controllerId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await _apiClient.GetAsync<OtaCheckResponseDto>(
+                $"{MobileApiEndpoints.FirmwareOtaCheck}?controller_id={controllerId}",
+                cancellationToken);
+
+            if (response.IsSuccess && response.Data != null)
+            {
+                return response.Data;
+            }
+        }
+        catch
+        {
+        }
+
+        return null;
+    }
 }

@@ -34,6 +34,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IAquariumService, AquariumService>();
         services.AddSingleton<IKnowledgeService, KnowledgeService>();
         services.AddSingleton<IControllerService, ControllerService>();
+        services.AddSingleton<ITelemetryHubService, TelemetryHubService>();
 
         return services;
     }

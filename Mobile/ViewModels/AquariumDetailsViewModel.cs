@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mobile.Services.Dto.Control;
 using Mobile.Services.Dto.Notification;
+using Mobile.Services.Dto.Telemetry;
+using Mobile.Services.Interfaces;
 using Mobile.Views;
 
 namespace Mobile.ViewModels;
@@ -11,6 +13,8 @@ namespace Mobile.ViewModels;
 public partial class AquariumDetailsViewModel : ObservableObject
 {
     private readonly IAquariumService _aquariumService;
+    private readonly ITelemetryHubService _telemetryHubService;
+    private Guid? _currentSubscribedId;
 
     [ObservableProperty]
     private string? _aquariumIdString;
@@ -69,9 +73,29 @@ public partial class AquariumDetailsViewModel : ObservableObject
     [ObservableProperty]
     private bool _isBusy;
 
-    public AquariumDetailsViewModel(IAquariumService aquariumService)
+    [ObservableProperty]
+    private bool _isLiveTelemetryActive = true;
+
+    public AquariumDetailsViewModel(IAquariumService aquariumService, ITelemetryHubService telemetryHubService)
     {
         _aquariumService = aquariumService;
+        _telemetryHubService = telemetryHubService;
+        _telemetryHubService.RawTelemetryReceived += OnRawTelemetryReceived;
+    }
+
+    private void OnRawTelemetryReceived(object? sender, TelemetryRawChartPointDto point)
+    {
+        if (point == null) return;
+
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            var sensor = Sensors.FirstOrDefault(s => s.Id == point.SensorId);
+            if (sensor != null)
+            {
+                sensor.Value = Math.Round(point.Value, 2);
+                sensor.LastUpdated = point.RecordedAt.ToLocalTime();
+            }
+        });
     }
 
     async partial void OnAquariumIdStringChanged(string? value)
@@ -85,6 +109,13 @@ public partial class AquariumDetailsViewModel : ObservableObject
     public async Task LoadAsync(Guid id)
     {
         IsBusy = true;
+
+        if (_currentSubscribedId.HasValue && _currentSubscribedId.Value != id)
+        {
+            _ = _telemetryHubService.UnsubscribeFromEcosystemAsync(_currentSubscribedId.Value);
+        }
+        _currentSubscribedId = id;
+        _ = _telemetryHubService.SubscribeToEcosystemAsync(id);
         Aquarium = await _aquariumService.GetAquariumByIdAsync(id);
         if (Aquarium != null)
         {

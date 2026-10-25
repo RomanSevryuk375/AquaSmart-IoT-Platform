@@ -218,9 +218,21 @@
                 <VerticalStackLayout x:Name="SensorsSection"
                                      Spacing="10"
                                      IsVisible="{Binding IsSensorsTabSelected}">
-                    <Grid ColumnDefinitions="*,Auto">
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
                         <Label Grid.Column="0" Text="Датчики" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
-                        <Button Grid.Column="1" Text="+ Добавить" Command="{Binding AddSensorCommand}" TextColor="#4152B0" BackgroundColor="Transparent" FontFamily="OpenSansSemibold" FontSize="13" Padding="4,0" />
+                        <Border Grid.Column="1"
+                                StrokeShape="RoundRectangle 8"
+                                StrokeThickness="0"
+                                BackgroundColor="#E8F5E9"
+                                Padding="8,3"
+                                VerticalOptions="Center"
+                                IsVisible="{Binding IsLiveTelemetryActive}">
+                            <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
+                                <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="#4CAF50" VerticalOptions="Center" />
+                                <Label Text="Live SignalR" TextColor="#2E7D32" FontFamily="OpenSansSemibold" FontSize="10" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Border>
+                        <Button Grid.Column="2" Text="+ Добавить" Command="{Binding AddSensorCommand}" TextColor="#4152B0" BackgroundColor="Transparent" FontFamily="OpenSansSemibold" FontSize="13" Padding="4,0" />
                     </Grid>
 
                     <!-- Empty State (Figma: Емкость. Датчики. Пусто) -->
