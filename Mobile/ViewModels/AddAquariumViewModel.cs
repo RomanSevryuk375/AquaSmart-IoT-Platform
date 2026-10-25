@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mobile.Models;
 using Mobile.Services.Interfaces;
+using Mobile.Views;
 
 namespace Mobile.ViewModels;
 
@@ -15,7 +16,23 @@ public partial class AddAquariumViewModel : ObservableObject
 
     // Step 1: Tank Type
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TankTypeName))]
+    [NotifyPropertyChangedFor(nameof(TankTypeIcon))]
+    [NotifyPropertyChangedFor(nameof(SpeciesInfo))]
+    [NotifyPropertyChangedFor(nameof(IsAquariumSelected))]
+    [NotifyPropertyChangedFor(nameof(IsTerrariumSelected))]
+    [NotifyPropertyChangedFor(nameof(IsPaludariumSelected))]
+    [NotifyPropertyChangedFor(nameof(IsGrowboxSelected))]
+    [NotifyPropertyChangedFor(nameof(IsFlorariumSelected))]
+    [NotifyPropertyChangedFor(nameof(IsFormicariumSelected))]
     private int _selectedTankType = 0; // 0: Aquarium, 1: Terrarium, 2: Paludarium, 3: Growbox, 4: Florarium, 5: Formicarium
+
+    public bool IsAquariumSelected => SelectedTankType == 0;
+    public bool IsTerrariumSelected => SelectedTankType == 1;
+    public bool IsPaludariumSelected => SelectedTankType == 2;
+    public bool IsGrowboxSelected => SelectedTankType == 3;
+    public bool IsFlorariumSelected => SelectedTankType == 4;
+    public bool IsFormicariumSelected => SelectedTankType == 5;
 
     // Step 2: Name
     [ObservableProperty]
@@ -55,7 +72,22 @@ public partial class AddAquariumViewModel : ObservableObject
 
     // Step 7: Color theme
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsTheme0Selected))]
+    [NotifyPropertyChangedFor(nameof(IsTheme1Selected))]
+    [NotifyPropertyChangedFor(nameof(IsTheme2Selected))]
+    [NotifyPropertyChangedFor(nameof(IsTheme3Selected))]
+    [NotifyPropertyChangedFor(nameof(IsTheme4Selected))]
+    [NotifyPropertyChangedFor(nameof(IsTheme5Selected))]
+    [NotifyPropertyChangedFor(nameof(PreviewThemeColor))]
+    [NotifyPropertyChangedFor(nameof(PreviewBorderColor))]
     private int _selectedThemeIndex = 0; // 0: Blue, 1: Cyan, 2: Green, 3: Yellow, 4: Orange, 5: Gray
+
+    public bool IsTheme0Selected => SelectedThemeIndex == 0;
+    public bool IsTheme1Selected => SelectedThemeIndex == 1;
+    public bool IsTheme2Selected => SelectedThemeIndex == 2;
+    public bool IsTheme3Selected => SelectedThemeIndex == 3;
+    public bool IsTheme4Selected => SelectedThemeIndex == 4;
+    public bool IsTheme5Selected => SelectedThemeIndex == 5;
 
     // Overlays
     [ObservableProperty]
@@ -259,7 +291,21 @@ public partial class AddAquariumViewModel : ObservableObject
     private async Task GoToEquipmentAsync()
     {
         IsSuccessOpen = false;
-        await Shell.Current.GoToAsync($"AquariumDetailsPage?aquariumId={CreatedAquariumId}");
+        try
+        {
+            await Shell.Current.GoToAsync($"../{nameof(AquariumDetailsPage)}?aquariumId={CreatedAquariumId}");
+        }
+        catch
+        {
+            try
+            {
+                await Shell.Current.GoToAsync($"///{nameof(AquariumDetailsPage)}?aquariumId={CreatedAquariumId}");
+            }
+            catch
+            {
+                await Shell.Current.GoToAsync($"{nameof(AquariumDetailsPage)}?aquariumId={CreatedAquariumId}");
+            }
+        }
     }
 
     [RelayCommand]

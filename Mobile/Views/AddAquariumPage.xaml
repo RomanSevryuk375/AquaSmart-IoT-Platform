@@ -81,10 +81,22 @@
                             <Label Text="Выберите тип — это поможет настроить параметры мониторинга" TextColor="#6E6E6E" FontSize="13" />
                         </VerticalStackLayout>
 
-                        <!-- Tank Type Cards -->
+                        <!-- Tank Type Cards matching Figma -->
                         <VerticalStackLayout Spacing="10">
                             <!-- 0. Аквариум -->
-                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                            <Border StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Stroke" Value="#E4E7F4" />
+                                        <Setter Property="StrokeThickness" Value="1" />
+                                        <Style.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsAquariumSelected}" Value="True">
+                                                <Setter Property="Stroke" Value="#4152B0" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}">
                                         <TapGestureRecognizer.CommandParameter>
@@ -98,12 +110,40 @@
                                         <Label Text="Аквариум" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
                                         <Label Text="Ёмкость для рыб и водных обитателей" TextColor="#8C93A8" FontSize="12" />
                                     </VerticalStackLayout>
-                                    <RadioButton Grid.Column="2" IsChecked="True" VerticalOptions="Center" />
+                                    <Border Grid.Column="2" WidthRequest="22" HeightRequest="22" StrokeShape="RoundRectangle 6" VerticalOptions="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="BackgroundColor" Value="#FFFFFF" />
+                                                <Setter Property="Stroke" Value="#D0D5DD" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                                <Style.Triggers>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding IsAquariumSelected}" Value="True">
+                                                        <Setter Property="BackgroundColor" Value="#4152B0" />
+                                                        <Setter Property="Stroke" Value="#4152B0" />
+                                                        <Setter Property="StrokeThickness" Value="0" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Label Text="✓" TextColor="#FFFFFF" FontSize="13" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsAquariumSelected}" />
+                                    </Border>
                                 </Grid>
                             </Border>
 
                             <!-- 1. Террариум -->
-                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                            <Border StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Stroke" Value="#E4E7F4" />
+                                        <Setter Property="StrokeThickness" Value="1" />
+                                        <Style.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsTerrariumSelected}" Value="True">
+                                                <Setter Property="Stroke" Value="#4152B0" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}">
                                         <TapGestureRecognizer.CommandParameter>
@@ -117,12 +157,40 @@
                                         <Label Text="Террариум" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
                                         <Label Text="Среда для рептилий и амфибий" TextColor="#8C93A8" FontSize="12" />
                                     </VerticalStackLayout>
-                                    <RadioButton Grid.Column="2" IsChecked="False" VerticalOptions="Center" />
+                                    <Border Grid.Column="2" WidthRequest="22" HeightRequest="22" StrokeShape="RoundRectangle 6" VerticalOptions="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="BackgroundColor" Value="#FFFFFF" />
+                                                <Setter Property="Stroke" Value="#D0D5DD" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                                <Style.Triggers>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding IsTerrariumSelected}" Value="True">
+                                                        <Setter Property="BackgroundColor" Value="#4152B0" />
+                                                        <Setter Property="Stroke" Value="#4152B0" />
+                                                        <Setter Property="StrokeThickness" Value="0" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Label Text="✓" TextColor="#FFFFFF" FontSize="13" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsTerrariumSelected}" />
+                                    </Border>
                                 </Grid>
                             </Border>
 
                             <!-- 2. Палюдариум -->
-                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                            <Border StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Stroke" Value="#E4E7F4" />
+                                        <Setter Property="StrokeThickness" Value="1" />
+                                        <Style.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsPaludariumSelected}" Value="True">
+                                                <Setter Property="Stroke" Value="#4152B0" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}">
                                         <TapGestureRecognizer.CommandParameter>
@@ -136,12 +204,40 @@
                                         <Label Text="Палюдариум" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
                                         <Label Text="Совмещает водную и наземную зоны" TextColor="#8C93A8" FontSize="12" />
                                     </VerticalStackLayout>
-                                    <RadioButton Grid.Column="2" IsChecked="False" VerticalOptions="Center" />
+                                    <Border Grid.Column="2" WidthRequest="22" HeightRequest="22" StrokeShape="RoundRectangle 6" VerticalOptions="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="BackgroundColor" Value="#FFFFFF" />
+                                                <Setter Property="Stroke" Value="#D0D5DD" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                                <Style.Triggers>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding IsPaludariumSelected}" Value="True">
+                                                        <Setter Property="BackgroundColor" Value="#4152B0" />
+                                                        <Setter Property="Stroke" Value="#4152B0" />
+                                                        <Setter Property="StrokeThickness" Value="0" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Label Text="✓" TextColor="#FFFFFF" FontSize="13" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsPaludariumSelected}" />
+                                    </Border>
                                 </Grid>
                             </Border>
 
                             <!-- 3. Гроубокс -->
-                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                            <Border StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Stroke" Value="#E4E7F4" />
+                                        <Setter Property="StrokeThickness" Value="1" />
+                                        <Style.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsGrowboxSelected}" Value="True">
+                                                <Setter Property="Stroke" Value="#4152B0" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}">
                                         <TapGestureRecognizer.CommandParameter>
@@ -155,12 +251,40 @@
                                         <Label Text="Гроубокс" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
                                         <Label Text="Закрытая камера для растений" TextColor="#8C93A8" FontSize="12" />
                                     </VerticalStackLayout>
-                                    <RadioButton Grid.Column="2" IsChecked="False" VerticalOptions="Center" />
+                                    <Border Grid.Column="2" WidthRequest="22" HeightRequest="22" StrokeShape="RoundRectangle 6" VerticalOptions="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="BackgroundColor" Value="#FFFFFF" />
+                                                <Setter Property="Stroke" Value="#D0D5DD" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                                <Style.Triggers>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding IsGrowboxSelected}" Value="True">
+                                                        <Setter Property="BackgroundColor" Value="#4152B0" />
+                                                        <Setter Property="Stroke" Value="#4152B0" />
+                                                        <Setter Property="StrokeThickness" Value="0" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Label Text="✓" TextColor="#FFFFFF" FontSize="13" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsGrowboxSelected}" />
+                                    </Border>
                                 </Grid>
                             </Border>
 
                             <!-- 4. Флорариум -->
-                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                            <Border StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Stroke" Value="#E4E7F4" />
+                                        <Setter Property="StrokeThickness" Value="1" />
+                                        <Style.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsFlorariumSelected}" Value="True">
+                                                <Setter Property="Stroke" Value="#4152B0" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}">
                                         <TapGestureRecognizer.CommandParameter>
@@ -174,12 +298,40 @@
                                         <Label Text="Флорариум" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
                                         <Label Text="Декоративная ёмкость для растений" TextColor="#8C93A8" FontSize="12" />
                                     </VerticalStackLayout>
-                                    <RadioButton Grid.Column="2" IsChecked="False" VerticalOptions="Center" />
+                                    <Border Grid.Column="2" WidthRequest="22" HeightRequest="22" StrokeShape="RoundRectangle 6" VerticalOptions="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="BackgroundColor" Value="#FFFFFF" />
+                                                <Setter Property="Stroke" Value="#D0D5DD" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                                <Style.Triggers>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding IsFlorariumSelected}" Value="True">
+                                                        <Setter Property="BackgroundColor" Value="#4152B0" />
+                                                        <Setter Property="Stroke" Value="#4152B0" />
+                                                        <Setter Property="StrokeThickness" Value="0" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Label Text="✓" TextColor="#FFFFFF" FontSize="13" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsFlorariumSelected}" />
+                                    </Border>
                                 </Grid>
                             </Border>
 
                             <!-- 5. Формикарий -->
-                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                            <Border StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Stroke" Value="#E4E7F4" />
+                                        <Setter Property="StrokeThickness" Value="1" />
+                                        <Style.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsFormicariumSelected}" Value="True">
+                                                <Setter Property="Stroke" Value="#4152B0" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}">
                                         <TapGestureRecognizer.CommandParameter>
@@ -193,7 +345,23 @@
                                         <Label Text="Формикарий" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
                                         <Label Text="Муравьиная ферма" TextColor="#8C93A8" FontSize="12" />
                                     </VerticalStackLayout>
-                                    <RadioButton Grid.Column="2" IsChecked="False" VerticalOptions="Center" />
+                                    <Border Grid.Column="2" WidthRequest="22" HeightRequest="22" StrokeShape="RoundRectangle 6" VerticalOptions="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="BackgroundColor" Value="#FFFFFF" />
+                                                <Setter Property="Stroke" Value="#D0D5DD" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                                <Style.Triggers>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding IsFormicariumSelected}" Value="True">
+                                                        <Setter Property="BackgroundColor" Value="#4152B0" />
+                                                        <Setter Property="Stroke" Value="#4152B0" />
+                                                        <Setter Property="StrokeThickness" Value="0" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Label Text="✓" TextColor="#FFFFFF" FontSize="13" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsFormicariumSelected}" />
+                                    </Border>
                                 </Grid>
                             </Border>
                         </VerticalStackLayout>
@@ -398,7 +566,7 @@
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>0</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
                                 </Border.GestureRecognizers>
-                                <Label Text="✓" TextColor="#FFFFFF" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                                <Label Text="✓" TextColor="#FFFFFF" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsTheme0Selected}" />
                             </Border>
 
                             <!-- Cyan (1) -->
@@ -406,6 +574,7 @@
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>1</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
                                 </Border.GestureRecognizers>
+                                <Label Text="✓" TextColor="#FFFFFF" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsTheme1Selected}" />
                             </Border>
 
                             <!-- Green (2) -->
@@ -413,6 +582,7 @@
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>2</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
                                 </Border.GestureRecognizers>
+                                <Label Text="✓" TextColor="#FFFFFF" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsTheme2Selected}" />
                             </Border>
 
                             <!-- Yellow (3) -->
@@ -420,6 +590,7 @@
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>3</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
                                 </Border.GestureRecognizers>
+                                <Label Text="✓" TextColor="#FFFFFF" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsTheme3Selected}" />
                             </Border>
 
                             <!-- Orange (4) -->
@@ -427,6 +598,7 @@
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>4</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
                                 </Border.GestureRecognizers>
+                                <Label Text="✓" TextColor="#FFFFFF" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsTheme4Selected}" />
                             </Border>
 
                             <!-- Gray (5) -->
@@ -434,6 +606,7 @@
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>5</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
                                 </Border.GestureRecognizers>
+                                <Label Text="✓" TextColor="#FFFFFF" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsTheme5Selected}" />
                             </Border>
                         </HorizontalStackLayout>
 
@@ -548,7 +721,8 @@
                                 CornerRadius="14"
                                 HeightRequest="52"
                                 FontFamily="OpenSansSemibold"
-                                FontSize="15" />
+                                FontSize="13"
+                                Padding="4,0" />
 
                         <Button Text="Вернуться на главную"
                                 Command="{Binding GoToMainCommand}"

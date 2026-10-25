@@ -207,6 +207,11 @@ public sealed class AquariumService : IAquariumService
         {
         }
 
+        if (model.Id == Guid.Empty)
+        {
+            model.Id = Guid.NewGuid();
+        }
+
         lock (_syncLock)
         {
             _aquariums.Add(model);
