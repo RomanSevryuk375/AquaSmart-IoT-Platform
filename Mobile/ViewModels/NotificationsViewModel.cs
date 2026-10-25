@@ -11,10 +11,14 @@ namespace Mobile.ViewModels;
 public partial class NotificationsViewModel : ObservableObject
 {
     private readonly IApiClient _apiClient;
+    private readonly IAquariumService _aquariumService;
     private readonly List<NotificationModel> _allNotifications = new();
 
     [ObservableProperty]
     private ObservableCollection<NotificationModel> _notifications = new();
+
+    [ObservableProperty]
+    private ObservableCollection<ReminderDto> _reminders = new();
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasNoNotifications))]
@@ -23,10 +27,16 @@ public partial class NotificationsViewModel : ObservableObject
     public bool HasNoNotifications => !HasNotifications;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasNoReminders))]
+    private bool _hasReminders;
+
+    public bool HasNoReminders => !HasReminders;
+
+    [ObservableProperty]
     private int _unreadCount;
 
     [ObservableProperty]
-    private string _selectedFilter = "Все"; // "Все", "Непрочитанные", "Важные"
+    private string _selectedFilter = "Все"; // "Все", "Непрочитанные", "Важные", "Напоминания"
 
     [ObservableProperty]
     private bool _isBusy;
@@ -34,15 +44,18 @@ public partial class NotificationsViewModel : ObservableObject
     public bool IsAllFilterSelected => SelectedFilter == "Все";
     public bool IsUnreadFilterSelected => SelectedFilter == "Непрочитанные";
     public bool IsImportantFilterSelected => SelectedFilter == "Важные";
+    public bool IsRemindersFilterSelected => SelectedFilter == "Напоминания";
 
-    public NotificationsViewModel(IApiClient apiClient)
+    public NotificationsViewModel(IApiClient apiClient, IAquariumService aquariumService)
     {
         _apiClient = apiClient;
+        _aquariumService = aquariumService;
     }
 
     public async Task InitializeAsync()
     {
         await LoadNotificationsAsync();
+        await LoadRemindersAsync();
     }
 
     [RelayCommand]
@@ -147,7 +160,101 @@ public partial class NotificationsViewModel : ObservableObject
         OnPropertyChanged(nameof(IsAllFilterSelected));
         OnPropertyChanged(nameof(IsUnreadFilterSelected));
         OnPropertyChanged(nameof(IsImportantFilterSelected));
+        OnPropertyChanged(nameof(IsRemindersFilterSelected));
         ApplyFilter();
+        if (filter == "Напоминания")
+        {
+            _ = LoadRemindersAsync();
+        }
+    }
+
+    [RelayCommand]
+    public async Task LoadRemindersAsync()
+    {
+        try
+        {
+            var list = await _aquariumService.GetRemindersAsync();
+            Reminders.Clear();
+            foreach (var r in list) Reminders.Add(r);
+            HasReminders = Reminders.Count > 0;
+        }
+        catch
+        {
+        }
+    }
+
+    [RelayCommand]
+    private async Task CompleteReminderAsync(ReminderDto? reminder)
+    {
+        if (reminder == null) return;
+        IsBusy = true;
+        var success = await _aquariumService.CompleteReminderAsync(reminder.Id);
+        await LoadRemindersAsync();
+        IsBusy = false;
+
+        if (success)
+        {
+            await Shell.Current.DisplayAlert("Выполнено", $"Задача '{reminder.TaskName}' выполнена! Следующий срок рассчитан через {reminder.IntervalDays} дн.", "OK");
+        }
+    }
+
+    [RelayCommand]
+    private async Task AddReminderAsync()
+    {
+        var aquariums = await _aquariumService.GetAquariumsAsync();
+        if (aquariums.Count == 0)
+        {
+            await Shell.Current.DisplayAlert("Напоминание", "Сначала создайте ёмкость в приложении.", "OK");
+            return;
+        }
+
+        Guid targetEcosystemId = aquariums[0].Id;
+        if (aquariums.Count > 1)
+        {
+            var names = aquariums.Select(a => a.Name).ToArray();
+            var chosen = await Shell.Current.DisplayActionSheet("Выберите ёмкость", "Отмена", null, names);
+            if (string.IsNullOrWhiteSpace(chosen) || chosen == "Отмена") return;
+            var match = aquariums.FirstOrDefault(a => a.Name == chosen);
+            if (match != null) targetEcosystemId = match.Id;
+        }
+
+        var taskName = await Shell.Current.DisplayPromptAsync(
+            "Новое напоминание",
+            "Название задачи (например, 'Подмена воды 20%' или 'Тестирование NO3'):",
+            initialValue: "Подмена воды 20%");
+
+        if (string.IsNullOrWhiteSpace(taskName)) return;
+
+        var intervalStr = await Shell.Current.DisplayPromptAsync(
+            "Интервал",
+            "Повторять каждые (дней):",
+            initialValue: "7",
+            keyboard: Keyboard.Numeric);
+
+        if (string.IsNullOrWhiteSpace(intervalStr) || !int.TryParse(intervalStr, out var interval) || interval <= 0)
+            interval = 7;
+
+        var request = new CreateReminderRequestDto(targetEcosystemId, taskName, interval);
+        IsBusy = true;
+        await _aquariumService.CreateReminderAsync(request);
+        await LoadRemindersAsync();
+        IsBusy = false;
+
+        await Shell.Current.DisplayAlert("Напоминание создано", $"Задача '{taskName}' запланирована с повторением каждые {interval} дн.", "OK");
+    }
+
+    [RelayCommand]
+    private async Task DeleteReminderAsync(ReminderDto? reminder)
+    {
+        if (reminder == null) return;
+        var confirm = await Shell.Current.DisplayAlert("Удалить", $"Удалить напоминание '{reminder.TaskName}'?", "Да", "Отмена");
+        if (confirm)
+        {
+            IsBusy = true;
+            await _aquariumService.DeleteReminderAsync(reminder.Id);
+            await LoadRemindersAsync();
+            IsBusy = false;
+        }
     }
 
     private void ApplyFilter()

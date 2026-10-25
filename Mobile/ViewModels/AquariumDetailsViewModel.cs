@@ -43,6 +43,9 @@ public partial class AquariumDetailsViewModel : ObservableObject
     private ObservableCollection<MaintenanceLogDto> _maintenanceLogs = new();
 
     [ObservableProperty]
+    private ObservableCollection<ScheduleDto> _schedules = new();
+
+    [ObservableProperty]
     private VacationModeDto? _activeVacationMode;
 
     [ObservableProperty]
@@ -118,6 +121,7 @@ public partial class AquariumDetailsViewModel : ObservableObject
 
         await RefreshVacationModeAsync(id);
         await RefreshMaintenanceLogsAsync(id);
+        await RefreshSchedulesAsync(id);
 
         IsBusy = false;
     }
@@ -180,6 +184,71 @@ public partial class AquariumDetailsViewModel : ObservableObject
         catch
         {
         }
+    }
+
+    private async Task RefreshSchedulesAsync(Guid ecosystemId)
+    {
+        try
+        {
+            var scheds = await _aquariumService.GetSchedulesAsync(ecosystemId);
+            Schedules.Clear();
+            foreach (var s in scheds) Schedules.Add(s);
+        }
+        catch
+        {
+        }
+    }
+
+    [RelayCommand]
+    private async Task ToggleScheduleAsync(ScheduleDto schedule)
+    {
+        var newState = !schedule.IsEnabled;
+        var success = await _aquariumService.ToggleScheduleAsync(schedule.Id, newState);
+        if (success)
+        {
+            var idx = Schedules.IndexOf(schedule);
+            if (idx >= 0) Schedules[idx] = schedule with { IsEnabled = newState };
+        }
+    }
+
+    [RelayCommand]
+    private async Task AddScheduleAsync()
+    {
+        if (Aquarium == null || Relays.Count == 0)
+        {
+            await Shell.Current.DisplayAlert("Расписание", "Сначала добавьте хотя бы одно реле в систему.", "OK");
+            return;
+        }
+
+        var relayNames = Relays.Select(r => r.Name).ToArray();
+        var selectedRelayName = await Shell.Current.DisplayActionSheet("Выберите реле для таймера", "Отмена", null, relayNames);
+        if (string.IsNullOrWhiteSpace(selectedRelayName) || selectedRelayName == "Отмена") return;
+
+        var relay = Relays.FirstOrDefault(r => r.Name == selectedRelayName);
+        if (relay == null) return;
+
+        var startHourStr = await Shell.Current.DisplayPromptAsync("Время включения", "Час включения (0-23, например 8):", initialValue: "8", keyboard: Keyboard.Numeric);
+        if (string.IsNullOrWhiteSpace(startHourStr) || !int.TryParse(startHourStr, out var hour) || hour < 0 || hour > 23) return;
+
+        var durStr = await Shell.Current.DisplayPromptAsync("Длительность", "Длительность работы (минут, например 480 = 8ч):", initialValue: "480", keyboard: Keyboard.Numeric);
+        if (string.IsNullOrWhiteSpace(durStr) || !double.TryParse(durStr, out var dur) || dur <= 0) dur = 480;
+
+        var cron = $"0 {hour} * * *";
+        var request = new CreateScheduleRequestDto(
+            Aquarium.Id,
+            relay.Id,
+            cron,
+            dur,
+            false,
+            true
+        );
+
+        IsBusy = true;
+        await _aquariumService.CreateScheduleAsync(request);
+        await RefreshSchedulesAsync(Aquarium.Id);
+        IsBusy = false;
+
+        await Shell.Current.DisplayAlert("Расписание", $"Таймер для '{relay.Name}' настроен на каждый день в {hour:D2}:00 на {dur:F0} минут.", "OK");
     }
 
     [RelayCommand]

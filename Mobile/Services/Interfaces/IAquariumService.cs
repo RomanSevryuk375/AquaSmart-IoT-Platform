@@ -26,4 +26,14 @@ public interface IAquariumService
 
     Task<List<MaintenanceLogDto>> GetMaintenanceLogsAsync(Guid ecosystemId, CancellationToken cancellationToken = default);
     Task<bool> AddMaintenanceLogAsync(CreateMaintenanceLogRequestDto dto, CancellationToken cancellationToken = default);
+
+    Task<List<ScheduleDto>> GetSchedulesAsync(Guid ecosystemId, CancellationToken cancellationToken = default);
+    Task<bool> CreateScheduleAsync(CreateScheduleRequestDto dto, CancellationToken cancellationToken = default);
+    Task<bool> ToggleScheduleAsync(Guid scheduleId, bool isActive, CancellationToken cancellationToken = default);
+    Task<bool> DeleteScheduleAsync(Guid scheduleId, CancellationToken cancellationToken = default);
+
+    Task<List<ReminderDto>> GetRemindersAsync(Guid? ecosystemId = null, CancellationToken cancellationToken = default);
+    Task<bool> CreateReminderAsync(CreateReminderRequestDto dto, CancellationToken cancellationToken = default);
+    Task<bool> CompleteReminderAsync(Guid reminderId, CancellationToken cancellationToken = default);
+    Task<bool> DeleteReminderAsync(Guid reminderId, CancellationToken cancellationToken = default);
 }

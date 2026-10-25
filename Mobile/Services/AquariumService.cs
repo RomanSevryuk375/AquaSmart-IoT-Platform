@@ -15,6 +15,8 @@ public sealed class AquariumService : IAquariumService
     private readonly List<ScenarioModel> _scenarios = new();
     private readonly List<VacationModeDto> _vacationModes = new();
     private readonly List<MaintenanceLogDto> _maintenanceLogs = new();
+    private readonly List<ScheduleDto> _schedules = new();
+    private readonly List<ReminderDto> _reminders = new();
 
     public AquariumService(IApiClient apiClient)
     {
@@ -686,6 +688,237 @@ public sealed class AquariumService : IAquariumService
                 Metrics = dto.Metrics ?? new(),
                 CreatedAt = DateTime.UtcNow
             });
+        }
+        return true;
+    }
+
+    public async Task<List<ScheduleDto>> GetSchedulesAsync(Guid ecosystemId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var route = $"{MobileApiEndpoints.Schedules}?ecosystemId={ecosystemId}";
+            var response = await _apiClient.GetAsync<List<ScheduleDto>>(route, cancellationToken);
+            if (response.IsSuccess && response.Data != null)
+            {
+                lock (_syncLock)
+                {
+                    _schedules.RemoveAll(x => x.EcosystemId == ecosystemId);
+                    _schedules.AddRange(response.Data);
+                }
+                return response.Data;
+            }
+        }
+        catch
+        {
+        }
+
+        lock (_syncLock)
+        {
+            return _schedules.Where(x => x.EcosystemId == ecosystemId).ToList();
+        }
+    }
+
+    public async Task<bool> CreateScheduleAsync(CreateScheduleRequestDto dto, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await _apiClient.PostAsync(MobileApiEndpoints.Schedules, dto, cancellationToken);
+            if (response.IsSuccess)
+            {
+                await GetSchedulesAsync(dto.EcosystemId, cancellationToken);
+                return true;
+            }
+        }
+        catch
+        {
+        }
+
+        lock (_syncLock)
+        {
+            _schedules.Add(new ScheduleDto
+            {
+                Id = Guid.NewGuid(),
+                EcosystemId = dto.EcosystemId,
+                RelayId = dto.RelayId,
+                CronExpression = dto.CronExpression,
+                DurationMin = dto.DurationMin,
+                IsEnabled = dto.IsEnabled,
+                IsFadeMode = dto.IsFadeMode,
+                CreatedAt = DateTime.UtcNow
+            });
+        }
+        return true;
+    }
+
+    public async Task<bool> ToggleScheduleAsync(Guid scheduleId, bool isActive, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var route = $"{MobileApiEndpoints.Schedules}/{scheduleId}/active";
+            var response = await _apiClient.PutAsync(route, new { isActive }, cancellationToken);
+            if (response.IsSuccess)
+            {
+                return true;
+            }
+        }
+        catch
+        {
+        }
+
+        lock (_syncLock)
+        {
+            var s = _schedules.FirstOrDefault(x => x.Id == scheduleId);
+            if (s != null)
+            {
+                var idx = _schedules.IndexOf(s);
+                _schedules[idx] = s with { IsEnabled = isActive };
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public async Task<bool> DeleteScheduleAsync(Guid scheduleId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var route = $"{MobileApiEndpoints.Schedules}/{scheduleId}";
+            var response = await _apiClient.DeleteAsync(route, cancellationToken);
+            if (response.IsSuccess)
+            {
+                return true;
+            }
+        }
+        catch
+        {
+        }
+
+        lock (_syncLock)
+        {
+            _schedules.RemoveAll(x => x.Id == scheduleId);
+        }
+        return true;
+    }
+
+    public async Task<List<ReminderDto>> GetRemindersAsync(Guid? ecosystemId = null, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var route = ecosystemId.HasValue
+                ? $"{MobileApiEndpoints.Reminders}?ecosystemId={ecosystemId.Value}"
+                : MobileApiEndpoints.Reminders;
+
+            var response = await _apiClient.GetAsync<List<ReminderDto>>(route, cancellationToken);
+            if (response.IsSuccess && response.Data != null)
+            {
+                lock (_syncLock)
+                {
+                    if (ecosystemId.HasValue)
+                    {
+                        _reminders.RemoveAll(x => x.EcosystemId == ecosystemId.Value);
+                        _reminders.AddRange(response.Data);
+                    }
+                    else
+                    {
+                        _reminders.Clear();
+                        _reminders.AddRange(response.Data);
+                    }
+                }
+                return response.Data.OrderBy(x => x.NextDueAt).ToList();
+            }
+        }
+        catch
+        {
+        }
+
+        lock (_syncLock)
+        {
+            if (ecosystemId.HasValue)
+                return _reminders.Where(x => x.EcosystemId == ecosystemId.Value).OrderBy(x => x.NextDueAt).ToList();
+            return _reminders.OrderBy(x => x.NextDueAt).ToList();
+        }
+    }
+
+    public async Task<bool> CreateReminderAsync(CreateReminderRequestDto dto, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await _apiClient.PostAsync(MobileApiEndpoints.Reminders, dto, cancellationToken);
+            if (response.IsSuccess)
+            {
+                await GetRemindersAsync(dto.EcosystemId, cancellationToken);
+                return true;
+            }
+        }
+        catch
+        {
+        }
+
+        lock (_syncLock)
+        {
+            _reminders.Add(new ReminderDto
+            {
+                Id = Guid.NewGuid(),
+                EcosystemId = dto.EcosystemId,
+                TaskName = dto.TaskName,
+                IntervalDays = dto.IntervalDays,
+                NextDueAt = DateTime.UtcNow.AddDays(dto.IntervalDays),
+                CreatedAt = DateTime.UtcNow
+            });
+        }
+        return true;
+    }
+
+    public async Task<bool> CompleteReminderAsync(Guid reminderId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var route = $"{MobileApiEndpoints.Reminders}/{reminderId}/complete";
+            var response = await _apiClient.PatchAsync(route, new { }, cancellationToken);
+            if (response.IsSuccess)
+            {
+                return true;
+            }
+        }
+        catch
+        {
+        }
+
+        lock (_syncLock)
+        {
+            var rem = _reminders.FirstOrDefault(x => x.Id == reminderId);
+            if (rem != null)
+            {
+                var idx = _reminders.IndexOf(rem);
+                _reminders[idx] = rem with
+                {
+                    LastDoneAt = DateTime.UtcNow,
+                    NextDueAt = DateTime.UtcNow.AddDays(rem.IntervalDays)
+                };
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public async Task<bool> DeleteReminderAsync(Guid reminderId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var route = $"{MobileApiEndpoints.Reminders}/{reminderId}";
+            var response = await _apiClient.DeleteAsync(route, cancellationToken);
+            if (response.IsSuccess)
+            {
+                return true;
+            }
+        }
+        catch
+        {
+        }
+
+        lock (_syncLock)
+        {
+            _reminders.RemoveAll(x => x.Id == reminderId);
         }
         return true;
     }

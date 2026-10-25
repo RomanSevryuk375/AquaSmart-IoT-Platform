@@ -140,6 +140,35 @@ public sealed class ApiClient : IApiClient
         }
     }
 
+    public async Task<ApiResponse> PatchAsync<TRequest>(string route, TRequest data, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var uri = BuildUri(route);
+            using var response = await _httpClient.PatchAsJsonAsync(uri, data, JsonOptions, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return ApiResponse.Success((int)response.StatusCode);
+            }
+
+            var error = await ParseErrorMessageAsync(response);
+            return ApiResponse.Failure(error, (int)response.StatusCode);
+        }
+        catch (TaskCanceledException)
+        {
+            return ApiResponse.Failure("Тайм-аут подключения к серверу API Gateway", 408);
+        }
+        catch (HttpRequestException ex)
+        {
+            return ApiResponse.Failure($"Ошибка сети: {ex.Message}", 503);
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse.Failure($"Ошибка: {ex.Message}", 500);
+        }
+    }
+
     public async Task<ApiResponse> DeleteAsync(string route, CancellationToken cancellationToken = default)
     {
         try
