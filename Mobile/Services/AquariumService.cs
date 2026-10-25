@@ -181,11 +181,7 @@ public sealed class AquariumService : IAquariumService
     {
         try
         {
-            int ecosystemType = model.WaterType switch
-            {
-                WaterType.Marine => 2,
-                _ => 1
-            };
+            int ecosystemType = model.EcosystemType > 0 ? model.EcosystemType : 1;
 
             var request = new CreateEcosystemRequestDto(
                 ecosystemType,

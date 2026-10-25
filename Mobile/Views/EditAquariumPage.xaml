@@ -150,31 +150,15 @@
                             </VerticalStackLayout>
                         </Border>
 
-                        <!-- 2: Палюдариум -->
+                        <!-- 2: Гроубокс -->
                         <Border Grid.Row="0" Grid.Column="2"
-                                StrokeShape="RoundRectangle 10"
-                                StrokeThickness="{Binding IsPaludariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='1.5|1'}"
-                                Stroke="{Binding IsPaludariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#4152B0|#E4E7F4'}"
-                                BackgroundColor="{Binding IsPaludariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#F0F4FF|#FFFFFF'}"
-                                Padding="8,10">
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}" CommandParameter="2" />
-                            </Border.GestureRecognizers>
-                            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
-                                <Label Text="🐢" FontSize="20" HorizontalTextAlignment="Center" />
-                                <Label Text="Палюдариум" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="12" HorizontalTextAlignment="Center" />
-                            </VerticalStackLayout>
-                        </Border>
-
-                        <!-- 3: Гроубокс -->
-                        <Border Grid.Row="1" Grid.Column="0"
                                 StrokeShape="RoundRectangle 10"
                                 StrokeThickness="{Binding IsGrowboxSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='1.5|1'}"
                                 Stroke="{Binding IsGrowboxSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#4152B0|#E4E7F4'}"
                                 BackgroundColor="{Binding IsGrowboxSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#F0F4FF|#FFFFFF'}"
                                 Padding="8,10">
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}" CommandParameter="3" />
+                                <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}" CommandParameter="2" />
                             </Border.GestureRecognizers>
                             <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
                                 <Label Text="🌱" FontSize="20" HorizontalTextAlignment="Center" />
@@ -182,15 +166,15 @@
                             </VerticalStackLayout>
                         </Border>
 
-                        <!-- 4: Флорариум -->
-                        <Border Grid.Row="1" Grid.Column="1"
+                        <!-- 3: Флорариум -->
+                        <Border Grid.Row="1" Grid.Column="0"
                                 StrokeShape="RoundRectangle 10"
                                 StrokeThickness="{Binding IsFlorariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='1.5|1'}"
                                 Stroke="{Binding IsFlorariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#4152B0|#E4E7F4'}"
                                 BackgroundColor="{Binding IsFlorariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#F0F4FF|#FFFFFF'}"
                                 Padding="8,10">
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}" CommandParameter="4" />
+                                <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}" CommandParameter="3" />
                             </Border.GestureRecognizers>
                             <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
                                 <Label Text="🌸" FontSize="20" HorizontalTextAlignment="Center" />
@@ -198,15 +182,15 @@
                             </VerticalStackLayout>
                         </Border>
 
-                        <!-- 5: Формикарий -->
-                        <Border Grid.Row="1" Grid.Column="2"
+                        <!-- 4: Формикарий -->
+                        <Border Grid.Row="1" Grid.Column="1"
                                 StrokeShape="RoundRectangle 10"
                                 StrokeThickness="{Binding IsFormicariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='1.5|1'}"
                                 Stroke="{Binding IsFormicariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#4152B0|#E4E7F4'}"
                                 BackgroundColor="{Binding IsFormicariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#F0F4FF|#FFFFFF'}"
                                 Padding="8,10">
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}" CommandParameter="5" />
+                                <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}" CommandParameter="4" />
                             </Border.GestureRecognizers>
                             <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
                                 <Label Text="🐜" FontSize="20" HorizontalTextAlignment="Center" />

@@ -31,18 +31,16 @@ public partial class EditAquariumViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(SpeciesInfo))]
     [NotifyPropertyChangedFor(nameof(IsAquariumSelected))]
     [NotifyPropertyChangedFor(nameof(IsTerrariumSelected))]
-    [NotifyPropertyChangedFor(nameof(IsPaludariumSelected))]
     [NotifyPropertyChangedFor(nameof(IsGrowboxSelected))]
     [NotifyPropertyChangedFor(nameof(IsFlorariumSelected))]
     [NotifyPropertyChangedFor(nameof(IsFormicariumSelected))]
-    private int _selectedTankType = 0; // 0..5
+    private int _selectedTankType = 0; // 0..4 (1..5 matching backend EcosystemType)
 
     public bool IsAquariumSelected => SelectedTankType == 0;
     public bool IsTerrariumSelected => SelectedTankType == 1;
-    public bool IsPaludariumSelected => SelectedTankType == 2;
-    public bool IsGrowboxSelected => SelectedTankType == 3;
-    public bool IsFlorariumSelected => SelectedTankType == 4;
-    public bool IsFormicariumSelected => SelectedTankType == 5;
+    public bool IsGrowboxSelected => SelectedTankType == 2;
+    public bool IsFlorariumSelected => SelectedTankType == 3;
+    public bool IsFormicariumSelected => SelectedTankType == 4;
 
     [ObservableProperty]
     private int _selectedWaterType = 0; // 0: Freshwater, 1: Marine
@@ -78,20 +76,18 @@ public partial class EditAquariumViewModel : ObservableObject
     public string TankTypeName => SelectedTankType switch
     {
         1 => "Террариум",
-        2 => "Палюдариум",
-        3 => "Гроубокс",
-        4 => "Флорариум",
-        5 => "Формикарий",
+        2 => "Гроубокс",
+        3 => "Флорариум",
+        4 => "Формикарий",
         _ => "Аквариум"
     };
 
     public string TankTypeIcon => SelectedTankType switch
     {
         1 => "🦎",
-        2 => "🐢",
-        3 => "🌱",
-        4 => "🌸",
-        5 => "🐜",
+        2 => "🌱",
+        3 => "🌸",
+        4 => "🐜",
         _ => "🐟"
     };
 
@@ -157,15 +153,16 @@ public partial class EditAquariumViewModel : ObservableObject
                     ? Aquarium.TankTypeSubtitle
                     : (Aquarium.SpeciesInfo ?? string.Empty);
 
-                SelectedTankType = typeStr switch
-                {
-                    var s when s.Contains("Террариум", StringComparison.OrdinalIgnoreCase) => 1,
-                    var s when s.Contains("Палюдариум", StringComparison.OrdinalIgnoreCase) => 2,
-                    var s when s.Contains("Гроубокс", StringComparison.OrdinalIgnoreCase) => 3,
-                    var s when s.Contains("Флорариум", StringComparison.OrdinalIgnoreCase) => 4,
-                    var s when s.Contains("Формикарий", StringComparison.OrdinalIgnoreCase) => 5,
-                    _ => 0
-                };
+                SelectedTankType = Aquarium.EcosystemType > 0 
+                    ? Math.Clamp(Aquarium.EcosystemType - 1, 0, 4)
+                    : (typeStr switch
+                    {
+                        var s when s.Contains("Террариум", StringComparison.OrdinalIgnoreCase) => 1,
+                        var s when s.Contains("Гроубокс", StringComparison.OrdinalIgnoreCase) => 2,
+                        var s when s.Contains("Флорариум", StringComparison.OrdinalIgnoreCase) => 3,
+                        var s when s.Contains("Формикарий", StringComparison.OrdinalIgnoreCase) => 4,
+                        _ => 0
+                    });
 
                 // If the name was the default "Мой первый аквариум" but this container is a Terrarium/etc., adjust it
                 if (Name.Equals("Мой первый аквариум", StringComparison.OrdinalIgnoreCase) && SelectedTankType > 0)
@@ -286,6 +283,7 @@ public partial class EditAquariumViewModel : ObservableObject
                 Aquarium.CardBorderColor = CardBorderColor;
                 Aquarium.ControllerName = SelectedControllerName;
                 Aquarium.SpeciesInfo = SpeciesInfo;
+                Aquarium.EcosystemType = SelectedTankType + 1;
 
                 await _aquariumService.UpdateAquariumAsync(Aquarium);
             }

@@ -5,6 +5,7 @@ public class AquariumModel
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = string.Empty;
     public double VolumeLiters { get; set; }
+    public int EcosystemType { get; set; } = 1; // 1: Aquarium, 2: Terrarium, 3: Growbox, 4: Florarium, 5: Formicary
     public WaterType WaterType { get; set; } = WaterType.Freshwater;
     public string SpeciesInfo { get; set; } = string.Empty;
     public string Dimensions { get; set; } = string.Empty;

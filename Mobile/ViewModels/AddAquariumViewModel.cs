@@ -21,18 +21,18 @@ public partial class AddAquariumViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(SpeciesInfo))]
     [NotifyPropertyChangedFor(nameof(IsAquariumSelected))]
     [NotifyPropertyChangedFor(nameof(IsTerrariumSelected))]
-    [NotifyPropertyChangedFor(nameof(IsPaludariumSelected))]
     [NotifyPropertyChangedFor(nameof(IsGrowboxSelected))]
     [NotifyPropertyChangedFor(nameof(IsFlorariumSelected))]
     [NotifyPropertyChangedFor(nameof(IsFormicariumSelected))]
-    private int _selectedTankType = 0; // 0: Aquarium, 1: Terrarium, 2: Paludarium, 3: Growbox, 4: Florarium, 5: Formicarium
+    private int _selectedTankType = 0; // 0: Aquarium (1), 1: Terrarium (2), 2: Growbox (3), 3: Florarium (4), 4: Formicarium (5)
 
     public bool IsAquariumSelected => SelectedTankType == 0;
     public bool IsTerrariumSelected => SelectedTankType == 1;
-    public bool IsPaludariumSelected => SelectedTankType == 2;
-    public bool IsGrowboxSelected => SelectedTankType == 3;
-    public bool IsFlorariumSelected => SelectedTankType == 4;
-    public bool IsFormicariumSelected => SelectedTankType == 5;
+    public bool IsGrowboxSelected => SelectedTankType == 2;
+    public bool IsFlorariumSelected => SelectedTankType == 3;
+    public bool IsFormicariumSelected => SelectedTankType == 4;
+
+    public int BackendEcosystemType => SelectedTankType + 1;
 
     // Step 2: Name
     [ObservableProperty]
@@ -102,20 +102,18 @@ public partial class AddAquariumViewModel : ObservableObject
     public string TankTypeName => SelectedTankType switch
     {
         1 => "Террариум",
-        2 => "Палюдариум",
-        3 => "Гроубокс",
-        4 => "Флорариум",
-        5 => "Формикарий",
+        2 => "Гроубокс",
+        3 => "Флорариум",
+        4 => "Формикарий",
         _ => "Аквариум"
     };
 
     public string TankTypeIcon => SelectedTankType switch
     {
         1 => "🦎",
-        2 => "🐢",
-        3 => "🌱",
-        4 => "🌸",
-        5 => "🐜",
+        2 => "🌱",
+        3 => "🌸",
+        4 => "🐜",
         _ => "🐟"
     };
 
@@ -286,7 +284,8 @@ public partial class AddAquariumViewModel : ObservableObject
             SpeciesInfo = $"{TankTypeName} • {Volume}л • {SelectedControllerName}",
             ControllerName = SelectedControllerName,
             CardThemeColor = PreviewThemeColor,
-            CardBorderColor = PreviewBorderColor
+            CardBorderColor = PreviewBorderColor,
+            EcosystemType = BackendEcosystemType
         };
 
         var created = await _aquariumService.AddAquariumAsync(model);
