@@ -1,6 +1,7 @@
 using Mobile.Models;
 using Mobile.Services.Dto.Control;
 using Mobile.Services.Dto.Device;
+using Mobile.Services.Dto.Notification;
 
 namespace Mobile.Services;
 
@@ -12,6 +13,8 @@ public sealed class AquariumService : IAquariumService
     private readonly List<SensorModel> _sensors = new();
     private readonly List<RelayModel> _relays = new();
     private readonly List<ScenarioModel> _scenarios = new();
+    private readonly List<VacationModeDto> _vacationModes = new();
+    private readonly List<MaintenanceLogDto> _maintenanceLogs = new();
 
     public AquariumService(IApiClient apiClient)
     {
@@ -521,5 +524,169 @@ public sealed class AquariumService : IAquariumService
             }
         }
         return Task.FromResult(false);
+    }
+
+    public async Task<List<VacationModeDto>> GetVacationModesAsync(Guid ecosystemId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var route = $"{MobileApiEndpoints.VacationModes}?ecosystemId={ecosystemId}";
+            var response = await _apiClient.GetAsync<List<VacationModeDto>>(route, cancellationToken);
+            if (response.IsSuccess && response.Data != null)
+            {
+                lock (_syncLock)
+                {
+                    _vacationModes.RemoveAll(x => x.EcosystemId == ecosystemId);
+                    _vacationModes.AddRange(response.Data);
+                }
+                return response.Data;
+            }
+        }
+        catch
+        {
+        }
+
+        lock (_syncLock)
+        {
+            return _vacationModes.Where(x => x.EcosystemId == ecosystemId).ToList();
+        }
+    }
+
+    public async Task<bool> CreateVacationModeAsync(CreateVacationModeRequestDto dto, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await _apiClient.PostAsync(MobileApiEndpoints.VacationModes, dto, cancellationToken);
+            if (response.IsSuccess)
+            {
+                await GetVacationModesAsync(dto.EcosystemId, cancellationToken);
+                return true;
+            }
+        }
+        catch
+        {
+        }
+
+        // Local fallback
+        lock (_syncLock)
+        {
+            _vacationModes.Add(new VacationModeDto
+            {
+                Id = Guid.NewGuid(),
+                EcosystemId = dto.EcosystemId,
+                DateRange = $"{dto.StartDate:dd.MM.yyyy} - {dto.EndDate:dd.MM.yyyy}",
+                CalculatedFeed = dto.CalculatedFeed,
+                IsActive = dto.IsActive,
+                CreatedAt = DateTime.UtcNow
+            });
+        }
+        return true;
+    }
+
+    public async Task<bool> ToggleVacationModeAsync(Guid vacationModeId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var route = $"{MobileApiEndpoints.VacationModes}/{vacationModeId}/toggle";
+            var response = await _apiClient.PutAsync(route, new { }, cancellationToken);
+            if (response.IsSuccess)
+            {
+                return true;
+            }
+        }
+        catch
+        {
+        }
+
+        lock (_syncLock)
+        {
+            var vac = _vacationModes.FirstOrDefault(x => x.Id == vacationModeId);
+            if (vac != null)
+            {
+                var idx = _vacationModes.IndexOf(vac);
+                _vacationModes[idx] = vac with { IsActive = !vac.IsActive };
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public async Task<bool> DeleteVacationModeAsync(Guid vacationModeId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var route = $"{MobileApiEndpoints.VacationModes}/{vacationModeId}";
+            var response = await _apiClient.DeleteAsync(route, cancellationToken);
+            if (response.IsSuccess)
+            {
+                return true;
+            }
+        }
+        catch
+        {
+        }
+
+        lock (_syncLock)
+        {
+            _vacationModes.RemoveAll(x => x.Id == vacationModeId);
+        }
+        return true;
+    }
+
+    public async Task<List<MaintenanceLogDto>> GetMaintenanceLogsAsync(Guid ecosystemId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var route = $"{MobileApiEndpoints.MaintenanceLogs}?ecosystemId={ecosystemId}";
+            var response = await _apiClient.GetAsync<List<MaintenanceLogDto>>(route, cancellationToken);
+            if (response.IsSuccess && response.Data != null)
+            {
+                lock (_syncLock)
+                {
+                    _maintenanceLogs.RemoveAll(x => x.EcosystemId == ecosystemId);
+                    _maintenanceLogs.AddRange(response.Data);
+                }
+                return response.Data.OrderByDescending(x => x.ActionDate).ToList();
+            }
+        }
+        catch
+        {
+        }
+
+        lock (_syncLock)
+        {
+            return _maintenanceLogs.Where(x => x.EcosystemId == ecosystemId).OrderByDescending(x => x.ActionDate).ToList();
+        }
+    }
+
+    public async Task<bool> AddMaintenanceLogAsync(CreateMaintenanceLogRequestDto dto, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await _apiClient.PostAsync(MobileApiEndpoints.MaintenanceLogs, dto, cancellationToken);
+            if (response.IsSuccess)
+            {
+                await GetMaintenanceLogsAsync(dto.EcosystemId, cancellationToken);
+                return true;
+            }
+        }
+        catch
+        {
+        }
+
+        // Local fallback
+        lock (_syncLock)
+        {
+            _maintenanceLogs.Add(new MaintenanceLogDto
+            {
+                Id = Guid.NewGuid(),
+                EcosystemId = dto.EcosystemId,
+                ActionDate = dto.ActionDate,
+                Notes = dto.Notes,
+                Metrics = dto.Metrics ?? new(),
+                CreatedAt = DateTime.UtcNow
+            });
+        }
+        return true;
     }
 }

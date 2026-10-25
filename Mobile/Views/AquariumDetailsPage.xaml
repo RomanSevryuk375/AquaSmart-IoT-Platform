@@ -4,6 +4,7 @@
              xmlns:vm="clr-namespace:Mobile.ViewModels"
              xmlns:models="clr-namespace:Mobile.Models"
              xmlns:controls="clr-namespace:Mobile.Views.Controls"
+             xmlns:dto="clr-namespace:Mobile.Services.Dto.Notification"
              x:Class="Mobile.Views.AquariumDetailsPage"
              x:DataType="vm:AquariumDetailsViewModel"
              BackgroundColor="#FFFFFF"
@@ -78,49 +79,77 @@
             </Border>
         </Grid>
 
-        <!-- Controller Card -->
-        <Border Grid.Row="1"
-                x:Name="HeaderCard"
-                StrokeThickness="1"
-                Stroke="#E4E7F4"
-                StrokeShape="RoundRectangle 16"
-                BackgroundColor="#FFFFFF"
-                Padding="16,14"
-                Margin="0,0,0,14">
-            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="6">
-                <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="2">
-                    <Label Text="{Binding Aquarium.ControllerName}"
-                           TextColor="#141414"
-                           FontFamily="OpenSansSemibold"
-                           FontSize="15"
-                           FontAttributes="Bold" />
-                    <Label Text="{Binding Aquarium.SpeciesInfo}"
-                           TextColor="#8C93A8"
-                           FontSize="12" />
-                </VerticalStackLayout>
+        <!-- Controller Card & Vacation Mode Banner -->
+        <VerticalStackLayout Grid.Row="1" Spacing="10" Margin="0,0,0,14">
+            <Border x:Name="HeaderCard"
+                    StrokeThickness="1"
+                    Stroke="#E4E7F4"
+                    StrokeShape="RoundRectangle 16"
+                    BackgroundColor="#FFFFFF"
+                    Padding="16,14">
+                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="6">
+                    <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="2">
+                        <Label Text="{Binding Aquarium.ControllerName}"
+                               TextColor="#141414"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="15"
+                               FontAttributes="Bold" />
+                        <Label Text="{Binding Aquarium.SpeciesInfo}"
+                               TextColor="#8C93A8"
+                               FontSize="12" />
+                    </VerticalStackLayout>
 
-                <!-- Switch on right -->
-                <Switch Grid.Row="0" Grid.Column="1"
-                        IsToggled="{Binding Aquarium.IsOnline}"
-                        IsEnabled="False"
-                        OnColor="#4152B0"
-                        ThumbColor="#FFFFFF"
-                        VerticalOptions="Center" />
+                    <!-- Switch on right -->
+                    <Switch Grid.Row="0" Grid.Column="1"
+                            IsToggled="{Binding Aquarium.IsOnline}"
+                            IsEnabled="False"
+                            OnColor="#4152B0"
+                            ThumbColor="#FFFFFF"
+                            VerticalOptions="Center" />
 
-                <!-- Status pill -->
-                <Border Grid.Row="1" Grid.Column="0"
-                        HorizontalOptions="Start"
-                        BackgroundColor="{Binding Aquarium.CardThemeColor}"
-                        StrokeShape="RoundRectangle 6"
-                        Padding="8,3"
-                        StrokeThickness="0">
-                    <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
-                        <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="{Binding Aquarium.StatusDotColor}" VerticalOptions="Center" />
-                        <Label Text="{Binding Aquarium.StatusSummary}" TextColor="{Binding Aquarium.StatusDotColor}" FontFamily="OpenSansSemibold" FontSize="11" VerticalOptions="Center" />
-                    </HorizontalStackLayout>
-                </Border>
-            </Grid>
-        </Border>
+                    <!-- Status pill -->
+                    <Border Grid.Row="1" Grid.Column="0"
+                            HorizontalOptions="Start"
+                            BackgroundColor="{Binding Aquarium.CardThemeColor}"
+                            StrokeShape="RoundRectangle 6"
+                            Padding="8,3"
+                            StrokeThickness="0">
+                        <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                            <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="{Binding Aquarium.StatusDotColor}" VerticalOptions="Center" />
+                            <Label Text="{Binding Aquarium.StatusSummary}" TextColor="{Binding Aquarium.StatusDotColor}" FontFamily="OpenSansSemibold" FontSize="11" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- Vacation Mode Banner Card -->
+            <Border StrokeThickness="1"
+                    Stroke="#F3E5AB"
+                    StrokeShape="RoundRectangle 14"
+                    BackgroundColor="#FFFDF5"
+                    Padding="14,10">
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                    <Label Grid.Column="0" Text="🏖️" FontSize="20" VerticalOptions="Center" />
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                        <Label Text="Режим отпуска" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="13" FontAttributes="Bold" />
+                        <Label Text="{Binding VacationModeText}" TextColor="#8C7A3E" FontSize="11" LineBreakMode="TailTruncation" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="2"
+                            Text="Настроить"
+                            Command="{Binding ConfigureVacationModeCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="#4152B0"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="12"
+                            Padding="4,0"
+                            VerticalOptions="Center" />
+                    <Switch Grid.Column="3"
+                            IsToggled="{Binding IsVacationModeActive, Mode=TwoWay}"
+                            OnColor="#4152B0"
+                            VerticalOptions="Center" />
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
 
         <!-- Segmented Tab Bar (датчики | реле | сценарии) -->
         <Border Grid.Row="2"
@@ -129,7 +158,7 @@
                 StrokeShape="RoundRectangle 12"
                 Padding="4"
                 StrokeThickness="0">
-            <Grid ColumnDefinitions="*,*,*">
+            <Grid ColumnDefinitions="*,*,*,*">
                 <!-- Tab 0: Датчики -->
                 <Button Grid.Column="0"
                         Text="Датчики"
@@ -140,7 +169,7 @@
                         CornerRadius="8"
                         HeightRequest="38"
                         FontFamily="OpenSansSemibold"
-                        FontSize="13" />
+                        FontSize="12" />
 
                 <!-- Tab 1: Реле -->
                 <Button Grid.Column="1"
@@ -152,7 +181,7 @@
                         CornerRadius="8"
                         HeightRequest="38"
                         FontFamily="OpenSansSemibold"
-                        FontSize="13" />
+                        FontSize="12" />
 
                 <!-- Tab 2: Сценарии -->
                 <Button Grid.Column="2"
@@ -164,7 +193,19 @@
                         CornerRadius="8"
                         HeightRequest="38"
                         FontFamily="OpenSansSemibold"
-                        FontSize="13" />
+                        FontSize="12" />
+
+                <!-- Tab 3: Журнал -->
+                <Button Grid.Column="3"
+                        Text="Журнал"
+                        Command="{Binding SelectTabCommand}"
+                        CommandParameter="3"
+                        BackgroundColor="{Binding IsLogsTabSelected, Converter={StaticResource TabActiveBgConverter}}"
+                        TextColor="{Binding IsLogsTabSelected, Converter={StaticResource TabActiveTextConverter}}"
+                        CornerRadius="8"
+                        HeightRequest="38"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="12" />
             </Grid>
         </Border>
 
@@ -280,6 +321,85 @@
                                             <Label Text="{Binding ActionText}" TextColor="#8C93A8" FontSize="11" />
                                         </VerticalStackLayout>
                                         <Switch Grid.Column="1" IsToggled="{Binding IsActive, Mode=TwoWay}" OnColor="#4152B0" VerticalOptions="Center" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+                <!-- Maintenance Logs List (Tab 3) -->
+                <VerticalStackLayout x:Name="LogsSection"
+                                     Spacing="12"
+                                     IsVisible="{Binding IsLogsTabSelected}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="Журнал обслуживания" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Button Grid.Column="1" Text="+ Запись" Command="{Binding QuickLogMaintenanceCommand}" CommandParameter="Запись в журнал" TextColor="#4152B0" BackgroundColor="Transparent" FontFamily="OpenSansSemibold" FontSize="13" Padding="4,0" />
+                    </Grid>
+
+                    <!-- Quick Action Chips -->
+                    <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                        <HorizontalStackLayout Spacing="8">
+                            <Button Text="💧 + Подмена воды"
+                                    Command="{Binding QuickLogMaintenanceCommand}"
+                                    CommandParameter="Подмена воды"
+                                    BackgroundColor="#EBF3FF"
+                                    TextColor="#2176FF"
+                                    FontFamily="OpenSansSemibold"
+                                    FontSize="12"
+                                    CornerRadius="16"
+                                    HeightRequest="34"
+                                    Padding="12,0" />
+                            <Button Text="🫧 + Чистка фильтра"
+                                    Command="{Binding QuickLogMaintenanceCommand}"
+                                    CommandParameter="Чистка фильтра"
+                                    BackgroundColor="#E8F8F5"
+                                    TextColor="#16A085"
+                                    FontFamily="OpenSansSemibold"
+                                    FontSize="12"
+                                    CornerRadius="16"
+                                    HeightRequest="34"
+                                    Padding="12,0" />
+                            <Button Text="🧪 + Тесты воды"
+                                    Command="{Binding QuickLogMaintenanceCommand}"
+                                    CommandParameter="Тестирование воды"
+                                    BackgroundColor="#FFF4E6"
+                                    TextColor="#E67E22"
+                                    FontFamily="OpenSansSemibold"
+                                    FontSize="12"
+                                    CornerRadius="16"
+                                    HeightRequest="34"
+                                    Padding="12,0" />
+                        </HorizontalStackLayout>
+                    </ScrollView>
+
+                    <!-- Empty State -->
+                    <VerticalStackLayout IsVisible="{Binding HasNoLogs}" Spacing="12" Margin="0,10,0,0">
+                        <controls:FishMascotCard HeightOverride="130" BadgeText="📋" BadgeColor="#2176FF" />
+                        <Label Text="Журнал пуст" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="17" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                        <Label Text="Фиксируйте регулярное обслуживание: подмены воды, чистку фильтров и замеры параметров, чтобы следить за здоровьем экосистемы." TextColor="#6E6E6E" FontSize="13" LineHeight="1.3" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Logs List -->
+                    <CollectionView ItemsSource="{Binding MaintenanceLogs}"
+                                    IsVisible="{Binding HasNoLogs, Converter={StaticResource InvertedBoolConverter}}"
+                                    SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="dto:MaintenanceLogDto">
+                                <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" Padding="14,12" Margin="0,0,0,8">
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                        <Border Grid.Column="0"
+                                                WidthRequest="36" HeightRequest="36"
+                                                StrokeShape="RoundRectangle 10"
+                                                BackgroundColor="#F4F6FD"
+                                                StrokeThickness="0"
+                                                VerticalOptions="Start">
+                                            <Label Text="📝" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" Spacing="3">
+                                            <Label Text="{Binding Notes}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="13" LineBreakMode="WordWrap" />
+                                            <Label Text="{Binding ActionDate, StringFormat='{0:dd.MM.yyyy HH:mm}'}" TextColor="#8C93A8" FontSize="11" />
+                                        </VerticalStackLayout>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

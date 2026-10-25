@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mobile.Services.Dto.Control;
+using Mobile.Services.Dto.Notification;
 using Mobile.Views;
 
 namespace Mobile.ViewModels;
@@ -20,11 +22,13 @@ public partial class AquariumDetailsViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(IsSensorsTabSelected))]
     [NotifyPropertyChangedFor(nameof(IsRelaysTabSelected))]
     [NotifyPropertyChangedFor(nameof(IsScenariosTabSelected))]
-    private int _selectedTabIndex = 0; // 0: Sensors, 1: Relays, 2: Scenarios
+    [NotifyPropertyChangedFor(nameof(IsLogsTabSelected))]
+    private int _selectedTabIndex = 0; // 0: Sensors, 1: Relays, 2: Scenarios, 3: Logs
 
     public bool IsSensorsTabSelected => SelectedTabIndex == 0;
     public bool IsRelaysTabSelected => SelectedTabIndex == 1;
     public bool IsScenariosTabSelected => SelectedTabIndex == 2;
+    public bool IsLogsTabSelected => SelectedTabIndex == 3;
 
     [ObservableProperty]
     private ObservableCollection<SensorModel> _sensors = new();
@@ -36,6 +40,18 @@ public partial class AquariumDetailsViewModel : ObservableObject
     private ObservableCollection<ScenarioModel> _scenarios = new();
 
     [ObservableProperty]
+    private ObservableCollection<MaintenanceLogDto> _maintenanceLogs = new();
+
+    [ObservableProperty]
+    private VacationModeDto? _activeVacationMode;
+
+    [ObservableProperty]
+    private bool _isVacationModeActive;
+
+    [ObservableProperty]
+    private string _vacationModeText = "Режим отпуска отключен";
+
+    [ObservableProperty]
     private bool _hasNoSensors;
 
     [ObservableProperty]
@@ -43,6 +59,9 @@ public partial class AquariumDetailsViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _hasNoScenarios;
+
+    [ObservableProperty]
+    private bool _hasNoLogs;
 
     [ObservableProperty]
     private bool _isBusy;
@@ -69,7 +88,6 @@ public partial class AquariumDetailsViewModel : ObservableObject
             if (string.IsNullOrWhiteSpace(Aquarium.TankTypeSubtitle) || Aquarium.TankTypeSubtitle == "Ёмкость")
             {
                 if (Aquarium.SpeciesInfo.Contains("Террариум", StringComparison.OrdinalIgnoreCase)) Aquarium.TankTypeSubtitle = "Террариум";
-                else if (Aquarium.SpeciesInfo.Contains("Палюдариум", StringComparison.OrdinalIgnoreCase)) Aquarium.TankTypeSubtitle = "Палюдариум";
                 else if (Aquarium.SpeciesInfo.Contains("Гроубокс", StringComparison.OrdinalIgnoreCase)) Aquarium.TankTypeSubtitle = "Гроубокс";
                 else if (Aquarium.SpeciesInfo.Contains("Флорариум", StringComparison.OrdinalIgnoreCase)) Aquarium.TankTypeSubtitle = "Флорариум";
                 else if (Aquarium.SpeciesInfo.Contains("Формикарий", StringComparison.OrdinalIgnoreCase)) Aquarium.TankTypeSubtitle = "Формикарий";
@@ -98,6 +116,151 @@ public partial class AquariumDetailsViewModel : ObservableObject
         foreach (var sc in scList) Scenarios.Add(sc);
         HasNoScenarios = Scenarios.Count == 0;
 
+        await RefreshVacationModeAsync(id);
+        await RefreshMaintenanceLogsAsync(id);
+
+        IsBusy = false;
+    }
+
+    private bool _isUpdatingVacationModeInternally;
+
+    async partial void OnIsVacationModeActiveChanged(bool value)
+    {
+        if (_isUpdatingVacationModeInternally || Aquarium == null) return;
+
+        if (ActiveVacationMode == null)
+        {
+            if (value)
+            {
+                await ConfigureVacationModeAsync();
+            }
+            return;
+        }
+
+        if (ActiveVacationMode.IsActive != value)
+        {
+            await _aquariumService.ToggleVacationModeAsync(ActiveVacationMode.Id);
+            ActiveVacationMode = ActiveVacationMode with { IsActive = value };
+            VacationModeText = value
+                ? $"Активен: {ActiveVacationMode.DateRange} (корм {ActiveVacationMode.CalculatedFeed:F0}%)"
+                : "Режим отпуска отключен";
+        }
+    }
+
+    private async Task RefreshVacationModeAsync(Guid ecosystemId)
+    {
+        try
+        {
+            _isUpdatingVacationModeInternally = true;
+            var vacations = await _aquariumService.GetVacationModesAsync(ecosystemId);
+            ActiveVacationMode = vacations.FirstOrDefault(x => x.IsActive) ?? vacations.FirstOrDefault();
+            IsVacationModeActive = ActiveVacationMode?.IsActive ?? false;
+            VacationModeText = IsVacationModeActive
+                ? $"Активен: {ActiveVacationMode?.DateRange} (корм {ActiveVacationMode?.CalculatedFeed:F0}%)"
+                : "Режим отпуска отключен";
+        }
+        catch
+        {
+        }
+        finally
+        {
+            _isUpdatingVacationModeInternally = false;
+        }
+    }
+
+    private async Task RefreshMaintenanceLogsAsync(Guid ecosystemId)
+    {
+        try
+        {
+            var logs = await _aquariumService.GetMaintenanceLogsAsync(ecosystemId);
+            MaintenanceLogs.Clear();
+            foreach (var l in logs) MaintenanceLogs.Add(l);
+            HasNoLogs = MaintenanceLogs.Count == 0;
+        }
+        catch
+        {
+        }
+    }
+
+    [RelayCommand]
+    private async Task ToggleVacationModeAsync()
+    {
+        if (Aquarium == null) return;
+
+        if (ActiveVacationMode == null)
+        {
+            await ConfigureVacationModeAsync();
+            return;
+        }
+
+        var success = await _aquariumService.ToggleVacationModeAsync(ActiveVacationMode.Id);
+        if (success)
+        {
+            IsVacationModeActive = !IsVacationModeActive;
+            VacationModeText = IsVacationModeActive
+                ? $"Активен: {ActiveVacationMode.DateRange} (корм {ActiveVacationMode.CalculatedFeed:F0}%)"
+                : "Режим отпуска отключен";
+        }
+    }
+
+    [RelayCommand]
+    private async Task ConfigureVacationModeAsync()
+    {
+        if (Aquarium == null) return;
+
+        var daysStr = await Shell.Current.DisplayPromptAsync("Режим отпуска", "Количество дней отпуска:", initialValue: "14", keyboard: Keyboard.Numeric);
+        if (string.IsNullOrWhiteSpace(daysStr) || !int.TryParse(daysStr, out var days) || days <= 0) return;
+
+        var feedStr = await Shell.Current.DisplayPromptAsync("Режим отпуска", "Снижение корма (в % от нормы, например 50):", initialValue: "50", keyboard: Keyboard.Numeric);
+        if (string.IsNullOrWhiteSpace(feedStr) || !double.TryParse(feedStr, out var feedPct)) feedPct = 50.0;
+
+        var start = DateTime.UtcNow.Date;
+        var end = start.AddDays(days);
+
+        var request = new CreateVacationModeRequestDto(
+            Aquarium.Id,
+            start,
+            end,
+            true,
+            feedPct
+        );
+
+        IsBusy = true;
+        await _aquariumService.CreateVacationModeAsync(request);
+        await RefreshVacationModeAsync(Aquarium.Id);
+        IsBusy = false;
+
+        await Shell.Current.DisplayAlert("Режим отпуска", $"Режим отпуска активирован на {days} дн. (до {end:dd.MM.yyyy}). Кормление снижено до {feedPct}%.", "OK");
+    }
+
+    [RelayCommand]
+    private async Task QuickLogMaintenanceAsync(string? actionType)
+    {
+        if (Aquarium == null || string.IsNullOrWhiteSpace(actionType)) return;
+
+        var note = await Shell.Current.DisplayPromptAsync(
+            actionType,
+            "Добавьте комментарий (например, 'Заменено 20% воды' или 'Промыт губчатый фильтр'):",
+            initialValue: actionType switch
+            {
+                "Подмена воды" => "Плановая подмена 20% осмосом",
+                "Чистка фильтра" => "Промывка наполнителей фильтра",
+                "Тестирование воды" => "pH 6.8, TDS 140 ppm, NO3 10",
+                _ => string.Empty
+            });
+
+        if (note == null) return;
+
+        var request = new CreateMaintenanceLogRequestDto(
+            Aquarium.Id,
+            DateTime.UtcNow,
+            null,
+            $"{actionType}: {note}".TrimEnd(':', ' ')
+        );
+
+        IsBusy = true;
+        await _aquariumService.AddMaintenanceLogAsync(request);
+        await RefreshMaintenanceLogsAsync(Aquarium.Id);
         IsBusy = false;
     }
 
