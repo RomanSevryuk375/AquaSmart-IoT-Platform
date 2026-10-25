@@ -27,12 +27,12 @@ public partial class App : Application
     {
         try
         {
-            var savedTheme = Preferences.Default.Get("setting_theme", "Светлая");
+            var savedTheme = Preferences.Default.Get("setting_theme", "Системная");
             UserAppTheme = savedTheme switch
             {
                 "Тёмная" => AppTheme.Dark,
-                "Системная" => AppTheme.Unspecified,
-                _ => AppTheme.Light
+                "Светлая" => AppTheme.Light,
+                _ => AppTheme.Unspecified
             };
         }
         catch

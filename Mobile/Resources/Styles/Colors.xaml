@@ -27,6 +27,34 @@
     <Color x:Key="ErrorRedBg">#FDE8E8</Color>
     <Color x:Key="InputBorder">#E4E7F4</Color>
     
+    <!-- Semantic Theme Colors (Support Light & Dark mode seamlessly) -->
+    <Color x:Key="PageBgLight">#F6F7FC</Color>
+    <Color x:Key="PageBgDark">#12131A</Color>
+    <Color x:Key="PageWhiteBgLight">#FFFFFF</Color>
+    <Color x:Key="PageWhiteBgDark">#161822</Color>
+
+    <Color x:Key="CardBgLight">#FFFFFF</Color>
+    <Color x:Key="CardBgDark">#1E202C</Color>
+    <Color x:Key="CardSubtleBgLight">#F6F7FC</Color>
+    <Color x:Key="CardSubtleBgDark">#252837</Color>
+
+    <Color x:Key="CardBorderLight">#E4E7F4</Color>
+    <Color x:Key="CardBorderDark">#2C2F42</Color>
+    <Color x:Key="SeparatorLight">#F0F2F9</Color>
+    <Color x:Key="SeparatorDark">#252838</Color>
+
+    <Color x:Key="TextPrimaryLight">#141414</Color>
+    <Color x:Key="TextPrimaryDark">#F4F5FB</Color>
+    <Color x:Key="TextSecondaryLight">#6E6E6E</Color>
+    <Color x:Key="TextSecondaryDark">#9FA3B8</Color>
+    <Color x:Key="TextMutedLight">#8C93A8</Color>
+    <Color x:Key="TextMutedDark">#7E839B</Color>
+
+    <Color x:Key="InputBgLight">#FFFFFF</Color>
+    <Color x:Key="InputBgDark">#222432</Color>
+    <Color x:Key="InputBorderLight">#E4E7F4</Color>
+    <Color x:Key="InputBorderDark">#32364B</Color>
+    
     <Color x:Key="Secondary">#EDEFFB</Color>
     <Color x:Key="SecondaryDarkText">#4152B0</Color>
     <Color x:Key="Tertiary">#2E3A7E</Color>

@@ -4,7 +4,7 @@
              xmlns:vm="clr-namespace:Mobile.ViewModels"
              x:Class="Mobile.Views.AppSettingsPage"
              x:DataType="vm:AppSettingsViewModel"
-             BackgroundColor="#F6F7FC"
+             BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#12131A'}"
              Shell.NavBarIsVisible="False"
              Title="Настройки приложения">
 
@@ -14,9 +14,9 @@
             <Border Grid.Column="0"
                     WidthRequest="38" HeightRequest="38"
                     StrokeShape="RoundRectangle 10"
-                    BackgroundColor="#FFFFFF"
+                    BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                     StrokeThickness="1"
-                    Stroke="#E4E7F4">
+                    Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}">
                 <ImageButton Source="icon_chevron_left.png"
                              Command="{Binding GoBackCommand}"
                              BackgroundColor="Transparent"
@@ -27,7 +27,7 @@
 
             <Label Grid.Column="1"
                    Text="Настройки приложения"
-                   TextColor="#141414"
+                   TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                    FontFamily="OpenSansSemibold"
                    FontSize="18"
                    FontAttributes="Bold"
@@ -36,9 +36,9 @@
             <Border Grid.Column="2"
                     WidthRequest="38" HeightRequest="38"
                     StrokeShape="RoundRectangle 10"
-                    BackgroundColor="#FFFFFF"
+                    BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                     StrokeThickness="1"
-                    Stroke="#E4E7F4">
+                    Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}">
                 <ImageButton Source="icon_bell.png"
                              Command="{Binding OpenNotificationsCommand}"
                              BackgroundColor="Transparent"
@@ -54,15 +54,15 @@
                 <!-- 1. Внешний вид -->
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Внешний вид"
-                           TextColor="#141414"
+                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                            FontFamily="OpenSansSemibold"
                            FontSize="16"
                            FontAttributes="Bold" />
 
                     <Border StrokeThickness="1"
-                            Stroke="#E8EAF5"
+                            Stroke="{AppThemeBinding Light='#E8EAF5', Dark='#2C2F42'}"
                             StrokeShape="RoundRectangle 16"
-                            BackgroundColor="#FFFFFF"
+                            BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                             Padding="16,6">
                         <VerticalStackLayout Spacing="0">
                             <!-- Тема интерфейса -->
@@ -71,13 +71,13 @@
                                     <TapGestureRecognizer Command="{Binding ChooseThemeCommand}" />
                                 </Grid.GestureRecognizers>
                                 <VerticalStackLayout VerticalOptions="Center" Spacing="2">
-                                    <Label Text="Тема интерфейса" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
-                                    <Label Text="{Binding CurrentTheme}" TextColor="#6E6E6E" FontSize="13" />
+                                    <Label Text="Тема интерфейса" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" />
+                                    <Label Text="{Binding CurrentTheme}" TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="13" />
                                 </VerticalStackLayout>
                                 <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                             </Grid>
 
-                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+                            <BoxView HeightRequest="1" Color="{AppThemeBinding Light='#F0F2F9', Dark='#26283B'}" />
 
                             <!-- Язык приложения -->
                             <Grid ColumnDefinitions="*,Auto" HeightRequest="56">
@@ -85,8 +85,8 @@
                                     <TapGestureRecognizer Command="{Binding ChooseLanguageCommand}" />
                                 </Grid.GestureRecognizers>
                                 <VerticalStackLayout VerticalOptions="Center" Spacing="2">
-                                    <Label Text="Язык приложения" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
-                                    <Label Text="{Binding CurrentLanguage}" TextColor="#6E6E6E" FontSize="13" />
+                                    <Label Text="Язык приложения" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" />
+                                    <Label Text="{Binding CurrentLanguage}" TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="13" />
                                 </VerticalStackLayout>
                                 <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                             </Grid>
@@ -97,23 +97,23 @@
                 <!-- 2. Уведомления -->
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Уведомления"
-                           TextColor="#141414"
+                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                            FontFamily="OpenSansSemibold"
                            FontSize="16"
                            FontAttributes="Bold" />
 
                     <Border StrokeThickness="1"
-                            Stroke="#E8EAF5"
+                            Stroke="{AppThemeBinding Light='#E8EAF5', Dark='#2C2F42'}"
                             StrokeShape="RoundRectangle 16"
-                            BackgroundColor="#FFFFFF"
+                            BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                             Padding="16,6">
                         <VerticalStackLayout Spacing="0">
                             <!-- Аварийные сигналы -->
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" Padding="0,10">
                                 <VerticalStackLayout VerticalOptions="Center" Spacing="2">
-                                    <Label Text="Аварийные сигналы" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
+                                    <Label Text="Аварийные сигналы" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" />
                                     <Label Text="Оповещения о выходе показателей датчиков за критические пределы или протечках"
-                                           TextColor="#6E6E6E" FontSize="12" LineBreakMode="WordWrap" />
+                                           TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="12" LineBreakMode="WordWrap" />
                                 </VerticalStackLayout>
                                 <Switch Grid.Column="1"
                                         IsToggled="{Binding EmergencyAlerts}"
@@ -121,14 +121,14 @@
                                         VerticalOptions="Center" />
                             </Grid>
 
-                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+                            <BoxView HeightRequest="1" Color="{AppThemeBinding Light='#F0F2F9', Dark='#26283B'}" />
 
                             <!-- Потеря связи с платой -->
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" Padding="0,10">
                                 <VerticalStackLayout VerticalOptions="Center" Spacing="2">
-                                    <Label Text="Потеря связи с платой" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
+                                    <Label Text="Потеря связи с платой" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" />
                                     <Label Text="Уведомления, если контроллер потерял связь с сетью или снова вернулся в сеть"
-                                           TextColor="#6E6E6E" FontSize="12" LineBreakMode="WordWrap" />
+                                           TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="12" LineBreakMode="WordWrap" />
                                 </VerticalStackLayout>
                                 <Switch Grid.Column="1"
                                         IsToggled="{Binding ConnectionLossAlerts}"
@@ -136,14 +136,14 @@
                                         VerticalOptions="Center" />
                             </Grid>
 
-                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+                            <BoxView HeightRequest="1" Color="{AppThemeBinding Light='#F0F2F9', Dark='#26283B'}" />
 
                             <!-- Запуск сценариев -->
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" Padding="0,10">
                                 <VerticalStackLayout VerticalOptions="Center" Spacing="2">
-                                    <Label Text="Запуск сценариев" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
+                                    <Label Text="Запуск сценариев" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" />
                                     <Label Text="Короткие пуши о том, что реле успешно включилось по таймеру или датчику"
-                                           TextColor="#6E6E6E" FontSize="12" LineBreakMode="WordWrap" />
+                                           TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="12" LineBreakMode="WordWrap" />
                                 </VerticalStackLayout>
                                 <Switch Grid.Column="1"
                                         IsToggled="{Binding ScenarioAlerts}"
@@ -151,14 +151,14 @@
                                         VerticalOptions="Center" />
                             </Grid>
 
-                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+                            <BoxView HeightRequest="1" Color="{AppThemeBinding Light='#F0F2F9', Dark='#26283B'}" />
 
                             <!-- Оповещения в Telegram -->
                             <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12" Padding="0,10">
                                 <VerticalStackLayout VerticalOptions="Center" Spacing="2">
-                                    <Label Text="Оповещения в Telegram" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
+                                    <Label Text="Оповещения в Telegram" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" />
                                     <Label Text="Дублирование важных алертов и задач в Telegram-бот"
-                                           TextColor="#6E6E6E" FontSize="12" LineBreakMode="WordWrap" />
+                                           TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="12" LineBreakMode="WordWrap" />
                                 </VerticalStackLayout>
                                 <Button Grid.Column="1"
                                         Text="Бот"
@@ -183,15 +183,15 @@
                 <!-- 3. Данные -->
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Данные"
-                           TextColor="#141414"
+                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                            FontFamily="OpenSansSemibold"
                            FontSize="16"
                            FontAttributes="Bold" />
 
                     <Border StrokeThickness="1"
-                            Stroke="#E8EAF5"
+                            Stroke="{AppThemeBinding Light='#E8EAF5', Dark='#2C2F42'}"
                             StrokeShape="RoundRectangle 16"
-                            BackgroundColor="#FFFFFF"
+                            BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                             Padding="16,6">
                         <VerticalStackLayout Spacing="0">
                             <!-- Обновление экранов -->
@@ -200,30 +200,30 @@
                                     <TapGestureRecognizer Command="{Binding ChooseRefreshIntervalCommand}" />
                                 </Grid.GestureRecognizers>
                                 <VerticalStackLayout VerticalOptions="Center" Spacing="2">
-                                    <Label Text="Обновление экранов" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
-                                    <Label Text="{Binding RefreshInterval}" TextColor="#6E6E6E" FontSize="13" />
+                                    <Label Text="Обновление экранов" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" />
+                                    <Label Text="{Binding RefreshInterval}" TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="13" />
                                 </VerticalStackLayout>
                                 <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                             </Grid>
 
-                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+                            <BoxView HeightRequest="1" Color="{AppThemeBinding Light='#F0F2F9', Dark='#26283B'}" />
 
                             <!-- Экономия трафика (Wi-Fi) -->
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" HeightRequest="52">
-                                <Label Text="Экономия трафика (Wi-Fi)" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                                <Label Text="Экономия трафика (Wi-Fi)" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
                                 <Switch Grid.Column="1"
                                         IsToggled="{Binding TrafficSaving}"
                                         OnColor="#4152B0"
                                         VerticalOptions="Center" />
                             </Grid>
 
-                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+                            <BoxView HeightRequest="1" Color="{AppThemeBinding Light='#F0F2F9', Dark='#26283B'}" />
 
                             <!-- Локальный кэш и очистка -->
                             <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10" HeightRequest="56">
                                 <VerticalStackLayout VerticalOptions="Center" Spacing="2">
-                                    <Label Text="Локальный кэш" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
-                                    <Label Text="{Binding CacheSize}" TextColor="#6E6E6E" FontSize="13" />
+                                    <Label Text="Локальный кэш" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" />
+                                    <Label Text="{Binding CacheSize}" TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="13" />
                                 </VerticalStackLayout>
                                 <Button Grid.Column="1"
                                         Text="Очистить"

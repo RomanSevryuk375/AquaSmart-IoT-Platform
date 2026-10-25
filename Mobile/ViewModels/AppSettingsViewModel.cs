@@ -18,7 +18,7 @@ public partial class AppSettingsViewModel : ObservableObject
     private const string TelegramAlertsKey = "setting_telegram_alerts";
 
     [ObservableProperty]
-    private string _currentTheme = "Светлая";
+    private string _currentTheme = "Системная";
 
     [ObservableProperty]
     private string _currentLanguage = "Русский";
@@ -55,7 +55,7 @@ public partial class AppSettingsViewModel : ObservableObject
 
     private void LoadSettings()
     {
-        CurrentTheme = Preferences.Default.Get(ThemeKey, "Светлая");
+        CurrentTheme = Preferences.Default.Get(ThemeKey, "Системная");
         CurrentLanguage = Preferences.Default.Get(LanguageKey, "Русский");
         RefreshInterval = Preferences.Default.Get(RefreshIntervalKey, "30 сек.");
         EmergencyAlerts = Preferences.Default.Get(EmergencyAlertsKey, true);

@@ -4,7 +4,7 @@
              xmlns:vm="clr-namespace:Mobile.ViewModels"
              x:Class="Mobile.Views.ProfilePage"
              x:DataType="vm:ProfileViewModel"
-             BackgroundColor="#F6F7FC"
+             BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#12131A'}"
              Shell.NavBarIsVisible="False"
              Title="Профиль">
 
@@ -13,7 +13,7 @@
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10" Margin="0,4,0,16">
             <Label Grid.Column="0"
                    Text="Профиль"
-                   TextColor="#141414"
+                   TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                    FontFamily="OpenSansSemibold"
                    FontSize="22"
                    FontAttributes="Bold"
@@ -23,9 +23,9 @@
             <Border Grid.Column="1"
                     WidthRequest="38" HeightRequest="38"
                     StrokeShape="RoundRectangle 10"
-                    BackgroundColor="#FFFFFF"
+                    BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                     StrokeThickness="1"
-                    Stroke="#E4E7F4">
+                    Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}">
                 <ImageButton Source="icon_edit.png"
                              Command="{Binding GoToEditProfileCommand}"
                              BackgroundColor="Transparent"
@@ -38,9 +38,9 @@
             <Border Grid.Column="2"
                     WidthRequest="38" HeightRequest="38"
                     StrokeShape="RoundRectangle 10"
-                    BackgroundColor="#FFFFFF"
+                    BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                     StrokeThickness="1"
-                    Stroke="#E4E7F4">
+                    Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}">
                 <ImageButton Source="icon_bell.png"
                              Command="{Binding OpenNotificationsCommand}"
                              BackgroundColor="Transparent"
@@ -91,7 +91,7 @@
 
                     <!-- Nickname / Full Name (Tap to edit) -->
                     <Label Text="{Binding User.FullName}"
-                           TextColor="#141414"
+                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                            FontFamily="OpenSansSemibold"
                            FontSize="20"
                            FontAttributes="Bold"
@@ -103,7 +103,7 @@
 
                     <!-- Email (Tap to edit) -->
                     <Label Text="{Binding User.Email}"
-                           TextColor="#6E6E6E"
+                           TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}"
                            FontSize="14"
                            HorizontalTextAlignment="Center">
                         <Label.GestureRecognizers>
@@ -114,15 +114,15 @@
 
                 <!-- Telegram Bot Integration Banner Card -->
                 <Border StrokeThickness="1"
-                        Stroke="#CDE5F6"
+                        Stroke="{AppThemeBinding Light='#CDE5F6', Dark='#244158'}"
                         StrokeShape="RoundRectangle 20"
-                        BackgroundColor="#FFFFFF"
+                        BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                         Padding="16,14">
                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalOptions="Center">
                         <Border Grid.Column="0"
                                 StrokeThickness="0"
                                 StrokeShape="RoundRectangle 12"
-                                BackgroundColor="#E8F4FC"
+                                BackgroundColor="{AppThemeBinding Light='#E8F4FC', Dark='#1B2D3C'}"
                                 WidthRequest="44" HeightRequest="44"
                                 VerticalOptions="Center">
                             <Image Source="icon_telegram.png"
@@ -132,12 +132,12 @@
 
                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                             <Label Text="Telegram-бот"
-                                   TextColor="#141414"
+                                   TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                                    FontFamily="OpenSansSemibold"
                                    FontSize="15"
                                    FontAttributes="Bold" />
                             <Label Text="Уведомления об авариях и напоминания в чат"
-                                   TextColor="#6E6E6E"
+                                   TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}"
                                    FontSize="12"
                                    LineBreakMode="WordWrap" />
                         </VerticalStackLayout>
@@ -159,9 +159,9 @@
                 <!-- Grouped Settings & Navigation Card matching Figma -->
                 <Border x:Name="SettingsCard"
                         StrokeThickness="1"
-                        Stroke="#E8EAF5"
+                        Stroke="{AppThemeBinding Light='#E8EAF5', Dark='#2C2F42'}"
                         StrokeShape="RoundRectangle 20"
-                        BackgroundColor="#FFFFFF"
+                        BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                         Padding="16,6">
                     <VerticalStackLayout Spacing="0">
                         <!-- 1. Мои контроллеры -->
@@ -170,11 +170,11 @@
                                 <TapGestureRecognizer Command="{Binding GoToControllersCommand}" />
                             </Grid.GestureRecognizers>
                             <Image Grid.Column="0" Source="icon_cpu.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                            <Label Grid.Column="1" Text="Мои контроллеры" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="Мои контроллеры" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
                             <Image Grid.Column="2" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                         </Grid>
 
-                        <BoxView HeightRequest="1" Color="#F0F2F9" />
+                        <BoxView HeightRequest="1" Color="{AppThemeBinding Light='#F0F2F9', Dark='#26283B'}" />
 
                         <!-- 2. Настройки приложения -->
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" HeightRequest="52">
@@ -182,11 +182,11 @@
                                 <TapGestureRecognizer Command="{Binding GoToAppSettingsCommand}" />
                             </Grid.GestureRecognizers>
                             <Image Grid.Column="0" Source="icon_settings.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                            <Label Grid.Column="1" Text="Настройки приложения" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="Настройки приложения" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
                             <Image Grid.Column="2" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                         </Grid>
 
-                        <BoxView HeightRequest="1" Color="#F0F2F9" />
+                        <BoxView HeightRequest="1" Color="{AppThemeBinding Light='#F0F2F9', Dark='#26283B'}" />
 
                         <!-- 3. Данные и история -->
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" HeightRequest="52">
@@ -194,11 +194,11 @@
                                 <TapGestureRecognizer Command="{Binding GoToDataHistoryCommand}" />
                             </Grid.GestureRecognizers>
                             <Image Grid.Column="0" Source="icon_chart.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                            <Label Grid.Column="1" Text="Данные и история" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="Данные и история" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
                             <Image Grid.Column="2" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                         </Grid>
 
-                        <BoxView HeightRequest="1" Color="#F0F2F9" />
+                        <BoxView HeightRequest="1" Color="{AppThemeBinding Light='#F0F2F9', Dark='#26283B'}" />
 
                         <!-- 4. Безопасность -->
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" HeightRequest="52">
@@ -206,11 +206,11 @@
                                 <TapGestureRecognizer Command="{Binding GoToSecurityCommand}" />
                             </Grid.GestureRecognizers>
                             <Image Grid.Column="0" Source="icon_shield.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                            <Label Grid.Column="1" Text="Безопасность" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="Безопасность" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
                             <Image Grid.Column="2" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                         </Grid>
 
-                        <BoxView HeightRequest="1" Color="#F0F2F9" />
+                        <BoxView HeightRequest="1" Color="{AppThemeBinding Light='#F0F2F9', Dark='#26283B'}" />
 
                         <!-- 5. Помощь и поддержка -->
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" HeightRequest="52">
@@ -218,11 +218,11 @@
                                 <TapGestureRecognizer Command="{Binding GoToHelpSupportCommand}" />
                             </Grid.GestureRecognizers>
                             <Image Grid.Column="0" Source="icon_help.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                            <Label Grid.Column="1" Text="Помощь и поддержка" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="Помощь и поддержка" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
                             <Image Grid.Column="2" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                         </Grid>
 
-                        <BoxView HeightRequest="1" Color="#F0F2F9" />
+                        <BoxView HeightRequest="1" Color="{AppThemeBinding Light='#F0F2F9', Dark='#26283B'}" />
 
                         <!-- 6. О приложении -->
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" HeightRequest="52">
@@ -230,11 +230,11 @@
                                 <TapGestureRecognizer Command="{Binding GoToAboutAppCommand}" />
                             </Grid.GestureRecognizers>
                             <Image Grid.Column="0" Source="icon_info.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                            <Label Grid.Column="1" Text="О приложении" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="О приложении" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
                             <Image Grid.Column="2" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                         </Grid>
 
-                        <BoxView HeightRequest="1" Color="#F0F2F9" />
+                        <BoxView HeightRequest="1" Color="{AppThemeBinding Light='#F0F2F9', Dark='#26283B'}" />
 
                         <!-- 7. Выйти из приложения -->
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" HeightRequest="52">
@@ -242,11 +242,11 @@
                                 <TapGestureRecognizer Command="{Binding LogoutCommand}" />
                             </Grid.GestureRecognizers>
                             <Image Grid.Column="0" Source="icon_logout.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                            <Label Grid.Column="1" Text="Выйти из приложения" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="Выйти из приложения" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
                             <Image Grid.Column="2" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                         </Grid>
 
-                        <BoxView HeightRequest="1" Color="#F0F2F9" />
+                        <BoxView HeightRequest="1" Color="{AppThemeBinding Light='#F0F2F9', Dark='#26283B'}" />
 
                         <!-- 8. Удалить аккаунт (Red) -->
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" HeightRequest="52">
