@@ -17,7 +17,7 @@ public partial class ControllerDetailsViewModel : ObservableObject
     private ControllerModel? _controller;
 
     [ObservableProperty]
-    private string _controllerCode = "020623465";
+    private string _controllerCode = string.Empty;
 
     [ObservableProperty]
     private string _name = string.Empty;
@@ -45,6 +45,7 @@ public partial class ControllerDetailsViewModel : ObservableObject
             {
                 Name = Controller.Name;
                 MacAddress = Controller.MacAddress;
+                ControllerCode = "AQ-" + Controller.Id.ToString()[..8].ToUpperInvariant();
                 IsEnabled = Controller.IsOnline;
             }
         }

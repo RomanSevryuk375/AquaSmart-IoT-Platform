@@ -31,13 +31,6 @@ public partial class ProfileViewModel : ObservableObject
     {
         IsBusy = true;
         User = await _identityService.GetCurrentUserAsync();
-        // If user full name is empty in mock/first run, provide pleasant default from Figma
-        if (string.IsNullOrWhiteSpace(User.FullName))
-        {
-            User.FullName = "Роман";
-            User.Email = "roman.romanov@gmail.com";
-            User.Phone = "+375 (29) 123-45-67";
-        }
         IsBusy = false;
     }
 

@@ -26,10 +26,10 @@ public partial class AddSensorViewModel : ObservableObject
     private string _port = string.Empty;
 
     [ObservableProperty]
-    private string _minValueString = "22.0";
+    private string _minValueString = string.Empty;
 
     [ObservableProperty]
-    private string _maxValueString = "28.0";
+    private string _maxValueString = string.Empty;
 
     [ObservableProperty]
     private bool _isCancelDialogVisible;
@@ -94,16 +94,22 @@ public partial class AddSensorViewModel : ObservableObject
         }
 
         Guid.TryParse(AquariumIdString, out var aqId);
-        double.TryParse(MinValueString, out var min);
-        double.TryParse(MaxValueString, out var max);
 
-        var (type, unit, icon, typeName) = SensorTypeIndex switch
+        var (type, unit, icon, typeName, defMin, defMax) = SensorTypeIndex switch
         {
-            1 => (SensorType.Ph, "pH", "🧪", "Кислотность pH"),
-            2 => (SensorType.DissolvedOxygen, "мг/л", "🫧", "Кислород O2"),
-            3 => (SensorType.TdsSalinity, "ppm", "🧂", "Минерализация TDS"),
-            _ => (SensorType.Temperature, "°C", "🌡️", "Температура воды")
+            1 => (SensorType.Ph, "pH", "🧪", "Кислотность pH", 6.5, 8.0),
+            2 => (SensorType.DissolvedOxygen, "мг/л", "🫧", "Кислород O2", 5.0, 9.0),
+            3 => (SensorType.TdsSalinity, "ppm", "🧂", "Минерализация TDS", 100.0, 300.0),
+            _ => (SensorType.Temperature, "°C", "🌡️", "Температура воды", 22.0, 28.0)
         };
+
+        var min = double.TryParse(MinValueString, System.Globalization.CultureInfo.InvariantCulture, out var parsedMin)
+            ? parsedMin
+            : (double.TryParse(MinValueString, out parsedMin) ? parsedMin : defMin);
+
+        var max = double.TryParse(MaxValueString, System.Globalization.CultureInfo.InvariantCulture, out var parsedMax)
+            ? parsedMax
+            : (double.TryParse(MaxValueString, out parsedMax) ? parsedMax : defMax);
 
         var protocolName = ProtocolIndex switch
         {

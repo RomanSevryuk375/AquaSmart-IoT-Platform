@@ -14,7 +14,7 @@ public partial class AddScenarioViewModel : ObservableObject
     private string? _aquariumIdString;
 
     [ObservableProperty]
-    private string _scenarioName = "Поддержание температуры";
+    private string _scenarioName = string.Empty;
 
     [ObservableProperty]
     private string _selectedSensor = "Температура воды";
@@ -23,7 +23,7 @@ public partial class AddScenarioViewModel : ObservableObject
     private string _selectedOperator = "<";
 
     [ObservableProperty]
-    private string _thresholdValue = "24.5";
+    private string _thresholdValue = string.Empty;
 
     [ObservableProperty]
     private string _selectedAction = "Включить";
@@ -107,21 +107,23 @@ public partial class AddScenarioViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveAsync()
     {
-        if (string.IsNullOrWhiteSpace(ScenarioName))
-        {
-            await Shell.Current.DisplayAlert("Внимание", "Укажите название сценария", "OK");
-            return;
-        }
+        var scenarioName = string.IsNullOrWhiteSpace(ScenarioName) 
+            ? $"{SelectedAction} {SelectedRelay} при {SelectedSensor}" 
+            : ScenarioName.Trim();
+
+        var thresh = string.IsNullOrWhiteSpace(ThresholdValue) 
+            ? (SelectedSensor.Contains("pH") ? "7.0" : "24.5") 
+            : ThresholdValue.Trim();
 
         Guid.TryParse(AquariumIdString, out var aqId);
 
-        var condition = $"Если {SelectedSensor} {SelectedOperator} {ThresholdValue}{SensorUnit}";
+        var condition = $"Если {SelectedSensor} {SelectedOperator} {thresh}{SensorUnit}";
         var action = $"{SelectedAction} {SelectedRelay} ({SelectedDuration})";
 
         var scenario = new ScenarioModel
         {
             AquariumId = aqId,
-            Name = ScenarioName.Trim(),
+            Name = scenarioName,
             ConditionText = condition,
             ActionText = action,
             FrequencyText = SelectedDuration,
@@ -130,7 +132,7 @@ public partial class AddScenarioViewModel : ObservableObject
 
         await _aquariumService.AddScenarioAsync(scenario);
 
-        CreatedScenarioTitle = ScenarioName.Trim();
+        CreatedScenarioTitle = scenarioName;
         CreatedScenarioSubtitle = $"{condition} • {action}";
         CreatedScenarioStatus = IsActive ? "Активно" : "Отключено";
 

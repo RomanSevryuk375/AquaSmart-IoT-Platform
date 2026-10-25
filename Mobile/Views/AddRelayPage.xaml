@@ -57,7 +57,7 @@
                     <Label Text="Название реле" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
                     <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="50" Padding="14,0">
                         <Entry Text="{Binding RelayName}"
-                               Placeholder="Введите название реле"
+                               Placeholder="Например, Основной фильтр"
                                PlaceholderColor="#8C93A8"
                                TextColor="#141414"
                                VerticalOptions="Center" />
@@ -112,7 +112,7 @@
                     <Label Text="Адрес подключения" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
                     <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="50" Padding="14,0">
                         <Entry Text="{Binding Address}"
-                               Placeholder="Выберите адрес подключения"
+                               Placeholder="Например, GPIO 12"
                                PlaceholderColor="#8C93A8"
                                TextColor="#141414"
                                VerticalOptions="Center" />

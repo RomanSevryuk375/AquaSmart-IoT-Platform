@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Mobile.ViewModels"
              xmlns:controls="clr-namespace:Mobile.Views.Controls"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
              x:Class="Mobile.Views.AddControllerPage"
              x:DataType="vm:AddControllerViewModel"
              BackgroundColor="#FFFFFF"
@@ -89,27 +90,62 @@
                     </Grid>
                 </Border>
 
-                <!-- QR Viewfinder Simulation Section -->
+                <!-- QR Viewfinder Section -->
                 <VerticalStackLayout Spacing="10" IsVisible="{Binding IsQrMode}">
-                    <Border StrokeThickness="0" StrokeShape="RoundRectangle 20" BackgroundColor="#1E2337" HeightRequest="230" Padding="16">
-                        <Grid HorizontalOptions="Center" VerticalOptions="Center">
-                            <!-- Viewfinder Reticle Frame -->
-                            <Border Stroke="#4152B0" StrokeThickness="2" StrokeShape="RoundRectangle 16"
-                                    WidthRequest="180" HeightRequest="180" BackgroundColor="#111422">
-                                <VerticalStackLayout Spacing="10" HorizontalOptions="Center" VerticalOptions="Center">
-                                    <Image Source="icon_search.png" WidthRequest="36" HeightRequest="36" />
-                                    <Label Text="Наведите камеру&#10;на QR-код платы"
-                                           TextColor="#EDEFFB"
-                                           FontSize="12"
-                                           HorizontalTextAlignment="Center" />
-                                </VerticalStackLayout>
+                    <Border StrokeThickness="0" StrokeShape="RoundRectangle 20" BackgroundColor="#1E2337" HeightRequest="250" Padding="0">
+                        <Grid>
+                            <!-- Real Camera View using ZXing -->
+                            <zxing:CameraBarcodeReaderView
+                                x:Name="BarcodeReader"
+                                HorizontalOptions="FillAndExpand"
+                                VerticalOptions="FillAndExpand"
+                                IsDetecting="{Binding IsDetecting}"
+                                IsTorchOn="{Binding IsTorchOn}"
+                                BarcodesDetected="OnBarcodesDetected" />
+
+                            <!-- Viewfinder Reticle Overlay -->
+                            <Grid InputTransparent="True" HorizontalOptions="Center" VerticalOptions="Center">
+                                <Border Stroke="#4152B0" StrokeThickness="2.5" StrokeShape="RoundRectangle 16"
+                                        WidthRequest="190" HeightRequest="190" BackgroundColor="#10000000">
+                                    <VerticalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
+                                        <Border Stroke="#4152B0" StrokeThickness="1" StrokeShape="RoundRectangle 8" BackgroundColor="#80111422" Padding="8,4">
+                                            <Label Text="Наведите на QR-код"
+                                                   TextColor="#FFFFFF"
+                                                   FontFamily="OpenSansSemibold"
+                                                   FontSize="12"
+                                                   HorizontalTextAlignment="Center" />
+                                        </Border>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </Grid>
+
+                            <!-- Torch / Flashlight Button Overlay -->
+                            <Border HorizontalOptions="End" VerticalOptions="Start" Margin="12"
+                                    WidthRequest="40" HeightRequest="40"
+                                    StrokeThickness="0" StrokeShape="RoundRectangle 20"
+                                    BackgroundColor="#80000000">
+                                <ImageButton Source="icon_eye.png"
+                                             Command="{Binding ToggleTorchCommand}"
+                                             BackgroundColor="Transparent"
+                                             Padding="8"
+                                             WidthRequest="36" HeightRequest="36" />
                             </Border>
+
+                            <!-- Camera Permission Hint if not granted -->
+                            <VerticalStackLayout IsVisible="{Binding IsCameraPermissionGranted, Converter={StaticResource InverseBoolConverter}}"
+                                                 Spacing="10" HorizontalOptions="Center" VerticalOptions="Center" Padding="20">
+                                <Image Source="icon_search.png" WidthRequest="36" HeightRequest="36" />
+                                <Label Text="Нажмите «Сканировать» для включения камеры"
+                                       TextColor="#EDEFFB"
+                                       FontSize="13"
+                                       HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
                         </Grid>
                     </Border>
 
-                    <!-- Scan Trigger Button -->
-                    <Button Text="📷 Сканировать QR-код на устройстве"
-                            Command="{Binding SimulateQrScanCommand}"
+                    <!-- Scan Trigger / Rescan Button -->
+                    <Button Text="{Binding ScanButtonText}"
+                            Command="{Binding TriggerScanOrPickCommand}"
                             BackgroundColor="#EDEFFB"
                             TextColor="#4152B0"
                             FontFamily="OpenSansSemibold"
@@ -159,7 +195,7 @@
                     <Label Text="Название контроллера" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
                     <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="50" Padding="14,0">
                         <Entry Text="{Binding ControllerName}"
-                               Placeholder="Контроллер №123"
+                               Placeholder="Например, Контроллер №123"
                                PlaceholderColor="#8C93A8"
                                TextColor="#141414"
                                VerticalOptions="Center" />

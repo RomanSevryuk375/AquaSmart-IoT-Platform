@@ -107,6 +107,8 @@
                             HeightRequest="48"
                             Padding="14,0">
                         <Entry Text="{Binding FullName}"
+                               Placeholder="Ваше имя"
+                               PlaceholderColor="#8C93A8"
                                TextColor="#141414"
                                VerticalOptions="Center" />
                     </Border>
@@ -125,6 +127,8 @@
                             HeightRequest="48"
                             Padding="14,0">
                         <Entry Text="{Binding Email}"
+                               Placeholder="example@domain.com"
+                               PlaceholderColor="#8C93A8"
                                TextColor="#141414"
                                Keyboard="Email"
                                VerticalOptions="Center" />
@@ -144,6 +148,8 @@
                             HeightRequest="48"
                             Padding="14,0">
                         <Entry Text="{Binding Phone}"
+                               Placeholder="+375 (29) 123-45-67"
+                               PlaceholderColor="#8C93A8"
                                TextColor="#141414"
                                Keyboard="Telephone"
                                VerticalOptions="Center" />

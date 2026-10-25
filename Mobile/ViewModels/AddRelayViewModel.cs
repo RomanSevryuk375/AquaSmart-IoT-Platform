@@ -23,7 +23,7 @@ public partial class AddRelayViewModel : ObservableObject
     private int _protocolIndex = 0; // 0: Digital, 1: Analog, 2: I2C, 3: OneWire
 
     [ObservableProperty]
-    private string _address = "GPIO 12";
+    private string _address = string.Empty;
 
     [ObservableProperty]
     private bool _isManualControl = true;
@@ -84,20 +84,6 @@ public partial class AddRelayViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveAsync()
     {
-        if (string.IsNullOrWhiteSpace(RelayName))
-        {
-            await Shell.Current.DisplayAlert("Внимание", "Укажите название реле", "OK");
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(Address))
-        {
-            await Shell.Current.DisplayAlert("Внимание", "Укажите адрес подключения", "OK");
-            return;
-        }
-
-        Guid.TryParse(AquariumIdString, out var aqId);
-
         var (type, icon, typeName) = DeviceTypeIndex switch
         {
             1 => (AquariumDeviceType.Heater, "🔥", "Нагреватель"),
@@ -106,6 +92,11 @@ public partial class AddRelayViewModel : ObservableObject
             4 => (AquariumDeviceType.Feeder, "🍽️", "Автокормушка"),
             _ => (AquariumDeviceType.FilterPump, "⚡", "Фильтр")
         };
+
+        var relayName = string.IsNullOrWhiteSpace(RelayName) ? typeName : RelayName.Trim();
+        var address = string.IsNullOrWhiteSpace(Address) ? "GPIO 12" : Address.Trim();
+
+        Guid.TryParse(AquariumIdString, out var aqId);
 
         var protocolName = ProtocolIndex switch
         {
@@ -122,18 +113,18 @@ public partial class AddRelayViewModel : ObservableObject
         var relay = new RelayModel
         {
             AquariumId = aqId,
-            Name = RelayName.Trim(),
+            Name = relayName,
             Type = type,
             PinChannel = channelNum,
-            ScheduleInfo = $"{modeText} • {Address.Trim()}",
+            ScheduleInfo = $"{modeText} • {address}",
             IsOn = false
         };
 
         await _aquariumService.AddRelayAsync(relay);
 
-        CreatedRelayName = RelayName.Trim();
+        CreatedRelayName = relayName;
         CreatedRelayIcon = icon;
-        CreatedRelaySubtitle = $"{typeName} • {modeText} • {protocolName} • {Address.Trim()}";
+        CreatedRelaySubtitle = $"{typeName} • {modeText} • {protocolName} • {address}";
         CreatedRelayStatus = IsOpenContact ? "Открыто" : "Закрыто";
         IsSuccessOpen = true;
         OnPropertyChanged(nameof(IsFormVisible));

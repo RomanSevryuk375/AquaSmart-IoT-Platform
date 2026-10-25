@@ -36,7 +36,7 @@ public partial class AddAquariumViewModel : ObservableObject
 
     // Step 2: Name
     [ObservableProperty]
-    private string _name = "Мой первый аквариум";
+    private string _name = string.Empty;
 
     // Step 3: Volume
     [ObservableProperty]

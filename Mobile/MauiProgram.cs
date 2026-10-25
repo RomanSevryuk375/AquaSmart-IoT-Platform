@@ -1,6 +1,10 @@
 using Microsoft.Extensions.Logging;
 using Mobile.Extensions;
 
+#if ANDROID || IOS
+using ZXing.Net.Maui.Controls;
+#endif
+
 namespace Mobile;
 
 public static class MauiProgram
@@ -10,6 +14,9 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
+#if ANDROID || IOS
+            .UseBarcodeReader()
+#endif
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

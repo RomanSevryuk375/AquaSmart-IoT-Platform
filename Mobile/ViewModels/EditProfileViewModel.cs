@@ -40,9 +40,9 @@ public partial class EditProfileViewModel : ObservableObject
     {
         IsBusy = true;
         var user = await _identityService.GetCurrentUserAsync();
-        FullName = string.IsNullOrWhiteSpace(user.FullName) ? "Роман" : user.FullName;
-        Email = string.IsNullOrWhiteSpace(user.Email) ? "roman.romanov@gmail.com" : user.Email;
-        Phone = string.IsNullOrWhiteSpace(user.Phone) ? "+375 (29) 123-45-67" : user.Phone;
+        FullName = user.FullName ?? string.Empty;
+        Email = user.Email ?? string.Empty;
+        Phone = user.Phone ?? string.Empty;
         Initials = user.Initials;
         AvatarPath = user.AvatarPath;
         OnPropertyChanged(nameof(HasAvatar));

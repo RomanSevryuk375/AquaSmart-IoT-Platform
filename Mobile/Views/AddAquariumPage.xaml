@@ -385,7 +385,7 @@
                             <Label Text="Название ёмкости" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
                             <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="52" Padding="14,0">
                                 <Entry Text="{Binding Name}"
-                                       Placeholder="Введите название ёмкости"
+                                       Placeholder="Например, Мой первый аквариум"
                                        PlaceholderColor="#8C93A8"
                                        TextColor="#141414"
                                        VerticalOptions="Center" />
