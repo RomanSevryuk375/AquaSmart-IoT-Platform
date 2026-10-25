@@ -13,10 +13,10 @@
         <Grid Grid.Row="0" Margin="0,4,0,10">
             <Border WidthRequest="38" HeightRequest="38"
                     StrokeShape="RoundRectangle 10"
-                    BackgroundColor="#F6F7FC"
+                    BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
                     StrokeThickness="0"
                     HorizontalOptions="Start">
-                <ImageButton Source="icon_chevron_left.png"
+                <ImageButton Source="{AppThemeBinding Light='icon_chevron_left.png', Dark='icon_chevron_left_white.png'}"
                              Command="{Binding CancelCommand}"
                              BackgroundColor="Transparent"
                              WidthRequest="20" HeightRequest="20"

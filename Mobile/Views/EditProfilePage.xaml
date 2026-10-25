@@ -14,9 +14,9 @@
             <Border Grid.Column="0"
                     WidthRequest="38" HeightRequest="38"
                     StrokeShape="RoundRectangle 10"
-                    BackgroundColor="#F6F7FC"
+                    BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
                     StrokeThickness="0">
-                <ImageButton Source="icon_chevron_left.png"
+                <ImageButton Source="{AppThemeBinding Light='icon_chevron_left.png', Dark='icon_chevron_left_white.png'}"
                              Command="{Binding GoBackCommand}"
                              BackgroundColor="Transparent"
                              WidthRequest="20" HeightRequest="20"
@@ -26,7 +26,7 @@
 
             <Label Grid.Column="1"
                    Text="Редактирование профиля"
-                   TextColor="#141414"
+                   TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
                    FontFamily="OpenSansSemibold"
                    FontSize="18"
                    FontAttributes="Bold"
@@ -74,7 +74,7 @@
                                 Stroke="#FFFFFF"
                                 HorizontalOptions="End"
                                 VerticalOptions="End">
-                            <Image Source="icon_edit.png"
+                            <Image Source="icon_edit_white.png"
                                    WidthRequest="14" HeightRequest="14"
                                    HorizontalOptions="Center"
                                    VerticalOptions="Center" />

@@ -5,7 +5,7 @@
              xmlns:controls="clr-namespace:Mobile.Views.Controls"
              x:Class="Mobile.Views.AddAquariumPage"
              x:DataType="vm:AddAquariumViewModel"
-             BackgroundColor="#FFFFFF"
+             BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#12131A'}"
              Shell.NavBarIsVisible="False"
              Title="Добавление ёмкости">
 
@@ -18,10 +18,10 @@
                 <Border Grid.Column="0"
                         WidthRequest="38" HeightRequest="38"
                         StrokeShape="RoundRectangle 10"
-                        BackgroundColor="#F6F7FC"
+                        BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
                         StrokeThickness="0"
                         VerticalOptions="Center">
-                    <ImageButton Source="icon_arrow_left.png"
+                    <ImageButton Source="{AppThemeBinding Light='icon_arrow_left.png', Dark='icon_arrow_left_white.png'}"
                                  Command="{Binding PrevStepCommand}"
                                  BackgroundColor="Transparent"
                                  WidthRequest="20" HeightRequest="20"
@@ -31,7 +31,7 @@
 
                 <Label Grid.Column="1"
                        Text="Добавление ёмкости"
-                       TextColor="#141414"
+                       TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
                        FontFamily="OpenSansSemibold"
                        FontSize="18"
                        FontAttributes="Bold"
@@ -41,10 +41,10 @@
                 <Border Grid.Column="2"
                         WidthRequest="38" HeightRequest="38"
                         StrokeShape="RoundRectangle 10"
-                        BackgroundColor="#F6F7FC"
+                        BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
                         StrokeThickness="0"
                         VerticalOptions="Center">
-                    <ImageButton Source="icon_close.png"
+                    <ImageButton Source="{AppThemeBinding Light='icon_close.png', Dark='icon_close_white.png'}"
                                  Command="{Binding PromptCancelCommand}"
                                  BackgroundColor="Transparent"
                                  WidthRequest="18" HeightRequest="18"
@@ -462,8 +462,8 @@
                                     <TapGestureRecognizer Command="{Binding OpenCalendarCommand}" />
                                 </Border.GestureRecognizers>
                                 <Grid ColumnDefinitions="*,Auto">
-                                    <Label Text="{Binding LaunchDate}" TextColor="#141414" FontSize="15" VerticalOptions="Center" />
-                                    <Image Grid.Column="1" Source="icon_calendar.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                                    <Label Text="{Binding LaunchDate}" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="15" VerticalOptions="Center" />
+                                    <Image Grid.Column="1" Source="{AppThemeBinding Light='icon_calendar.png', Dark='icon_calendar_white.png'}" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
                                 </Grid>
                             </Border>
                         </VerticalStackLayout>
@@ -491,8 +491,8 @@
                                     <TapGestureRecognizer Command="{Binding OpenControllerPickerCommand}" />
                                 </Border.GestureRecognizers>
                                 <Grid ColumnDefinitions="*,Auto">
-                                    <Label Text="{Binding SelectedControllerName}" TextColor="#141414" FontSize="15" VerticalOptions="Center" />
-                                    <Image Grid.Column="1" Source="icon_chevron_down.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                                    <Label Text="{Binding SelectedControllerName}" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="15" VerticalOptions="Center" />
+                                    <Image Grid.Column="1" Source="{AppThemeBinding Light='icon_chevron_down.png', Dark='icon_chevron_down_white.png'}" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
                                 </Grid>
                             </Border>
                         </VerticalStackLayout>

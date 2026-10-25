@@ -6,7 +6,7 @@
              xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
              x:Class="Mobile.Views.AddControllerPage"
              x:DataType="vm:AddControllerViewModel"
-             BackgroundColor="#FFFFFF"
+             BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#12131A'}"
              Shell.NavBarIsVisible="False"
              Title="Новый контроллер">
 
@@ -18,10 +18,10 @@
                 <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,10">
                     <Border WidthRequest="36" HeightRequest="36"
                             StrokeShape="RoundRectangle 10"
-                            BackgroundColor="#F6F7FC"
+                            BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
                             StrokeThickness="0"
                             VerticalOptions="Center">
-                        <ImageButton Source="icon_arrow_left.png"
+                        <ImageButton Source="{AppThemeBinding Light='icon_arrow_left.png', Dark='icon_arrow_left_white.png'}"
                                      Command="{Binding PromptCancelCommand}"
                                      BackgroundColor="Transparent"
                                      WidthRequest="20" HeightRequest="20"
@@ -31,7 +31,7 @@
 
                     <Label Grid.Column="1"
                            Text="Новый контроллер"
-                           TextColor="#141414"
+                           TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
                            FontFamily="OpenSansSemibold"
                            FontSize="18"
                            FontAttributes="Bold"
@@ -41,10 +41,10 @@
                     <Border Grid.Column="2"
                             WidthRequest="36" HeightRequest="36"
                             StrokeShape="RoundRectangle 10"
-                            BackgroundColor="#F6F7FC"
+                            BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
                             StrokeThickness="0"
                             VerticalOptions="Center">
-                        <ImageButton Source="icon_close.png"
+                        <ImageButton Source="{AppThemeBinding Light='icon_close.png', Dark='icon_close_white.png'}"
                                      Command="{Binding PromptCancelCommand}"
                                      BackgroundColor="Transparent"
                                      WidthRequest="18" HeightRequest="18"
@@ -122,9 +122,9 @@
                             <!-- Torch / Flashlight Button Overlay -->
                             <Border HorizontalOptions="End" VerticalOptions="Start" Margin="12"
                                     WidthRequest="40" HeightRequest="40"
-                                    StrokeThickness="0" StrokeShape="RoundRectangle 20"
+                                     StrokeThickness="0" StrokeShape="RoundRectangle 20"
                                     BackgroundColor="#80000000">
-                                <ImageButton Source="icon_eye.png"
+                                <ImageButton Source="icon_eye_white.png"
                                              Command="{Binding ToggleTorchCommand}"
                                              BackgroundColor="Transparent"
                                              Padding="8"
@@ -134,7 +134,7 @@
                             <!-- Camera Permission Hint if not granted -->
                             <VerticalStackLayout IsVisible="{Binding IsCameraPermissionGranted, Converter={StaticResource InverseBoolConverter}}"
                                                  Spacing="10" HorizontalOptions="Center" VerticalOptions="Center" Padding="20">
-                                <Image Source="icon_search.png" WidthRequest="36" HeightRequest="36" />
+                                <Image Source="icon_search_white.png" WidthRequest="36" HeightRequest="36" />
                                 <Label Text="Нажмите «Сканировать» для включения камеры"
                                        TextColor="#EDEFFB"
                                        FontSize="13"

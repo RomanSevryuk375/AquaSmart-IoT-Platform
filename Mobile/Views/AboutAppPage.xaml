@@ -4,7 +4,7 @@
              xmlns:vm="clr-namespace:Mobile.ViewModels"
              x:Class="Mobile.Views.AboutAppPage"
              x:DataType="vm:AboutAppViewModel"
-             BackgroundColor="#F6F7FC"
+             BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#161824'}"
              Shell.NavBarIsVisible="False"
              Title="О приложении">
 
@@ -14,10 +14,10 @@
             <Border Grid.Column="0"
                     WidthRequest="38" HeightRequest="38"
                     StrokeShape="RoundRectangle 10"
-                    BackgroundColor="#FFFFFF"
+                    BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                     StrokeThickness="1"
-                    Stroke="#E4E7F4">
-                <ImageButton Source="icon_chevron_left.png"
+                    Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2E3346'}">
+                <ImageButton Source="{AppThemeBinding Light='icon_chevron_left.png', Dark='icon_chevron_left_white.png'}"
                              Command="{Binding GoBackCommand}"
                              BackgroundColor="Transparent"
                              WidthRequest="20" HeightRequest="20"
@@ -27,7 +27,7 @@
 
             <Label Grid.Column="1"
                    Text="О приложении"
-                   TextColor="#141414"
+                   TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
                    FontFamily="OpenSansSemibold"
                    FontSize="18"
                    FontAttributes="Bold"
@@ -36,10 +36,10 @@
             <Border Grid.Column="2"
                     WidthRequest="38" HeightRequest="38"
                     StrokeShape="RoundRectangle 10"
-                    BackgroundColor="#FFFFFF"
+                    BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                     StrokeThickness="1"
-                    Stroke="#E4E7F4">
-                <ImageButton Source="icon_bell.png"
+                    Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2E3346'}">
+                <ImageButton Source="{AppThemeBinding Light='icon_bell.png', Dark='icon_bell_white.png'}"
                              Command="{Binding OpenNotificationsCommand}"
                              BackgroundColor="Transparent"
                              WidthRequest="18" HeightRequest="18"
@@ -63,19 +63,19 @@
                 <!-- 1. Информация о приложении -->
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Информация о приложении"
-                           TextColor="#141414"
+                           TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
                            FontFamily="OpenSansSemibold"
                            FontSize="16"
                            FontAttributes="Bold" />
 
                     <Border StrokeThickness="1"
-                            Stroke="#E8EAF5"
+                            Stroke="{AppThemeBinding Light='#E8EAF5', Dark='#2E3346'}"
                             StrokeShape="RoundRectangle 16"
-                            BackgroundColor="#FFFFFF"
+                            BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                             Padding="16,14">
                         <VerticalStackLayout Spacing="2">
-                            <Label Text="SmartAqua" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
-                            <Label Text="Версия 1.0.0" TextColor="#6E6E6E" FontSize="13" />
+                            <Label Text="SmartAqua" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontFamily="OpenSansSemibold" FontSize="15" />
+                            <Label Text="Версия 1.0.0" TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#A0A4B8'}" FontSize="13" />
                         </VerticalStackLayout>
                     </Border>
                 </VerticalStackLayout>
@@ -83,15 +83,15 @@
                 <!-- 2. Документы -->
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Документы"
-                           TextColor="#141414"
+                           TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
                            FontFamily="OpenSansSemibold"
                            FontSize="16"
                            FontAttributes="Bold" />
 
                     <Border StrokeThickness="1"
-                            Stroke="#E8EAF5"
+                            Stroke="{AppThemeBinding Light='#E8EAF5', Dark='#2E3346'}"
                             StrokeShape="RoundRectangle 16"
-                            BackgroundColor="#FFFFFF"
+                            BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                             Padding="16,6">
                         <VerticalStackLayout Spacing="0">
                             <!-- Пользовательское соглашение -->
@@ -99,30 +99,30 @@
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding OpenTermsCommand}" />
                                 </Grid.GestureRecognizers>
-                                <Label Text="Пользовательское соглашение" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
-                                <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                                <Label Text="Пользовательское соглашение" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                                <Image Grid.Column="1" Source="{AppThemeBinding Light='icon_chevron_right.png', Dark='icon_chevron_right_white.png'}" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                             </Grid>
 
-                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+                            <BoxView HeightRequest="1" Color="{AppThemeBinding Light='#F0F2F9', Dark='#2E3346'}" />
 
                             <!-- Политика конфиденциальности -->
                             <Grid ColumnDefinitions="*,Auto" HeightRequest="52">
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding OpenPrivacyCommand}" />
                                 </Grid.GestureRecognizers>
-                                <Label Text="Политика конфиденциальности" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
-                                <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                                <Label Text="Политика конфиденциальности" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                                <Image Grid.Column="1" Source="{AppThemeBinding Light='icon_chevron_right.png', Dark='icon_chevron_right_white.png'}" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                             </Grid>
 
-                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+                            <BoxView HeightRequest="1" Color="{AppThemeBinding Light='#F0F2F9', Dark='#2E3346'}" />
 
                             <!-- Лицензии -->
                             <Grid ColumnDefinitions="*,Auto" HeightRequest="52">
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding OpenLicensesCommand}" />
                                 </Grid.GestureRecognizers>
-                                <Label Text="Лицензии (Open Source)" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
-                                <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                                <Label Text="Лицензии (Open Source)" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                                <Image Grid.Column="1" Source="{AppThemeBinding Light='icon_chevron_right.png', Dark='icon_chevron_right_white.png'}" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                             </Grid>
                         </VerticalStackLayout>
                     </Border>
@@ -131,15 +131,15 @@
                 <!-- 3. Мы в сети -->
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Мы в сети"
-                           TextColor="#141414"
+                           TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
                            FontFamily="OpenSansSemibold"
                            FontSize="16"
                            FontAttributes="Bold" />
 
                     <Border StrokeThickness="1"
-                            Stroke="#E8EAF5"
+                            Stroke="{AppThemeBinding Light='#E8EAF5', Dark='#2E3346'}"
                             StrokeShape="RoundRectangle 16"
-                            BackgroundColor="#FFFFFF"
+                            BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                             Padding="16,6">
                         <VerticalStackLayout Spacing="0">
                             <!-- Официальный сайт -->
@@ -147,19 +147,19 @@
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding OpenWebsiteCommand}" />
                                 </Grid.GestureRecognizers>
-                                <Label Text="Официальный сайт" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
-                                <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                                <Label Text="Официальный сайт" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                                <Image Grid.Column="1" Source="{AppThemeBinding Light='icon_chevron_right.png', Dark='icon_chevron_right_white.png'}" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                             </Grid>
 
-                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+                            <BoxView HeightRequest="1" Color="{AppThemeBinding Light='#F0F2F9', Dark='#2E3346'}" />
 
                             <!-- Оценить приложение -->
                             <Grid ColumnDefinitions="*,Auto" HeightRequest="52">
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding RateAppCommand}" />
                                 </Grid.GestureRecognizers>
-                                <Label Text="Оценить приложение" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
-                                <Image Grid.Column="1" Source="icon_chevron_right.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                                <Label Text="Оценить приложение" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontFamily="OpenSansSemibold" FontSize="15" VerticalOptions="Center" />
+                                <Image Grid.Column="1" Source="{AppThemeBinding Light='icon_chevron_right.png', Dark='icon_chevron_right_white.png'}" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                             </Grid>
                         </VerticalStackLayout>
                     </Border>

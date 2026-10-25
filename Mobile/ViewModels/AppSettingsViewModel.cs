@@ -89,12 +89,14 @@ public partial class AppSettingsViewModel : ObservableObject
         try
         {
             if (Application.Current == null) return;
-            Application.Current.UserAppTheme = theme?.ToLowerInvariant() switch
+            var appTheme = theme?.ToLowerInvariant() switch
             {
                 "light" or "светлая" => AppTheme.Light,
                 "dark" or "тёмная" => AppTheme.Dark,
                 _ => AppTheme.Unspecified // Default is OS system theme
             };
+            Application.Current.UserAppTheme = appTheme;
+            Services.PlatformThemeService.ApplySystemBarsTheme(appTheme);
         }
         catch
         {

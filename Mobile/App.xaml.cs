@@ -28,16 +28,26 @@ public partial class App : Application
         try
         {
             var savedTheme = Preferences.Default.Get("setting_theme", "system");
-            UserAppTheme = savedTheme?.ToLowerInvariant() switch
+            var theme = savedTheme?.ToLowerInvariant() switch
             {
                 "dark" or "тёмная" => AppTheme.Dark,
                 "light" or "светлая" => AppTheme.Light,
                 _ => AppTheme.Unspecified // Default is OS system theme!
             };
+            UserAppTheme = theme;
+            Services.PlatformThemeService.ApplySystemBarsTheme(theme);
+
+            RequestedThemeChanged -= OnAppRequestedThemeChanged;
+            RequestedThemeChanged += OnAppRequestedThemeChanged;
         }
         catch
         {
         }
+    }
+
+    private void OnAppRequestedThemeChanged(object? sender, AppThemeChangedEventArgs e)
+    {
+        Services.PlatformThemeService.ApplySystemBarsTheme(UserAppTheme);
     }
 
     protected override void OnSleep()

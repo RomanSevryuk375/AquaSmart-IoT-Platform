@@ -5,7 +5,7 @@
              xmlns:controls="clr-namespace:Mobile.Views.Controls"
              x:Class="Mobile.Views.AddSensorPage"
              x:DataType="vm:AddSensorViewModel"
-             BackgroundColor="#FFFFFF"
+             BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#12131A'}"
              Shell.NavBarIsVisible="False"
              Title="Добавление датчика">
 
@@ -17,10 +17,10 @@
                 <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,10">
                     <Border WidthRequest="36" HeightRequest="36"
                             StrokeShape="RoundRectangle 10"
-                            BackgroundColor="#F6F7FC"
+                            BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
                             StrokeThickness="0"
                             VerticalOptions="Center">
-                        <ImageButton Source="icon_arrow_left.png"
+                        <ImageButton Source="{AppThemeBinding Light='icon_arrow_left.png', Dark='icon_arrow_left_white.png'}"
                                      Command="{Binding PromptCancelCommand}"
                                      BackgroundColor="Transparent"
                                      WidthRequest="20" HeightRequest="20"
@@ -30,7 +30,7 @@
 
                     <Label Grid.Column="1"
                            Text="Добавление датчика"
-                           TextColor="#141414"
+                           TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
                            FontFamily="OpenSansSemibold"
                            FontSize="18"
                            FontAttributes="Bold"
@@ -40,10 +40,10 @@
                     <Border Grid.Column="2"
                             WidthRequest="36" HeightRequest="36"
                             StrokeShape="RoundRectangle 10"
-                            BackgroundColor="#F6F7FC"
+                            BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
                             StrokeThickness="0"
                             VerticalOptions="Center">
-                        <ImageButton Source="icon_close.png"
+                        <ImageButton Source="{AppThemeBinding Light='icon_close.png', Dark='icon_close_white.png'}"
                                      Command="{Binding PromptCancelCommand}"
                                      BackgroundColor="Transparent"
                                      WidthRequest="18" HeightRequest="18"

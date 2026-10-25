@@ -31,7 +31,7 @@
                         BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
                         StrokeThickness="1"
                         Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}">
-                    <ImageButton Source="icon_plus.png"
+                    <ImageButton Source="{AppThemeBinding Light='icon_plus.png', Dark='icon_plus_white.png'}"
                                  Command="{Binding AddAquariumCommand}"
                                  BackgroundColor="Transparent"
                                  WidthRequest="20" HeightRequest="20"
@@ -46,7 +46,7 @@
                         BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
                         StrokeThickness="1"
                         Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}">
-                    <ImageButton Source="icon_bell.png"
+                    <ImageButton Source="{AppThemeBinding Light='icon_bell.png', Dark='icon_bell_white.png'}"
                                  Command="{Binding OpenNotificationsCommand}"
                                  BackgroundColor="Transparent"
                                  WidthRequest="20" HeightRequest="20"

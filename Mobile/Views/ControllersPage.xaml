@@ -6,7 +6,7 @@
              xmlns:controls="clr-namespace:Mobile.Views.Controls"
              x:Class="Mobile.Views.ControllersPage"
              x:DataType="vm:ControllersViewModel"
-             BackgroundColor="#FFFFFF"
+             BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#12131A'}"
              Shell.NavBarIsVisible="False"
              Title="Мои контроллеры">
 
@@ -16,10 +16,10 @@
             <Border Grid.Column="0"
                     WidthRequest="38" HeightRequest="38"
                     StrokeShape="RoundRectangle 10"
-                    BackgroundColor="#F6F7FC"
+                    BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
                     StrokeThickness="0"
                     VerticalOptions="Center">
-                <ImageButton Source="icon_arrow_left.png"
+                <ImageButton Source="{AppThemeBinding Light='icon_arrow_left.png', Dark='icon_arrow_left_white.png'}"
                              Command="{Binding GoBackCommand}"
                              BackgroundColor="Transparent"
                              WidthRequest="20" HeightRequest="20"
@@ -29,7 +29,7 @@
 
             <Label Grid.Column="1"
                    Text="Мои контроллеры"
-                   TextColor="#141414"
+                   TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
                    FontFamily="OpenSansSemibold"
                    FontSize="18"
                    FontAttributes="Bold"
@@ -40,10 +40,10 @@
             <Border Grid.Column="2"
                     WidthRequest="38" HeightRequest="38"
                     StrokeShape="RoundRectangle 10"
-                    BackgroundColor="#F6F7FC"
+                    BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
                     StrokeThickness="0"
                     VerticalOptions="Center">
-                <ImageButton Source="icon_plus.png"
+                <ImageButton Source="{AppThemeBinding Light='icon_plus.png', Dark='icon_plus_white.png'}"
                              Command="{Binding AddControllerCommand}"
                              BackgroundColor="Transparent"
                              WidthRequest="18" HeightRequest="18"
@@ -55,10 +55,10 @@
             <Border Grid.Column="3"
                     WidthRequest="38" HeightRequest="38"
                     StrokeShape="RoundRectangle 10"
-                    BackgroundColor="#F6F7FC"
+                    BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
                     StrokeThickness="0"
                     VerticalOptions="Center">
-                <ImageButton Source="icon_bell.png"
+                <ImageButton Source="{AppThemeBinding Light='icon_bell.png', Dark='icon_bell_white.png'}"
                              Command="{Binding OpenNotificationsCommand}"
                              BackgroundColor="Transparent"
                              WidthRequest="18" HeightRequest="18"
@@ -79,13 +79,13 @@
                     <!-- Titles -->
                     <VerticalStackLayout Spacing="8">
                         <Label Text="Добавьте первый контроллер"
-                               TextColor="#141414"
+                               TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
                                FontFamily="OpenSansSemibold"
                                FontSize="20"
                                FontAttributes="Bold"
                                HorizontalTextAlignment="Center" />
                         <Label Text="Контроллер соединяет приложение с вашей ёмкостью — сканируйте QR-код на устройстве, чтобы начать"
-                               TextColor="#6E6E6E"
+                               TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#A0A4B8'}"
                                FontSize="14"
                                LineHeight="1.3"
                                HorizontalTextAlignment="Center" />
@@ -104,10 +104,10 @@
 
                         <Button Text="Изучить базу знаний"
                                 Command="{Binding OpenKnowledgeBaseCommand}"
-                                BackgroundColor="#FFFFFF"
-                                BorderColor="#E4E7F4"
+                                BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
+                                BorderColor="{AppThemeBinding Light='#E4E7F4', Dark='#2E3346'}"
                                 BorderWidth="1"
-                                TextColor="#4152B0"
+                                TextColor="{AppThemeBinding Light='#4152B0', Dark='#738AFF'}"
                                 CornerRadius="14"
                                 HeightRequest="52"
                                 FontFamily="OpenSansSemibold"
@@ -122,9 +122,9 @@
                     <BindableLayout.ItemTemplate>
                         <DataTemplate x:DataType="models:ControllerModel">
                             <Border StrokeThickness="1"
-                                    Stroke="#E4E7F4"
+                                    Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2E3346'}"
                                     StrokeShape="RoundRectangle 16"
-                                    BackgroundColor="#FFFFFF"
+                                    BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
                                     Padding="16,14">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ControllersViewModel}}, Path=SelectControllerCommand}"
@@ -136,7 +136,7 @@
                                     <Border Grid.Column="0"
                                             WidthRequest="40" HeightRequest="40"
                                             StrokeShape="RoundRectangle 20"
-                                            BackgroundColor="#F6F7FC"
+                                            BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#161824'}"
                                             StrokeThickness="0"
                                             VerticalOptions="Center">
                                         <Label Text="⚙" FontSize="18" TextColor="#4152B0" HorizontalOptions="Center" VerticalOptions="Center" />
@@ -145,12 +145,12 @@
                                     <!-- Controller Info -->
                                     <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                                         <Label Text="{Binding Name}"
-                                               TextColor="#141414"
+                                               TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
                                                FontFamily="OpenSansSemibold"
                                                FontSize="15"
                                                FontAttributes="Bold" />
                                         <Label Text="{Binding MacAddress}"
-                                               TextColor="#8C93A8"
+                                               TextColor="{AppThemeBinding Light='#8C93A8', Dark='#73778F'}"
                                                FontSize="12" />
                                     </VerticalStackLayout>
 
