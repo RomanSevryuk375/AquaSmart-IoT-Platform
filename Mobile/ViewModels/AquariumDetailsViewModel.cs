@@ -14,6 +14,7 @@ public partial class AquariumDetailsViewModel : ObservableObject
 {
     private readonly IAquariumService _aquariumService;
     private readonly ITelemetryHubService _telemetryHubService;
+    private readonly ISecurityService _securityService;
     private Guid? _currentSubscribedId;
 
     [ObservableProperty]
@@ -76,10 +77,14 @@ public partial class AquariumDetailsViewModel : ObservableObject
     [ObservableProperty]
     private bool _isLiveTelemetryActive = true;
 
-    public AquariumDetailsViewModel(IAquariumService aquariumService, ITelemetryHubService telemetryHubService)
+    public AquariumDetailsViewModel(
+        IAquariumService aquariumService,
+        ITelemetryHubService telemetryHubService,
+        ISecurityService securityService)
     {
         _aquariumService = aquariumService;
         _telemetryHubService = telemetryHubService;
+        _securityService = securityService;
         _telemetryHubService.RawTelemetryReceived += OnRawTelemetryReceived;
     }
 
@@ -380,6 +385,9 @@ public partial class AquariumDetailsViewModel : ObservableObject
     [RelayCommand]
     private async Task ToggleRelayAsync(RelayModel relay)
     {
+        var authorized = await _securityService.CheckRelayPinAsync(relay.Name);
+        if (!authorized) return;
+
         await _aquariumService.ToggleRelayAsync(relay.Id);
         relay.IsOn = !relay.IsOn;
         var idx = Relays.IndexOf(relay);

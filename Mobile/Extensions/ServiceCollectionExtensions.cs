@@ -35,6 +35,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IKnowledgeService, KnowledgeService>();
         services.AddSingleton<IControllerService, ControllerService>();
         services.AddSingleton<ITelemetryHubService, TelemetryHubService>();
+        services.AddSingleton<ISecurityService, SecurityService>();
 
         return services;
     }

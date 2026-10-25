@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mobile.Services.Interfaces;
 using Mobile.Views;
 
 namespace Mobile.ViewModels;
@@ -9,6 +10,7 @@ public partial class DashboardViewModel : ObservableObject
 {
     private readonly IAquariumService _aquariumService;
     private readonly IIdentityService _identityService;
+    private readonly ISecurityService _securityService;
 
     [ObservableProperty]
     private string _greeting = "Добро пожаловать!";
@@ -54,10 +56,14 @@ public partial class DashboardViewModel : ObservableObject
     [ObservableProperty]
     private bool _isBusy;
 
-    public DashboardViewModel(IAquariumService aquariumService, IIdentityService identityService)
+    public DashboardViewModel(
+        IAquariumService aquariumService,
+        IIdentityService identityService,
+        ISecurityService securityService)
     {
         _aquariumService = aquariumService;
         _identityService = identityService;
+        _securityService = securityService;
     }
 
     public async Task InitializeAsync()
@@ -159,6 +165,9 @@ public partial class DashboardViewModel : ObservableObject
     [RelayCommand]
     private async Task ToggleRelayAsync(RelayModel relay)
     {
+        var authorized = await _securityService.CheckRelayPinAsync(relay.Name);
+        if (!authorized) return;
+
         await _aquariumService.ToggleRelayAsync(relay.Id);
         relay.IsOn = !relay.IsOn;
         var idx = QuickRelays.IndexOf(relay);

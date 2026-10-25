@@ -1,11 +1,13 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mobile.Services.Interfaces;
 
 namespace Mobile.ViewModels;
 
 public partial class LoginViewModel : ObservableObject
 {
     private readonly IAuthService _authService;
+    private readonly ISecurityService _securityService;
 
     [ObservableProperty]
     private string _emailOrLogin = string.Empty;
@@ -23,6 +25,9 @@ public partial class LoginViewModel : ObservableObject
     private bool _isBusy;
 
     [ObservableProperty]
+    private bool _canUseBiometrics;
+
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasEmailOrLoginError))]
     private string? _emailOrLoginError;
     public bool HasEmailOrLoginError => !string.IsNullOrEmpty(EmailOrLoginError);
@@ -37,9 +42,27 @@ public partial class LoginViewModel : ObservableObject
     private string? _errorMessage;
     public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 
-    public LoginViewModel(IAuthService authService)
+    public LoginViewModel(IAuthService authService, ISecurityService securityService)
     {
         _authService = authService;
+        _securityService = securityService;
+        _ = CheckBiometricsAsync();
+    }
+
+    private async Task CheckBiometricsAsync()
+    {
+        CanUseBiometrics = await _securityService.CanUseBiometricsOrPinAsync();
+    }
+
+    [RelayCommand]
+    private async Task BiometricLoginAsync()
+    {
+        if (IsBusy) return;
+        var success = await _securityService.AuthenticateBiometricOrPinAsync();
+        if (success)
+        {
+            await Shell.Current.GoToAsync("//DashboardPage");
+        }
     }
 
     partial void OnEmailOrLoginChanged(string value)
