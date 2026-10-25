@@ -149,6 +149,48 @@ public partial class DashboardViewModel : ObservableObject
 
         OnPropertyChanged(nameof(HasRecentEvents));
         IsBusy = false;
+        StartAutoRefreshTimer();
+    }
+
+    private IDispatcherTimer? _autoRefreshTimer;
+
+    private void StartAutoRefreshTimer()
+    {
+        _autoRefreshTimer?.Stop();
+        var interval = AppSettingsViewModel.GetUiRefreshInterval();
+        _autoRefreshTimer = Application.Current?.Dispatcher?.CreateTimer();
+        if (_autoRefreshTimer != null)
+        {
+            _autoRefreshTimer.Interval = interval;
+            _autoRefreshTimer.Tick += async (_, _) =>
+            {
+                if (SelectedAquarium != null && !IsBusy)
+                {
+                    await QuietRefreshAsync(SelectedAquarium.Id);
+                }
+            };
+            _autoRefreshTimer.Start();
+        }
+    }
+
+    private async Task QuietRefreshAsync(Guid aquariumId)
+    {
+        try
+        {
+            var sensors = await _aquariumService.GetSensorsAsync(aquariumId);
+            foreach (var s in sensors)
+            {
+                var existing = ActiveSensors.FirstOrDefault(x => x.Id == s.Id);
+                if (existing != null)
+                {
+                    existing.Value = s.Value;
+                    existing.LastUpdated = s.LastUpdated;
+                }
+            }
+        }
+        catch
+        {
+        }
     }
 
     private async Task LoadAquariumDetailsAsync(Guid aquariumId)

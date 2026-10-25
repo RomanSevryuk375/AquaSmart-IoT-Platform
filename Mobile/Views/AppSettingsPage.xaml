@@ -216,6 +216,27 @@
                                         OnColor="#4152B0"
                                         VerticalOptions="Center" />
                             </Grid>
+
+                            <BoxView HeightRequest="1" Color="#F0F2F9" />
+
+                            <!-- Локальный кэш и очистка -->
+                            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10" HeightRequest="56">
+                                <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                                    <Label Text="Локальный кэш" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" />
+                                    <Label Text="{Binding CacheSize}" TextColor="#6E6E6E" FontSize="13" />
+                                </VerticalStackLayout>
+                                <Button Grid.Column="1"
+                                        Text="Очистить"
+                                        Command="{Binding ClearCacheCommand}"
+                                        BackgroundColor="#FEECEB"
+                                        TextColor="#E53935"
+                                        FontFamily="OpenSansSemibold"
+                                        FontSize="12"
+                                        CornerRadius="8"
+                                        HeightRequest="34"
+                                        Padding="12,0"
+                                        VerticalOptions="Center" />
+                            </Grid>
                         </VerticalStackLayout>
                     </Border>
                 </VerticalStackLayout>

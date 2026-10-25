@@ -41,6 +41,12 @@ public partial class AppSettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool _telegramAlerts = true;
 
+    [ObservableProperty]
+    private string _cacheSize = "0.0 МБ";
+
+    [ObservableProperty]
+    private bool _isClearingCache;
+
     public AppSettingsViewModel(IIdentityService identityService)
     {
         _identityService = identityService;
@@ -57,6 +63,7 @@ public partial class AppSettingsViewModel : ObservableObject
         ScenarioAlerts = Preferences.Default.Get(ScenarioAlertsKey, true);
         TrafficSaving = Preferences.Default.Get(TrafficSavingKey, true);
         TelegramAlerts = Preferences.Default.Get(TelegramAlertsKey, true);
+        CalculateCacheSize();
     }
 
     private static void ApplyTheme(string theme)
@@ -134,6 +141,108 @@ public partial class AppSettingsViewModel : ObservableObject
         {
             RefreshInterval = result;
             Preferences.Default.Set(RefreshIntervalKey, result);
+            await Shell.Current.DisplayAlert("Обновление данных", $"Периодичность автообновления установлена на {result}", "OK");
+        }
+    }
+
+    public static TimeSpan GetUiRefreshInterval()
+    {
+        var str = Preferences.Default.Get(RefreshIntervalKey, "30 сек.");
+        return str switch
+        {
+            "10 сек." => TimeSpan.FromSeconds(10),
+            "30 сек." => TimeSpan.FromSeconds(30),
+            "60 сек." => TimeSpan.FromSeconds(60),
+            "2 мин." => TimeSpan.FromMinutes(2),
+            _ => TimeSpan.FromSeconds(30)
+        };
+    }
+
+    public void CalculateCacheSize()
+    {
+        long totalBytes = 0;
+        try
+        {
+            var cacheDir = FileSystem.CacheDirectory;
+            if (Directory.Exists(cacheDir))
+            {
+                var dirInfo = new DirectoryInfo(cacheDir);
+                foreach (var file in dirInfo.EnumerateFiles("*", SearchOption.AllDirectories))
+                {
+                    totalBytes += file.Length;
+                }
+            }
+
+            var appDataDir = FileSystem.AppDataDirectory;
+            if (Directory.Exists(appDataDir))
+            {
+                var tempDir = Path.Combine(appDataDir, "temp");
+                if (Directory.Exists(tempDir))
+                {
+                    var dirInfo = new DirectoryInfo(tempDir);
+                    foreach (var file in dirInfo.EnumerateFiles("*", SearchOption.AllDirectories))
+                    {
+                        totalBytes += file.Length;
+                    }
+                }
+            }
+        }
+        catch
+        {
+        }
+
+        if (totalBytes < 1024)
+        {
+            CacheSize = $"{totalBytes} Б";
+        }
+        else if (totalBytes < 1024 * 1024)
+        {
+            CacheSize = $"{(totalBytes / 1024.0):F1} КБ";
+        }
+        else
+        {
+            CacheSize = $"{(totalBytes / (1024.0 * 1024.0)):F1} МБ";
+        }
+    }
+
+    [RelayCommand]
+    private async Task ClearCacheAsync()
+    {
+        var confirm = await Shell.Current.DisplayAlert(
+            "Очистка кэша",
+            "Удалить временные файлы, сохранённые миниатюры и кэш ответов сервера?",
+            "Очистить",
+            "Отмена");
+
+        if (!confirm) return;
+
+        IsClearingCache = true;
+        try
+        {
+            var cacheDir = FileSystem.CacheDirectory;
+            if (Directory.Exists(cacheDir))
+            {
+                var dirInfo = new DirectoryInfo(cacheDir);
+                foreach (var file in dirInfo.EnumerateFiles("*", SearchOption.AllDirectories))
+                {
+                    try { file.Delete(); } catch { }
+                }
+                foreach (var subDir in dirInfo.EnumerateDirectories())
+                {
+                    try { subDir.Delete(true); } catch { }
+                }
+            }
+
+            CalculateCacheSize();
+            await Shell.Current.DisplayAlert("Успех", "Локальный кэш приложения успешно очищен.", "OK");
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Ошибка", $"Не удалось очистить кэш: {ex.Message}", "OK");
+        }
+        finally
+        {
+            IsClearingCache = false;
         }
     }
 
