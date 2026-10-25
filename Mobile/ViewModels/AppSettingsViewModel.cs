@@ -7,6 +7,7 @@ namespace Mobile.ViewModels;
 public partial class AppSettingsViewModel : ObservableObject
 {
     private readonly IIdentityService _identityService;
+    private readonly ILocalizationService _localizationService;
 
     private const string ThemeKey = "setting_theme";
     private const string LanguageKey = "setting_language";
@@ -47,16 +48,22 @@ public partial class AppSettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool _isClearingCache;
 
-    public AppSettingsViewModel(IIdentityService identityService)
+    public AppSettingsViewModel(IIdentityService identityService, ILocalizationService localizationService)
     {
         _identityService = identityService;
+        _localizationService = localizationService;
+        _localizationService.LanguageChanged += (s, e) =>
+        {
+            UpdateLocalizedTheme();
+            CalculateCacheSize();
+        };
         LoadSettings();
     }
 
     private void LoadSettings()
     {
-        CurrentTheme = Preferences.Default.Get(ThemeKey, "Системная");
-        CurrentLanguage = Preferences.Default.Get(LanguageKey, "Русский");
+        UpdateLocalizedTheme();
+        CurrentLanguage = _localizationService.CurrentLanguage;
         RefreshInterval = Preferences.Default.Get(RefreshIntervalKey, "30 сек.");
         EmergencyAlerts = Preferences.Default.Get(EmergencyAlertsKey, true);
         ConnectionLossAlerts = Preferences.Default.Get(ConnectionAlertsKey, true);
@@ -66,16 +73,27 @@ public partial class AppSettingsViewModel : ObservableObject
         CalculateCacheSize();
     }
 
+    private void UpdateLocalizedTheme()
+    {
+        var savedTheme = Preferences.Default.Get(ThemeKey, "system");
+        CurrentTheme = savedTheme?.ToLowerInvariant() switch
+        {
+            "light" or "светлая" => _localizationService.GetString("Theme_Light"),
+            "dark" or "тёмная" => _localizationService.GetString("Theme_Dark"),
+            _ => _localizationService.GetString("Theme_System")
+        };
+    }
+
     private static void ApplyTheme(string theme)
     {
         try
         {
             if (Application.Current == null) return;
-            Application.Current.UserAppTheme = theme switch
+            Application.Current.UserAppTheme = theme?.ToLowerInvariant() switch
             {
-                "Светлая" => AppTheme.Light,
-                "Тёмная" => AppTheme.Dark,
-                _ => AppTheme.Unspecified
+                "light" or "светлая" => AppTheme.Light,
+                "dark" or "тёмная" => AppTheme.Dark,
+                _ => AppTheme.Unspecified // Default is OS system theme
             };
         }
         catch
@@ -113,35 +131,68 @@ public partial class AppSettingsViewModel : ObservableObject
     [RelayCommand]
     private async Task ChooseThemeAsync()
     {
-        var result = await Shell.Current.DisplayActionSheet("Тема интерфейса", "Отмена", null, "Светлая", "Тёмная", "Системная");
-        if (!string.IsNullOrWhiteSpace(result) && result != "Отмена")
+        var title = _localizationService.GetString("Settings_Theme");
+        var cancel = _localizationService.GetString("Common_Cancel");
+        var light = _localizationService.GetString("Theme_Light");
+        var dark = _localizationService.GetString("Theme_Dark");
+        var system = _localizationService.GetString("Theme_System");
+
+        var result = await Shell.Current.DisplayActionSheet(title, cancel, null, light, dark, system);
+        if (!string.IsNullOrWhiteSpace(result) && result != cancel && result != "Отмена")
         {
-            CurrentTheme = result;
-            Preferences.Default.Set(ThemeKey, result);
-            MainThread.BeginInvokeOnMainThread(() => ApplyTheme(result));
+            string canonical;
+            if (result == dark || result.Equals("Dark", StringComparison.OrdinalIgnoreCase) || result.Equals("Тёмная", StringComparison.OrdinalIgnoreCase))
+            {
+                canonical = "dark";
+                CurrentTheme = dark;
+            }
+            else if (result == light || result.Equals("Light", StringComparison.OrdinalIgnoreCase) || result.Equals("Светлая", StringComparison.OrdinalIgnoreCase))
+            {
+                canonical = "light";
+                CurrentTheme = light;
+            }
+            else
+            {
+                canonical = "system";
+                CurrentTheme = system;
+            }
+
+            Preferences.Default.Set(ThemeKey, canonical);
+            MainThread.BeginInvokeOnMainThread(() => ApplyTheme(canonical));
         }
     }
 
     [RelayCommand]
     private async Task ChooseLanguageAsync()
     {
-        var result = await Shell.Current.DisplayActionSheet("Язык приложения", "Отмена", null, "Русский", "English");
-        if (!string.IsNullOrWhiteSpace(result) && result != "Отмена")
+        var title = _localizationService.GetString("Settings_Language");
+        var cancel = _localizationService.GetString("Common_Cancel");
+        var result = await Shell.Current.DisplayActionSheet(title, cancel, null, "Русский", "English");
+        if (!string.IsNullOrWhiteSpace(result) && result != cancel && result != "Отмена")
         {
             CurrentLanguage = result;
-            Preferences.Default.Set(LanguageKey, result);
+            _localizationService.SetLanguage(result);
+            UpdateLocalizedTheme();
+            CalculateCacheSize();
         }
     }
 
     [RelayCommand]
     private async Task ChooseRefreshIntervalAsync()
     {
-        var result = await Shell.Current.DisplayActionSheet("Обновление экранов", "Отмена", null, "10 сек.", "30 сек.", "60 сек.", "2 мин.");
-        if (!string.IsNullOrWhiteSpace(result) && result != "Отмена")
+        var cancel = _localizationService.GetString("Common_Cancel");
+        var result = await Shell.Current.DisplayActionSheet(
+            _localizationService.GetString("Settings_RefreshInterval"),
+            cancel,
+            null,
+            "10 сек.", "30 сек.", "60 сек.", "2 мин.");
+        if (!string.IsNullOrWhiteSpace(result) && result != cancel && result != "Отмена")
         {
             RefreshInterval = result;
             Preferences.Default.Set(RefreshIntervalKey, result);
-            await Shell.Current.DisplayAlert("Обновление данных", $"Периодичность автообновления установлена на {result}", "OK");
+            var title = _localizationService.IsEnglish ? "Auto-Refresh" : "Обновление данных";
+            var msg = _localizationService.IsEnglish ? $"Refresh rate set to {result}" : $"Периодичность автообновления установлена на {result}";
+            await Shell.Current.DisplayAlert(title, msg, _localizationService.GetString("Common_Ok"));
         }
     }
 
@@ -191,28 +242,32 @@ public partial class AppSettingsViewModel : ObservableObject
         {
         }
 
+        var isEn = _localizationService.IsEnglish;
         if (totalBytes < 1024)
         {
-            CacheSize = $"{totalBytes} Б";
+            CacheSize = isEn ? $"{totalBytes} B" : $"{totalBytes} Б";
         }
         else if (totalBytes < 1024 * 1024)
         {
-            CacheSize = $"{(totalBytes / 1024.0):F1} КБ";
+            CacheSize = isEn ? $"{(totalBytes / 1024.0):F1} KB" : $"{(totalBytes / 1024.0):F1} КБ";
         }
         else
         {
-            CacheSize = $"{(totalBytes / (1024.0 * 1024.0)):F1} МБ";
+            CacheSize = isEn ? $"{(totalBytes / (1024.0 * 1024.0)):F1} MB" : $"{(totalBytes / (1024.0 * 1024.0)):F1} МБ";
         }
     }
 
     [RelayCommand]
     private async Task ClearCacheAsync()
     {
-        var confirm = await Shell.Current.DisplayAlert(
-            "Очистка кэша",
-            "Удалить временные файлы, сохранённые миниатюры и кэш ответов сервера?",
-            "Очистить",
-            "Отмена");
+        var title = _localizationService.GetString("Settings_LocalCache");
+        var message = _localizationService.IsEnglish
+            ? "Delete temporary files, cached thumbnails and server responses?"
+            : "Удалить временные файлы, сохранённые миниатюры и кэш ответов сервера?";
+        var clearBtn = _localizationService.GetString("Settings_Clear");
+        var cancelBtn = _localizationService.GetString("Common_Cancel");
+
+        var confirm = await Shell.Current.DisplayAlert(title, message, clearBtn, cancelBtn);
 
         if (!confirm) return;
 
@@ -234,11 +289,19 @@ public partial class AppSettingsViewModel : ObservableObject
             }
 
             CalculateCacheSize();
-            await Shell.Current.DisplayAlert("Успех", "Локальный кэш приложения успешно очищен.", "OK");
+            var successTitle = _localizationService.GetString("Common_Success");
+            var successMsg = _localizationService.IsEnglish
+                ? "Local app cache has been successfully cleared."
+                : "Локальный кэш приложения успешно очищен.";
+            await Shell.Current.DisplayAlert(successTitle, successMsg, _localizationService.GetString("Common_Ok"));
         }
         catch (Exception ex)
         {
-            await Shell.Current.DisplayAlert("Ошибка", $"Не удалось очистить кэш: {ex.Message}", "OK");
+            var errorTitle = _localizationService.GetString("Common_Error");
+            var errorMsg = _localizationService.IsEnglish
+                ? $"Failed to clear cache: {ex.Message}"
+                : $"Не удалось очистить кэш: {ex.Message}";
+            await Shell.Current.DisplayAlert(errorTitle, errorMsg, _localizationService.GetString("Common_Ok"));
         }
         finally
         {
