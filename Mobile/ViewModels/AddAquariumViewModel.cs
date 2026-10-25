@@ -299,18 +299,14 @@ public partial class AddAquariumViewModel : ObservableObject
         IsSuccessOpen = false;
         try
         {
-            await Shell.Current.GoToAsync($"../{nameof(AquariumDetailsPage)}?aquariumId={CreatedAquariumId}");
+            await Shell.Current.GoToAsync(nameof(AquariumDetailsPage), new Dictionary<string, object>
+            {
+                ["aquariumId"] = CreatedAquariumId.ToString()
+            });
         }
         catch
         {
-            try
-            {
-                await Shell.Current.GoToAsync($"///{nameof(AquariumDetailsPage)}?aquariumId={CreatedAquariumId}");
-            }
-            catch
-            {
-                await Shell.Current.GoToAsync($"{nameof(AquariumDetailsPage)}?aquariumId={CreatedAquariumId}");
-            }
+            await Shell.Current.GoToAsync($"{nameof(AquariumDetailsPage)}?aquariumId={CreatedAquariumId}");
         }
     }
 

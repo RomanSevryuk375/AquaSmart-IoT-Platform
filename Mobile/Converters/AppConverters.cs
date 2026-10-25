@@ -15,12 +15,26 @@ public class BoolToColorConverter : IValueConverter
             var parts = paramStr.Split('|');
             if (parts.Length == 2)
             {
-                var truePart = Color.FromArgb(parts[0].Trim());
-                var falsePart = Color.FromArgb(parts[1].Trim());
+                var truePart = ParseColor(parts[0].Trim(), TrueColor);
+                var falsePart = ParseColor(parts[1].Trim(), FalseColor);
                 return b ? truePart : falsePart;
             }
         }
         return b ? TrueColor : FalseColor;
+    }
+
+    private static Color ParseColor(string raw, Color fallback)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return fallback;
+        if (raw.Equals("Transparent", StringComparison.OrdinalIgnoreCase)) return Colors.Transparent;
+        try
+        {
+            return Color.FromArgb(raw);
+        }
+        catch
+        {
+            return fallback;
+        }
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

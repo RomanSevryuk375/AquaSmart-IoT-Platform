@@ -7,10 +7,23 @@ using Mobile.Services.Interfaces;
 namespace Mobile.ViewModels;
 
 [QueryProperty(nameof(AquariumIdString), "aquariumId")]
-public partial class EditAquariumViewModel : ObservableObject
+public partial class EditAquariumViewModel : ObservableObject, IQueryAttributable
 {
     private readonly IAquariumService _aquariumService;
     private readonly IControllerService _controllerService;
+
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        if (query.TryGetValue("aquariumId", out var val) && val != null)
+        {
+            var strVal = val.ToString();
+            if (Guid.TryParse(strVal, out var id))
+            {
+                AquariumIdString = strVal;
+                _ = LoadAsync(id);
+            }
+        }
+    }
 
     [ObservableProperty]
     private string? _aquariumIdString;
@@ -306,12 +319,13 @@ public partial class EditAquariumViewModel : ObservableObject
     {
         if (Aquarium == null) return;
 
-        bool confirm = await Shell.Current.DisplayAlert(
-            "Удаление ёмкости",
-            $"Вы уверены, что хотите удалить «{Aquarium.Name}»? Это действие нельзя отменить.",
-            "Удалить",
-            "Отмена");
+        var loc = Services.LocalizationService.Instance;
+        var title = loc.GetString("EditTank_DeleteConfirmTitle");
+        var msg = string.Format(loc.GetString("EditTank_DeleteConfirmMsg"), Aquarium.Name);
+        var deleteText = loc.GetString("Common_Delete");
+        var cancelText = loc.GetString("Common_Cancel");
 
+        bool confirm = await Shell.Current.DisplayAlert(title, msg, deleteText, cancelText);
         if (!confirm) return;
 
         IsBusy = true;

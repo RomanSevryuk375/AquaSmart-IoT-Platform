@@ -432,7 +432,10 @@ public partial class AquariumDetailsViewModel : ObservableObject
     {
         if (Aquarium != null)
         {
-            await Shell.Current.GoToAsync($"{nameof(EditAquariumPage)}?aquariumId={Aquarium.Id}");
+            await Shell.Current.GoToAsync(nameof(EditAquariumPage), new Dictionary<string, object>
+            {
+                ["aquariumId"] = Aquarium.Id.ToString()
+            });
         }
     }
 

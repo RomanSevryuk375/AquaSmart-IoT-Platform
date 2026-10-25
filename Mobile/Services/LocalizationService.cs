@@ -183,7 +183,27 @@ public class LocalizationService : ILocalizationService
         ["Tank_AddFirstScenario"] = "Добавьте первый сценарий",
         ["Tank_FirstScenarioDesc"] = "Свяжите датчики и реле между собой, чтобы система сама управляла приборами по расписанию или при изменении показателей",
         ["Tank_JournalEmpty"] = "Журнал пуст",
-        ["Tank_JournalEmptyDesc"] = "Фиксируйте регулярное обслуживание: подмены воды, чистку фильтров и замеры параметров, чтобы следить за здоровьем экосистемы."
+        ["Tank_JournalEmptyDesc"] = "Фиксируйте регулярное обслуживание: подмены воды, чистку фильтров и замеры параметров, чтобы следить за здоровьем экосистемы.",
+
+        // Edit Tank
+        ["EditTank_Title"] = "Редактирование ёмкости",
+        ["EditTank_Name"] = "Название ёмкости *",
+        ["EditTank_NamePlaceholder"] = "Например, Мой аквариум",
+        ["EditTank_Volume"] = "Объём (литров) *",
+        ["EditTank_VolumePlaceholder"] = "30",
+        ["EditTank_Type"] = "Тип ёмкости",
+        ["EditTank_Aquarium"] = "Аквариум",
+        ["EditTank_Terrarium"] = "Террариум",
+        ["EditTank_Growbox"] = "Гроубокс",
+        ["EditTank_Florarium"] = "Флорариум",
+        ["EditTank_Formicarium"] = "Формикарий",
+        ["EditTank_Theme"] = "Цветовая тема карточки",
+        ["EditTank_Controller"] = "Привязанный контроллер",
+        ["EditTank_SelectController"] = "Выберите контроллер",
+        ["EditTank_SaveChanges"] = "Сохранить изменения",
+        ["EditTank_DeleteTank"] = "Удалить ёмкость",
+        ["EditTank_DeleteConfirmTitle"] = "Удаление ёмкости",
+        ["EditTank_DeleteConfirmMsg"] = "Вы уверены, что хотите удалить «{0}»? Это действие нельзя отменить."
     };
 
     private static readonly Dictionary<string, string> EnglishDictionary = new(StringComparer.OrdinalIgnoreCase)
@@ -307,6 +327,26 @@ public class LocalizationService : ILocalizationService
         ["Tank_AddFirstScenario"] = "Add first scenario",
         ["Tank_FirstScenarioDesc"] = "Link sensors and relays together so the system automatically triggers devices on schedule or thresholds",
         ["Tank_JournalEmpty"] = "Logbook is empty",
-        ["Tank_JournalEmptyDesc"] = "Log regular maintenance: water changes, filter cleaning, and chemical tests to keep your ecosystem healthy."
+        ["Tank_JournalEmptyDesc"] = "Log regular maintenance: water changes, filter cleaning, and chemical tests to keep your ecosystem healthy.",
+
+        // Edit Tank
+        ["EditTank_Title"] = "Edit Tank",
+        ["EditTank_Name"] = "Tank name *",
+        ["EditTank_NamePlaceholder"] = "e.g., My Aquarium",
+        ["EditTank_Volume"] = "Volume (liters) *",
+        ["EditTank_VolumePlaceholder"] = "30",
+        ["EditTank_Type"] = "Tank type",
+        ["EditTank_Aquarium"] = "Aquarium",
+        ["EditTank_Terrarium"] = "Terrarium",
+        ["EditTank_Growbox"] = "Growbox",
+        ["EditTank_Florarium"] = "Florarium",
+        ["EditTank_Formicarium"] = "Formicarium",
+        ["EditTank_Theme"] = "Card color theme",
+        ["EditTank_Controller"] = "Assigned controller",
+        ["EditTank_SelectController"] = "Select controller",
+        ["EditTank_SaveChanges"] = "Save changes",
+        ["EditTank_DeleteTank"] = "Delete tank",
+        ["EditTank_DeleteConfirmTitle"] = "Delete Tank",
+        ["EditTank_DeleteConfirmMsg"] = "Are you sure you want to delete \"{0}\"? This action cannot be undone."
     };
 }
