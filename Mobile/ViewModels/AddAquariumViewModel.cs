@@ -152,6 +152,11 @@ public partial class AddAquariumViewModel : ObservableObject
         SelectedTankType = typeIndex;
         OnPropertyChanged(nameof(TankTypeName));
         OnPropertyChanged(nameof(TankTypeIcon));
+
+        if (string.IsNullOrWhiteSpace(Name) || Name.StartsWith("Мой первый", StringComparison.OrdinalIgnoreCase))
+        {
+            Name = $"Мой первый {TankTypeName.ToLowerInvariant()}";
+        }
     }
 
     [RelayCommand]
@@ -273,9 +278,11 @@ public partial class AddAquariumViewModel : ObservableObject
 
         var model = new AquariumModel
         {
-            Name = string.IsNullOrWhiteSpace(Name) ? "Мой первый аквариум" : Name.Trim(),
+            Name = string.IsNullOrWhiteSpace(Name) ? $"Мой первый {TankTypeName.ToLowerInvariant()}" : Name.Trim(),
             VolumeLiters = Volume,
             WaterType = SelectedTankType == 1 ? WaterType.Marine : WaterType.Freshwater,
+            TankTypeSubtitle = TankTypeName,
+            Icon = TankTypeIcon,
             SpeciesInfo = $"{TankTypeName} • {Volume}л • {SelectedControllerName}",
             ControllerName = SelectedControllerName,
             CardThemeColor = PreviewThemeColor,

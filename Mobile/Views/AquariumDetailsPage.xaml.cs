@@ -18,6 +18,10 @@ public partial class AquariumDetailsPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        if (Guid.TryParse(_viewModel.AquariumIdString, out var id))
+        {
+            await _viewModel.LoadAsync(id);
+        }
         await Task.WhenAll(
             HeaderCard.FadeInUpAsync(300, 15),
             ContentScroll.FadeInUpAsync(350, 20)

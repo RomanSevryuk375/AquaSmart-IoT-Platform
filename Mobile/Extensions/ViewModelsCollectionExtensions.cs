@@ -39,6 +39,7 @@ public static class ViewModelsCollectionExtensions
         services.AddTransient<DeleteAccountViewModel>();
         services.AddTransient<ArticleDetailsViewModel>();
         services.AddTransient<NotificationsViewModel>();
+        services.AddTransient<EditAquariumViewModel>();
 
         return services;
     }

@@ -35,7 +35,7 @@ public class AquariumModel
     public string CardThemeColor { get; set; } = "#F0F4FF";
     public string CardBorderColor { get; set; } = "#DCE4F7";
     public bool IsOnline { get; set; }
-    public string StatusSummary { get; set; } = "• Не привязан";
+    public string StatusSummary { get; set; } = "Не привязан";
     public string StatusDotColor { get; set; } = "#8C93A8";
     public string TemperatureDisplay { get; set; } = "-- °C";
     public string TankTypeSubtitle { get; set; } = "Ёмкость";

@@ -64,6 +64,24 @@ public partial class AquariumDetailsViewModel : ObservableObject
     {
         IsBusy = true;
         Aquarium = await _aquariumService.GetAquariumByIdAsync(id);
+        if (Aquarium != null)
+        {
+            if (string.IsNullOrWhiteSpace(Aquarium.TankTypeSubtitle) || Aquarium.TankTypeSubtitle == "Ёмкость")
+            {
+                if (Aquarium.SpeciesInfo.Contains("Террариум", StringComparison.OrdinalIgnoreCase)) Aquarium.TankTypeSubtitle = "Террариум";
+                else if (Aquarium.SpeciesInfo.Contains("Палюдариум", StringComparison.OrdinalIgnoreCase)) Aquarium.TankTypeSubtitle = "Палюдариум";
+                else if (Aquarium.SpeciesInfo.Contains("Гроубокс", StringComparison.OrdinalIgnoreCase)) Aquarium.TankTypeSubtitle = "Гроубокс";
+                else if (Aquarium.SpeciesInfo.Contains("Флорариум", StringComparison.OrdinalIgnoreCase)) Aquarium.TankTypeSubtitle = "Флорариум";
+                else if (Aquarium.SpeciesInfo.Contains("Формикарий", StringComparison.OrdinalIgnoreCase)) Aquarium.TankTypeSubtitle = "Формикарий";
+                else Aquarium.TankTypeSubtitle = "Аквариум";
+            }
+
+            if (Aquarium.Name.Equals("Мой первый аквариум", StringComparison.OrdinalIgnoreCase) &&
+                Aquarium.TankTypeSubtitle != "Аквариум")
+            {
+                Aquarium.Name = $"Мой первый {Aquarium.TankTypeSubtitle.ToLowerInvariant()}";
+            }
+        }
 
         var sList = await _aquariumService.GetSensorsAsync(id);
         Sensors.Clear();
@@ -136,6 +154,15 @@ public partial class AquariumDetailsViewModel : ObservableObject
     private async Task GoBackAsync()
     {
         await Shell.Current.GoToAsync("..");
+    }
+
+    [RelayCommand]
+    private async Task EditAsync()
+    {
+        if (Aquarium != null)
+        {
+            await Shell.Current.GoToAsync($"{nameof(EditAquariumPage)}?aquariumId={Aquarium.Id}");
+        }
     }
 
     [RelayCommand]

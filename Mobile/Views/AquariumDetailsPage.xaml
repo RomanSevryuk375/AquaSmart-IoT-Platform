@@ -12,7 +12,7 @@
 
     <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="20,24,20,20">
         <!-- Top Navigation Bar: Back Arrow, Tank Title & Actions (Figma: Емкость) -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12" Margin="0,4,0,14">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8" Margin="0,4,0,14">
             <!-- Back button -->
             <Border WidthRequest="36" HeightRequest="36"
                     StrokeShape="RoundRectangle 10"
@@ -29,18 +29,22 @@
 
             <!-- Title & Subtitle -->
             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
-                <HorizontalStackLayout Spacing="6">
-                    <BoxView WidthRequest="8" HeightRequest="8" CornerRadius="4" Color="#4CAF50" VerticalOptions="Center" />
-                    <Label Text="{Binding Aquarium.Name, FallbackValue='Ёмкость'}"
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="6" VerticalOptions="Center">
+                    <BoxView Grid.Column="0" WidthRequest="8" HeightRequest="8" CornerRadius="4" Color="#4CAF50" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="{Binding Aquarium.Name, FallbackValue='Ёмкость'}"
                            TextColor="#141414"
                            FontFamily="OpenSansSemibold"
-                           FontSize="18"
+                           FontSize="16"
                            FontAttributes="Bold"
+                           LineBreakMode="TailTruncation"
                            VerticalOptions="Center" />
-                </HorizontalStackLayout>
+                </Grid>
                 <Label Text="{Binding Aquarium.TankTypeSubtitle}"
                        TextColor="#8C93A8"
-                       FontSize="12" />
+                       FontSize="12"
+                       LineBreakMode="TailTruncation"
+                       Margin="14,0,0,0" />
             </VerticalStackLayout>
 
             <!-- Edit Button -->
@@ -51,6 +55,7 @@
                     StrokeThickness="0"
                     VerticalOptions="Center">
                 <ImageButton Source="icon_edit.png"
+                             Command="{Binding EditCommand}"
                              BackgroundColor="Transparent"
                              WidthRequest="18" HeightRequest="18"
                              Padding="0"
@@ -165,7 +170,7 @@
 
         <!-- Tab Content -->
         <ScrollView Grid.Row="3" x:Name="ContentScroll">
-            <VerticalStackLayout Spacing="14">
+            <VerticalStackLayout Spacing="14" Padding="0,0,0,48">
 
                 <!-- Sensors List (Tab 0) -->
                 <VerticalStackLayout x:Name="SensorsSection"
@@ -177,9 +182,9 @@
                     </Grid>
 
                     <!-- Empty State (Figma: Емкость. Датчики. Пусто) -->
-                    <VerticalStackLayout IsVisible="{Binding HasNoSensors}" Spacing="16" Margin="0,8,0,0">
-                        <controls:FishMascotCard HeightOverride="180" BadgeText="🧪" BadgeColor="#7BA028" />
-                        <Label Text="Добавьте первый датчик" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                    <VerticalStackLayout IsVisible="{Binding HasNoSensors}" Spacing="12" Margin="0,6,0,0">
+                        <controls:FishMascotCard HeightOverride="140" BadgeText="🧪" BadgeColor="#7BA028" />
+                        <Label Text="Добавьте первый датчик" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="17" FontAttributes="Bold" HorizontalTextAlignment="Center" />
                         <Label Text="Здесь будут отображаться ваши устройства. Добавьте первый датчик, чтобы контролировать параметры системы" TextColor="#6E6E6E" FontSize="13" LineHeight="1.3" HorizontalTextAlignment="Center" />
                         <Button Text="Добавить датчик" Command="{Binding AddSensorCommand}" BackgroundColor="#4152B0" TextColor="#FFFFFF" CornerRadius="12" HeightRequest="46" FontFamily="OpenSansSemibold" FontSize="14" Margin="0,4,0,0" />
                     </VerticalStackLayout>
@@ -218,9 +223,9 @@
                     </Grid>
 
                     <!-- Empty State (Figma: Емкость. Реле. Пусто) -->
-                    <VerticalStackLayout IsVisible="{Binding HasNoRelays}" Spacing="16" Margin="0,8,0,0">
-                        <controls:FishMascotCard HeightOverride="180" BadgeText="⚡" BadgeColor="#7BA028" />
-                        <Label Text="Добавьте первое реле" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                    <VerticalStackLayout IsVisible="{Binding HasNoRelays}" Spacing="12" Margin="0,6,0,0">
+                        <controls:FishMascotCard HeightOverride="140" BadgeText="⚡" BadgeColor="#7BA028" />
+                        <Label Text="Добавьте первое реле" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="17" FontAttributes="Bold" HorizontalTextAlignment="Center" />
                         <Label Text="Здесь будет список ваших исполнительных устройств. Добавьте первое реле, чтобы взять контроль над оборудованием" TextColor="#6E6E6E" FontSize="13" LineHeight="1.3" HorizontalTextAlignment="Center" />
                         <Button Text="Добавить реле" Command="{Binding AddRelayCommand}" BackgroundColor="#4152B0" TextColor="#FFFFFF" CornerRadius="12" HeightRequest="46" FontFamily="OpenSansSemibold" FontSize="14" Margin="0,4,0,0" />
                     </VerticalStackLayout>
@@ -255,9 +260,9 @@
                     </Grid>
 
                     <!-- Empty State (Figma: Емкость. Сценарии. Пусто) -->
-                    <VerticalStackLayout IsVisible="{Binding HasNoScenarios}" Spacing="16" Margin="0,8,0,0">
-                        <controls:FishMascotCard HeightOverride="180" BadgeText="🎛️" BadgeColor="#7BA028" />
-                        <Label Text="Добавьте первый сценарий" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                    <VerticalStackLayout IsVisible="{Binding HasNoScenarios}" Spacing="12" Margin="0,6,0,0">
+                        <controls:FishMascotCard HeightOverride="140" BadgeText="🎛️" BadgeColor="#7BA028" />
+                        <Label Text="Добавьте первый сценарий" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="17" FontAttributes="Bold" HorizontalTextAlignment="Center" />
                         <Label Text="Свяжите датчики и реле между собой, чтобы система сама управляла приборами по расписанию или при изменении показателей" TextColor="#6E6E6E" FontSize="13" LineHeight="1.3" HorizontalTextAlignment="Center" />
                         <Button Text="Добавить сценарий" Command="{Binding AddScenarioCommand}" BackgroundColor="#4152B0" TextColor="#FFFFFF" CornerRadius="12" HeightRequest="46" FontFamily="OpenSansSemibold" FontSize="14" Margin="0,4,0,0" />
                     </VerticalStackLayout>

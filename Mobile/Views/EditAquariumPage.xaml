@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Mobile.ViewModels"
+             xmlns:models="clr-namespace:Mobile.Models"
+             x:Class="Mobile.Views.EditAquariumPage"
+             x:DataType="vm:EditAquariumViewModel"
+             BackgroundColor="#FFFFFF"
+             Shell.NavBarIsVisible="False"
+             Title="Редактирование ёмкости">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="20,16,20,20">
+
+        <!-- Top Navigation Bar: Back Arrow, Title, Delete Action -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Margin="0,4,0,16">
+            <Border Grid.Column="0"
+                    WidthRequest="38" HeightRequest="38"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="#F6F7FC"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <ImageButton Source="icon_arrow_left.png"
+                             Command="{Binding GoBackCommand}"
+                             BackgroundColor="Transparent"
+                             WidthRequest="20" HeightRequest="20"
+                             Padding="0"
+                             HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+
+            <Label Grid.Column="1"
+                   Text="Редактирование ёмкости"
+                   TextColor="#141414"
+                   FontFamily="OpenSansSemibold"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center" />
+
+            <Border Grid.Column="2"
+                    WidthRequest="38" HeightRequest="38"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="#FDF2F2"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <ImageButton Source="icon_trash.png"
+                             Command="{Binding DeleteCommand}"
+                             BackgroundColor="Transparent"
+                             WidthRequest="18" HeightRequest="18"
+                             Padding="0"
+                             HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+        </Grid>
+
+        <!-- Scrollable Form Fields -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="20" Padding="0,0,0,24">
+
+                <!-- Live Preview Card -->
+                <Border StrokeThickness="1.5"
+                        Stroke="{Binding CardBorderColor}"
+                        StrokeShape="RoundRectangle 16"
+                        BackgroundColor="{Binding CardThemeColor}"
+                        Padding="16,14">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" VerticalOptions="Center">
+                        <Label Grid.Column="0"
+                               Text="{Binding TankTypeIcon}"
+                               FontSize="32"
+                               VerticalOptions="Center" />
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="{Binding Name, FallbackValue='Название ёмкости'}"
+                                   TextColor="#141414"
+                                   FontFamily="OpenSansSemibold"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   LineBreakMode="TailTruncation" />
+                            <Label Text="{Binding SpeciesInfo}"
+                                   TextColor="#8C93A8"
+                                   FontSize="12"
+                                   LineBreakMode="TailTruncation" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Section: Название -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Название ёмкости *" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Border StrokeThickness="1"
+                            Stroke="#E4E7F4"
+                            StrokeShape="RoundRectangle 12"
+                            BackgroundColor="#FFFFFF"
+                            Padding="14,4">
+                        <Entry Text="{Binding Name, Mode=TwoWay}"
+                               Placeholder="Например, Мой аквариум"
+                               PlaceholderColor="#8C93A8"
+                               TextColor="#141414"
+                               FontSize="14"
+                               ClearButtonVisibility="WhileEditing" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Section: Объём -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Объём (литров) *" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Border StrokeThickness="1"
+                            Stroke="#E4E7F4"
+                            StrokeShape="RoundRectangle 12"
+                            BackgroundColor="#FFFFFF"
+                            Padding="14,4">
+                        <Entry Text="{Binding Volume, Mode=TwoWay}"
+                               Placeholder="30"
+                               PlaceholderColor="#8C93A8"
+                               TextColor="#141414"
+                               FontSize="14"
+                               Keyboard="Numeric" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Section: Тип ёмкости -->
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Тип ёмкости" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8">
+                        <!-- 0: Аквариум -->
+                        <Border Grid.Row="0" Grid.Column="0"
+                                StrokeShape="RoundRectangle 10"
+                                StrokeThickness="{Binding IsAquariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='1.5|1'}"
+                                Stroke="{Binding IsAquariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#4152B0|#E4E7F4'}"
+                                BackgroundColor="{Binding IsAquariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#F0F4FF|#FFFFFF'}"
+                                Padding="8,10">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}" CommandParameter="0" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                <Label Text="🐟" FontSize="20" HorizontalTextAlignment="Center" />
+                                <Label Text="Аквариум" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="12" HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- 1: Террариум -->
+                        <Border Grid.Row="0" Grid.Column="1"
+                                StrokeShape="RoundRectangle 10"
+                                StrokeThickness="{Binding IsTerrariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='1.5|1'}"
+                                Stroke="{Binding IsTerrariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#4152B0|#E4E7F4'}"
+                                BackgroundColor="{Binding IsTerrariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#F0F4FF|#FFFFFF'}"
+                                Padding="8,10">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}" CommandParameter="1" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                <Label Text="🦎" FontSize="20" HorizontalTextAlignment="Center" />
+                                <Label Text="Террариум" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="12" HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- 2: Палюдариум -->
+                        <Border Grid.Row="0" Grid.Column="2"
+                                StrokeShape="RoundRectangle 10"
+                                StrokeThickness="{Binding IsPaludariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='1.5|1'}"
+                                Stroke="{Binding IsPaludariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#4152B0|#E4E7F4'}"
+                                BackgroundColor="{Binding IsPaludariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#F0F4FF|#FFFFFF'}"
+                                Padding="8,10">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}" CommandParameter="2" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                <Label Text="🐢" FontSize="20" HorizontalTextAlignment="Center" />
+                                <Label Text="Палюдариум" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="12" HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- 3: Гроубокс -->
+                        <Border Grid.Row="1" Grid.Column="0"
+                                StrokeShape="RoundRectangle 10"
+                                StrokeThickness="{Binding IsGrowboxSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='1.5|1'}"
+                                Stroke="{Binding IsGrowboxSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#4152B0|#E4E7F4'}"
+                                BackgroundColor="{Binding IsGrowboxSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#F0F4FF|#FFFFFF'}"
+                                Padding="8,10">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}" CommandParameter="3" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                <Label Text="🌱" FontSize="20" HorizontalTextAlignment="Center" />
+                                <Label Text="Гроубокс" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="12" HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- 4: Флорариум -->
+                        <Border Grid.Row="1" Grid.Column="1"
+                                StrokeShape="RoundRectangle 10"
+                                StrokeThickness="{Binding IsFlorariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='1.5|1'}"
+                                Stroke="{Binding IsFlorariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#4152B0|#E4E7F4'}"
+                                BackgroundColor="{Binding IsFlorariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#F0F4FF|#FFFFFF'}"
+                                Padding="8,10">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}" CommandParameter="4" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                <Label Text="🌸" FontSize="20" HorizontalTextAlignment="Center" />
+                                <Label Text="Флорариум" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="12" HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- 5: Формикарий -->
+                        <Border Grid.Row="1" Grid.Column="2"
+                                StrokeShape="RoundRectangle 10"
+                                StrokeThickness="{Binding IsFormicariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='1.5|1'}"
+                                Stroke="{Binding IsFormicariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#4152B0|#E4E7F4'}"
+                                BackgroundColor="{Binding IsFormicariumSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#F0F4FF|#FFFFFF'}"
+                                Padding="8,10">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}" CommandParameter="5" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                <Label Text="🐜" FontSize="20" HorizontalTextAlignment="Center" />
+                                <Label Text="Формикарий" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="12" HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
+
+                <!-- Section: Цветовая тема карточки -->
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Цветовая тема карточки" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Grid ColumnDefinitions="*,*,*,*,*,*" ColumnSpacing="10" Margin="0,4">
+                        <!-- Theme 0: Blue -->
+                        <Border Grid.Column="0" WidthRequest="44" HeightRequest="44" StrokeShape="RoundRectangle 22" StrokeThickness="2"
+                                Stroke="{Binding IsTheme0Selected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#4152B0|Transparent'}"
+                                BackgroundColor="#F0F4FF">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectThemeCommand}" CommandParameter="0" />
+                            </Border.GestureRecognizers>
+                            <Label Text="✓" TextColor="#4152B0" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"
+                                   IsVisible="{Binding IsTheme0Selected}" />
+                        </Border>
+
+                        <!-- Theme 1: Cyan -->
+                        <Border Grid.Column="1" WidthRequest="44" HeightRequest="44" StrokeShape="RoundRectangle 22" StrokeThickness="2"
+                                Stroke="{Binding IsTheme1Selected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#00ACC1|Transparent'}"
+                                BackgroundColor="#E0F7FA">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectThemeCommand}" CommandParameter="1" />
+                            </Border.GestureRecognizers>
+                            <Label Text="✓" TextColor="#00ACC1" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"
+                                   IsVisible="{Binding IsTheme1Selected}" />
+                        </Border>
+
+                        <!-- Theme 2: Green -->
+                        <Border Grid.Column="2" WidthRequest="44" HeightRequest="44" StrokeShape="RoundRectangle 22" StrokeThickness="2"
+                                Stroke="{Binding IsTheme2Selected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#43A047|Transparent'}"
+                                BackgroundColor="#EDF7EE">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectThemeCommand}" CommandParameter="2" />
+                            </Border.GestureRecognizers>
+                            <Label Text="✓" TextColor="#43A047" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"
+                                   IsVisible="{Binding IsTheme2Selected}" />
+                        </Border>
+
+                        <!-- Theme 3: Yellow -->
+                        <Border Grid.Column="3" WidthRequest="44" HeightRequest="44" StrokeShape="RoundRectangle 22" StrokeThickness="2"
+                                Stroke="{Binding IsTheme3Selected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FBC02D|Transparent'}"
+                                BackgroundColor="#FFF9E6">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectThemeCommand}" CommandParameter="3" />
+                            </Border.GestureRecognizers>
+                            <Label Text="✓" TextColor="#FBC02D" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"
+                                   IsVisible="{Binding IsTheme3Selected}" />
+                        </Border>
+
+                        <!-- Theme 4: Orange -->
+                        <Border Grid.Column="4" WidthRequest="44" HeightRequest="44" StrokeShape="RoundRectangle 22" StrokeThickness="2"
+                                Stroke="{Binding IsTheme4Selected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#FB8C00|Transparent'}"
+                                BackgroundColor="#FFF3E0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectThemeCommand}" CommandParameter="4" />
+                            </Border.GestureRecognizers>
+                            <Label Text="✓" TextColor="#FB8C00" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"
+                                   IsVisible="{Binding IsTheme4Selected}" />
+                        </Border>
+
+                        <!-- Theme 5: Gray -->
+                        <Border Grid.Column="5" WidthRequest="44" HeightRequest="44" StrokeShape="RoundRectangle 22" StrokeThickness="2"
+                                Stroke="{Binding IsTheme5Selected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#757575|Transparent'}"
+                                BackgroundColor="#F5F5F5">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectThemeCommand}" CommandParameter="5" />
+                            </Border.GestureRecognizers>
+                            <Label Text="✓" TextColor="#757575" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"
+                                   IsVisible="{Binding IsTheme5Selected}" />
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
+
+                <!-- Section: Контроллер -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Привязанный контроллер" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Border StrokeThickness="1"
+                            Stroke="#E4E7F4"
+                            StrokeShape="RoundRectangle 12"
+                            BackgroundColor="#FFFFFF"
+                            Padding="14,4">
+                        <Picker ItemsSource="{Binding AvailableControllers}"
+                                ItemDisplayBinding="{Binding Name}"
+                                SelectedItem="{Binding SelectedController}"
+                                Title="Выберите контроллер"
+                                TextColor="#141414"
+                                FontSize="14" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Error Message -->
+                <Border StrokeShape="RoundRectangle 10"
+                        StrokeThickness="0"
+                        BackgroundColor="#FDF2F2"
+                        Padding="12,10"
+                        IsVisible="{Binding HasError}">
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="#E53935"
+                           FontSize="13" />
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Bottom Actions -->
+        <VerticalStackLayout Grid.Row="2" Spacing="10" Margin="0,10,0,0">
+            <!-- Save Button -->
+            <Button Text="Сохранить изменения"
+                    Command="{Binding SaveCommand}"
+                    BackgroundColor="#4152B0"
+                    TextColor="#FFFFFF"
+                    CornerRadius="12"
+                    HeightRequest="48"
+                    FontFamily="OpenSansSemibold"
+                    FontSize="15"
+                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
+
+            <!-- Delete Button -->
+            <Button Text="Удалить ёмкость"
+                    Command="{Binding DeleteCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="#D32F2F"
+                    BorderColor="#FFCDD2"
+                    BorderWidth="1"
+                    CornerRadius="12"
+                    HeightRequest="44"
+                    FontFamily="OpenSansSemibold"
+                    FontSize="14" />
+        </VerticalStackLayout>
+
+    </Grid>
+</ContentPage>

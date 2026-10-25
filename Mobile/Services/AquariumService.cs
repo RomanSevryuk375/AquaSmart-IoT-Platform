@@ -111,8 +111,8 @@ public sealed class AquariumService : IAquariumService
                             _ => "#C5D4F5"
                         },
                         StatusSummary = matchedController?.IsOnline == true
-                            ? "• В сети • Всё в порядке"
-                            : "• Не в сети • Требуется подключение",
+                            ? "В сети • Всё в порядке"
+                            : "Не в сети • Требуется подключение",
                         StatusDotColor = matchedController?.IsOnline == true ? "#4CAF50" : "#FFA000",
                         IsNormalStatus = matchedController?.IsOnline ?? false
                     };
@@ -217,6 +217,71 @@ public sealed class AquariumService : IAquariumService
             _aquariums.Add(model);
         }
         return model;
+    }
+
+    public async Task<AquariumModel> UpdateAquariumAsync(AquariumModel model, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var request = new UpdateEcosystemRequestDto(
+                model.Name,
+                model.VolumeLiters,
+                Guid.Empty);
+
+            await _apiClient.PutAsync<UpdateEcosystemRequestDto>(
+                $"{ApiConfiguration.Routes.Ecosystems}/{model.Id}",
+                request,
+                cancellationToken);
+        }
+        catch
+        {
+        }
+
+        lock (_syncLock)
+        {
+            var existing = _aquariums.FirstOrDefault(x => x.Id == model.Id);
+            if (existing != null)
+            {
+                existing.Name = model.Name;
+                existing.VolumeLiters = model.VolumeLiters;
+                existing.WaterType = model.WaterType;
+                existing.SpeciesInfo = model.SpeciesInfo;
+                existing.Dimensions = model.Dimensions;
+                existing.CardThemeColor = model.CardThemeColor;
+                existing.CardBorderColor = model.CardBorderColor;
+                existing.ControllerName = model.ControllerName;
+                existing.TankTypeSubtitle = model.TankTypeSubtitle;
+                existing.Icon = model.Icon;
+            }
+            else
+            {
+                _aquariums.Add(model);
+            }
+        }
+
+        return model;
+    }
+
+    public async Task<bool> DeleteAquariumAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await _apiClient.DeleteAsync($"{ApiConfiguration.Routes.Ecosystems}/{id}", cancellationToken);
+        }
+        catch
+        {
+        }
+
+        lock (_syncLock)
+        {
+            var existing = _aquariums.FirstOrDefault(x => x.Id == id);
+            if (existing != null)
+            {
+                _aquariums.Remove(existing);
+            }
+        }
+
+        return true;
     }
 
     public async Task<List<SensorModel>> GetSensorsAsync(Guid aquariumId, CancellationToken cancellationToken = default)

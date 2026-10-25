@@ -38,6 +38,7 @@ public static class ViewsCollectionExtensions
         services.AddTransient<DeleteAccountPage>();
         services.AddTransient<ArticleDetailsPage>();
         services.AddTransient<NotificationsPage>();
+        services.AddTransient<EditAquariumPage>();
 
         return services;
     }
