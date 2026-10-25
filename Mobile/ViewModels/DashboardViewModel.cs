@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mobile.Views;
 
 namespace Mobile.ViewModels;
 
@@ -208,5 +209,11 @@ public partial class DashboardViewModel : ObservableObject
     private async Task AddRelayAsync()
     {
         await Shell.Current.GoToAsync("AddRelayPage");
+    }
+
+    [RelayCommand]
+    private async Task OpenNotificationsAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(NotificationsPage));
     }
 }

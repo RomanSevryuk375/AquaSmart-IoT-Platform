@@ -26,6 +26,7 @@
                     BackgroundColor="#F6F7FC"
                     StrokeThickness="0">
                 <ImageButton Source="icon_bell.png"
+                             Command="{Binding OpenNotificationsCommand}"
                              BackgroundColor="Transparent"
                              WidthRequest="20" HeightRequest="20"
                              Padding="0"

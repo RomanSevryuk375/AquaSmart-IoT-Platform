@@ -56,48 +56,7 @@ public partial class ProfileViewModel : ObservableObject
     [RelayCommand]
     private async Task OpenNotificationsAsync()
     {
-        try
-        {
-            var response = await _apiClient.GetAsync<IReadOnlyList<NotificationItemDto>>(
-                $"{ApiConfiguration.Routes.Notifications}?take=5");
-
-            if (response.IsSuccess && response.Data != null && response.Data.Count > 0)
-            {
-                var options = response.Data
-                    .Select(n => $"{GetLevelIcon(n.Level)} {n.Message}")
-                    .Concat(new[] { "⚙️ Настройки уведомлений" })
-                    .ToArray();
-
-                var selected = await Shell.Current.DisplayActionSheet(
-                    "🔔 Уведомления",
-                    "Закрыть",
-                    null,
-                    options);
-
-                if (selected == "⚙️ Настройки уведомлений")
-                {
-                    await Shell.Current.GoToAsync(nameof(AppSettingsPage));
-                }
-                return;
-            }
-        }
-        catch
-        {
-        }
-
-        var action = await Shell.Current.DisplayActionSheet(
-            "🔔 Центр уведомлений",
-            "Закрыть",
-            null,
-            "🟢 Все системы: норма",
-            "📟 Контроллеры: на связи",
-            "🔔 Push-уведомления активны",
-            "⚙️ Настройки уведомлений");
-
-        if (action == "⚙️ Настройки уведомлений")
-        {
-            await Shell.Current.GoToAsync(nameof(AppSettingsPage));
-        }
+        await Shell.Current.GoToAsync(nameof(NotificationsPage));
     }
 
     private static string GetLevelIcon(int level) => level switch

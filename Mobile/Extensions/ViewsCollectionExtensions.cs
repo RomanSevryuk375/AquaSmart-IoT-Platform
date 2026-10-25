@@ -37,6 +37,7 @@ public static class ViewsCollectionExtensions
         services.AddTransient<AboutAppPage>();
         services.AddTransient<DeleteAccountPage>();
         services.AddTransient<ArticleDetailsPage>();
+        services.AddTransient<NotificationsPage>();
 
         return services;
     }

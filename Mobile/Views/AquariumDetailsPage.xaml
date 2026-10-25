@@ -65,6 +65,7 @@
                     StrokeThickness="0"
                     VerticalOptions="Center">
                 <ImageButton Source="icon_bell.png"
+                             Command="{Binding OpenNotificationsCommand}"
                              BackgroundColor="Transparent"
                              WidthRequest="18" HeightRequest="18"
                              Padding="0"

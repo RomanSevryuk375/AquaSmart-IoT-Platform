@@ -101,4 +101,10 @@ public partial class KnowledgeBaseViewModel : ObservableObject
         };
         await Shell.Current.GoToAsync(nameof(ArticleDetailsPage), navigationParameter);
     }
+
+    [RelayCommand]
+    private async Task OpenNotificationsAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(NotificationsPage));
+    }
 }

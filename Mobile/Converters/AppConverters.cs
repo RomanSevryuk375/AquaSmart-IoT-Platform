@@ -9,17 +9,36 @@ public class BoolToColorConverter : IValueConverter
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is bool b)
+        bool b = value is bool flag && flag;
+        if (parameter is string paramStr && paramStr.Contains('|'))
         {
-            return b ? TrueColor : FalseColor;
+            var parts = paramStr.Split('|');
+            if (parts.Length == 2)
+            {
+                var truePart = Color.FromArgb(parts[0].Trim());
+                var falsePart = Color.FromArgb(parts[1].Trim());
+                return b ? truePart : falsePart;
+            }
         }
-        return FalseColor;
+        return b ? TrueColor : FalseColor;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }
+}
+
+public class GreaterThanZeroConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is int count) return count > 0;
+        if (value is double d) return d > 0;
+        return false;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
 }
 
 public class InverseBoolConverter : IValueConverter

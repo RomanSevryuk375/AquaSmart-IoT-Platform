@@ -38,6 +38,7 @@ public static class ViewModelsCollectionExtensions
         services.AddTransient<AboutAppViewModel>();
         services.AddTransient<DeleteAccountViewModel>();
         services.AddTransient<ArticleDetailsViewModel>();
+        services.AddTransient<NotificationsViewModel>();
 
         return services;
     }

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mobile.Views;
 
 namespace Mobile.ViewModels;
 
@@ -45,5 +46,11 @@ public partial class AquariumsViewModel : ObservableObject
     private async Task AddAquariumAsync()
     {
         await Shell.Current.GoToAsync("AddAquariumPage");
+    }
+
+    [RelayCommand]
+    private async Task OpenNotificationsAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(NotificationsPage));
     }
 }
