@@ -22,6 +22,14 @@ public static class MauiProgram
         builder.Services.AddViewModels();
         builder.Services.AddViews();
 
+#if ANDROID
+        Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoUnderline", (handler, view) =>
+        {
+            handler.PlatformView.Background = null;
+            handler.PlatformView.SetBackgroundColor(Android.Graphics.Color.Transparent);
+        });
+#endif
+
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
