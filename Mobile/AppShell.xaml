@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:Mobile"
     xmlns:views="clr-namespace:Mobile.Views"
     xmlns:vm="clr-namespace:Mobile.ViewModels"
+    xmlns:converters="clr-namespace:Mobile.Converters"
     x:DataType="vm:AppShellViewModel"
     Shell.FlyoutBehavior="Flyout"
     FlyoutBackgroundColor="#FFFFFF"
@@ -19,6 +20,12 @@
     Shell.TabBarUnselectedColor="#8C93A8"
     Shell.TabBarTitleColor="#4152B0"
     Title="AquaSmart">
+
+    <Shell.Resources>
+        <ResourceDictionary>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+        </ResourceDictionary>
+    </Shell.Resources>
 
     <Shell.FlyoutHeader>
         <Grid BackgroundColor="#4152B0"
