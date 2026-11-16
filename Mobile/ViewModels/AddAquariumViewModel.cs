@@ -1,0 +1,420 @@
+using System.Collections.ObjectModel;
+using System.Globalization;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Mobile.Models;
+using Mobile.Services.Interfaces;
+using Mobile.Views;
+
+namespace Mobile.ViewModels;
+
+public partial class AddAquariumViewModel : ObservableObject
+{
+    private readonly IAquariumService _aquariumService;
+    private readonly IControllerService _controllerService;
+
+    public ObservableCollection<ControllerModel> AvailableControllers { get; } = new();
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CurrentStepText))]
+    private int _currentStep = 1;
+
+    public string CurrentStepText => string.Format(LocalizationService.Instance["Wizard_Step"], CurrentStep);
+
+    // Step 1: Tank Type
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TankTypeName))]
+    [NotifyPropertyChangedFor(nameof(TankTypeIcon))]
+    [NotifyPropertyChangedFor(nameof(SpeciesInfo))]
+    [NotifyPropertyChangedFor(nameof(IsAquariumSelected))]
+    [NotifyPropertyChangedFor(nameof(IsTerrariumSelected))]
+    [NotifyPropertyChangedFor(nameof(IsGrowboxSelected))]
+    [NotifyPropertyChangedFor(nameof(IsFlorariumSelected))]
+    [NotifyPropertyChangedFor(nameof(IsFormicariumSelected))]
+    private int _selectedTankType = 0; // 0: Aquarium (1), 1: Terrarium (2), 2: Growbox (3), 3: Florarium (4), 4: Formicarium (5)
+
+    public bool IsAquariumSelected => SelectedTankType == 0;
+    public bool IsTerrariumSelected => SelectedTankType == 1;
+    public bool IsGrowboxSelected => SelectedTankType == 2;
+    public bool IsFlorariumSelected => SelectedTankType == 3;
+    public bool IsFormicariumSelected => SelectedTankType == 4;
+
+    public int BackendEcosystemType => SelectedTankType + 1;
+
+    // Step 2: Name
+    [ObservableProperty]
+    private string _name = string.Empty;
+
+    // Step 3: Volume
+    [ObservableProperty]
+    private int _volume = 20;
+
+    // Step 4: Inhabitants
+    public ObservableCollection<InhabitantChipModel> InhabitantsList { get; } = new()
+    {
+        new(LocalizationService.Instance["Wizard_Inhabitant_FreshwaterFish"], true),
+        new(LocalizationService.Instance["Wizard_Inhabitant_MarineFish"], false),
+        new(LocalizationService.Instance["Wizard_Inhabitant_AquaticPlants"], true),
+        new(LocalizationService.Instance["Wizard_Inhabitant_Turtles"], false),
+        new(LocalizationService.Instance["Wizard_Inhabitant_LizardsSnakes"], false),
+        new(LocalizationService.Instance["Wizard_Inhabitant_Frogs"], false),
+        new(LocalizationService.Instance["Wizard_Inhabitant_Plants"], false),
+        new(LocalizationService.Instance["Wizard_Inhabitant_Ants"], false),
+        new(LocalizationService.Instance["Wizard_Inhabitant_Other"], false)
+    };
+
+    // Step 5: Launch Date
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(LaunchDate))]
+    private DateTime _selectedLaunchDate = DateTime.Today;
+
+    public string LaunchDate
+    {
+        get => SelectedLaunchDate.ToString("dd.MM.yyyy");
+        set
+        {
+            if (DateTime.TryParseExact(value, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt) ||
+                DateTime.TryParse(value, out dt))
+            {
+                SelectedLaunchDate = dt;
+            }
+        }
+    }
+
+    public DateTime MaxLaunchDate => DateTime.Today.AddDays(1);
+
+    [ObservableProperty]
+    private bool _isCalendarOpen;
+
+    // Step 6: Controller
+    [ObservableProperty]
+    private string _selectedControllerName = LocalizationService.Instance.IsEnglish ? "Auto-create Hub" : "Авто-создание Hub";
+
+    [ObservableProperty]
+    private Guid _selectedControllerId = Guid.Empty;
+
+    [ObservableProperty]
+    private bool _isControllerPickerOpen;
+
+    // Step 7: Color theme
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsTheme0Selected))]
+    [NotifyPropertyChangedFor(nameof(IsTheme1Selected))]
+    [NotifyPropertyChangedFor(nameof(IsTheme2Selected))]
+    [NotifyPropertyChangedFor(nameof(IsTheme3Selected))]
+    [NotifyPropertyChangedFor(nameof(IsTheme4Selected))]
+    [NotifyPropertyChangedFor(nameof(IsTheme5Selected))]
+    [NotifyPropertyChangedFor(nameof(PreviewThemeColor))]
+    [NotifyPropertyChangedFor(nameof(PreviewBorderColor))]
+    private int _selectedThemeIndex = 0; // 0: Blue, 1: Cyan, 2: Green, 3: Yellow, 4: Orange, 5: Gray
+
+    public bool IsTheme0Selected => SelectedThemeIndex == 0;
+    public bool IsTheme1Selected => SelectedThemeIndex == 1;
+    public bool IsTheme2Selected => SelectedThemeIndex == 2;
+    public bool IsTheme3Selected => SelectedThemeIndex == 3;
+    public bool IsTheme4Selected => SelectedThemeIndex == 4;
+    public bool IsTheme5Selected => SelectedThemeIndex == 5;
+
+    // Overlays
+    [ObservableProperty]
+    private bool _isCancelDialogOpen;
+
+    [ObservableProperty]
+    private bool _isSuccessOpen;
+
+    [ObservableProperty]
+    private Guid _createdAquariumId;
+
+    public string TankTypeName => SelectedTankType switch
+    {
+        1 => LocalizationService.Instance["TankType_Terrarium"],
+        2 => LocalizationService.Instance["TankType_Growbox"],
+        3 => LocalizationService.Instance["TankType_Florarium"],
+        4 => LocalizationService.Instance["TankType_Formicarium"],
+        _ => LocalizationService.Instance["TankType_Aquarium"]
+    };
+
+    public string TankTypeIcon => SelectedTankType switch
+    {
+        1 => "🦎",
+        2 => "🌱",
+        3 => "🌸",
+        4 => "🐜",
+        _ => "🐟"
+    };
+
+    public string PreviewThemeColor => SelectedThemeIndex switch
+    {
+        1 => "#E0F7FA",
+        2 => "#EDF7EE",
+        3 => "#FFF9E6",
+        4 => "#FFF3E0",
+        5 => "#F5F5F5",
+        _ => "#F0F4FF"
+    };
+
+    public string PreviewBorderColor => SelectedThemeIndex switch
+    {
+        1 => "#80DEEA",
+        2 => "#C3E6C7",
+        3 => "#FFE082",
+        4 => "#FFCC80",
+        5 => "#E0E0E0",
+        _ => "#C5D4F5"
+    };
+
+    public string SpeciesInfo => $"{TankTypeName} • {Volume}{(LocalizationService.Instance.IsEnglish ? "L" : "л")} • {SelectedControllerName}";
+
+    public AddAquariumViewModel(IAquariumService aquariumService, IControllerService controllerService)
+    {
+        _aquariumService = aquariumService;
+        _controllerService = controllerService;
+        _ = LoadControllersAsync();
+    }
+
+    private async Task LoadControllersAsync()
+    {
+        try
+        {
+            var controllers = await _controllerService.GetControllersAsync();
+            var aquariums = await _aquariumService.GetAquariumsAsync();
+            var usedIds = aquariums.Where(a => a.ControllerId != Guid.Empty).Select(a => a.ControllerId).ToHashSet();
+
+            AvailableControllers.Clear();
+            foreach (var c in controllers.Where(c => !usedIds.Contains(c.Id)))
+            {
+                AvailableControllers.Add(c);
+            }
+
+            if (AvailableControllers.Count > 0)
+            {
+                SelectedControllerName = AvailableControllers[0].Name;
+                SelectedControllerId = AvailableControllers[0].Id;
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    [RelayCommand]
+    private void SelectTankType(int typeIndex)
+    {
+        SelectedTankType = typeIndex;
+        OnPropertyChanged(nameof(TankTypeName));
+        OnPropertyChanged(nameof(TankTypeIcon));
+
+        if (string.IsNullOrWhiteSpace(Name) || Name.StartsWith("Мой первый", StringComparison.OrdinalIgnoreCase) || Name.StartsWith("My First", StringComparison.OrdinalIgnoreCase))
+        {
+            Name = LocalizationService.Instance.IsEnglish
+                ? $"My First {TankTypeName}"
+                : $"Мой первый {TankTypeName.ToLowerInvariant()}";
+        }
+    }
+
+    [RelayCommand]
+    private void IncrementVolume()
+    {
+        Volume += 5;
+    }
+
+    [RelayCommand]
+    private void DecrementVolume()
+    {
+        if (Volume > 1) Volume -= (Volume > 5 ? 5 : 1);
+    }
+
+    [RelayCommand]
+    private void ToggleInhabitant(InhabitantChipModel item)
+    {
+        item.IsSelected = !item.IsSelected;
+    }
+
+    [RelayCommand]
+    private void OpenCalendar()
+    {
+        IsCalendarOpen = true;
+    }
+
+    [RelayCommand]
+    private void SetTodayDate()
+    {
+        SelectedLaunchDate = DateTime.Today;
+        OnPropertyChanged(nameof(LaunchDate));
+    }
+
+    [RelayCommand]
+    private void CloseCalendar(string? selectedDate = null)
+    {
+        if (!string.IsNullOrEmpty(selectedDate))
+        {
+            LaunchDate = selectedDate;
+        }
+        IsCalendarOpen = false;
+    }
+
+    [RelayCommand]
+    private void OpenControllerPicker()
+    {
+        IsControllerPickerOpen = true;
+    }
+
+    [RelayCommand]
+    private void CloseControllerPicker()
+    {
+        IsControllerPickerOpen = false;
+    }
+
+    [RelayCommand]
+    private void SelectController(ControllerModel? controller)
+    {
+        if (controller != null)
+        {
+            SelectedControllerName = controller.Name;
+            SelectedControllerId = controller.Id;
+        }
+        IsControllerPickerOpen = false;
+    }
+
+    [RelayCommand]
+    private void SelectAutoController()
+    {
+        SelectedControllerName = LocalizationService.Instance.IsEnglish ? "Auto-create Hub" : "Авто-создание Hub";
+        SelectedControllerId = Guid.Empty;
+        IsControllerPickerOpen = false;
+    }
+
+    [RelayCommand]
+    private void SelectTheme(int index)
+    {
+        SelectedThemeIndex = index;
+        OnPropertyChanged(nameof(PreviewThemeColor));
+        OnPropertyChanged(nameof(PreviewBorderColor));
+    }
+
+    [RelayCommand]
+    private void NextStep()
+    {
+        if (CurrentStep == 2 && string.IsNullOrWhiteSpace(Name))
+        {
+            Name = $"{TankTypeName} #1";
+        }
+
+        if (CurrentStep < 7)
+        {
+            CurrentStep++;
+        }
+        else
+        {
+            _ = SaveAsync();
+        }
+    }
+
+    [RelayCommand]
+    private void PrevStep()
+    {
+        if (CurrentStep > 1)
+        {
+            CurrentStep--;
+        }
+        else
+        {
+            IsCancelDialogOpen = true;
+        }
+    }
+
+    [RelayCommand]
+    private void PromptCancel()
+    {
+        IsCancelDialogOpen = true;
+    }
+
+    [RelayCommand]
+    private void ResumeEditing()
+    {
+        IsCancelDialogOpen = false;
+    }
+
+    [RelayCommand]
+    private async Task ConfirmCancelAsync()
+    {
+        IsCancelDialogOpen = false;
+        await Shell.Current.GoToAsync("..");
+    }
+
+    [RelayCommand]
+    private async Task SaveAsync()
+    {
+        var selectedInhabitants = InhabitantsList
+            .Where(x => x.IsSelected)
+            .Select(x => x.Title)
+            .ToList();
+
+        var speciesInfo = selectedInhabitants.Count > 0
+            ? string.Join(", ", selectedInhabitants)
+            : LocalizationService.Instance["Tank_NoInhabitants"];
+
+        var defaultName = LocalizationService.Instance.IsEnglish
+            ? $"My First {TankTypeName}"
+            : $"Мой первый {TankTypeName.ToLowerInvariant()}";
+
+        var unitL = LocalizationService.Instance.IsEnglish ? "L" : "л";
+
+        var model = new AquariumModel
+        {
+            Name = string.IsNullOrWhiteSpace(Name) ? defaultName : Name.Trim(),
+            VolumeLiters = Volume > 0 ? Volume : 20,
+            WaterType = SelectedTankType == 1 ? WaterType.Marine : WaterType.Freshwater,
+            TankTypeSubtitle = TankTypeName,
+            Icon = TankTypeIcon,
+            SpeciesInfo = $"{TankTypeName} • {(Volume > 0 ? Volume : 20)}{unitL} • {SelectedControllerName}",
+            ControllerId = SelectedControllerId,
+            ControllerName = SelectedControllerName,
+            CardThemeColor = PreviewThemeColor,
+            CardBorderColor = PreviewBorderColor,
+            EcosystemType = BackendEcosystemType
+        };
+
+        var created = await _aquariumService.AddAquariumAsync(model);
+        CreatedAquariumId = created.Id;
+        IsSuccessOpen = true;
+    }
+
+    [RelayCommand]
+    private async Task GoToEquipmentAsync()
+    {
+        IsSuccessOpen = false;
+        try
+        {
+            await Shell.Current.GoToAsync(nameof(AquariumDetailsPage), new Dictionary<string, object>
+            {
+                ["aquariumId"] = CreatedAquariumId.ToString()
+            });
+        }
+        catch
+        {
+            await Shell.Current.GoToAsync($"{nameof(AquariumDetailsPage)}?aquariumId={CreatedAquariumId}");
+        }
+    }
+
+    [RelayCommand]
+    private async Task GoToMainAsync()
+    {
+        IsSuccessOpen = false;
+        await Shell.Current.GoToAsync("//MainTabs/DashboardPage");
+    }
+}
+
+public partial class InhabitantChipModel : ObservableObject
+{
+    public string Title { get; set; }
+
+    [ObservableProperty]
+    private bool _isSelected;
+
+    public InhabitantChipModel(string title, bool isSelected = false)
+    {
+        Title = title;
+        _isSelected = isSelected;
+    }
+}

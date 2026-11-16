@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Mobile.ViewModels"
+             xmlns:models="clr-namespace:Mobile.Models"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
+             xmlns:loc="clr-namespace:Mobile.Converters"
+             x:Class="Mobile.Views.ControllersPage"
+             x:DataType="vm:ControllersViewModel"
+             BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#12131A'}"
+             Shell.NavBarIsVisible="False"
+             Title="{loc:Translate Controller_MyControllers}">
+
+    <Grid RowDefinitions="Auto,*" Padding="20,16,20,10">
+        <!-- Top Bar: Back, "Мои контроллеры", Add (+), Notifications (Bell) -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10" Margin="0,4,0,16">
+            <Border Grid.Column="0"
+                    WidthRequest="38" HeightRequest="38"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <ImageButton Source="{AppThemeBinding Light='icon_arrow_left.png', Dark='icon_arrow_left_white.png'}"
+                             Command="{Binding GoBackCommand}"
+                             BackgroundColor="Transparent"
+                             WidthRequest="20" HeightRequest="20"
+                             Padding="0"
+                             HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+
+            <Label Grid.Column="1"
+                   Text="{loc:Translate Controller_MyControllers}"
+                   TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
+                   FontFamily="OpenSansSemibold"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center"
+                   Margin="4,0,0,0" />
+
+            <!-- Add Controller Button (+) -->
+            <Border Grid.Column="2"
+                    WidthRequest="38" HeightRequest="38"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <ImageButton Source="{AppThemeBinding Light='icon_plus.png', Dark='icon_plus_white.png'}"
+                             Command="{Binding AddControllerCommand}"
+                             BackgroundColor="Transparent"
+                             WidthRequest="18" HeightRequest="18"
+                             Padding="0"
+                             HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+
+            <!-- Bell Notifications -->
+            <Border Grid.Column="3"
+                    WidthRequest="38" HeightRequest="38"
+                    StrokeShape="RoundRectangle 10"
+                    BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <ImageButton Source="{AppThemeBinding Light='icon_bell.png', Dark='icon_bell_white.png'}"
+                             Command="{Binding OpenNotificationsCommand}"
+                             BackgroundColor="Transparent"
+                             WidthRequest="18" HeightRequest="18"
+                             Padding="0"
+                             HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+        </Grid>
+
+        <!-- Main Scrollable Area -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="16" Padding="0,0,0,24">
+
+                <!-- 1. EMPTY STATE (Figma: Контроллеры. Контроллеров нет) -->
+                <VerticalStackLayout IsVisible="{Binding HasNoControllers}" Spacing="18" Margin="0,10,0,0">
+                    <!-- Fish Mascot Card with Gear badge -->
+                    <controls:FishMascotCard HeightOverride="240" BadgeText="⚙" BadgeColor="#7BA028" />
+
+                    <!-- Titles -->
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{loc:Translate Controller_EmptyTitle}"
+                               TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="{loc:Translate Controller_EmptyDesc}"
+                               TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#A0A4B8'}"
+                               FontSize="14"
+                               LineHeight="1.3"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Buttons: "Сканировать QR-код" & "Изучить базу знаний" -->
+                    <VerticalStackLayout Spacing="12" Margin="0,10,0,0">
+                        <Button Text="{loc:Translate Controller_ScanQr}"
+                                Command="{Binding AddControllerCommand}"
+                                BackgroundColor="#4152B0"
+                                TextColor="#FFFFFF"
+                                CornerRadius="14"
+                                HeightRequest="52"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+
+                        <Button Text="{loc:Translate Dash_ExploreKb}"
+                                Command="{Binding OpenKnowledgeBaseCommand}"
+                                BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
+                                BorderColor="{AppThemeBinding Light='#E4E7F4', Dark='#2E3346'}"
+                                BorderWidth="1"
+                                TextColor="{AppThemeBinding Light='#4152B0', Dark='#738AFF'}"
+                                CornerRadius="14"
+                                HeightRequest="52"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- 2. NON-EMPTY LIST (Figma: Контроллеры) -->
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Controllers}"
+                                     IsVisible="{Binding HasControllers}"
+                                     Spacing="12">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="models:ControllerModel">
+                            <Border StrokeThickness="1"
+                                    Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2E3346'}"
+                                    StrokeShape="RoundRectangle 16"
+                                    BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
+                                    Padding="16,14">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ControllersViewModel}}, Path=SelectControllerCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+
+                                <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12">
+                                    <!-- Gear icon in circle -->
+                                    <Border Grid.Column="0"
+                                            WidthRequest="40" HeightRequest="40"
+                                            StrokeShape="RoundRectangle 20"
+                                            BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#161824'}"
+                                            StrokeThickness="0"
+                                            VerticalOptions="Center">
+                                        <Label Text="⚙" FontSize="18" TextColor="#4152B0" HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </Border>
+
+                                    <!-- Controller Info -->
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{Binding Name}"
+                                               TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
+                                               FontFamily="OpenSansSemibold"
+                                               FontSize="15"
+                                               FontAttributes="Bold" />
+                                        <Label Text="{Binding MacAddress}"
+                                               TextColor="{AppThemeBinding Light='#8C93A8', Dark='#73778F'}"
+                                               FontSize="12" />
+                                    </VerticalStackLayout>
+
+                                    <!-- Online Status Pill with Dot -->
+                                    <HorizontalStackLayout Grid.Column="2" Spacing="4" VerticalOptions="Center" Margin="0,0,6,0">
+                                        <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="{Binding StatusColor}" VerticalOptions="Center" />
+                                        <Label Text="{Binding StatusText}" TextColor="{Binding StatusColor}" FontSize="12" FontFamily="OpenSansSemibold" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+
+                                    <!-- Switch on right -->
+                                    <Switch Grid.Column="3"
+                                            IsToggled="{Binding IsOnline, Mode=TwoWay}"
+                                            OnColor="#4152B0"
+                                            ThumbColor="#FFFFFF"
+                                            VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>
