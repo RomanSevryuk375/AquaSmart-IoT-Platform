@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Mobile.ViewModels"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
+             xmlns:loc="clr-namespace:Mobile.Converters"
+             x:Class="Mobile.Views.LoginPage"
+             x:DataType="vm:LoginViewModel"
+             BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#12131A'}"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <Grid RowDefinitions="Auto,*,Auto" Padding="20,20,20,28">
+            <!-- Header Section with Mascot Banner -->
+            <VerticalStackLayout Grid.Row="0" x:Name="HeaderContainer" Spacing="16">
+                <!-- Fish Mascot Card with "hi" badge -->
+                <controls:FishMascotCard HeightOverride="140"
+                                         BadgeText="hi"
+                                         BadgeColor="#7BA028" />
+
+                <!-- Welcome Title (Wrapped properly to prevent clipping) -->
+                <Label LineBreakMode="WordWrap"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       Margin="0,4,0,0">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="{loc:Translate Auth_WelcomeTo}" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" />
+                            <Span Text="SmartAqua" TextColor="#4152B0" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+            </VerticalStackLayout>
+
+            <!-- Form Section -->
+            <VerticalStackLayout Grid.Row="1" x:Name="FormContainer" Spacing="16" Margin="0,16,0,16">
+                <!-- Login / Phone / Email -->
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="{loc:Translate Auth_LoginTitle}"
+                           TextColor="{AppThemeBinding Light='#333333', Dark='#D8DBEC'}"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="13" />
+                    <Border Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
+                            Padding="14,0"
+                            HeightRequest="48">
+                        <Entry Text="{Binding EmailOrLogin, Mode=TwoWay}"
+                               Placeholder="{loc:Translate Auth_LoginPlaceholder}"
+                               PlaceholderColor="#8C93A8"
+                               TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                               HeightRequest="48"
+                               VerticalOptions="Center"
+                               FontFamily="OpenSansRegular"
+                               FontSize="14" />
+                    </Border>
+                    <Label Text="{Binding EmailOrLoginError}"
+                           IsVisible="{Binding HasEmailOrLoginError}"
+                           TextColor="#E53935"
+                           FontFamily="OpenSansRegular"
+                           FontSize="11"
+                           Margin="2,0,0,0" />
+                </VerticalStackLayout>
+
+                <!-- Password -->
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="{loc:Translate Auth_PasswordTitle}"
+                           TextColor="{AppThemeBinding Light='#333333', Dark='#D8DBEC'}"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="13" />
+                    <Border Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
+                            Padding="14,0"
+                            HeightRequest="48">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Entry Grid.Column="0"
+                                   Text="{Binding Password, Mode=TwoWay}"
+                                   Placeholder="{loc:Translate Auth_PasswordPlaceholder}"
+                                   PlaceholderColor="#8C93A8"
+                                   TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                                   IsPassword="{Binding IsPasswordHidden}"
+                                   HeightRequest="48"
+                                   VerticalOptions="Center"
+                                   FontFamily="OpenSansRegular"
+                                   FontSize="14" />
+                            <ImageButton Grid.Column="1"
+                                         Source="{Binding PasswordEyeIcon}"
+                                         Command="{Binding TogglePasswordCommand}"
+                                         BackgroundColor="Transparent"
+                                         WidthRequest="24"
+                                         HeightRequest="24"
+                                         Padding="0"
+                                         VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+                    <Label Text="{Binding PasswordError}"
+                           IsVisible="{Binding HasPasswordError}"
+                           TextColor="#E53935"
+                           FontFamily="OpenSansRegular"
+                           FontSize="11"
+                           Margin="2,0,0,0" />
+                </VerticalStackLayout>
+
+                <!-- General Server / Connection Error Banner -->
+                <Border IsVisible="{Binding HasError}"
+                        BackgroundColor="{AppThemeBinding Light='#FDECEA', Dark='#3B1B1D'}"
+                        Stroke="{AppThemeBinding Light='#F5C6CB', Dark='#5C282C'}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 8"
+                        Padding="12,10"
+                        Margin="0,-4,0,4">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                        <Label Grid.Column="0" Text="⚠️" FontSize="14" VerticalOptions="Center" />
+                        <Label Grid.Column="1"
+                               Text="{Binding ErrorMessage}"
+                               TextColor="#E53935"
+                               FontFamily="OpenSansRegular"
+                               FontSize="12"
+                               LineHeight="1.25"
+                               VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- Forgot Password Link (Left-aligned as in Figma) -->
+                <HorizontalStackLayout HorizontalOptions="Start">
+                    <Button Text="{loc:Translate Auth_ForgotPassword}"
+                            Command="{Binding GoToForgotPasswordCommand}"
+                            TextColor="#4152B0"
+                            BackgroundColor="Transparent"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="13"
+                            Padding="0" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+            <!-- Bottom Actions Section (Login Button + Register Link) -->
+            <VerticalStackLayout Grid.Row="2" Spacing="16" Margin="0,8,0,8">
+                <!-- Login Button -->
+                <Button Text="{loc:Translate Auth_SignIn}"
+                        Command="{Binding LoginCommand}"
+                        BackgroundColor="#4152B0"
+                        TextColor="#FFFFFF"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="15"
+                        CornerRadius="12"
+                        HeightRequest="48">
+                    <Button.Shadow>
+                        <Shadow Brush="#254152B0" Offset="0,4" Radius="8" Opacity="0.6" />
+                    </Button.Shadow>
+                </Button>
+
+                <!-- Biometric / PIN Quick Login Button -->
+                <Button Text="{loc:Translate Auth_BiometricSignIn}"
+                        Command="{Binding BiometricLoginCommand}"
+                        IsVisible="{Binding CanUseBiometrics}"
+                        BackgroundColor="{AppThemeBinding Light='#F0F2FB', Dark='#1E2235'}"
+                        TextColor="{AppThemeBinding Light='#4152B0', Dark='#B9C4F0'}"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="14"
+                        CornerRadius="12"
+                        HeightRequest="44" />
+
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   Color="#4152B0"
+                                   HorizontalOptions="Center" />
+
+                <!-- Bottom Register Link -->
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
+                    <Label Text="{loc:Translate Auth_NotRegistered}"
+                           TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}"
+                           VerticalOptions="Center"
+                           FontFamily="OpenSansRegular"
+                           FontSize="13" />
+                    <Button Text="{loc:Translate Auth_Register}"
+                            Command="{Binding GoToRegistrationCommand}"
+                            TextColor="#4152B0"
+                            BackgroundColor="Transparent"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="13"
+                            Padding="0" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Grid>
+    </ScrollView>
+</ContentPage>
