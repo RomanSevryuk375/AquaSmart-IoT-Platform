@@ -40,7 +40,7 @@ public class RuleConditionTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("ConditionThreshold.Invalid");
+        result.Error.Code.Should().Be("RuleCondition.Invalid");
     }
 
     [Fact]

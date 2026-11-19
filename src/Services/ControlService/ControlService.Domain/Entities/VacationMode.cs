@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Results;
 using BuildingBlocks.Domain.ValueObjects;
@@ -42,21 +43,24 @@ public sealed class VacationMode : AggregateRoot, IEntity
         bool isActive,
         double calculatedFeed)
     {
-        Result<DateRange> dateRangeResult = DateRange.Create(startDate, endDate);
-        if (dateRangeResult.IsFailure)
-        {
-            return Result<VacationMode>.Failure(dateRangeResult.Error);
-        }
+        var errors = new List<string>();
 
+        DomainGuard.CheckNotEmpty(vacationModeId, "VacationMode Id", errors);
+        DomainGuard.CheckNotEmpty(ecosystemId, nameof(EcosystemId), errors);
+        DateRange? dateRange = DomainGuard.Collect(DateRange.Create(startDate, endDate), errors);
         if (calculatedFeed < ControlConstants.MinCalculatedFeed)
         {
-            return Result<VacationMode>.Failure(Error.Validation<VacationMode>(
-                ControlValidationMessages.CalculatedFeedCannotBeNegative));
+            errors.Add(ControlValidationMessages.CalculatedFeedCannotBeNegative);
+        }
+
+        if (errors.Count != 0)
+        {
+            return DomainGuard.ValidationFailure<VacationMode>(errors);
         }
 
         var vacation = new VacationMode(
             vacationModeId, ecosystemId,
-            dateRangeResult.Value, isActive, calculatedFeed,
+            dateRange!, isActive, calculatedFeed,
             createdAt: DateTime.UtcNow);
 
         return Result<VacationMode>.Success(vacation);

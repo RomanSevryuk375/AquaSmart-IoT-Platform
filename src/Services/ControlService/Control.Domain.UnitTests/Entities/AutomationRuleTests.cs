@@ -49,7 +49,7 @@ public class AutomationRuleTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Name.Invalid");
+        result.Error.Code.Should().Be("AutomationRule.Invalid");
     }
 
     [Fact]

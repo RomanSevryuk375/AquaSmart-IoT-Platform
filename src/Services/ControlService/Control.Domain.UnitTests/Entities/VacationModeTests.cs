@@ -49,7 +49,7 @@ public class VacationModeTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("DateRange.Invalid");
+        result.Error.Code.Should().Be("VacationMode.Invalid");
     }
 
     [Fact]

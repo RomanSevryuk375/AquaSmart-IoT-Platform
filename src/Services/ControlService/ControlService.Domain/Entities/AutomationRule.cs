@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
@@ -55,15 +56,23 @@ public sealed class AutomationRule : AggregateRoot, IEntity
         RuleAction action,
         bool isActive)
     {
-        Result<Name> nameResult = Name.Create(rawName);
-        if (nameResult.IsFailure)
+        var errors = new List<string>();
+
+        DomainGuard.CheckNotEmpty(ruleId, "AutomationRule Id", errors);
+        DomainGuard.CheckNotEmpty(ecosystemId, nameof(EcosystemId), errors);
+        DomainGuard.CheckNotEmpty(relayId, nameof(RelayId), errors);
+        Name? name = DomainGuard.Collect(Name.Create(rawName), errors);
+        DomainGuard.CheckEnum(@operator, nameof(Operator), errors);
+        DomainGuard.CheckEnum(action, nameof(Action), errors);
+
+        if (errors.Count != 0)
         {
-            return Result<AutomationRule>.Failure(nameResult.Error);
+            return DomainGuard.ValidationFailure<AutomationRule>(errors);
         }
 
         var rule = new AutomationRule(
             ruleId, ecosystemId, relayId,
-            nameResult.Value, @operator, action, isActive,
+            name!, @operator, action, isActive,
             createdAt: DateTime.UtcNow);
 
         rule.IncrementVersion();
@@ -73,13 +82,19 @@ public sealed class AutomationRule : AggregateRoot, IEntity
 
     public Result Update(string rawName, Guid relayId, Operator @operator, RuleAction action)
     {
-        Result<Name> nameResult = Name.Create(rawName);
-        if (nameResult.IsFailure)
+        var errors = new List<string>();
+
+        DomainGuard.CheckNotEmpty(relayId, nameof(RelayId), errors);
+        Name? name = DomainGuard.Collect(Name.Create(rawName), errors);
+        DomainGuard.CheckEnum(@operator, nameof(Operator), errors);
+        DomainGuard.CheckEnum(action, nameof(Action), errors);
+
+        if (errors.Count != 0)
         {
-            return Result.Failure(nameResult.Error);
+            return Result.Failure(Error.Validation<AutomationRule>(string.Join(", ", errors)));
         }
 
-        Name = nameResult.Value;
+        Name = name!;
         RelayId = relayId;
         Operator = @operator;
         Action = action;
