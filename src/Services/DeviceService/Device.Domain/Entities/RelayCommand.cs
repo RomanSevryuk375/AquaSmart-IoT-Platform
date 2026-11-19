@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
@@ -53,6 +54,17 @@ public sealed class RelayCommand : AggregateRoot, IEntity
         bool targetState,
         DateTime? expireAt)
     {
+        var errors = new List<string>();
+
+        DomainGuard.CheckNotEmpty(id, "RelayCommand Id", errors);
+        DomainGuard.CheckNotEmpty(controllerId, nameof(ControllerId), errors);
+        DomainGuard.CheckNotEmpty(relayId, nameof(RelayId), errors);
+
+        if (errors.Count != 0)
+        {
+            return DomainGuard.ValidationFailure<RelayCommand>(errors);
+        }
+
         var command = new RelayCommand(
             id,
             controllerId,
