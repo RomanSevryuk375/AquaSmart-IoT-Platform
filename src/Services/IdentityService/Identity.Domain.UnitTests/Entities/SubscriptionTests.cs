@@ -103,6 +103,6 @@ public class SubscriptionTests
         sub.DurationDays.Should().Be(duration);
         sub.Permissions.Should().BeEquivalentTo(permissions);
         sub.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, tolerance);
-        sub.Version.Should().BeEmpty();
+        sub.Version.Should().NotBeEmpty();
     }
 }

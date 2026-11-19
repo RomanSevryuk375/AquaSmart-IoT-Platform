@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Results;
 using Telemetry.Domain.Events;
@@ -43,6 +44,10 @@ public sealed class RawTelemetry : AggregateRoot, IEntity
     {
         var errors = new List<string>();
 
+        DomainGuard.CheckNotEmpty(id, "RawTelemetry Id", errors);
+        DomainGuard.CheckNotEmpty(sensorId, nameof(SensorId), errors);
+        DomainGuard.CheckNotEmpty(ecosystemId, "EcosystemId", errors);
+
         if (recordedAt > DateTime.UtcNow.AddMinutes(TelemetryConstants.MaxFutureDelayMinutes))
         {
             errors.Add(ErrorMessages.Telemetry.RecordedAtFuture);
@@ -53,10 +58,9 @@ public sealed class RawTelemetry : AggregateRoot, IEntity
             errors.Add(ErrorMessages.Telemetry.ExternalMessageIdEmpty);
         }
 
-        if (errors.Count > 0)
+        if (errors.Count != 0)
         {
-            return Result<RawTelemetry>.Failure(Error.Validation<RawTelemetry>(
-                    string.Join("; ", errors)));
+            return DomainGuard.ValidationFailure<RawTelemetry>(errors);
         }
 
         var telemetryData = new RawTelemetry(

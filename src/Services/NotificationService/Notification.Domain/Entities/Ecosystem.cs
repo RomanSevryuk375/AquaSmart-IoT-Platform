@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Results;
 using Notification.Domain.ValueObjects;
 
@@ -32,15 +33,20 @@ public sealed class Ecosystem : AggregateRoot, IEntity
         Guid userId,
         string rawName)
     {
-        Result<Name> nameResult = Name.Create(rawName);
-        if (nameResult.IsFailure)
+        var errors = new List<string>();
+
+        DomainGuard.CheckNotEmpty(ecosystemId, "Ecosystem Id", errors);
+        DomainGuard.CheckNotEmpty(userId, nameof(UserId), errors);
+        Name? ecosystemName = DomainGuard.Collect(Name.Create(rawName), errors);
+
+        if (errors.Count != 0)
         {
-            return Result<Ecosystem>.Failure(nameResult.Error);
+            return DomainGuard.ValidationFailure<Ecosystem>(errors);
         }
 
         var ecosystem = new Ecosystem(
             ecosystemId, userId,
-            nameResult.Value,
+            ecosystemName!,
             createdAt: DateTime.UtcNow);
 
         return Result<Ecosystem>.Success(ecosystem);

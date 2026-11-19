@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
@@ -53,27 +54,27 @@ public sealed class Sensor : AggregateRoot, IEntity
     {
         var errors = new List<string>();
 
+        DomainGuard.CheckNotEmpty(id, "Sensor Id", errors);
+        DomainGuard.CheckNotEmpty(controllerId, nameof(ControllerId), errors);
+        DomainGuard.CheckNotEmpty(ecosystemId, nameof(EcosystemId), errors);
+        DomainGuard.CheckEnum(type, nameof(Type), errors);
+        DomainGuard.CheckEnum(state, nameof(State), errors);
+
         if (string.IsNullOrWhiteSpace(unit))
         {
             errors.Add(ErrorMessages.Sensor.UnitMustNotBeEmpty);
         }
 
-        Result<DeviceName> nameResut = DeviceName.Create(rawName);
-        if (nameResut.IsFailure)
-        {
-            errors.Add(nameResut.Error.Message);
-        }
+        DeviceName? name = DomainGuard.Collect(DeviceName.Create(rawName), errors);
 
-
-        if (errors.Count > 0)
+        if (errors.Count != 0)
         {
-            return Result<Sensor>.Failure(Error.Validation<Sensor>(
-                      string.Join("; ", errors)));
+            return DomainGuard.ValidationFailure<Sensor>(errors);
         }
 
         var sensor = new Sensor(
             id, controllerId, ecosystemId,
-            nameResut.Value, type, state, unit.Trim(),
+            name!, type, state, unit.Trim(),
             lastValue, updatedAt,
             createdAt,
             isDataDelayed: false);
@@ -86,10 +87,18 @@ public sealed class Sensor : AggregateRoot, IEntity
         SensorType type,
         string unit)
     {
+        var errors = new List<string>();
+
+        DomainGuard.CheckNotEmpty(controllerId, nameof(ControllerId), errors);
+        DomainGuard.CheckEnum(type, nameof(Type), errors);
         if (string.IsNullOrWhiteSpace(unit))
         {
-            return Result.Failure(Error.Validation<Sensor>(
-                ErrorMessages.Sensor.UnitMustNotBeEmpty));
+            errors.Add(ErrorMessages.Sensor.UnitMustNotBeEmpty);
+        }
+
+        if (errors.Count != 0)
+        {
+            return Result.Failure(Error.Validation<Sensor>(string.Join(", ", errors)));
         }
 
         ControllerId = controllerId;

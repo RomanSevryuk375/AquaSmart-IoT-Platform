@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Results;
 
 namespace Telemetry.Domain.Entities;
@@ -31,6 +32,17 @@ public sealed class Ecosystem : AggregateRoot, IEntity
         Guid controllerId,
         Guid userId)
     {
+        var errors = new List<string>();
+
+        DomainGuard.CheckNotEmpty(ecosystemId, "Ecosystem Id", errors);
+        DomainGuard.CheckNotEmpty(controllerId, nameof(ControllerId), errors);
+        DomainGuard.CheckNotEmpty(userId, nameof(UserId), errors);
+
+        if (errors.Count != 0)
+        {
+            return DomainGuard.ValidationFailure<Ecosystem>(errors);
+        }
+
         var ecosystem = new Ecosystem(
             ecosystemId, controllerId, userId,
             createdAt: DateTime.UtcNow);

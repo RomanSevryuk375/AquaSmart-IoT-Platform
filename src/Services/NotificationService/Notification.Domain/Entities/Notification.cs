@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
 using Notification.Domain.ValueObjects;
@@ -60,15 +61,21 @@ public sealed class Notification : AggregateRoot, IEntity
         NotificationLevel level,
         string rawMessage)
     {
-        Result<MessageText> messageResult = MessageText.Create(rawMessage);
-        if (messageResult.IsFailure)
+        var errors = new List<string>();
+
+        DomainGuard.CheckNotEmpty(notificationId, "Notification Id", errors);
+        DomainGuard.CheckNotEmpty(userId, nameof(UserId), errors);
+        DomainGuard.CheckEnum(level, nameof(Level), errors);
+        MessageText? message = DomainGuard.Collect(MessageText.Create(rawMessage), errors);
+
+        if (errors.Count != 0)
         {
-            return Result<Notification>.Failure(messageResult.Error);
+            return DomainGuard.ValidationFailure<Notification>(errors);
         }
 
         var notification = new Notification(
             notificationId, userId, ecosystemId,
-            level, messageResult.Value, isRead: false,
+            level, message!, isRead: false,
             createdAt: DateTime.UtcNow,
 
             isPublished: false, publishedAt: null,

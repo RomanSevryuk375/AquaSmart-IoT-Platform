@@ -44,7 +44,7 @@ public class UserTests
         result.Value.TelegramChatId.Should().Be(telegramChatId);
         result.Value.IsNotifyEnabled.Should().Be(enable);
         result.Value.CreatedAt.Should().Be(createdAt);
-        result.Value.Version.Should().Be(Guid.Empty);
+        result.Value.Version.Should().NotBeEmpty();
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public class UserTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("PhoneNumber.Invalid");
+        result.Error.Code.Should().Be("User.Invalid");
     }
 
     [Fact]
@@ -84,7 +84,7 @@ public class UserTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("TimeZoneId.Invalid");
+        result.Error.Code.Should().Be("User.Invalid");
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class UserTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("EmailAddress.Invalid");
+        result.Error.Code.Should().Be("User.Invalid");
     }
 
     [Fact]
@@ -159,7 +159,7 @@ public class UserTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("EmailAddress.Invalid");
+        result.Error.Code.Should().Be("User.Invalid");
         user.Version.Should().Be(initialVersion);
     }
 
@@ -175,7 +175,7 @@ public class UserTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("PhoneNumber.Invalid");
+        result.Error.Code.Should().Be("User.Invalid");
         user.Version.Should().Be(initialVersion);
     }
 

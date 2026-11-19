@@ -1,6 +1,7 @@
 // Ignore Spelling: tg
 
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Results;
 using Notification.Domain.ValueObjects;
 
@@ -55,32 +56,25 @@ public sealed class User : AggregateRoot, IEntity
         bool enable,
         DateTime createdAt)
     {
-        Result<PhoneNumber> phoneResult = PhoneNumber.Create(rawPhoneNumber);
-        if (phoneResult.IsFailure)
-        {
-            return Result<User>.Failure(phoneResult.Error);
-        }
+        var errors = new List<string>();
 
-        Result<TimeZoneId> tzResult = TimeZoneId.Create(rawTimeZone);
-        if (tzResult.IsFailure)
-        {
-            return Result<User>.Failure(tzResult.Error);
-        }
-
-        Result<EmailAddress> emailResult = EmailAddress.Create(rawEmail);
-        if (emailResult.IsFailure)
-        {
-            return Result<User>.Failure(emailResult.Error);
-        }
+        DomainGuard.CheckNotEmpty(userId, "User Id", errors);
+        PhoneNumber? phoneNumber = DomainGuard.Collect(PhoneNumber.Create(rawPhoneNumber), errors);
+        TimeZoneId? timeZone = DomainGuard.Collect(TimeZoneId.Create(rawTimeZone), errors);
+        EmailAddress? email = DomainGuard.Collect(EmailAddress.Create(rawEmail), errors);
 
         if (tgEnable && telegramChatId is null)
         {
-            return Result<User>.Failure(Error.Validation<User>(
-                "Telegram chat id must not be empty if tgEnable is true."));
+            errors.Add("Telegram chat id must not be empty if tgEnable is true.");
+        }
+
+        if (errors.Count != 0)
+        {
+            return DomainGuard.ValidationFailure<User>(errors);
         }
 
         var user = new User(
-            userId, emailResult.Value, tzResult.Value, phoneResult.Value,
+            userId, email!, timeZone!, phoneNumber!,
             emailEnable, tgEnable, telegramChatId,
             isNotifyEnabled: enable,
             createdAt);
@@ -92,20 +86,18 @@ public sealed class User : AggregateRoot, IEntity
         string email,
         string phoneNumber)
     {
-        Result<PhoneNumber> phoneResult = PhoneNumber.Create(phoneNumber);
-        if (phoneResult.IsFailure)
+        var errors = new List<string>();
+
+        PhoneNumber? phoneVo = DomainGuard.Collect(PhoneNumber.Create(phoneNumber), errors);
+        EmailAddress? emailVo = DomainGuard.Collect(EmailAddress.Create(email), errors);
+
+        if (errors.Count != 0)
         {
-            return Result<User>.Failure(phoneResult.Error);
+            return Result.Failure(Error.Validation<User>(string.Join(", ", errors)));
         }
 
-        Result<EmailAddress> emailResult = EmailAddress.Create(email);
-        if (emailResult.IsFailure)
-        {
-            return Result<User>.Failure(emailResult.Error);
-        }
-
-        Email = emailResult.Value;
-        PhoneNumber = phoneResult.Value;
+        Email = emailVo!;
+        PhoneNumber = phoneVo!;
 
         IncrementVersion();
 

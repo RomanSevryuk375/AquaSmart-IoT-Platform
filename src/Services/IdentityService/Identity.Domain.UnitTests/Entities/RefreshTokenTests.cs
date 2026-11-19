@@ -73,7 +73,7 @@ public class RefreshTokenTests
         token.IsRevoked.Should().BeFalse();
         token.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, tolerance);
         token.ExpiredAt.Should().BeCloseTo(DateTime.UtcNow.AddDays(30), tolerance);
-        token.Version.Should().BeEmpty();
+        token.Version.Should().NotBeEmpty();
     }
 
     [Fact]

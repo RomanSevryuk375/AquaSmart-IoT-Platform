@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
 using Telemetry.Domain.Events;
@@ -44,21 +45,26 @@ public sealed class AggregateTelemetry : AggregateRoot, IEntity
         DateTime periodStart, PeriodType period,
         double minValue, double maxValue, double avgValue, int dataPointsCount)
     {
-        Result<TelemetrySummary> summaryResult = TelemetrySummary.Create(
-            minValue, avgValue, maxValue, dataPointsCount);
-        if (summaryResult.IsFailure)
-        {
-            return Result<AggregateTelemetry>.Failure(summaryResult.Error);
-        }
+        var errors = new List<string>();
 
-        TelemetrySummary summary = summaryResult.Value;
+        DomainGuard.CheckNotEmpty(id, "AggregateTelemetry Id", errors);
+        DomainGuard.CheckNotEmpty(sensorId, nameof(SensorId), errors);
+        DomainGuard.CheckNotEmpty(ecosystemId, "EcosystemId", errors);
+        DomainGuard.CheckEnum(period, nameof(Period), errors);
+        TelemetrySummary? summary = DomainGuard.Collect(
+            TelemetrySummary.Create(minValue, avgValue, maxValue, dataPointsCount), errors);
+
+        if (errors.Count != 0)
+        {
+            return DomainGuard.ValidationFailure<AggregateTelemetry>(errors);
+        }
 
         var aggregateData = new AggregateTelemetry(
             id,
             sensorId,
             periodStart,
             period,
-            summary,
+            summary!,
             createdAt: DateTime.UtcNow,
             isAggregated: false);
 
@@ -67,7 +73,7 @@ public sealed class AggregateTelemetry : AggregateRoot, IEntity
             SensorId = sensorId,
             EcosystemId = ecosystemId,
             Period = period,
-            MaxValue = summary.MaxValue,
+            MaxValue = summary!.MaxValue,
             MinValue = summary.MinValue,
             AvgValue = summary.AvgValue,
             Time = periodStart,
