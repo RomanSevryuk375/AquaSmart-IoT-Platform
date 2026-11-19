@@ -2,7 +2,7 @@ using System.Globalization;
 using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Results;
 
-namespace Control.Domain.ValueObjects;
+namespace BuildingBlocks.Domain.ValueObjects;
 
 public sealed record DateRange
 {

@@ -1,6 +1,6 @@
 using BuildingBlocks.Domain.Results;
+using BuildingBlocks.Domain.ValueObjects;
 using FluentAssertions;
-using IdentityService.Domain.ValueObjects;
 
 namespace Identity.Domain.UnitTests.ValueObjects;
 

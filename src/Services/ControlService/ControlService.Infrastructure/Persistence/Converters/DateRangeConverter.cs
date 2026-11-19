@@ -1,4 +1,4 @@
-using Control.Domain.ValueObjects;
+using BuildingBlocks.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Control.Infrastructure.Persistence.Converters;

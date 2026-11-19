@@ -1,12 +1,12 @@
 using BuildingBlocks.Domain.Results;
 
-namespace IdentityService.Domain.ValueObjects;
+namespace BuildingBlocks.Domain.ValueObjects;
 
-public sealed record Money
+public record Money
 {
     public decimal Amount { get; }
 
-    internal Money(decimal amount)
+    protected Money(decimal amount)
     {
         Amount = amount;
     }

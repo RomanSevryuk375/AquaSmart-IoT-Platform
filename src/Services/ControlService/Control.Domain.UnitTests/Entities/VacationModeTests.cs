@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Results;
+using BuildingBlocks.Domain.ValueObjects;
 
 namespace Control.Domain.UnitTests.Entities;
 

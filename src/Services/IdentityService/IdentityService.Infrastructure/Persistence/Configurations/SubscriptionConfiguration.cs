@@ -1,5 +1,6 @@
 using System.Text.Json;
 using BuildingBlocks.Domain.Enums;
+using BuildingBlocks.Domain.ValueObjects;
 using BuildingBlocks.Presentation.Authorization;
 using IdentityService.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;

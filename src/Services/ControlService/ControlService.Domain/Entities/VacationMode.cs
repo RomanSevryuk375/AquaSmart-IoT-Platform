@@ -1,7 +1,7 @@
 using BuildingBlocks.Domain.Abstractions;
 using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Results;
-using Control.Domain.ValueObjects;
+using BuildingBlocks.Domain.ValueObjects;
 
 namespace Control.Domain.Entities;
 

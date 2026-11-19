@@ -1,5 +1,6 @@
 using BuildingBlocks.Domain.Abstractions;
 using BuildingBlocks.Domain.Results;
+using BuildingBlocks.Domain.ValueObjects;
 using IdentityService.Domain.ValueObjects;
 
 namespace IdentityService.Domain.Entities;
