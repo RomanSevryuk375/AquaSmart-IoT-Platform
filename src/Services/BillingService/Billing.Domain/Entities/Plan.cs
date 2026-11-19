@@ -33,7 +33,6 @@ public sealed class Plan : AggregateRoot, IEntity
         TrialPeriodDays = trialPeriodDays;
         IsActive = isActive;
         CreatedAt = createdAt;
-        IncrementVersion();
     }
 
 #pragma warning disable CS8618

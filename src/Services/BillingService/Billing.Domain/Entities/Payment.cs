@@ -39,7 +39,6 @@ public sealed class Payment : AggregateRoot, IEntity
         Provider = provider;
         IdempotencyKey = idempotencyKey;
         CreatedAt = createdAt;
-        IncrementVersion();
     }
 
 #pragma warning disable CS8618

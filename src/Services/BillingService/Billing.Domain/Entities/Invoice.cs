@@ -33,7 +33,6 @@ public sealed class Invoice : AggregateRoot, IEntity
         Currency = currency;
         DueDate = dueDate;
         CreatedAt = createdAt;
-        IncrementVersion();
     }
 
 #pragma warning disable CS8618

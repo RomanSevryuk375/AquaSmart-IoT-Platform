@@ -32,7 +32,6 @@ public sealed class Subscription : AggregateRoot, IEntity
         Period = period;
         TrialEnd = trialEnd;
         CreatedAt = createdAt;
-        IncrementVersion();
     }
 
 #pragma warning disable CS8618

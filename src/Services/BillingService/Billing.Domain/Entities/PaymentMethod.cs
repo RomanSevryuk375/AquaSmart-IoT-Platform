@@ -27,7 +27,6 @@ public sealed class PaymentMethod : IEntity, IHasVersion
         CardDetails = cardDetails;
         IsActive = true;
         CreatedAt = createdAt;
-        Version = Guid.NewGuid();
     }
 
 #pragma warning disable CS8618
@@ -42,7 +41,7 @@ public sealed class PaymentMethod : IEntity, IHasVersion
     public CardDetails? CardDetails { get; private set; }
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
-    public Guid Version { get; private set; }
+    public Guid Version { get; private set; } = Guid.NewGuid();
 
     internal static Result<PaymentMethod> Create(
         Guid id,

@@ -22,7 +22,6 @@ public sealed class BillingCustomer : AggregateRoot, IEntity
         UserId = userId;
         Email = email;
         CreatedAt = createdAt;
-        IncrementVersion();
     }
 
 #pragma warning disable CS8618
