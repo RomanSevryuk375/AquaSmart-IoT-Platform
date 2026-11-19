@@ -7,6 +7,24 @@ namespace Identity.Domain.UnitTests.Entities;
 public class SubscriptionTests
 {
     [Fact]
+    public void Create_WithEmptyId_ReturnsFailure()
+    {
+        // Act
+        Result<Subscription> result = Subscription.Create(
+            Guid.Empty,
+            rawName: "Premium",
+            rawPrice: 10.0m,
+            durationDays: 30,
+            permissions: []);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("Subscription.Invalid");
+        result.Error.Message.Should().Be("Subscription Id cannot be empty.");
+        result.Error.Type.Should().Be(ErrorType.Validation);
+    }
+
+    [Fact]
     public void Create_WithEmptyName_ReturnsFailure()
     {
         // Act
@@ -19,7 +37,7 @@ public class SubscriptionTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Name.Invalid");
+        result.Error.Code.Should().Be("Subscription.Invalid");
         result.Error.Message.Should().Be("Name cannot be empty.");
     }
 
@@ -36,7 +54,7 @@ public class SubscriptionTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Money.Invalid");
+        result.Error.Code.Should().Be("Subscription.Invalid");
         result.Error.Message.Should().Be("Amount cannot be negative.");
     }
 

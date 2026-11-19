@@ -10,6 +10,44 @@ namespace Identity.Domain.UnitTests.Entities;
 public class UserTests
 {
     [Fact]
+    public void Create_WithEmptyUserId_ReturnsFailure()
+    {
+        // Act
+        Result<User> result = User.Create(
+            Guid.Empty,
+            rawName: "Test User",
+            rawEmail: "test@example.com",
+            rawPhoneNumber: "+375291112233",
+            subscriptionId: Guid.NewGuid(),
+            rawTimeZone: "UTC");
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("User.Invalid");
+        result.Error.Message.Should().Be("UserId cannot be empty.");
+        result.Error.Type.Should().Be(ErrorType.Validation);
+    }
+
+    [Fact]
+    public void Create_WithEmptySubscriptionId_ReturnsFailure()
+    {
+        // Act
+        Result<User> result = User.Create(
+            Guid.NewGuid(),
+            rawName: "Test User",
+            rawEmail: "test@example.com",
+            rawPhoneNumber: "+375291112233",
+            subscriptionId: Guid.Empty,
+            rawTimeZone: "UTC");
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("User.Invalid");
+        result.Error.Message.Should().Be("SubscriptionId cannot be empty.");
+        result.Error.Type.Should().Be(ErrorType.Validation);
+    }
+
+    [Fact]
     public void Create_WithInvalidName_ReturnsFailure()
     {
         // Act
@@ -23,7 +61,7 @@ public class UserTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Name.Invalid");
+        result.Error.Code.Should().Be("User.Invalid");
     }
 
     [Fact]
@@ -40,7 +78,7 @@ public class UserTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("EmailAddress.Invalid");
+        result.Error.Code.Should().Be("User.Invalid");
     }
 
     [Fact]
@@ -57,7 +95,7 @@ public class UserTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("PhoneNumber.Invalid");
+        result.Error.Code.Should().Be("User.Invalid");
     }
 
     [Fact]
@@ -74,7 +112,7 @@ public class UserTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("TimeZoneId.Invalid");
+        result.Error.Code.Should().Be("User.Invalid");
     }
 
     [Fact]
@@ -138,7 +176,7 @@ public class UserTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Name.Invalid");
+        result.Error.Code.Should().Be("User.Invalid");
         user.Name.Should().Be(initialName);
         user.PhoneNumber.Should().Be(initialPhone);
         user.ConcurrencyStamp.Should().Be(initialStamp);
@@ -159,7 +197,7 @@ public class UserTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("PhoneNumber.Invalid");
+        result.Error.Code.Should().Be("User.Invalid");
         user.Name.Should().Be(initialName);
         user.PhoneNumber.Should().Be(initialPhone);
         user.ConcurrencyStamp.Should().Be(initialStamp);

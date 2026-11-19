@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Results;
 using BuildingBlocks.Domain.ValueObjects;
 using IdentityService.Domain.ValueObjects;
@@ -40,25 +41,19 @@ public sealed class Subscription : AggregateRoot, IEntity
         int durationDays,
         List<string> permissions)
     {
-        Result<Name> nameResult = Name.Create(rawName);
-        if (nameResult.IsFailure)
-        {
-            return Result<Subscription>.Failure(nameResult.Error);
-        }
+        var errors = new List<string>();
 
-        Result<Money> priceResult = Money.Create(rawPrice);
-        if (priceResult.IsFailure)
-        {
-            return Result<Subscription>.Failure(priceResult.Error);
-        }
+        DomainGuard.CheckNotEmpty(id, "Subscription Id", errors);
+        Name? name = DomainGuard.Collect(Name.Create(rawName), errors);
+        Money? price = DomainGuard.Collect(Money.Create(rawPrice), errors);
+        DomainGuard.CheckNonNegative(durationDays, "Duration", errors);
 
-        if (durationDays < 0)
+        if (errors.Count != 0)
         {
-            return Result<Subscription>.Failure(Error.Validation<Subscription>(
-                "Duration cannot be negative."));
+            return DomainGuard.ValidationFailure<Subscription>(errors);
         }
 
         return Result<Subscription>.Success(new Subscription(
-            id, nameResult.Value, priceResult.Value, durationDays, permissions));
+            id, name!, price!, durationDays, permissions));
     }
 }

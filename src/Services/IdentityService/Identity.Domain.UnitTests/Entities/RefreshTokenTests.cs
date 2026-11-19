@@ -32,7 +32,23 @@ public class RefreshTokenTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be("RefreshToken.Invalid");
-        result.Error.Message.Should().Be("Token hash cannot be empty.");
+        result.Error.Message.Should().Be("Token hash is required.");
+        result.Error.Type.Should().Be(ErrorType.Validation);
+    }
+
+    [Fact]
+    public void Create_WithTokenHashExceedingMaxLength_ReturnsFailure()
+    {
+        // Arrange
+        string longHash = new string('a', RefreshToken.MaxLength + 1);
+
+        // Act
+        Result<RefreshToken> result = RefreshToken.Create(Guid.NewGuid(), longHash);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("RefreshToken.Invalid");
+        result.Error.Message.Should().Be($"Token hash cannot exceed {RefreshToken.MaxLength} characters.");
         result.Error.Type.Should().Be(ErrorType.Validation);
     }
 

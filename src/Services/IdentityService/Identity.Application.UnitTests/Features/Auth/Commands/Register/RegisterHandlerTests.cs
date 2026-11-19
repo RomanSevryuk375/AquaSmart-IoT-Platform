@@ -140,7 +140,7 @@ public class RegisterHandlerTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Name.Invalid");
+        result.Error.Code.Should().Be("User.Invalid");
 
         await _userManagerMock.DidNotReceive().CreateAsync(Arg.Any<User>(), Arg.Any<string>());
         await _tokenRepoMock.DidNotReceive().AddAsync(Arg.Any<RefreshToken>(), Arg.Any<CancellationToken>());

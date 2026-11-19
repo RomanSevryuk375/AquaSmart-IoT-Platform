@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Results;
 
 namespace IdentityService.Domain.Entities;
@@ -38,26 +39,24 @@ public sealed class RefreshToken : AggregateRoot, IEntity
 
     public static Result<RefreshToken> Create(Guid userId, string tokenHash)
     {
-        if (userId == Guid.Empty)
-        {
-            return Result<RefreshToken>.Failure(Error.Validation<RefreshToken>(
-                "UserId cannot be empty."));
-        }
+        var errors = new List<string>();
 
-        if (string.IsNullOrWhiteSpace(tokenHash))
+        DomainGuard.CheckNotEmpty(userId, nameof(UserId), errors);
+        string cleanHash = DomainGuard.CheckText(tokenHash, MaxLength, "Token hash", errors);
+
+        if (errors.Count != 0)
         {
-            return Result<RefreshToken>.Failure(Error.Validation<RefreshToken>(
-                "Token hash cannot be empty."));
+            return DomainGuard.ValidationFailure<RefreshToken>(errors);
         }
 
         var token = new RefreshToken(
-            Guid.NewGuid(),
+            id: Guid.NewGuid(),
             userId,
-            tokenHash,
+            cleanHash,
             isUsed: false,
             isRevoked: false,
-            DateTime.UtcNow.AddDays(30),
-            DateTime.UtcNow);
+            expiredAt: DateTime.UtcNow.AddDays(30),
+            createdAt: DateTime.UtcNow);
 
         return Result<RefreshToken>.Success(token);
     }
@@ -74,4 +73,3 @@ public sealed class RefreshToken : AggregateRoot, IEntity
         IncrementVersion();
     }
 }
-

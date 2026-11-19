@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Results;
 using IdentityService.Domain.Events;
 using IdentityService.Domain.ValueObjects;
@@ -50,38 +51,28 @@ public sealed class User : IdentityUser<Guid>, IEntity, IHasDomainEvents
         Guid subscriptionId,
         string rawTimeZone)
     {
-        Result<Name> nameResult = Name.Create(rawName);
-        if (nameResult.IsFailure)
-        {
-            return Result<User>.Failure(nameResult.Error);
-        }
+        var errors = new List<string>();
 
-        Result<PhoneNumber> phoneResult = ValueObjects.PhoneNumber.Create(rawPhoneNumber);
-        if (phoneResult.IsFailure)
-        {
-            return Result<User>.Failure(phoneResult.Error);
-        }
+        DomainGuard.CheckNotEmpty(userId, "UserId", errors);
+        DomainGuard.CheckNotEmpty(subscriptionId, nameof(SubscriptionId), errors);
+        Name? name = DomainGuard.Collect(Name.Create(rawName), errors);
+        PhoneNumber? phoneNumber = DomainGuard.Collect(ValueObjects.PhoneNumber.Create(rawPhoneNumber), errors);
+        TimeZoneId? timeZone = DomainGuard.Collect(TimeZoneId.Create(rawTimeZone), errors);
+        EmailAddress? email = DomainGuard.Collect(EmailAddress.Create(rawEmail), errors);
 
-        Result<TimeZoneId> tzResult = TimeZoneId.Create(rawTimeZone);
-        if (tzResult.IsFailure)
+        if (errors.Count != 0)
         {
-            return Result<User>.Failure(tzResult.Error);
-        }
-
-        Result<EmailAddress> emailResult = EmailAddress.Create(rawEmail);
-        if (emailResult.IsFailure)
-        {
-            return Result<User>.Failure(emailResult.Error);
+            return DomainGuard.ValidationFailure<User>(errors);
         }
 
         var user = new User(
             userId,
-            nameResult.Value,
+            name!,
             telegramChatId: null,
-            emailResult.Value.Value,
-            phoneResult.Value,
+            email!.Value,
+            phoneNumber!,
             subscriptionId,
-            tzResult.Value);
+            timeZone!);
 
         user.RaiseEvent(new UserCreatedDomainEvent
         {
@@ -97,20 +88,18 @@ public sealed class User : IdentityUser<Guid>, IEntity, IHasDomainEvents
 
     public Result UpdateProfile(string rawName, string rawPhoneNumber)
     {
-        Result<Name> nameResult = Name.Create(rawName);
-        if (nameResult.IsFailure)
+        var errors = new List<string>();
+
+        Name? name = DomainGuard.Collect(Name.Create(rawName), errors);
+        PhoneNumber? phoneNumber = DomainGuard.Collect(ValueObjects.PhoneNumber.Create(rawPhoneNumber), errors);
+
+        if (errors.Count != 0)
         {
-            return Result.Failure(nameResult.Error);
+            return Result.Failure(Error.Validation<User>(string.Join(", ", errors)));
         }
 
-        Result<PhoneNumber> phoneResult = ValueObjects.PhoneNumber.Create(rawPhoneNumber);
-        if (phoneResult.IsFailure)
-        {
-            return Result.Failure(phoneResult.Error);
-        }
-
-        Name = nameResult.Value;
-        PhoneNumber = phoneResult.Value.Value;
+        Name = name!;
+        PhoneNumber = phoneNumber!.Value;
 
         IncrementVersion();
 
