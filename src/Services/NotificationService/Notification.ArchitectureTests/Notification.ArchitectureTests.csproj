@@ -5,6 +5,7 @@
         <ProjectReference Include="..\Notification.Domain\Notification.Domain.csproj" />
         <ProjectReference Include="..\Notification.Infrastructure\Notification.Infrastructure.csproj" />
         <ProjectReference Include="..\NotificationService\Notification.API.csproj" />
+        <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.ArchitectureTestShared\BuildingBlocks.ArchitectureTestShared.csproj" />
     </ItemGroup>
 
     <ItemGroup>

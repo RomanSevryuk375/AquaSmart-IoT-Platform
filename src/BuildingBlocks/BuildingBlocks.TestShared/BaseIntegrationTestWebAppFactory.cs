@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
 using Xunit;
 
-namespace BuildingBlocks.IntegrationTests;
+namespace BuildingBlocks.TestShared;
 
 public abstract class BaseIntegrationTestWebAppFactory<TProgram, TDbContext> : WebApplicationFactory<TProgram>, IAsyncLifetime
     where TProgram : class

@@ -8,8 +8,8 @@ namespace Device.ArchitectureTests;
 
 public abstract class BaseArchitectureTest
 {
-    protected static readonly Assembly DomainAssembly = typeof(Controller).Assembly;
-    protected static readonly Assembly ApplicationAssembly = typeof(IDeviceSecurityService).Assembly;
-    protected static readonly Assembly InfrastructureAssembly = typeof(DeviceDbContext).Assembly;
-    protected static readonly Assembly ApiAssembly = typeof(AddRelayEndpoint).Assembly;
+    internal static readonly Assembly DomainAssembly = typeof(Controller).Assembly;
+    internal static readonly Assembly ApplicationAssembly = typeof(IDeviceSecurityService).Assembly;
+    internal static readonly Assembly InfrastructureAssembly = typeof(DeviceDbContext).Assembly;
+    internal static readonly Assembly ApiAssembly = typeof(AddRelayEndpoint).Assembly;
 }

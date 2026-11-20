@@ -1,7 +1,7 @@
 using MediatR;
 using Npgsql;
 using Respawn;
-using BuildingBlocks.IntegrationTests;
+using BuildingBlocks.TestShared;
 
 namespace Control.Infrastructure.IntegrationTests.Infrastructure;
 

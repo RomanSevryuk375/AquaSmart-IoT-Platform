@@ -3,5 +3,6 @@
     <ProjectReference Include="..\Device.Domain\Device.Domain.csproj" />
     <ProjectReference Include="..\Device.Infrastrucrute\Device.Infrastructure.csproj" />
     <ProjectReference Include="..\DeviceService\Device.API.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.ArchitectureTestShared\BuildingBlocks.ArchitectureTestShared.csproj" />
   </ItemGroup>
 </Project>

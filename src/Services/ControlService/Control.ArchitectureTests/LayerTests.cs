@@ -1,48 +1,14 @@
+using System.Reflection;
+using BuildingBlocks.ArchitectureTestShared;
+
 namespace Control.ArchitectureTests;
 
-public class LayerTests : BaseArchitectureTest
+public class LayerTests : ServiceLayerArchitectureTestsBase
 {
-    [Fact]
-    public void DomainLayer_ShouldNotHaveDependencyOn_ApplicationLayer()
-    {
-        TestResult result = Types.InAssembly(DomainAssembly)
-            .Should()
-            .NotHaveDependencyOn("Control.Application")
-            .GetResult();
-
-        result.IsSuccessful.Should().BeTrue();
-    }
-
-    [Fact]
-    public void DomainLayer_ShouldNotHaveDependencyOn_InfrastructureLayer()
-    {
-        TestResult result = Types.InAssembly(DomainAssembly)
-            .Should()
-            .NotHaveDependencyOn("Control.Infrastructure")
-            .GetResult();
-
-        result.IsSuccessful.Should().BeTrue();
-    }
-
-    [Fact]
-    public void ApplicationLayer_ShouldNotHaveDependencyOn_InfrastructureLayer()
-    {
-        TestResult result = Types.InAssembly(ApplicationAssembly)
-            .Should()
-            .NotHaveDependencyOn("Control.Infrastructure")
-            .GetResult();
-
-        result.IsSuccessful.Should().BeTrue();
-    }
-
-    [Fact]
-    public void ApplicationLayer_ShouldNotHaveDependencyOn_ApiLayer()
-    {
-        TestResult result = Types.InAssembly(ApplicationAssembly)
-            .Should()
-            .NotHaveDependencyOn("Control.API")
-            .GetResult();
-
-        result.IsSuccessful.Should().BeTrue();
-    }
+    protected override Assembly DomainAssembly => BaseArchitectureTest.DomainAssembly;
+    protected override Assembly ApplicationAssembly => BaseArchitectureTest.ApplicationAssembly;
+    protected override Assembly InfrastructureAssembly => BaseArchitectureTest.InfrastructureAssembly;
+    protected override string ApplicationNamespace => "Control.Application";
+    protected override string InfrastructureNamespace => "Control.Infrastructure";
+    protected override string ApiNamespace => "Control.API";
 }

@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
     <ProjectReference Include="..\Device.Infrastrucrute\Device.Infrastructure.csproj" />
     <ProjectReference Include="..\Device.TestShared\Device.TestShared.csproj" />
     <ProjectReference Include="..\DeviceService\Device.API.csproj" />
-    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.IntegrationTests\BuildingBlocks.IntegrationTests.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.TestShared\BuildingBlocks.TestShared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,4 +1,4 @@
-using BuildingBlocks.IntegrationTests;
+using BuildingBlocks.TestShared;
 using Control.Domain.Interfaces;
 using NSubstitute;
 using BuildingBlocks.Domain.Results;

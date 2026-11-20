@@ -4,7 +4,7 @@
     <ProjectReference Include="..\Identity.TestShared\Identity.TestShared.csproj" />
     <ProjectReference Include="..\IdentityService.Infrastructure\IdentityService.Infrastructure.csproj" />
     <ProjectReference Include="..\IdentityService\IdentityService.API.csproj" />
-    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.IntegrationTests\BuildingBlocks.IntegrationTests.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.TestShared\BuildingBlocks.TestShared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

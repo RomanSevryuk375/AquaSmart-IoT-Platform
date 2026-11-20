@@ -8,8 +8,8 @@ namespace Control.ArchitectureTests;
 
 public abstract class BaseArchitectureTest
 {
-    protected static readonly Assembly DomainAssembly = typeof(AutomationRule).Assembly;
-    protected static readonly Assembly ApplicationAssembly = typeof(IRuleBoundRequest).Assembly;
-    protected static readonly Assembly InfrastructureAssembly = typeof(ControlDbContext).Assembly;
-    protected static readonly Assembly ApiAssembly = typeof(AddConditionEndpoint).Assembly;
+    internal static readonly Assembly DomainAssembly = typeof(AutomationRule).Assembly;
+    internal static readonly Assembly ApplicationAssembly = typeof(IRuleBoundRequest).Assembly;
+    internal static readonly Assembly InfrastructureAssembly = typeof(ControlDbContext).Assembly;
+    internal static readonly Assembly ApiAssembly = typeof(AddConditionEndpoint).Assembly;
 }

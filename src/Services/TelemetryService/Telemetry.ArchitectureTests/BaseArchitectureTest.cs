@@ -8,8 +8,8 @@ namespace Telemetry.ArchitectureTests;
 
 public abstract class BaseArchitectureTest
 {
-    protected static readonly Assembly DomainAssembly = typeof(Ecosystem).Assembly;
-    protected static readonly Assembly ApplicationAssembly = typeof(AddTelemetryBatchCommand).Assembly;
-    protected static readonly Assembly InfrastructureAssembly = typeof(TelemetryDbContext).Assembly;
-    protected static readonly Assembly ApiAssembly = typeof(GetRawDataEndpoint).Assembly;
+    internal static readonly Assembly DomainAssembly = typeof(Ecosystem).Assembly;
+    internal static readonly Assembly ApplicationAssembly = typeof(AddTelemetryBatchCommand).Assembly;
+    internal static readonly Assembly InfrastructureAssembly = typeof(TelemetryDbContext).Assembly;
+    internal static readonly Assembly ApiAssembly = typeof(GetRawDataEndpoint).Assembly;
 }

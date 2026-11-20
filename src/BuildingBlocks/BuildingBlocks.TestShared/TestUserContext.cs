@@ -1,6 +1,6 @@
 using BuildingBlocks.Domain.Abstractions;
 
-namespace BuildingBlocks.IntegrationTests;
+namespace BuildingBlocks.TestShared;
 
 public sealed class TestUserContext : IUserContext
 {
