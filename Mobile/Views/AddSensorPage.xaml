@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Mobile.ViewModels"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
+             xmlns:loc="clr-namespace:Mobile.Converters"
+             x:Class="Mobile.Views.AddSensorPage"
+             x:DataType="vm:AddSensorViewModel"
+             BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#12131A'}"
+             Shell.NavBarIsVisible="False"
+             Title="{loc:Translate Sensor_AddTitle}">
+
+    <Grid>
+        <!-- 1. MAIN FORM (Figma: 1. Добавление датчика) -->
+        <ScrollView IsVisible="{Binding IsFormVisible}">
+            <VerticalStackLayout Spacing="16" Padding="20,16,20,30">
+                <!-- Top Navigation Bar (< Добавление датчика   X) -->
+                <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,10">
+                    <Border WidthRequest="36" HeightRequest="36"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
+                            StrokeThickness="0"
+                            VerticalOptions="Center">
+                        <ImageButton Source="{AppThemeBinding Light='icon_arrow_left.png', Dark='icon_arrow_left_white.png'}"
+                                     Command="{Binding PromptCancelCommand}"
+                                     BackgroundColor="Transparent"
+                                     WidthRequest="20" HeightRequest="20"
+                                     Padding="0"
+                                     HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+
+                    <Label Grid.Column="1"
+                           Text="{loc:Translate Sensor_AddTitle}"
+                           TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center"
+                           Margin="12,0,0,0" />
+
+                    <Border Grid.Column="2"
+                            WidthRequest="36" HeightRequest="36"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
+                            StrokeThickness="0"
+                            VerticalOptions="Center">
+                        <ImageButton Source="{AppThemeBinding Light='icon_close.png', Dark='icon_close_white.png'}"
+                                     Command="{Binding PromptCancelCommand}"
+                                     BackgroundColor="Transparent"
+                                     WidthRequest="18" HeightRequest="18"
+                                     Padding="0"
+                                     HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                </Grid>
+
+                <!-- Sensor Name -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="{loc:Translate Sensor_Name}" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Border StrokeThickness="1" Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}" StrokeShape="RoundRectangle 12" BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}" HeightRequest="50" Padding="14,0">
+                        <Entry Text="{Binding SensorName}"
+                               Placeholder="{loc:Translate Sensor_NamePlaceholder}"
+                               PlaceholderColor="{AppThemeBinding Light='#8C93A8', Dark='#73778F'}"
+                               TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                               VerticalOptions="Center" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Sensor Type Picker -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="{loc:Translate Sensor_Type}" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Border StrokeThickness="1" Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}" StrokeShape="RoundRectangle 12" BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}" HeightRequest="50" Padding="14,0">
+                        <Picker SelectedIndex="{Binding SensorTypeIndex}"
+                                ItemsSource="{Binding SensorTypes}"
+                                TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                                Title="{loc:Translate Sensor_SelectType}"
+                                TitleColor="{AppThemeBinding Light='#8C93A8', Dark='#73778F'}"
+                                VerticalOptions="Center" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Connection Protocol Picker -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="{loc:Translate Sensor_Protocol}" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Border StrokeThickness="1" Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}" StrokeShape="RoundRectangle 12" BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}" HeightRequest="50" Padding="14,0">
+                        <Picker SelectedIndex="{Binding ProtocolIndex}"
+                                TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                                Title="{loc:Translate Sensor_SelectProtocol}"
+                                TitleColor="{AppThemeBinding Light='#8C93A8', Dark='#73778F'}"
+                                VerticalOptions="Center">
+                            <Picker.ItemsSource>
+                                <x:Array Type="{x:Type x:String}">
+                                    <x:String>Digital (GPIO)</x:String>
+                                    <x:String>Analog (ADC)</x:String>
+                                    <x:String>I2C</x:String>
+                                    <x:String>OneWire</x:String>
+                                </x:Array>
+                            </Picker.ItemsSource>
+                        </Picker>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Connection Address / Port -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="{loc:Translate Sensor_Address}" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Border StrokeThickness="1" Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}" StrokeShape="RoundRectangle 12" BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}" HeightRequest="50" Padding="14,0">
+                        <Entry Text="{Binding Port}"
+                               Placeholder="{loc:Translate Sensor_AddressPlaceholder}"
+                               PlaceholderColor="{AppThemeBinding Light='#8C93A8', Dark='#73778F'}"
+                               TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                               VerticalOptions="Center" />
+                    </Border>
+                    <!-- Quick Preset Badges -->
+                    <HorizontalStackLayout Spacing="8" Margin="0,2,0,0">
+                        <Button Text="GPIO 4"
+                                Command="{Binding SelectPortPresetCommand}"
+                                CommandParameter="GPIO 4"
+                                BackgroundColor="{AppThemeBinding Light='#EDEFFB', Dark='#222640'}"
+                                TextColor="{AppThemeBinding Light='#4152B0', Dark='#8E9DF0'}"
+                                FontSize="12"
+                                HeightRequest="32"
+                                Padding="10,0"
+                                CornerRadius="8" />
+                        <Button Text="D2"
+                                Command="{Binding SelectPortPresetCommand}"
+                                CommandParameter="D2"
+                                BackgroundColor="{AppThemeBinding Light='#EDEFFB', Dark='#222640'}"
+                                TextColor="{AppThemeBinding Light='#4152B0', Dark='#8E9DF0'}"
+                                FontSize="12"
+                                HeightRequest="32"
+                                Padding="10,0"
+                                CornerRadius="8" />
+                        <Button Text="A0"
+                                Command="{Binding SelectPortPresetCommand}"
+                                CommandParameter="A0"
+                                BackgroundColor="{AppThemeBinding Light='#EDEFFB', Dark='#222640'}"
+                                TextColor="{AppThemeBinding Light='#4152B0', Dark='#8E9DF0'}"
+                                FontSize="12"
+                                HeightRequest="32"
+                                Padding="10,0"
+                                CornerRadius="8" />
+                        <Button Text="0x2F"
+                                Command="{Binding SelectPortPresetCommand}"
+                                CommandParameter="0x2F"
+                                BackgroundColor="{AppThemeBinding Light='#EDEFFB', Dark='#222640'}"
+                                TextColor="{AppThemeBinding Light='#4152B0', Dark='#8E9DF0'}"
+                                FontSize="12"
+                                HeightRequest="32"
+                                Padding="10,0"
+                                CornerRadius="8" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- Safe Thresholds (Min & Max) -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,4,0,10">
+                    <VerticalStackLayout Grid.Column="0" Spacing="6">
+                        <Label Text="{loc:Translate Sensor_MinThreshold}" TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}" StrokeShape="RoundRectangle 12" BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}" HeightRequest="48" Padding="12,0">
+                            <Entry Text="{Binding MinValueString}"
+                                   Keyboard="Numeric"
+                                   Placeholder="22.0"
+                                   PlaceholderColor="{AppThemeBinding Light='#8C93A8', Dark='#73778F'}"
+                                   TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Grid.Column="1" Spacing="6">
+                        <Label Text="{loc:Translate Sensor_MaxThreshold}" TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="13" />
+                        <Border StrokeThickness="1" Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}" StrokeShape="RoundRectangle 12" BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}" HeightRequest="48" Padding="12,0">
+                            <Entry Text="{Binding MaxValueString}"
+                                   Keyboard="Numeric"
+                                   Placeholder="28.0"
+                                   PlaceholderColor="{AppThemeBinding Light='#8C93A8', Dark='#73778F'}"
+                                   TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!-- Single wide "Добавить датчик" Button as in Figma -->
+                <Button Text="{loc:Translate Sensor_AddSensorBtn}"
+                        Command="{Binding SaveCommand}"
+                        BackgroundColor="#4152B0"
+                        TextColor="#FFFFFF"
+                        CornerRadius="14"
+                        HeightRequest="52"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="15"
+                        Margin="0,8,0,0" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- 2. SUCCESS SCREEN (Figma: Добавление датчика. Успешно) -->
+        <ScrollView IsVisible="{Binding IsSuccessVisible}">
+            <VerticalStackLayout Spacing="20" Padding="24,30,24,30" VerticalOptions="Center">
+                <!-- Fish Mascot Card with Checkmark badge -->
+                <controls:FishMascotCard HeightOverride="220" BadgeText="✓" BadgeColor="#7BA028" />
+
+                <!-- Created Sensor Summary Card -->
+                <Border StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                        StrokeShape="RoundRectangle 14"
+                        BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
+                        Padding="16,14"
+                        Margin="0,6,0,0">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Label Grid.Column="0" Text="{Binding CreatedSensorIcon}" FontSize="24" VerticalOptions="Center" />
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                            <Label Text="{Binding CreatedSensorName}"
+                                   TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                                   FontFamily="OpenSansSemibold"
+                                   FontSize="15"
+                                   FontAttributes="Bold" />
+                            <Label Text="{Binding CreatedSensorSubtitle}"
+                                   TextColor="{AppThemeBinding Light='#8C93A8', Dark='#9FA3B8'}"
+                                   FontSize="12" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Success Header & Description -->
+                <VerticalStackLayout Spacing="8" Margin="0,4,0,10">
+                    <Label Text="{loc:Translate Sensor_AddedSuccessTitle}"
+                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="{loc:Translate Sensor_AddedSuccessDesc}"
+                           TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}"
+                           FontSize="14"
+                           LineHeight="1.3"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <!-- Action Buttons: "Вернуться к ёмкости" & "Добавить ещё датчик" -->
+                <VerticalStackLayout Spacing="10">
+                    <Button Text="{loc:Translate Sensor_ReturnToTank}"
+                            Command="{Binding ReturnToAquariumCommand}"
+                            BackgroundColor="#4152B0"
+                            TextColor="#FFFFFF"
+                            CornerRadius="14"
+                            HeightRequest="52"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15" />
+
+                    <Button Text="{loc:Translate Sensor_AddAnother}"
+                            Command="{Binding AddAnotherSensorCommand}"
+                            BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
+                            BorderColor="#4152B0"
+                            BorderWidth="1.5"
+                            TextColor="{AppThemeBinding Light='#4152B0', Dark='#8E9DF0'}"
+                            CornerRadius="14"
+                            HeightRequest="52"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- 3. CANCEL CONFIRMATION MODAL (Figma: Добавление датчика. Отмена) -->
+        <Grid BackgroundColor="#80000000" IsVisible="{Binding IsCancelDialogVisible}">
+            <Border VerticalOptions="End"
+                    StrokeShape="RoundRectangle 24 24 0 0"
+                    BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#161824'}"
+                    StrokeThickness="0"
+                    Padding="24,24,24,32">
+                <VerticalStackLayout Spacing="18">
+                    <!-- Fish Mascot Card with Question badge -->
+                    <controls:FishMascotCard HeightOverride="180" BadgeText="?" BadgeColor="#7BA028" />
+
+                    <!-- Titles -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="{loc:Translate Sensor_CancelTitle}"
+                               TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="{loc:Translate Sensor_CancelDesc}"
+                               TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}"
+                               FontSize="14"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Buttons: "Продолжить заполнение" & "Да, отменить" -->
+                    <VerticalStackLayout Spacing="10" Margin="0,6,0,0">
+                        <Button Text="{loc:Translate Sensor_ResumeEditing}"
+                                Command="{Binding ResumeEditingCommand}"
+                                BackgroundColor="#4152B0"
+                                TextColor="#FFFFFF"
+                                CornerRadius="14"
+                                HeightRequest="50"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+
+                        <Button Text="{loc:Translate Sensor_ConfirmCancel}"
+                                Command="{Binding ConfirmCancelCommand}"
+                                BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
+                                BorderColor="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                                BorderWidth="1"
+                                TextColor="{AppThemeBinding Light='#6A738A', Dark='#B2B7CF'}"
+                                CornerRadius="14"
+                                HeightRequest="50"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+    </Grid>
+</ContentPage>

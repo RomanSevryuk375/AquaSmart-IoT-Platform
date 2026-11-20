@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Mobile.ViewModels"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+             xmlns:loc="clr-namespace:Mobile.Converters"
+             x:Class="Mobile.Views.AddControllerPage"
+             x:DataType="vm:AddControllerViewModel"
+             BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#12131A'}"
+             Shell.NavBarIsVisible="False"
+             Title="{loc:Translate Controller_AddTitle}">
+
+    <Grid>
+        <!-- 1. MAIN FORM (Figma: Добавление контроллера) -->
+        <ScrollView IsVisible="{Binding IsFormVisible}">
+            <VerticalStackLayout Spacing="16" Padding="20,16,20,30">
+                <!-- Top Navigation Bar (< Новый контроллер   X) -->
+                <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,10">
+                    <Border WidthRequest="36" HeightRequest="36"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
+                            StrokeThickness="0"
+                            VerticalOptions="Center">
+                        <ImageButton Source="{AppThemeBinding Light='icon_arrow_left.png', Dark='icon_arrow_left_white.png'}"
+                                     Command="{Binding PromptCancelCommand}"
+                                     BackgroundColor="Transparent"
+                                     WidthRequest="20" HeightRequest="20"
+                                     Padding="0"
+                                     HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+
+                    <Label Grid.Column="1"
+                           Text="{loc:Translate Controller_AddTitle}"
+                           TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center"
+                           Margin="12,0,0,0" />
+
+                    <Border Grid.Column="2"
+                            WidthRequest="36" HeightRequest="36"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
+                            StrokeThickness="0"
+                            VerticalOptions="Center">
+                        <ImageButton Source="{AppThemeBinding Light='icon_close.png', Dark='icon_close_white.png'}"
+                                     Command="{Binding PromptCancelCommand}"
+                                     BackgroundColor="Transparent"
+                                     WidthRequest="18" HeightRequest="18"
+                                     Padding="0"
+                                     HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                </Grid>
+
+                <!-- Method Switcher: QR-код | Ввести вручную -->
+                <Border StrokeThickness="0" StrokeShape="RoundRectangle 14" BackgroundColor="#F6F7FC" Padding="4">
+                    <Grid ColumnDefinitions="*,*">
+                        <!-- QR Mode button -->
+                        <Border Grid.Column="0"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10"
+                                BackgroundColor="{Binding IsQrMode, Converter={StaticResource InhabitantBgConverter}}"
+                                HeightRequest="40">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SwitchToQrModeCommand}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="{loc:Translate Controller_ScanQrMode}"
+                                   TextColor="{Binding IsQrMode, Converter={StaticResource InhabitantTextConverter}}"
+                                   FontFamily="OpenSansSemibold"
+                                   FontSize="13"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+
+                        <!-- Manual Mode button -->
+                        <Border Grid.Column="1"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10"
+                                BackgroundColor="{Binding IsManualMode, Converter={StaticResource InhabitantBgConverter}}"
+                                HeightRequest="40">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SwitchToManualModeCommand}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="{loc:Translate Controller_ManualMode}"
+                                   TextColor="{Binding IsManualMode, Converter={StaticResource InhabitantTextConverter}}"
+                                   FontFamily="OpenSansSemibold"
+                                   FontSize="13"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- QR Viewfinder Section -->
+                <VerticalStackLayout Spacing="10" IsVisible="{Binding IsQrMode}">
+                    <Border StrokeThickness="0" StrokeShape="RoundRectangle 20" BackgroundColor="#1E2337" HeightRequest="250" Padding="0">
+                        <Grid>
+                            <!-- Real Camera View using ZXing -->
+                            <zxing:CameraBarcodeReaderView
+                                x:Name="BarcodeReader"
+                                HorizontalOptions="FillAndExpand"
+                                VerticalOptions="FillAndExpand"
+                                IsDetecting="{Binding IsDetecting}"
+                                IsTorchOn="{Binding IsTorchOn}"
+                                BarcodesDetected="OnBarcodesDetected" />
+
+                            <!-- Viewfinder Reticle Overlay -->
+                            <Grid InputTransparent="True" HorizontalOptions="Center" VerticalOptions="Center">
+                                <Border Stroke="#4152B0" StrokeThickness="2.5" StrokeShape="RoundRectangle 16"
+                                        WidthRequest="190" HeightRequest="190" BackgroundColor="#10000000">
+                                    <VerticalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
+                                        <Border Stroke="#4152B0" StrokeThickness="1" StrokeShape="RoundRectangle 8" BackgroundColor="#80111422" Padding="8,4">
+                                            <Label Text="{loc:Translate Controller_AimQr}"
+                                                   TextColor="#FFFFFF"
+                                                   FontFamily="OpenSansSemibold"
+                                                   FontSize="12"
+                                                   HorizontalTextAlignment="Center" />
+                                        </Border>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </Grid>
+
+                            <!-- Torch / Flashlight Button Overlay -->
+                            <Border HorizontalOptions="End" VerticalOptions="Start" Margin="12"
+                                    WidthRequest="40" HeightRequest="40"
+                                     StrokeThickness="0" StrokeShape="RoundRectangle 20"
+                                    BackgroundColor="#80000000">
+                                <ImageButton Source="icon_eye_white.png"
+                                             Command="{Binding ToggleTorchCommand}"
+                                             BackgroundColor="Transparent"
+                                             Padding="8"
+                                             WidthRequest="36" HeightRequest="36" />
+                            </Border>
+
+                            <!-- Camera Permission Hint if not granted -->
+                            <VerticalStackLayout IsVisible="{Binding IsCameraPermissionGranted, Converter={StaticResource InverseBoolConverter}}"
+                                                 Spacing="10" HorizontalOptions="Center" VerticalOptions="Center" Padding="20">
+                                <Image Source="icon_search_white.png" WidthRequest="36" HeightRequest="36" />
+                                <Label Text="{loc:Translate Controller_CameraHint}"
+                                       TextColor="#EDEFFB"
+                                       FontSize="13"
+                                       HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+
+                    <!-- Scan Trigger / Rescan Button -->
+                    <Button Text="{Binding ScanButtonText}"
+                            Command="{Binding TriggerScanOrPickCommand}"
+                            BackgroundColor="#EDEFFB"
+                            TextColor="#4152B0"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="14"
+                            HeightRequest="46"
+                            CornerRadius="12" />
+
+                    <!-- Scanned Confirmation Notice -->
+                    <Border StrokeThickness="1" Stroke="#A5D6A7" StrokeShape="RoundRectangle 10" BackgroundColor="#E8F5E9" Padding="12,8"
+                            IsVisible="{Binding IsQrScanned}">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                            <Label Text="✓" TextColor="#2E7D32" FontFamily="OpenSansSemibold" FontSize="14" FontAttributes="Bold" />
+                            <Label Grid.Column="1" Text="{loc:Translate Controller_QrSuccess}" TextColor="#2E7D32" FontFamily="OpenSansSemibold" FontSize="13" VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Manual Input Section -->
+                <VerticalStackLayout Spacing="14" IsVisible="{Binding IsManualMode}">
+                    <!-- Controller Code -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="{loc:Translate Controller_CodeRequired}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="50" Padding="14,0">
+                            <Entry Text="{Binding ControllerCode}"
+                                   Placeholder="023623665 / AQ-ESP32-9842"
+                                   PlaceholderColor="#8C93A8"
+                                   TextColor="#141414"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- MAC Address -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="{loc:Translate Controller_MacRequired}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                        <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="50" Padding="14,0">
+                            <Entry Text="{Binding MacAddress}"
+                                   Placeholder="00:1A:2B:3C:4D:5E"
+                                   PlaceholderColor="#8C93A8"
+                                   TextColor="#141414"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- Common: Controller Name -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="{loc:Translate Controller_Name}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="50" Padding="14,0">
+                        <Entry Text="{Binding ControllerName}"
+                               Placeholder="{loc:Translate Controller_NamePlaceholder}"
+                               PlaceholderColor="#8C93A8"
+                               TextColor="#141414"
+                               VerticalOptions="Center" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Common: Model Type -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="{loc:Translate Controller_Model}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="50" Padding="14,0">
+                        <Picker SelectedItem="{Binding ModelType}"
+                                TextColor="#141414"
+                                VerticalOptions="Center">
+                            <Picker.ItemsSource>
+                                <x:Array Type="{x:Type x:String}">
+                                    <x:String>ESP32-AquaHub v2</x:String>
+                                    <x:String>AquaSmart ESP32 Pro</x:String>
+                                    <x:String>AquaSmart LED Controller</x:String>
+                                    <x:String>AquaSmart Feeder Module</x:String>
+                                </x:Array>
+                            </Picker.ItemsSource>
+                        </Picker>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Connect Button -->
+                <Button Text="{loc:Translate Controller_ConnectBtn}"
+                        Command="{Binding ConnectControllerCommand}"
+                        BackgroundColor="#4152B0"
+                        TextColor="#FFFFFF"
+                        CornerRadius="14"
+                        HeightRequest="52"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="15"
+                        Margin="0,8,0,0" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- 2. FULLSCREEN CONNECTING STATE (Figma: Подключаем контроллер...) -->
+        <Grid BackgroundColor="#4152B0" IsVisible="{Binding IsConnectingVisible}" Padding="30">
+            <VerticalStackLayout Spacing="24" VerticalOptions="Center" HorizontalOptions="Center">
+                <!-- Glowing mascot container -->
+                <Border StrokeThickness="0" StrokeShape="RoundRectangle 40" BackgroundColor="#5465C5" WidthRequest="180" HeightRequest="180">
+                    <Grid HorizontalOptions="Center" VerticalOptions="Center">
+                        <Image Source="fish_mascot.png" WidthRequest="110" HeightRequest="80" Aspect="AspectFit" />
+                        <ActivityIndicator IsRunning="True" Color="#FFFFFF" WidthRequest="160" HeightRequest="160" />
+                    </Grid>
+                </Border>
+
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{loc:Translate Controller_Connecting}"
+                           TextColor="#FFFFFF"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="{loc:Translate Controller_ConnectingSub}"
+                           TextColor="#EDEFFB"
+                           FontSize="14"
+                           LineHeight="1.3"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- 3. SUCCESS STATE (Figma: Контроллер подключён) -->
+        <ScrollView IsVisible="{Binding IsSuccessVisible}">
+            <VerticalStackLayout Spacing="20" Padding="20,24,20,30" VerticalOptions="Center">
+                <!-- Fish Mascot Card with Checkmark badge -->
+                <controls:FishMascotCard HeightOverride="200" BadgeText="✓" BadgeColor="#7BA028" />
+
+                <!-- Controller Preview Card -->
+                <Border StrokeThickness="1"
+                        Stroke="#E4E7F4"
+                        StrokeShape="RoundRectangle 16"
+                        BackgroundColor="#FFFFFF"
+                        Padding="16,14">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Border WidthRequest="44" HeightRequest="44"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="#F6F7FC"
+                                StrokeThickness="0">
+                            <Label Text="⚙" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                            <Label Text="{Binding CreatedControllerTitle}"
+                                   TextColor="#141414"
+                                   FontFamily="OpenSansSemibold"
+                                   FontSize="15"
+                                   FontAttributes="Bold" />
+                            <Label Text="{Binding CreatedControllerMac}"
+                                   TextColor="#8C93A8"
+                                   FontSize="12" />
+                        </VerticalStackLayout>
+                        <Label Grid.Column="2" Text="{Binding CreatedControllerStatus}" TextColor="#4CAF50" FontFamily="OpenSansSemibold" FontSize="12" VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- Success Header & Description -->
+                <VerticalStackLayout Spacing="8" Margin="0,4,0,10">
+                    <Label Text="{loc:Translate Controller_Connected}"
+                           TextColor="#141414"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="{loc:Translate Controller_ConnectedSub}"
+                           TextColor="#6E6E6E"
+                           FontSize="14"
+                           LineHeight="1.3"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <!-- Action Buttons: "Перейти к контроллерам" & "На главную" -->
+                <VerticalStackLayout Spacing="10">
+                    <Button Text="{loc:Translate Controller_GoToControllers}"
+                            Command="{Binding ReturnToControllersCommand}"
+                            BackgroundColor="#4152B0"
+                            TextColor="#FFFFFF"
+                            CornerRadius="14"
+                            HeightRequest="52"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15" />
+
+                    <Button Text="{loc:Translate Controller_GoHome}"
+                            Command="{Binding GoHomeCommand}"
+                            BackgroundColor="#FFFFFF"
+                            BorderColor="#4152B0"
+                            BorderWidth="1.5"
+                            TextColor="#4152B0"
+                            CornerRadius="14"
+                            HeightRequest="52"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- 4. CANCEL CONFIRMATION MODAL (Figma: Добавление контроллера. Отмена) -->
+        <Grid BackgroundColor="#80000000" IsVisible="{Binding IsCancelDialogOpen}">
+            <Border VerticalOptions="End"
+                    StrokeShape="RoundRectangle 24 24 0 0"
+                    BackgroundColor="#FFFFFF"
+                    StrokeThickness="0"
+                    Padding="24,24,24,32">
+                <VerticalStackLayout Spacing="18">
+                    <!-- Fish Mascot Card with Question badge -->
+                    <controls:FishMascotCard HeightOverride="180" BadgeText="?" BadgeColor="#7BA028" />
+
+                    <!-- Titles -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="{loc:Translate Controller_CancelAddTitle}"
+                               TextColor="#141414"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="{loc:Translate Controller_CancelAddDesc}"
+                               TextColor="#6E6E6E"
+                               FontSize="14"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Buttons: "Продолжить подключение" & "Да, отменить" -->
+                    <VerticalStackLayout Spacing="10" Margin="0,6,0,0">
+                        <Button Text="{loc:Translate Controller_ResumeAdd}"
+                                Command="{Binding ResumeEditingCommand}"
+                                BackgroundColor="#4152B0"
+                                TextColor="#FFFFFF"
+                                CornerRadius="14"
+                                HeightRequest="50"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+
+                        <Button Text="{loc:Translate Relay_ConfirmCancel}"
+                                Command="{Binding ConfirmCancelCommand}"
+                                BackgroundColor="#FFFFFF"
+                                BorderColor="#E4E7F4"
+                                BorderWidth="1"
+                                TextColor="#6A738A"
+                                CornerRadius="14"
+                                HeightRequest="50"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+    </Grid>
+</ContentPage>

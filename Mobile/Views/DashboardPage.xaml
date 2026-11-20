@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Mobile.ViewModels"
+             xmlns:models="clr-namespace:Mobile.Models"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
+             xmlns:loc="clr-namespace:Mobile.Converters"
+             x:Class="Mobile.Views.DashboardPage"
+             x:DataType="vm:DashboardViewModel"
+             BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#12131A'}"
+             Shell.NavBarIsVisible="False"
+             Title="AquaSmart">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,24,20,32" Spacing="20">
+
+            <!-- Top Header: Greeting & Plus / Bell Action Buttons (Figma: Главная) -->
+            <Grid x:Name="HeaderCard" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12" Margin="0,4,0,4">
+                <Label Grid.Column="0"
+                       Text="{Binding Greeting, FallbackValue='Welcome!'}"
+                       TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center" />
+
+                <!-- Add Button (+) -->
+                <Border Grid.Column="1"
+                        WidthRequest="38" HeightRequest="38"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
+                        StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}">
+                    <ImageButton Source="{AppThemeBinding Light='icon_plus.png', Dark='icon_plus_white.png'}"
+                                 Command="{Binding AddAquariumCommand}"
+                                 BackgroundColor="Transparent"
+                                 WidthRequest="20" HeightRequest="20"
+                                 Padding="0"
+                                 HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+
+                <!-- Notifications Button (Bell) -->
+                <Border Grid.Column="2"
+                        WidthRequest="38" HeightRequest="38"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
+                        StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}">
+                    <ImageButton Source="{AppThemeBinding Light='icon_bell.png', Dark='icon_bell_white.png'}"
+                                 Command="{Binding OpenNotificationsCommand}"
+                                 BackgroundColor="Transparent"
+                                 WidthRequest="20" HeightRequest="20"
+                                 Padding="0"
+                                 HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+            </Grid>
+
+            <!-- Zero State: Для нового пользователя (Figma: Главная. Для нового пользователя) -->
+            <VerticalStackLayout Spacing="16" IsVisible="{Binding HasNoAquariums}">
+                <controls:FishMascotCard HeightOverride="220"
+                                         BadgeText="⚙️"
+                                         BadgeColor="#7BA028" />
+
+                <Label Text="{loc:Translate Dash_AddFirstController}"
+                       TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="20"
+                       FontAttributes="Bold" />
+
+                <Label Text="{loc:Translate Dash_ZeroStateDesc}"
+                       TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}"
+                       FontFamily="OpenSansRegular"
+                       FontSize="14"
+                       LineHeight="1.3" />
+
+                <Button Text="{loc:Translate Dash_ConnectController}"
+                       Command="{Binding AddControllerCommand}"
+                       BackgroundColor="#4152B0"
+                       TextColor="#FFFFFF"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="15"
+                       CornerRadius="12"
+                       HeightRequest="48"
+                       Margin="0,8,0,0" />
+
+                <Button Text="{loc:Translate Dash_AddTank}"
+                       Command="{Binding AddAquariumCommand}"
+                       BackgroundColor="Transparent"
+                       BorderColor="#4152B0"
+                       BorderWidth="1.5"
+                       TextColor="#4152B0"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="14"
+                       CornerRadius="12"
+                       HeightRequest="48" />
+
+                <Button Text="{loc:Translate Dash_ExploreKb}"
+                       Command="{Binding GoToKnowledgeBaseCommand}"
+                       BackgroundColor="Transparent"
+                       TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="14"
+                       HeightRequest="44" />
+            </VerticalStackLayout>
+
+            <!-- Status Banner (Amber: Есть проблемы / Green: Всё хорошо) -->
+            <Border x:Name="AlertCard"
+                    IsVisible="{Binding HasProblems}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12"
+                    BackgroundColor="#FFF9E6"
+                    Padding="14,12">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                    <!-- Warning / Success Icon Badge -->
+                    <Border Grid.Column="0"
+                            WidthRequest="26" HeightRequest="26"
+                            StrokeShape="RoundRectangle 13"
+                            BackgroundColor="#FFE082"
+                            StrokeThickness="0"
+                            VerticalOptions="Center">
+                        <Label Text="⚠️" FontSize="13" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                        <Label Text="{Binding ProblemTitle}"
+                               TextColor="#E65100"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="14" />
+                        <Label Text="{Binding ProblemDescription}"
+                               TextColor="#BF360C"
+                               FontSize="12" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- Section 1: Все ёмкости (Figma: Все ёмкости - MainStateCard variants) -->
+            <VerticalStackLayout x:Name="AquariumsSection" Spacing="10" IsVisible="{Binding HasAquariums}">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0"
+                           Text="{loc:Translate Dash_AllTanks}"
+                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center" />
+
+                    <Button Grid.Column="1"
+                            Text="{loc:Translate Dash_Add}"
+                            Command="{Binding AddAquariumCommand}"
+                            TextColor="#4152B0"
+                            BackgroundColor="Transparent"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="13"
+                            Padding="4,0" />
+                </Grid>
+
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Aquariums}" Spacing="8">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="models:AquariumModel">
+                            <Border StrokeThickness="1"
+                                    Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                                    StrokeShape="RoundRectangle 12"
+                                    BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
+                                    Padding="14,10">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DashboardViewModel}}, Path=GoToAquariumDetailsCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12">
+                                    <!-- Species Icon Avatar -->
+                                    <Border Grid.Column="0"
+                                            WidthRequest="36" HeightRequest="36"
+                                            StrokeShape="RoundRectangle 8"
+                                            BackgroundColor="{Binding CardThemeColor}"
+                                            StrokeThickness="0">
+                                        <Label Text="{Binding Icon}" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </Border>
+
+                                    <!-- Tank Name -->
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Name}"
+                                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                                           FontFamily="OpenSansSemibold"
+                                           FontSize="14"
+                                           VerticalOptions="Center" />
+
+                                    <!-- Telemetry Metric -->
+                                    <Label Grid.Column="2"
+                                           Text="{Binding TemperatureDisplay}"
+                                           TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}"
+                                           FontFamily="OpenSansSemibold"
+                                           FontSize="13"
+                                           VerticalOptions="Center" />
+
+                                    <!-- Status Dot (Green / Yellow / Red) -->
+                                    <BoxView Grid.Column="3"
+                                             WidthRequest="8" HeightRequest="8"
+                                             CornerRadius="4"
+                                             Color="{Binding StatusDotColor}"
+                                             VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+
+            <!-- Section 2: Последние события (Figma Timeline Events) -->
+            <VerticalStackLayout x:Name="TelemetrySection" Spacing="10" IsVisible="{Binding HasRecentEvents}">
+                <Label Text="{loc:Translate Dash_RecentEvents}"
+                       TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="16"
+                       FontAttributes="Bold" />
+
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding RecentEvents}" Spacing="8">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="models:DashboardEventModel">
+                            <Border StrokeThickness="1"
+                                    Stroke="{Binding BorderColor}"
+                                    BackgroundColor="{Binding BackgroundColor}"
+                                    StrokeShape="RoundRectangle 10"
+                                    Padding="12">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                    <Label Grid.Column="0" Text="{Binding TimeText}" TextColor="{Binding TimeColor}" FontSize="12" FontFamily="OpenSansSemibold" VerticalOptions="Start" />
+                                    <Label Grid.Column="1" Text="{Binding Message}" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontSize="13" LineHeight="1.25" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+
+            <!-- Section 3: Быстрое управление реле (Quick Controls) -->
+            <VerticalStackLayout x:Name="RelaysSection" Spacing="10" IsVisible="{Binding HasAquariums}">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0"
+                           Text="{loc:Translate Dash_DeviceControl}"
+                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center" />
+
+                    <Button Grid.Column="1"
+                            Text="{loc:Translate Dash_AddRelay}"
+                            Command="{Binding AddRelayCommand}"
+                            TextColor="#4152B0"
+                            BackgroundColor="Transparent"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="13"
+                            Padding="4,0" />
+                </Grid>
+
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding QuickRelays}" Spacing="8">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="models:RelayModel">
+                            <Border StrokeThickness="1"
+                                    Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                                    StrokeShape="RoundRectangle 12"
+                                    BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
+                                    Padding="14,10">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Border Grid.Column="0"
+                                            WidthRequest="36" HeightRequest="36"
+                                            StrokeShape="RoundRectangle 8"
+                                            BackgroundColor="{AppThemeBinding Light='#EDEFFB', Dark='#262A45'}"
+                                            StrokeThickness="0">
+                                        <Label Text="{Binding Icon}" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </Border>
+
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{Binding Name}" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="14" />
+                                        <Label Text="{Binding ScheduleInfo}" TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="11" />
+                                    </VerticalStackLayout>
+
+                                    <!-- Switch -->
+                                    <Switch Grid.Column="2"
+                                            IsToggled="{Binding IsOn, Mode=TwoWay}"
+                                            OnColor="#4152B0"
+                                            ThumbColor="#FFFFFF"
+                                            VerticalOptions="Center">
+                                        <Switch.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DashboardViewModel}}, Path=ToggleRelayCommand}"
+                                                                  CommandParameter="{Binding .}" />
+                                        </Switch.GestureRecognizers>
+                                    </Switch>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:loc="clr-namespace:Mobile.Converters"
+             x:Class="Mobile.Views.Controls.CalendarBottomSheet">
+    <Grid BackgroundColor="#80000000" IsVisible="{Binding IsVisible, Source={RelativeSource Self}}">
+        <Border VerticalOptions="End"
+                StrokeShape="RoundRectangle 24 24 0 0"
+                BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
+                StrokeThickness="0"
+                Padding="24,20,24,28">
+            <VerticalStackLayout Spacing="18">
+                <!-- Month & Year navigation -->
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                    <Label Grid.Column="0"
+                           Text="{loc:Translate Calendar_SampleMonth}"
+                           TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center" />
+                    <ImageButton Grid.Column="1" Source="{AppThemeBinding Light='icon_chevron_left.png', Dark='icon_chevron_left_white.png'}" BackgroundColor="Transparent" WidthRequest="32" HeightRequest="32" Padding="6" VerticalOptions="Center" />
+                    <ImageButton Grid.Column="2" Source="{AppThemeBinding Light='icon_chevron_right.png', Dark='icon_chevron_right_white.png'}" BackgroundColor="Transparent" WidthRequest="32" HeightRequest="32" Padding="6" VerticalOptions="Center" />
+                </Grid>
+
+                <!-- Weekday headers -->
+                <Grid ColumnDefinitions="*,*,*,*,*,*,*" Margin="0,4">
+                    <Label Grid.Column="0" Text="{loc:Translate Calendar_Mon}" TextColor="{AppThemeBinding Light='#8C93A8', Dark='#73778F'}" FontSize="12" HorizontalOptions="Center" />
+                    <Label Grid.Column="1" Text="{loc:Translate Calendar_Tue}" TextColor="{AppThemeBinding Light='#8C93A8', Dark='#73778F'}" FontSize="12" HorizontalOptions="Center" />
+                    <Label Grid.Column="2" Text="{loc:Translate Calendar_Wed}" TextColor="{AppThemeBinding Light='#8C93A8', Dark='#73778F'}" FontSize="12" HorizontalOptions="Center" />
+                    <Label Grid.Column="3" Text="{loc:Translate Calendar_Thu}" TextColor="{AppThemeBinding Light='#8C93A8', Dark='#73778F'}" FontSize="12" HorizontalOptions="Center" />
+                    <Label Grid.Column="4" Text="{loc:Translate Calendar_Fri}" TextColor="{AppThemeBinding Light='#8C93A8', Dark='#73778F'}" FontSize="12" HorizontalOptions="Center" />
+                    <Label Grid.Column="5" Text="{loc:Translate Calendar_Sat}" TextColor="{AppThemeBinding Light='#8C93A8', Dark='#73778F'}" FontSize="12" HorizontalOptions="Center" />
+                    <Label Grid.Column="6" Text="{loc:Translate Calendar_Sun}" TextColor="{AppThemeBinding Light='#8C93A8', Dark='#73778F'}" FontSize="12" HorizontalOptions="Center" />
+                </Grid>
+
+                <!-- Calendar Days Grid (Sample month showing 11 selected as in Figma) -->
+                <Grid ColumnDefinitions="*,*,*,*,*,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="10">
+                    <!-- Row 0: 1 - 7 -->
+                    <Label Grid.Row="0" Grid.Column="0" Text="1" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="0" Grid.Column="1" Text="2" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="0" Grid.Column="2" Text="3" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="0" Grid.Column="3" Text="4" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="0" Grid.Column="4" Text="5" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="0" Grid.Column="5" Text="6" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="0" Grid.Column="6" Text="7" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+
+                    <!-- Row 1: 8 - 14 with 11 selected -->
+                    <Label Grid.Row="1" Grid.Column="0" Text="8" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="1" Grid.Column="1" Text="9" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="1" Grid.Column="2" Text="10" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <!-- Day 11 Selected Circle -->
+                    <Border Grid.Row="1" Grid.Column="3" WidthRequest="36" HeightRequest="36" StrokeShape="RoundRectangle 18" BackgroundColor="#4152B0" StrokeThickness="0" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label Text="11" TextColor="#FFFFFF" FontFamily="OpenSansSemibold" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                    <Label Grid.Row="1" Grid.Column="4" Text="12" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="1" Grid.Column="5" Text="13" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="1" Grid.Column="6" Text="14" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+
+                    <!-- Row 2: 15 - 21 -->
+                    <Label Grid.Row="2" Grid.Column="0" Text="15" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="2" Grid.Column="1" Text="16" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="2" Grid.Column="2" Text="17" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="2" Grid.Column="3" Text="18" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="2" Grid.Column="4" Text="19" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="2" Grid.Column="5" Text="20" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="2" Grid.Column="6" Text="21" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+
+                    <!-- Row 3: 22 - 28 -->
+                    <Label Grid.Row="3" Grid.Column="0" Text="22" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="3" Grid.Column="1" Text="23" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="3" Grid.Column="2" Text="24" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="3" Grid.Column="3" Text="25" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="3" Grid.Column="4" Text="26" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="3" Grid.Column="5" Text="27" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="3" Grid.Column="6" Text="28" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+
+                    <!-- Row 4: 29 - 30 -->
+                    <Label Grid.Row="4" Grid.Column="0" Text="29" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Grid.Row="4" Grid.Column="1" Text="30" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" />
+                </Grid>
+
+                <!-- Action buttons: Отмена & Ок -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,8,0,0">
+                    <Button Grid.Column="0"
+                            Text="{loc:Translate Common_Cancel}"
+                            BackgroundColor="Transparent"
+                            BorderColor="{AppThemeBinding Light='#4152B0', Dark='#738AFF'}"
+                            BorderWidth="1.5"
+                            TextColor="{AppThemeBinding Light='#4152B0', Dark='#738AFF'}"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="14"
+                            CornerRadius="10"
+                            HeightRequest="44" />
+                    <Button Grid.Column="1"
+                            Text="{loc:Translate Common_Ok}"
+                            BackgroundColor="#4152B0"
+                            TextColor="#FFFFFF"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="14"
+                            CornerRadius="10"
+                            HeightRequest="44" />
+                </Grid>
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentView>
