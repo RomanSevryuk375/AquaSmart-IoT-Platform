@@ -1,7 +1,7 @@
 using BuildingBlocks.Domain.Results;
 using BuildingBlocks.Domain.ValueObjects;
 
-namespace Control.Domain.UnitTests.ValueObjects;
+namespace BuildingBlocks.UnitTests.Domain.ValueObjects;
 
 public class DateRangeTests
 {

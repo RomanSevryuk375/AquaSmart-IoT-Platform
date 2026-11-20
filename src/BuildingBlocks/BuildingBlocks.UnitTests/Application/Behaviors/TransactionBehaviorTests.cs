@@ -4,7 +4,7 @@ using BuildingBlocks.Domain.Exceptions;
 using BuildingBlocks.Domain.Results;
 using NSubstitute.ExceptionExtensions;
 
-namespace Control.Application.UnitTests.Behaviors;
+namespace BuildingBlocks.UnitTests.Application.Behaviors;
 
 public class TransactionBehaviorTests
 {
@@ -21,7 +21,6 @@ public class TransactionBehaviorTests
     }
 
     [Fact]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     public async Task Handle_WhenRequestIsNotCommand_CallsNextWithoutTransaction()
     {
         // Arrange
@@ -37,10 +36,8 @@ public class TransactionBehaviorTests
     }
 
     [Fact]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     public async Task Handle_WhenCommandSucceeds_CommitsTransaction()
     {
-
         // Arrange
         var behavior = new TransactionBehavior<TestCommand, Result>(_unitOfWorkMock);
         _nextMock.Invoke().Returns(Result.Success());
@@ -60,7 +57,6 @@ public class TransactionBehaviorTests
     }
 
     [Fact]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     public async Task Handle_WhenCommandFails_RollbacksTransaction()
     {
         // Arrange
@@ -82,7 +78,6 @@ public class TransactionBehaviorTests
     }
 
     [Fact]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     public async Task Handle_WhenExceptionThrown_RollbacksTransactionAndRethrows()
     {
         // Arrange
@@ -101,7 +96,6 @@ public class TransactionBehaviorTests
     }
 
     [Fact]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     public async Task Handle_WhenConcurrencyExceptionThrown_RollbacksAndReturnsConflictResult()
     {
         // Arrange

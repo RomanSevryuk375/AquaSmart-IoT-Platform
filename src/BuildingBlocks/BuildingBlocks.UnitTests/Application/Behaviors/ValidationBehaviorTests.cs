@@ -1,11 +1,9 @@
-// Ignore Spelling: Validators
-
 using BuildingBlocks.Application.Behaviors;
 using BuildingBlocks.Domain.Results;
 using FluentValidation;
 using FluentValidation.Results;
 
-namespace Control.Application.UnitTests.Behaviors;
+namespace BuildingBlocks.UnitTests.Application.Behaviors;
 
 public class ValidationBehaviorTests
 {
@@ -20,7 +18,6 @@ public class ValidationBehaviorTests
     }
 
     [Fact]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     public async Task Handle_WithNoValidators_CallsNextAndReturnsSuccess()
     {
         // Arrange
@@ -36,7 +33,6 @@ public class ValidationBehaviorTests
     }
 
     [Fact]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     public async Task Handle_WithValidRequest_CallsNextAndReturnsSuccess()
     {
         // Arrange
@@ -56,7 +52,6 @@ public class ValidationBehaviorTests
     }
 
     [Fact]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     public async Task Handle_WithInvalidRequest_ReturnsFailureAndShortCircuits()
     {
         // Arrange

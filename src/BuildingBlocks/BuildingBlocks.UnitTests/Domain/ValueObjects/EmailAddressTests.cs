@@ -1,8 +1,7 @@
 using BuildingBlocks.Domain.Results;
-using FluentAssertions;
-using IdentityService.Domain.ValueObjects;
+using BuildingBlocks.Domain.ValueObjects;
 
-namespace Identity.Domain.UnitTests.ValueObjects;
+namespace BuildingBlocks.UnitTests.Domain.ValueObjects;
 
 public class EmailAddressTests
 {
@@ -62,6 +61,7 @@ public class EmailAddressTests
     [InlineData("test@example.com", "test@example.com")]
     [InlineData("  Test@Example.Com  ", "test@example.com")]
     [InlineData("user.name+tag@gmail.com", "user.name+tag@gmail.com")]
+    [InlineData("user.name+tag@domain.co.uk", "user.name+tag@domain.co.uk")]
     public void Create_WithValidEmail_ReturnsSuccessAndFormatsValue(string input, string expected)
     {
         // Act
@@ -71,5 +71,16 @@ public class EmailAddressTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Value.Should().Be(expected);
         result.Value.ToString().Should().Be(expected);
+    }
+
+    [Fact]
+    public void Equals_WithSameNormalizedValue_ReturnsTrue()
+    {
+        // Arrange
+        EmailAddress email1 = EmailAddress.Create("test@example.com").Value;
+        EmailAddress email2 = EmailAddress.Create("  TEST@EXAMPLE.COM  ").Value;
+
+        // Assert
+        email1.Should().Be(email2);
     }
 }

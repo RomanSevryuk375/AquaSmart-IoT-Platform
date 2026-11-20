@@ -1,8 +1,7 @@
 using BuildingBlocks.Domain.Results;
 using BuildingBlocks.Domain.ValueObjects;
-using FluentAssertions;
 
-namespace Identity.Domain.UnitTests.ValueObjects;
+namespace BuildingBlocks.UnitTests.Domain.ValueObjects;
 
 public class MoneyTests
 {
