@@ -25,5 +25,6 @@
     <Project Path="../Billing.ArchitectureTests/Billing.ArchitectureTests.csproj" Id="9e211662-c029-4695-bd2b-b89bb5acf27e" />
     <Project Path="../Billing.Domain.UnitTests/Billing.Domain.UnitTests.csproj" Id="77a91d49-0a44-44c3-9990-a79c2659944b" />
     <Project Path="../Billing.Infrastructure.IntegrationTests/Billing.Infrastructure.IntegrationTests.csproj" Id="9a295bdc-1683-42c2-993c-b15243ff7b9b" />
+    <Project Path="../Billing.TestShared/Billing.TestShared.csproj" Id="a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d" />
   </Folder>
 </Solution>
