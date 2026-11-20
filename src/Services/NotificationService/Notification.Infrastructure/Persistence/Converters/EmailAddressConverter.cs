@@ -1,5 +1,5 @@
+using BuildingBlocks.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Notification.Domain.ValueObjects;
 
 namespace Notification.Infrastructure.Persistence.Converters;
 

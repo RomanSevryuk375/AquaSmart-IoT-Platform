@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Results;
 
-namespace IdentityService.Domain.ValueObjects;
+namespace BuildingBlocks.Domain.ValueObjects;
 
 public sealed partial record EmailAddress
 {

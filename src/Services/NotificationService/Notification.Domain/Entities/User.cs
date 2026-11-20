@@ -3,6 +3,7 @@
 using BuildingBlocks.Domain.Abstractions;
 using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Results;
+using BuildingBlocks.Domain.ValueObjects;
 using Notification.Domain.ValueObjects;
 
 namespace Notification.Domain.Entities;

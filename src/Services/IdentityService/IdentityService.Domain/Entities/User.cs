@@ -1,6 +1,7 @@
 using BuildingBlocks.Domain.Abstractions;
 using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Results;
+using BuildingBlocks.Domain.ValueObjects;
 using IdentityService.Domain.Events;
 using IdentityService.Domain.ValueObjects;
 using Microsoft.AspNetCore.Identity;

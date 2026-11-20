@@ -2,7 +2,7 @@ using Billing.Domain.Enums;
 using BuildingBlocks.Domain.Abstractions;
 using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Results;
-using IdentityService.Domain.ValueObjects;
+using BuildingBlocks.Domain.ValueObjects;
 
 namespace Billing.Domain.Entities;
 
