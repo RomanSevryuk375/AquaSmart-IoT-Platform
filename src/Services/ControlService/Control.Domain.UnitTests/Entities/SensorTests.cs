@@ -49,7 +49,7 @@ public class SensorTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Name.Invalid");
+        result.Error.Code.Should().Be("Sensor.Invalid");
     }
 
     [Fact]

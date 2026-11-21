@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Results;
 using Notification.Domain.ValueObjects;
 
@@ -45,21 +46,25 @@ public sealed class Reminder : AggregateRoot, IEntity
         string rawTaskName,
         int intervalDays)
     {
-        Result<Name> nameResult = Name.Create(rawTaskName);
-        if (nameResult.IsFailure)
-        {
-            return Result<Reminder>.Failure(nameResult.Error);
-        }
+        var errors = new List<string>();
 
+        DomainGuard.CheckNotEmpty(reminderId, "Reminder Id", errors);
+        DomainGuard.CheckNotEmpty(userId, nameof(UserId), errors);
+        DomainGuard.CheckNotEmpty(ecosystemId, nameof(EcosystemId), errors);
+        Name? taskName = DomainGuard.Collect(Name.Create(rawTaskName), errors);
         if (intervalDays < 0)
         {
-            return Result<Reminder>.Failure(Error.Validation<Reminder>(
-                "Interval days must be positive."));
+            errors.Add("Interval days must be positive.");
+        }
+
+        if (errors.Count != 0)
+        {
+            return DomainGuard.ValidationFailure<Reminder>(errors);
         }
 
         var reminder = new Reminder(
             reminderId, userId, ecosystemId,
-            nameResult.Value,
+            taskName!,
             intervalDays, nextDueAt: DateTime.UtcNow.AddDays(intervalDays),
             createdAt: DateTime.UtcNow);
 
@@ -83,19 +88,20 @@ public sealed class Reminder : AggregateRoot, IEntity
 
     public Result UpdateSchedule(string taskName, int intervalDays)
     {
-        Result<Name> nameResult = Name.Create(taskName);
-        if (nameResult.IsFailure)
-        {
-            return Result.Failure(nameResult.Error);
-        }
+        var errors = new List<string>();
 
+        Name? name = DomainGuard.Collect(Name.Create(taskName), errors);
         if (intervalDays < 0)
         {
-            return Result<Reminder>.Failure(Error.Validation<Reminder>(
-                "Interval days must be positive."));
+            errors.Add("Interval days must be positive.");
         }
 
-        TaskName = nameResult.Value;
+        if (errors.Count != 0)
+        {
+            return Result.Failure(Error.Validation<Reminder>(string.Join(", ", errors)));
+        }
+
+        TaskName = name!;
         IntervalDays = intervalDays;
         NextDueAt = LastDoneAt.HasValue
             ? LastDoneAt.Value.AddDays(IntervalDays)

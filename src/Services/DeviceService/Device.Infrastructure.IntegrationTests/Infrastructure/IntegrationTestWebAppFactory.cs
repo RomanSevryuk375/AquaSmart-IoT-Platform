@@ -1,4 +1,4 @@
-using BuildingBlocks.IntegrationTests;
+using BuildingBlocks.TestShared;
 using MassTransit;
 
 namespace Device.Infrastructure.IntegrationTests.Infrastructure;

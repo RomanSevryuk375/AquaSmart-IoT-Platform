@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Constants;
+using BuildingBlocks.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Notification.Domain.ValueObjects;
 

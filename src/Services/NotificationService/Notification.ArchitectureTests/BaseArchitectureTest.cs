@@ -8,8 +8,8 @@ namespace Notification.ArchitectureTests;
 
 public abstract class BaseArchitectureTest
 {
-    protected static readonly Assembly DomainAssembly = typeof(User).Assembly;
-    protected static readonly Assembly ApplicationAssembly = typeof(ProcessUnpublishedNoticesCommand).Assembly;
-    protected static readonly Assembly InfrastructureAssembly = typeof(NotificationDbContext).Assembly;
-    protected static readonly Assembly ApiAssembly = typeof(AddReminderEndpoint).Assembly;
+    internal static readonly Assembly DomainAssembly = typeof(User).Assembly;
+    internal static readonly Assembly ApplicationAssembly = typeof(ProcessUnpublishedNoticesCommand).Assembly;
+    internal static readonly Assembly InfrastructureAssembly = typeof(NotificationDbContext).Assembly;
+    internal static readonly Assembly ApiAssembly = typeof(AddReminderEndpoint).Assembly;
 }

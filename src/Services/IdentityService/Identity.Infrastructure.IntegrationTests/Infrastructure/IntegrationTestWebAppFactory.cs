@@ -1,4 +1,4 @@
-using BuildingBlocks.IntegrationTests;
+using BuildingBlocks.TestShared;
 using Identity.TestShared.Helpers;
 using MassTransit;
 using Microsoft.AspNetCore.TestHost;

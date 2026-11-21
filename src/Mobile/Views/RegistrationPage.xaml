@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Mobile.ViewModels"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
+             xmlns:loc="clr-namespace:Mobile.Converters"
+             x:Class="Mobile.Views.RegistrationPage"
+             x:DataType="vm:RegistrationViewModel"
+             BackgroundColor="#FFFFFF"
+             Shell.NavBarIsVisible="False"
+             Title="{loc:Translate Auth_RegisterTitle}">
+
+    <ScrollView>
+        <VerticalStackLayout x:Name="RegistrationContainer" Padding="20,16,20,32" Spacing="12">
+            <!-- Fish Mascot Card with Clipboard Badge -->
+            <controls:FishMascotCard HeightOverride="120"
+                                     BadgeIcon="icon_clipboard_white.png"
+                                     BadgeColor="#7BA028" />
+
+            <!-- Title & Subtitle -->
+            <VerticalStackLayout Spacing="2">
+                <Label Text="{loc:Translate Auth_RegisterTitle}"
+                       TextColor="#141414"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="22"
+                       FontAttributes="Bold" />
+                <Label Text="{loc:Translate Auth_RegisterSubtitle}"
+                       TextColor="#6E6E6E"
+                       FontFamily="OpenSansRegular"
+                       FontSize="13" />
+            </VerticalStackLayout>
+
+            <!-- Form fields -->
+            <!-- Full Name -->
+            <VerticalStackLayout Spacing="3">
+                <Label Text="{loc:Translate Auth_FullName}" TextColor="#333333" FontFamily="OpenSansSemibold" FontSize="13" />
+                <Border Stroke="#E4E7F4" StrokeThickness="1" StrokeShape="RoundRectangle 10" BackgroundColor="#FFFFFF" Padding="14,0" HeightRequest="46">
+                    <Entry Text="{Binding FullName, Mode=TwoWay}" Placeholder="{loc:Translate Auth_FullNamePlaceholder}" PlaceholderColor="#8C93A8" TextColor="#141414" VerticalOptions="Center" FontSize="14" />
+                </Border>
+                <Label Text="{Binding FullNameError}"
+                       IsVisible="{Binding HasFullNameError}"
+                       TextColor="#E53935"
+                       FontFamily="OpenSansRegular"
+                       FontSize="11"
+                       Margin="2,0,0,0" />
+            </VerticalStackLayout>
+
+            <!-- Email -->
+            <VerticalStackLayout Spacing="3">
+                <Label Text="{loc:Translate Auth_Email}" TextColor="#333333" FontFamily="OpenSansSemibold" FontSize="13" />
+                <Border Stroke="#E4E7F4" StrokeThickness="1" StrokeShape="RoundRectangle 10" BackgroundColor="#FFFFFF" Padding="14,0" HeightRequest="46">
+                    <Entry Text="{Binding Email, Mode=TwoWay}" Placeholder="{loc:Translate Auth_EmailPlaceholder}" PlaceholderColor="#8C93A8" TextColor="#141414" Keyboard="Email" VerticalOptions="Center" FontSize="14" />
+                </Border>
+                <Label Text="{Binding EmailError}"
+                       IsVisible="{Binding HasEmailError}"
+                       TextColor="#E53935"
+                       FontFamily="OpenSansRegular"
+                       FontSize="11"
+                       Margin="2,0,0,0" />
+            </VerticalStackLayout>
+
+            <!-- Phone -->
+            <VerticalStackLayout Spacing="3">
+                <Label Text="{loc:Translate Auth_Phone}" TextColor="#333333" FontFamily="OpenSansSemibold" FontSize="13" />
+                <Border Stroke="#E4E7F4" StrokeThickness="1" StrokeShape="RoundRectangle 10" BackgroundColor="#FFFFFF" Padding="14,0" HeightRequest="46">
+                    <Entry Text="{Binding Phone, Mode=TwoWay}" Placeholder="{loc:Translate Auth_PhonePlaceholder}" PlaceholderColor="#8C93A8" TextColor="#141414" Keyboard="Telephone" VerticalOptions="Center" FontSize="14" />
+                </Border>
+                <Label Text="{Binding PhoneError}"
+                       IsVisible="{Binding HasPhoneError}"
+                       TextColor="#E53935"
+                       FontFamily="OpenSansRegular"
+                       FontSize="11"
+                       Margin="2,0,0,0" />
+            </VerticalStackLayout>
+
+            <!-- Password -->
+            <VerticalStackLayout Spacing="3">
+                <Label Text="{loc:Translate Auth_PasswordTitle}" TextColor="#333333" FontFamily="OpenSansSemibold" FontSize="13" />
+                <Border Stroke="#E4E7F4" StrokeThickness="1" StrokeShape="RoundRectangle 10" BackgroundColor="#FFFFFF" Padding="14,0" HeightRequest="46">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Entry Grid.Column="0" Text="{Binding Password, Mode=TwoWay}" Placeholder="{loc:Translate Auth_PasswordCreatePlaceholder}" PlaceholderColor="#8C93A8" TextColor="#141414" IsPassword="{Binding IsPasswordHidden}" VerticalOptions="Center" FontSize="14" />
+                        <ImageButton Grid.Column="1" Source="{Binding PasswordEyeIcon}" Command="{Binding TogglePasswordCommand}" BackgroundColor="Transparent" WidthRequest="24" HeightRequest="24" Padding="0" VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+                <Label Text="{Binding PasswordError}"
+                       IsVisible="{Binding HasPasswordError}"
+                       TextColor="#E53935"
+                       FontFamily="OpenSansRegular"
+                       FontSize="11"
+                       Margin="2,0,0,0" />
+            </VerticalStackLayout>
+
+            <!-- Confirm Password -->
+            <VerticalStackLayout Spacing="3">
+                <Label Text="{loc:Translate Auth_ConfirmPassword}" TextColor="#333333" FontFamily="OpenSansSemibold" FontSize="13" />
+                <Border Stroke="#E4E7F4" StrokeThickness="1" StrokeShape="RoundRectangle 10" BackgroundColor="#FFFFFF" Padding="14,0" HeightRequest="46">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Entry Grid.Column="0" Text="{Binding ConfirmPassword, Mode=TwoWay}" Placeholder="{loc:Translate Auth_ConfirmPasswordPlaceholder}" PlaceholderColor="#8C93A8" TextColor="#141414" IsPassword="{Binding IsConfirmPasswordHidden}" VerticalOptions="Center" FontSize="14" />
+                        <ImageButton Grid.Column="1" Source="{Binding ConfirmPasswordEyeIcon}" Command="{Binding ToggleConfirmPasswordCommand}" BackgroundColor="Transparent" WidthRequest="24" HeightRequest="24" Padding="0" VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+                <Label Text="{Binding ConfirmPasswordError}"
+                       IsVisible="{Binding HasConfirmPasswordError}"
+                       TextColor="#E53935"
+                       FontFamily="OpenSansRegular"
+                       FontSize="11"
+                       Margin="2,0,0,0" />
+            </VerticalStackLayout>
+
+            <!-- Checkbox Terms & Agreement -->
+            <VerticalStackLayout Spacing="4" Margin="0,2,0,0">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <CheckBox Grid.Column="0" IsChecked="{Binding AgreeToTerms, Mode=TwoWay}" Color="#4152B0" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           LineBreakMode="WordWrap"
+                           FontFamily="OpenSansRegular"
+                           FontSize="12"
+                           LineHeight="1.2"
+                           VerticalOptions="Center">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="{loc:Translate Auth_Terms1}" TextColor="#6E6E6E" />
+                                <Span Text="{loc:Translate Auth_Terms2}" TextColor="#4152B0" />
+                                <Span Text="{loc:Translate Auth_Terms3}" TextColor="#6E6E6E" />
+                                <Span Text="{loc:Translate Auth_Terms4}" TextColor="#4152B0" />
+                                <Span Text="{loc:Translate Auth_Terms5}" TextColor="#6E6E6E" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </Grid>
+                <Label Text="{Binding TermsError}"
+                       IsVisible="{Binding HasTermsError}"
+                       TextColor="#E53935"
+                       FontFamily="OpenSansRegular"
+                       FontSize="11"
+                       Margin="2,0,0,0" />
+            </VerticalStackLayout>
+
+            <!-- General Server / Connection Error Banner -->
+            <Border IsVisible="{Binding HasError}"
+                    BackgroundColor="#FDECEA"
+                    Stroke="#F5C6CB"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 8"
+                    Padding="12,10"
+                    Margin="0,2,0,0">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                    <Label Grid.Column="0" Text="⚠️" FontSize="14" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="{Binding ErrorMessage}"
+                           TextColor="#D32F2F"
+                           FontFamily="OpenSansRegular"
+                           FontSize="12"
+                           LineHeight="1.25"
+                           VerticalOptions="Center" />
+                </Grid>
+            </Border>
+
+            <!-- Register Button -->
+            <Button Text="{loc:Translate Auth_Register}"
+                    Command="{Binding RegisterCommand}"
+                    BackgroundColor="#4152B0"
+                    TextColor="#FFFFFF"
+                    FontFamily="OpenSansSemibold"
+                    FontSize="15"
+                    CornerRadius="12"
+                    HeightRequest="46"
+                    Margin="0,6,0,0">
+                <Button.Shadow>
+                    <Shadow Brush="#254152B0" Offset="0,4" Radius="8" Opacity="0.6" />
+                </Button.Shadow>
+            </Button>
+
+            <!-- Footer: Return to Login -->
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="4" Margin="0,4,0,8">
+                <Label Text="{loc:Translate Auth_AlreadyHaveAccount}"
+                       TextColor="#6E6E6E"
+                       VerticalOptions="Center"
+                       FontFamily="OpenSansRegular"
+                       FontSize="13" />
+                <Button Text="{loc:Translate Auth_SignIn}"
+                        Command="{Binding GoToLoginCommand}"
+                        TextColor="#4152B0"
+                        BackgroundColor="Transparent"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="13"
+                        Padding="0" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

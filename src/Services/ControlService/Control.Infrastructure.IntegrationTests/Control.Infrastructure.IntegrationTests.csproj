@@ -4,7 +4,7 @@
     <ProjectReference Include="..\Control.TestShared\Control.TestShared.csproj" />
     <ProjectReference Include="..\ControlService.Infrastructure\Control.Infrastructure.csproj" />
     <ProjectReference Include="..\ControlService\Control.API.csproj" />
-    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.IntegrationTests\BuildingBlocks.IntegrationTests.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.TestShared\BuildingBlocks.TestShared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

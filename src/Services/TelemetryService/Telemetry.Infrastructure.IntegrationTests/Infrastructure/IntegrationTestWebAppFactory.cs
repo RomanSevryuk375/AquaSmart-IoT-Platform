@@ -1,5 +1,5 @@
 using BuildingBlocks.Domain.Results;
-using BuildingBlocks.IntegrationTests;
+using BuildingBlocks.TestShared;
 using MassTransit;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Diagnostics.HealthChecks;

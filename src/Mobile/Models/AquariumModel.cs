@@ -1,0 +1,48 @@
+using Mobile.Services;
+
+namespace Mobile.Models;
+
+public class AquariumModel
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid ControllerId { get; set; } = Guid.Empty;
+    public string Name { get; set; } = string.Empty;
+    public double VolumeLiters { get; set; }
+    public int EcosystemType { get; set; } = 1; // 1: Aquarium, 2: Terrarium, 3: Growbox, 4: Florarium, 5: Formicary
+    public WaterType WaterType { get; set; } = WaterType.Freshwater;
+    public string SpeciesInfo { get; set; } = string.Empty;
+    public string Dimensions { get; set; } = string.Empty;
+
+    // Current telemetry snapshot
+    public double Temperature { get; set; }
+    public double Ph { get; set; }
+    public double Oxygen { get; set; }
+    public double SalinityTds { get; set; }
+
+    public bool IsNormalStatus { get; set; } = true;
+    public string StatusText => IsNormalStatus 
+        ? LocalizationService.Instance["Tank_StatusNormal"] 
+        : LocalizationService.Instance["Tank_StatusAttention"];
+    public string StatusColor => IsNormalStatus ? "#388E3C" : "#E53935";
+    public string WaterTypeDisplay => WaterType switch
+    {
+        WaterType.Marine => LocalizationService.Instance["WaterType_Marine"],
+        WaterType.Brackish => LocalizationService.Instance["WaterType_Brackish"],
+        _ => LocalizationService.Instance["WaterType_Freshwater"]
+    };
+
+    public int SensorsCount { get; set; }
+    public int RelaysCount { get; set; }
+    public int ScenariosCount { get; set; }
+
+    // Visual and meta properties
+    public string Icon { get; set; } = "🐟";
+    public string ControllerName { get; set; } = LocalizationService.Instance["Tank_NoController"];
+    public string CardThemeColor { get; set; } = "#F0F4FF";
+    public string CardBorderColor { get; set; } = "#DCE4F7";
+    public bool IsOnline { get; set; }
+    public string StatusSummary { get; set; } = LocalizationService.Instance["Tank_Unassigned"];
+    public string StatusDotColor { get; set; } = "#8C93A8";
+    public string TemperatureDisplay { get; set; } = "-- °C";
+    public string TankTypeSubtitle { get; set; } = LocalizationService.Instance["Tank_DefaultName"];
+}

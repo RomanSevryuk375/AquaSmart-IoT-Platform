@@ -7,6 +7,56 @@ on:
     branches: [ "main", "develop" ]
 
 jobs:
+  test-building-blocks:
+    name: Test [BuildingBlocks]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8.0
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Build BuildingBlocks
+      run: |
+        echo "Building all .csproj files in src/BuildingBlocks..."
+        for project in $(find src/BuildingBlocks -name "*.csproj"); do
+          echo "Building $project"
+          dotnet build "$project" --configuration Release
+        done
+
+    - name: Run BuildingBlocks Unit Tests
+      run: |
+        for file in $(find src/BuildingBlocks -name "*UnitTests.csproj"); do
+          echo "Running $file"
+          dotnet test "$file" --configuration Release --no-build --logger "trx;LogFileName=$(basename $file).trx"
+        done
+
+    - name: Run BuildingBlocks Integration Tests
+      run: |
+        for file in $(find src/BuildingBlocks -name "*IntegrationTests.csproj"); do
+          echo "Running $file"
+          dotnet test "$file" --configuration Release --no-build --logger "trx;LogFileName=$(basename $file).trx"
+        done
+
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-building-blocks
+        path: '**/*.trx'
+
   build-and-test:
     name: Test [${{ matrix.service }}]
     runs-on: ubuntu-latest

@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
 using Control.Domain.ValueObjects;
@@ -49,15 +50,23 @@ public sealed class Sensor : AggregateRoot, IEntity
         SensorType type,
         DateTime createdAt)
     {
-        Result<Name> nameResult = Name.Create(rawName);
-        if (nameResult.IsFailure)
+        var errors = new List<string>();
+
+        DomainGuard.CheckNotEmpty(id, "Sensor Id", errors);
+        DomainGuard.CheckNotEmpty(controllerId, nameof(ControllerId), errors);
+        DomainGuard.CheckNotEmpty(ecosystemId, nameof(EcosystemId), errors);
+        Name? name = DomainGuard.Collect(Name.Create(rawName), errors);
+        DomainGuard.CheckEnum(state, nameof(State), errors);
+        DomainGuard.CheckEnum(type, nameof(Type), errors);
+
+        if (errors.Count != 0)
         {
-            return Result<Sensor>.Failure(nameResult.Error);
+            return DomainGuard.ValidationFailure<Sensor>(errors);
         }
 
         var sensor = new Sensor(
             id, controllerId, ecosystemId,
-            nameResult.Value, state, type, lastValue: default,
+            name!, state, type, lastValue: default,
             createdAt);
 
         return Result<Sensor>.Success(sensor);
@@ -99,7 +108,7 @@ public sealed class Sensor : AggregateRoot, IEntity
         Result<Name> nameResult = Name.Create(rawName);
         if (nameResult.IsFailure)
         {
-            return Result<Sensor>.Failure(nameResult.Error);
+            return Result.Failure(nameResult.Error);
         }
 
         Name = nameResult.Value;

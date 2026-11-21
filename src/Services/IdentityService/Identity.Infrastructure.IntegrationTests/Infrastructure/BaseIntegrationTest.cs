@@ -1,4 +1,4 @@
-using BuildingBlocks.IntegrationTests;
+using BuildingBlocks.TestShared;
 using MediatR;
 using Npgsql;
 using Respawn;

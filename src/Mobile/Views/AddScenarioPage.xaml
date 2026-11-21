@@ -1,0 +1,599 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Mobile.ViewModels"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
+             xmlns:loc="clr-namespace:Mobile.Converters"
+             x:Class="Mobile.Views.AddScenarioPage"
+             x:DataType="vm:AddScenarioViewModel"
+             BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#12131A'}"
+             Shell.NavBarIsVisible="False"
+             Title="{loc:Translate Scenario_AddTitle}">
+
+    <Grid>
+        <!-- 1. MAIN FORM (Figma: Добавление сценария) -->
+        <ScrollView IsVisible="{Binding IsFormVisible}">
+            <VerticalStackLayout Spacing="16" Padding="20,16,20,30">
+                <!-- Top Navigation Bar (< Добавление сценария   X) -->
+                <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,10">
+                    <Border WidthRequest="36" HeightRequest="36"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
+                            StrokeThickness="0"
+                            VerticalOptions="Center">
+                        <ImageButton Source="{AppThemeBinding Light='icon_arrow_left.png', Dark='icon_arrow_left_white.png'}"
+                                     Command="{Binding PromptCancelCommand}"
+                                     BackgroundColor="Transparent"
+                                     WidthRequest="20" HeightRequest="20"
+                                     Padding="0"
+                                     HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+
+                    <Label Grid.Column="1"
+                           Text="{loc:Translate Scenario_AddTitle}"
+                           TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center"
+                           Margin="12,0,0,0" />
+
+                    <Border Grid.Column="2"
+                            WidthRequest="36" HeightRequest="36"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
+                            StrokeThickness="0"
+                            VerticalOptions="Center">
+                        <ImageButton Source="{AppThemeBinding Light='icon_close.png', Dark='icon_close_white.png'}"
+                                     Command="{Binding PromptCancelCommand}"
+                                     BackgroundColor="Transparent"
+                                     WidthRequest="18" HeightRequest="18"
+                                     Padding="0"
+                                     HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                </Grid>
+
+                <!-- Scenario Name -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="{loc:Translate Scenario_Name}" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="14" />
+                    <Border StrokeThickness="1" Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}" StrokeShape="RoundRectangle 12" BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}" HeightRequest="50" Padding="14,0">
+                        <Entry Text="{Binding ScenarioName}"
+                               Placeholder="{loc:Translate Scenario_NamePlaceholder}"
+                               PlaceholderColor="{AppThemeBinding Light='#8C93A8', Dark='#73778F'}"
+                               TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                               VerticalOptions="Center" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- BLOCK 1: ЕСЛИ (Триггер) -->
+                <Border StrokeThickness="1" Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}" StrokeShape="RoundRectangle 16" BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#181A25'}" Padding="16">
+                    <VerticalStackLayout Spacing="14">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                            <Border BackgroundColor="#4152B0" StrokeThickness="0" StrokeShape="RoundRectangle 6" Padding="8,4">
+                                <Label Text="{loc:Translate Scenario_If}" TextColor="#FFFFFF" FontFamily="OpenSansSemibold" FontSize="11" FontAttributes="Bold" />
+                            </Border>
+                            <Label Grid.Column="1" Text="{loc:Translate Scenario_Condition}" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="14" VerticalOptions="Center" />
+                        </Grid>
+
+                        <!-- Sensor Picker -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{loc:Translate Scenario_MonitoredMetric}" TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="13" />
+                            <Border StrokeThickness="1" Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}" StrokeShape="RoundRectangle 12" BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}" HeightRequest="48" Padding="14,0">
+                                <Picker SelectedItem="{Binding SelectedSensor}"
+                                        ItemsSource="{Binding TriggerTypes}"
+                                        TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                                        VerticalOptions="Center" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Operator Selection Chips -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{loc:Translate Scenario_ComparisonOperator}" TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="13" />
+                            <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="6">
+                                <!-- < -->
+                                <Border Grid.Column="0" HeightRequest="40" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="0"
+                                        Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                                        BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectOperatorCommand}" CommandParameter="&lt;" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsOperatorLessThan}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="#4152B0" />
+                                            <Setter Property="Stroke" Value="#4152B0" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="&lt;" FontFamily="OpenSansSemibold" FontSize="15" HorizontalTextAlignment="Center" VerticalOptions="Center"
+                                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsOperatorLessThan}" Value="True">
+                                                <Setter Property="TextColor" Value="#FFFFFF" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+
+                                <!-- <= -->
+                                <Border Grid.Column="1" HeightRequest="40" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="0"
+                                        Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                                        BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectOperatorCommand}" CommandParameter="&lt;=" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsOperatorLessThanOrEqual}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="#4152B0" />
+                                            <Setter Property="Stroke" Value="#4152B0" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="&lt;=" FontFamily="OpenSansSemibold" FontSize="13" HorizontalTextAlignment="Center" VerticalOptions="Center"
+                                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsOperatorLessThanOrEqual}" Value="True">
+                                                <Setter Property="TextColor" Value="#FFFFFF" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+
+                                <!-- = -->
+                                <Border Grid.Column="2" HeightRequest="40" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="0"
+                                        Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                                        BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectOperatorCommand}" CommandParameter="=" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsOperatorEqual}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="#4152B0" />
+                                            <Setter Property="Stroke" Value="#4152B0" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="=" FontFamily="OpenSansSemibold" FontSize="15" HorizontalTextAlignment="Center" VerticalOptions="Center"
+                                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsOperatorEqual}" Value="True">
+                                                <Setter Property="TextColor" Value="#FFFFFF" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+
+                                <!-- >= -->
+                                <Border Grid.Column="3" HeightRequest="40" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="0"
+                                        Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                                        BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectOperatorCommand}" CommandParameter="&gt;=" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsOperatorGreaterThanOrEqual}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="#4152B0" />
+                                            <Setter Property="Stroke" Value="#4152B0" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="&gt;=" FontFamily="OpenSansSemibold" FontSize="13" HorizontalTextAlignment="Center" VerticalOptions="Center"
+                                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsOperatorGreaterThanOrEqual}" Value="True">
+                                                <Setter Property="TextColor" Value="#FFFFFF" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+
+                                <!-- > -->
+                                <Border Grid.Column="4" HeightRequest="40" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="0"
+                                        Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                                        BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectOperatorCommand}" CommandParameter="&gt;" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsOperatorGreaterThan}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="#4152B0" />
+                                            <Setter Property="Stroke" Value="#4152B0" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="&gt;" FontFamily="OpenSansSemibold" FontSize="15" HorizontalTextAlignment="Center" VerticalOptions="Center"
+                                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsOperatorGreaterThan}" Value="True">
+                                                <Setter Property="TextColor" Value="#FFFFFF" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+                            </Grid>
+                        </VerticalStackLayout>
+
+                        <!-- Threshold Value Input -->
+                        <VerticalStackLayout Spacing="6">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="{loc:Translate Scenario_ThresholdValue}" TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="13" />
+                                <HorizontalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                    <Label Text="{loc:Translate Scenario_ComparisonOperator}" TextColor="{AppThemeBinding Light='#4152B0', Dark='#8E9DF0'}" FontFamily="OpenSansSemibold" FontSize="12" />
+                                    <Label Text=":" TextColor="{AppThemeBinding Light='#4152B0', Dark='#8E9DF0'}" FontFamily="OpenSansSemibold" FontSize="12" />
+                                    <Label Text="{Binding SelectedOperator}" TextColor="{AppThemeBinding Light='#4152B0', Dark='#8E9DF0'}" FontFamily="OpenSansSemibold" FontSize="12" />
+                                </HorizontalStackLayout>
+                            </Grid>
+                            <Border StrokeThickness="1" Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}" StrokeShape="RoundRectangle 12" BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}" HeightRequest="48" Padding="14,0">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Entry Text="{Binding ThresholdValue}"
+                                           Keyboard="Numeric"
+                                           Placeholder="24.5"
+                                           PlaceholderColor="{AppThemeBinding Light='#8C93A8', Dark='#73778F'}"
+                                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                                           VerticalOptions="Center" />
+                                    <Label Grid.Column="1" Text="{Binding SensorUnit}" TextColor="{AppThemeBinding Light='#8C93A8', Dark='#9FA3B8'}" FontFamily="OpenSansSemibold" FontSize="14" VerticalOptions="Center" Margin="0,0,6,0" />
+                                </Grid>
+                            </Border>
+                            <!-- Quick Threshold Presets -->
+                            <HorizontalStackLayout Spacing="6" Margin="0,2,0,0">
+                                <Button Text="24.0" Command="{Binding SelectPresetThresholdCommand}" CommandParameter="24.0"
+                                        BackgroundColor="{AppThemeBinding Light='#EDEFFB', Dark='#222640'}" TextColor="{AppThemeBinding Light='#4152B0', Dark='#8E9DF0'}" FontSize="12" HeightRequest="30" Padding="10,0" CornerRadius="8" />
+                                <Button Text="25.0" Command="{Binding SelectPresetThresholdCommand}" CommandParameter="25.0"
+                                        BackgroundColor="{AppThemeBinding Light='#EDEFFB', Dark='#222640'}" TextColor="{AppThemeBinding Light='#4152B0', Dark='#8E9DF0'}" FontSize="12" HeightRequest="30" Padding="10,0" CornerRadius="8" />
+                                <Button Text="26.0" Command="{Binding SelectPresetThresholdCommand}" CommandParameter="26.0"
+                                        BackgroundColor="{AppThemeBinding Light='#EDEFFB', Dark='#222640'}" TextColor="{AppThemeBinding Light='#4152B0', Dark='#8E9DF0'}" FontSize="12" HeightRequest="30" Padding="10,0" CornerRadius="8" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- BLOCK 2: ТОГДА (Действие) -->
+                <Border StrokeThickness="1" Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}" StrokeShape="RoundRectangle 16" BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#181A25'}" Padding="16">
+                    <VerticalStackLayout Spacing="14">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                            <Border BackgroundColor="#7BA028" StrokeThickness="0" StrokeShape="RoundRectangle 6" Padding="8,4">
+                                <Label Text="{loc:Translate Scenario_Then}" TextColor="#FFFFFF" FontFamily="OpenSansSemibold" FontSize="11" FontAttributes="Bold" />
+                            </Border>
+                            <Label Grid.Column="1" Text="{loc:Translate Scenario_ActionTitle}" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="14" VerticalOptions="Center" />
+                        </Grid>
+
+                        <!-- Action Chips -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{loc:Translate Scenario_RelayCommand}" TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="13" />
+                            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="6">
+                                <!-- Включить -->
+                                <Border Grid.Column="0" HeightRequest="40" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="2,0"
+                                        Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                                        BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectActionCommand}" CommandParameter="turn_on" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsActionTurnOn}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="#4152B0" />
+                                            <Setter Property="Stroke" Value="#4152B0" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="{loc:Translate Scenario_TurnOn}" FontFamily="OpenSansSemibold" FontSize="12" HorizontalTextAlignment="Center" VerticalOptions="Center" LineBreakMode="NoWrap"
+                                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsActionTurnOn}" Value="True">
+                                                <Setter Property="TextColor" Value="#FFFFFF" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+
+                                <!-- Выключить -->
+                                <Border Grid.Column="1" HeightRequest="40" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="2,0"
+                                        Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                                        BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectActionCommand}" CommandParameter="turn_off" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsActionTurnOff}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="#4152B0" />
+                                            <Setter Property="Stroke" Value="#4152B0" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="{loc:Translate Scenario_TurnOff}" FontFamily="OpenSansSemibold" FontSize="12" HorizontalTextAlignment="Center" VerticalOptions="Center" LineBreakMode="NoWrap"
+                                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsActionTurnOff}" Value="True">
+                                                <Setter Property="TextColor" Value="#FFFFFF" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+
+                                <!-- Переключить -->
+                                <Border Grid.Column="2" HeightRequest="40" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="2,0"
+                                        Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                                        BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectActionCommand}" CommandParameter="toggle" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsActionToggle}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="#4152B0" />
+                                            <Setter Property="Stroke" Value="#4152B0" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="{loc:Translate Scenario_Toggle}" FontFamily="OpenSansSemibold" FontSize="11" HorizontalTextAlignment="Center" VerticalOptions="Center" LineBreakMode="NoWrap"
+                                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsActionToggle}" Value="True">
+                                                <Setter Property="TextColor" Value="#FFFFFF" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+                            </Grid>
+                        </VerticalStackLayout>
+
+                        <!-- Relay Target Picker -->
+                        <VerticalStackLayout Spacing="6">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="{loc:Translate Scenario_DeviceTarget}" TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="13" />
+                                <HorizontalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                    <Label Text="{loc:Translate Scenario_ActionTitle}" TextColor="#7BA028" FontFamily="OpenSansSemibold" FontSize="12" />
+                                    <Label Text=":" TextColor="#7BA028" FontFamily="OpenSansSemibold" FontSize="12" />
+                                    <Label Text="{Binding SelectedAction}" TextColor="#7BA028" FontFamily="OpenSansSemibold" FontSize="12" />
+                                </HorizontalStackLayout>
+                            </Grid>
+                            <Border StrokeThickness="1" Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}" StrokeShape="RoundRectangle 12" BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}" HeightRequest="48" Padding="14,0">
+                                <Picker SelectedItem="{Binding SelectedRelay}"
+                                        ItemsSource="{Binding TargetDevices}"
+                                        TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                                        VerticalOptions="Center" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Duration Chips -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{loc:Translate Scenario_WorkDuration}" TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="13" />
+                            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="5">
+                                <!-- Постоянно -->
+                                <Border Grid.Column="0" HeightRequest="36" StrokeThickness="1" StrokeShape="RoundRectangle 8" Padding="1,0"
+                                        Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                                        BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectDurationCommand}" CommandParameter="continuous" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsDurationContinuous}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="#4152B0" />
+                                            <Setter Property="Stroke" Value="#4152B0" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="{loc:Translate Scenario_Continuous}" FontFamily="OpenSansSemibold" FontSize="10" HorizontalTextAlignment="Center" VerticalOptions="Center" LineBreakMode="NoWrap"
+                                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsDurationContinuous}" Value="True">
+                                                <Setter Property="TextColor" Value="#FFFFFF" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+
+                                <!-- 15 мин -->
+                                <Border Grid.Column="1" HeightRequest="36" StrokeThickness="1" StrokeShape="RoundRectangle 8" Padding="1,0"
+                                        Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                                        BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectDurationCommand}" CommandParameter="15_min" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsDuration15Min}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="#4152B0" />
+                                            <Setter Property="Stroke" Value="#4152B0" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="{loc:Translate Scenario_15Min}" FontFamily="OpenSansSemibold" FontSize="11" HorizontalTextAlignment="Center" VerticalOptions="Center" LineBreakMode="NoWrap"
+                                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsDuration15Min}" Value="True">
+                                                <Setter Property="TextColor" Value="#FFFFFF" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+
+                                <!-- 30 мин -->
+                                <Border Grid.Column="2" HeightRequest="36" StrokeThickness="1" StrokeShape="RoundRectangle 8" Padding="1,0"
+                                        Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                                        BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectDurationCommand}" CommandParameter="30_min" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsDuration30Min}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="#4152B0" />
+                                            <Setter Property="Stroke" Value="#4152B0" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="{loc:Translate Scenario_30Min}" FontFamily="OpenSansSemibold" FontSize="11" HorizontalTextAlignment="Center" VerticalOptions="Center" LineBreakMode="NoWrap"
+                                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsDuration30Min}" Value="True">
+                                                <Setter Property="TextColor" Value="#FFFFFF" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+
+                                <!-- 1 час -->
+                                <Border Grid.Column="3" HeightRequest="36" StrokeThickness="1" StrokeShape="RoundRectangle 8" Padding="1,0"
+                                        Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                                        BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectDurationCommand}" CommandParameter="1_hour" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsDuration1Hour}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="#4152B0" />
+                                            <Setter Property="Stroke" Value="#4152B0" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="{loc:Translate Scenario_1Hour}" FontFamily="OpenSansSemibold" FontSize="11" HorizontalTextAlignment="Center" VerticalOptions="Center" LineBreakMode="NoWrap"
+                                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsDuration1Hour}" Value="True">
+                                                <Setter Property="TextColor" Value="#FFFFFF" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+                            </Grid>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Active Immediately Switch -->
+                <Border StrokeThickness="1" Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}" StrokeShape="RoundRectangle 12" BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}" Padding="14,10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                            <Label Text="{loc:Translate Scenario_ActiveImmediately}" TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}" FontFamily="OpenSansSemibold" FontSize="14" />
+                            <Label Text="{loc:Translate Scenario_ActiveImmediatelySub}" TextColor="{AppThemeBinding Light='#8C93A8', Dark='#9FA3B8'}" FontSize="12" />
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding IsActive}"
+                                OnColor="{AppThemeBinding Light='#4152B0', Dark='#6366F1'}"
+                                ThumbColor="{AppThemeBinding Light='#FFFFFF', Dark='#FFFFFF'}"
+                                VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- Save Button -->
+                <Button Text="{loc:Translate Scenario_Save}"
+                        Command="{Binding SaveCommand}"
+                        BackgroundColor="#4152B0"
+                        TextColor="#FFFFFF"
+                        CornerRadius="14"
+                        HeightRequest="52"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="15"
+                        Margin="0,8,0,0" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- 2. SUCCESS STATE (Figma: Сценарий добавлен) -->
+        <ScrollView IsVisible="{Binding IsSuccessVisible}">
+            <VerticalStackLayout Spacing="20" Padding="20,24,20,30" VerticalOptions="Center">
+                <!-- Fish Mascot Card with Checkmark badge -->
+                <controls:FishMascotCard HeightOverride="200" BadgeText="✓" BadgeColor="#7BA028" />
+
+                <!-- Created Scenario Preview Card -->
+                <Border StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                        StrokeShape="RoundRectangle 16"
+                        BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
+                        Padding="16,14">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Border WidthRequest="44" HeightRequest="44"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{AppThemeBinding Light='#EDEFFB', Dark='#222640'}"
+                                StrokeThickness="0">
+                            <Label Text="⚡" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                            <Label Text="{Binding CreatedScenarioTitle}"
+                                   TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                                   FontFamily="OpenSansSemibold"
+                                   FontSize="15"
+                                   FontAttributes="Bold" />
+                            <Label Text="{Binding CreatedScenarioSubtitle}"
+                                   TextColor="{AppThemeBinding Light='#8C93A8', Dark='#9FA3B8'}"
+                                   FontSize="12" />
+                        </VerticalStackLayout>
+                        <Label Grid.Column="2" Text="{Binding CreatedScenarioStatus}" TextColor="#4CAF50" FontFamily="OpenSansSemibold" FontSize="12" VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- Success Header & Description -->
+                <VerticalStackLayout Spacing="8" Margin="0,4,0,10">
+                    <Label Text="{loc:Translate Scenario_AddedSuccessTitle}"
+                           TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="{loc:Translate Scenario_AddedSuccessDesc}"
+                           TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}"
+                           FontSize="14"
+                           LineHeight="1.3"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <!-- Action Buttons: "Вернуться к ёмкости" & "Добавить ещё сценарий" -->
+                <VerticalStackLayout Spacing="10">
+                    <Button Text="{loc:Translate Scenario_ReturnToTank}"
+                            Command="{Binding ReturnToAquariumCommand}"
+                            BackgroundColor="#4152B0"
+                            TextColor="#FFFFFF"
+                            CornerRadius="14"
+                            HeightRequest="52"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15" />
+
+                    <Button Text="{loc:Translate Scenario_AddAnother}"
+                            Command="{Binding AddAnotherScenarioCommand}"
+                            BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
+                            BorderColor="#4152B0"
+                            BorderWidth="1.5"
+                            TextColor="{AppThemeBinding Light='#4152B0', Dark='#8E9DF0'}"
+                            CornerRadius="14"
+                            HeightRequest="52"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- 3. CANCEL CONFIRMATION MODAL (Figma: Добавление сценария. Отмена) -->
+        <Grid BackgroundColor="#80000000" IsVisible="{Binding IsCancelDialogOpen}">
+            <Border VerticalOptions="End"
+                    StrokeShape="RoundRectangle 24 24 0 0"
+                    BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#161824'}"
+                    StrokeThickness="0"
+                    Padding="24,24,24,32">
+                <VerticalStackLayout Spacing="18">
+                    <!-- Fish Mascot Card with Question badge -->
+                    <controls:FishMascotCard HeightOverride="180" BadgeText="?" BadgeColor="#7BA028" />
+
+                    <!-- Titles -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="{loc:Translate Scenario_CancelTitle}"
+                               TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="{loc:Translate Scenario_CancelDesc}"
+                               TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}"
+                               FontSize="14"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Buttons: "Продолжить заполнение" & "Да, отменить" -->
+                    <VerticalStackLayout Spacing="10" Margin="0,6,0,0">
+                        <Button Text="{loc:Translate Scenario_ResumeEditing}"
+                                Command="{Binding ResumeEditingCommand}"
+                                BackgroundColor="#4152B0"
+                                TextColor="#FFFFFF"
+                                CornerRadius="14"
+                                HeightRequest="50"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+
+                        <Button Text="{loc:Translate Scenario_ConfirmCancel}"
+                                Command="{Binding ConfirmCancelCommand}"
+                                BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
+                                BorderColor="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}"
+                                BorderWidth="1"
+                                TextColor="{AppThemeBinding Light='#6A738A', Dark='#B2B7CF'}"
+                                CornerRadius="14"
+                                HeightRequest="50"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+    </Grid>
+</ContentPage>

@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Results;
 
@@ -44,10 +45,19 @@ public sealed class MaintenanceLog : AggregateRoot, IEntity
         Dictionary<string, double>? metrics,
         string notes)
     {
+        var errors = new List<string>();
+
+        DomainGuard.CheckNotEmpty(logId, "MaintenanceLog Id", errors);
+        DomainGuard.CheckNotEmpty(userId, nameof(UserId), errors);
+        DomainGuard.CheckNotEmpty(ecosystemId, nameof(EcosystemId), errors);
         if (actionDate > DateTime.UtcNow.AddMinutes(MaintenanceLogConstants.MaxFutureDelayMinutes))
         {
-            return Result<MaintenanceLog>.Failure(Error.Validation<MaintenanceLog>(
-                ErrorMessages.MaintenanceLog.ActionDateInFuture));
+            errors.Add(ErrorMessages.MaintenanceLog.ActionDateInFuture);
+        }
+
+        if (errors.Count != 0)
+        {
+            return DomainGuard.ValidationFailure<MaintenanceLog>(errors);
         }
 
         var log = new MaintenanceLog(

@@ -1,6 +1,7 @@
 // Ignore Spelling: Cron Validator
 
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Results;
 using Control.Domain.Interfaces;
@@ -30,7 +31,7 @@ public sealed class Schedule : AggregateRoot, IEntity
         CreatedAt = createdAt;
     }
 
-#pragma warning disable CS8618 
+#pragma warning disable CS8618
     private Schedule() { }
 #pragma warning restore CS8618
 
@@ -53,21 +54,26 @@ public sealed class Schedule : AggregateRoot, IEntity
         bool isFadeMode,
         bool isEnabled)
     {
-        Result<CronSchedule> cronResult = CronSchedule.Create(rawCronExpression, cronValidator);
-        if (cronResult.IsFailure)
-        {
-            return Result<Schedule>.Failure(cronResult.Error);
-        }
+        var errors = new List<string>();
 
+        DomainGuard.CheckNotEmpty(scheduleId, "Schedule Id", errors);
+        DomainGuard.CheckNotEmpty(ecosystemId, nameof(EcosystemId), errors);
+        DomainGuard.CheckNotEmpty(relayId, nameof(RelayId), errors);
+        CronSchedule? cron = DomainGuard.Collect(
+            CronSchedule.Create(rawCronExpression, cronValidator), errors);
         if (durationMin <= ControlConstants.MinDuration)
         {
-            return Result<Schedule>.Failure(Error.Validation<Schedule>(
-                ControlValidationMessages.DurationMinMustBeGreaterThanZero));
+            errors.Add(ControlValidationMessages.DurationMinMustBeGreaterThanZero);
+        }
+
+        if (errors.Count != 0)
+        {
+            return DomainGuard.ValidationFailure<Schedule>(errors);
         }
 
         var schedule = new Schedule(
             scheduleId, ecosystemId, relayId,
-            cronResult.Value, durationMin,
+            cron!, durationMin,
             isFadeMode, isEnabled,
             createdAt: DateTime.UtcNow);
 
@@ -81,19 +87,21 @@ public sealed class Schedule : AggregateRoot, IEntity
         bool isFadeMode,
         bool isEnabled)
     {
+        var errors = new List<string>();
+
+        CronSchedule? cron = DomainGuard.Collect(
+            CronSchedule.Create(rawCronExpression, cronValidator), errors);
         if (durationMin <= ControlConstants.MinDuration)
         {
-            return Result.Failure(Error.Validation<Schedule>(
-                ControlValidationMessages.DurationMinMustBeGreaterThanZero));
+            errors.Add(ControlValidationMessages.DurationMinMustBeGreaterThanZero);
         }
 
-        Result<CronSchedule> cronResult = CronSchedule.Create(rawCronExpression, cronValidator);
-        if (cronResult.IsFailure)
+        if (errors.Count != 0)
         {
-            return Result.Failure(cronResult.Error);
+            return Result.Failure(Error.Validation<Schedule>(string.Join(", ", errors)));
         }
 
-        CronExpression = cronResult.Value;
+        CronExpression = cron!;
         DurationMin = durationMin;
         IsFadeMode = isFadeMode;
         IsEnabled = isEnabled;

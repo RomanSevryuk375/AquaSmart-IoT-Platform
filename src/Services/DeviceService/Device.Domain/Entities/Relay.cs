@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
@@ -64,28 +65,23 @@ public sealed class Relay : AggregateRoot, IEntity
         bool isManual)
     {
         var errors = new List<string>();
-        Result<DeviceName> nameResult = DeviceName.Create(rawName);
-        if (nameResult.IsFailure)
-        {
-            errors.Add(nameResult.Error.Message);
-        }
 
-        Result<ConnectionAddress> addressResult = ConnectionAddress.Create(
-            connectionProtocol, rawConnectionAddress);
-        if (addressResult.IsFailure)
-        {
-            errors.Add(addressResult.Error.Message);
-        }
+        DomainGuard.CheckNotEmpty(id, "Relay Id", errors);
+        DomainGuard.CheckNotEmpty(controllerId, nameof(ControllerId), errors);
+        DomainGuard.CheckNotEmpty(userId, nameof(UserId), errors);
+        DeviceName? name = DomainGuard.Collect(DeviceName.Create(rawName), errors);
+        ConnectionAddress? address = DomainGuard.Collect(
+            ConnectionAddress.Create(connectionProtocol, rawConnectionAddress), errors);
+        DomainGuard.CheckEnum(purpose, nameof(Purpose), errors);
 
         if (errors.Count != 0)
         {
-            return Result<Relay>.Failure(Error.Validation<Relay>(
-                string.Join(", ", errors)));
+            return DomainGuard.ValidationFailure<Relay>(errors);
         }
 
         var relay = new Relay(
             id, controllerId, userId, powerSensorId,
-            nameResult.Value, addressResult.Value, isNormallyOpen, purpose,
+            name!, address!, isNormallyOpen, purpose,
             isActive, isManual,
             createdAt: DateTime.UtcNow);
 
@@ -112,15 +108,21 @@ public sealed class Relay : AggregateRoot, IEntity
         RelayPurpose purpose,
         bool isNormallyOpen)
     {
-        Result<ConnectionAddress> addressResult = ConnectionAddress.Create(
-            connectionProtocol, rawConnectionAddress);
-        if (addressResult.IsFailure)
+        var errors = new List<string>();
+
+        DomainGuard.CheckNotEmpty(controllerId, nameof(ControllerId), errors);
+        DomainGuard.CheckNotEmpty(userId, nameof(UserId), errors);
+        ConnectionAddress? address = DomainGuard.Collect(
+            ConnectionAddress.Create(connectionProtocol, rawConnectionAddress), errors);
+        DomainGuard.CheckEnum(purpose, nameof(Purpose), errors);
+
+        if (errors.Count != 0)
         {
-            return Result.Failure(addressResult.Error);
+            return Result.Failure(Error.Validation<Relay>(string.Join(", ", errors)));
         }
 
         ControllerId = controllerId;
-        ConnectionAddress = addressResult.Value;
+        ConnectionAddress = address!;
         IsNormallyOpen = isNormallyOpen;
         Purpose = purpose;
 
@@ -149,7 +151,7 @@ public sealed class Relay : AggregateRoot, IEntity
         Result<DeviceName> nameResult = DeviceName.Create(rawName);
         if (nameResult.IsFailure)
         {
-            return Result<Relay>.Failure(nameResult.Error);
+            return Result.Failure(nameResult.Error);
         }
 
         Name = nameResult.Value;

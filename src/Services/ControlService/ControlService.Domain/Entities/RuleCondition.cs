@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
 using Control.Domain.Factories;
@@ -44,16 +45,23 @@ public sealed class RuleCondition : IEntity
         double threshold,
         double hysteresis)
     {
-        Result<ConditionThreshold> conditionThresholdResult = ConditionThreshold.Create(
-            threshold, hysteresis);
-        if (conditionThresholdResult.IsFailure)
+        var errors = new List<string>();
+
+        DomainGuard.CheckNotEmpty(ruleConditionId, "RuleCondition Id", errors);
+        DomainGuard.CheckNotEmpty(automationRuleId, nameof(AutomationRuleId), errors);
+        DomainGuard.CheckNotEmpty(sensorId, nameof(SensorId), errors);
+        DomainGuard.CheckEnum(condition, nameof(Condition), errors);
+        ConditionThreshold? conditionThreshold = DomainGuard.Collect(
+            ConditionThreshold.Create(threshold, hysteresis), errors);
+
+        if (errors.Count != 0)
         {
-            return Result<RuleCondition>.Failure(conditionThresholdResult.Error);
+            return DomainGuard.ValidationFailure<RuleCondition>(errors);
         }
 
         var ruleCondition = new RuleCondition(
             ruleConditionId, automationRuleId, sensorId,
-            condition, conditionThresholdResult.Value,
+            condition, conditionThreshold!,
             createdAt: DateTime.UtcNow);
 
         return Result<RuleCondition>.Success(ruleCondition);
@@ -64,15 +72,19 @@ public sealed class RuleCondition : IEntity
         double threshold,
         double hysteresis)
     {
-        Result<ConditionThreshold> conditionThresholdResult = ConditionThreshold.Create(
-            threshold, hysteresis);
-        if (conditionThresholdResult.IsFailure)
+        var errors = new List<string>();
+
+        DomainGuard.CheckEnum(condition, nameof(Condition), errors);
+        ConditionThreshold? conditionThreshold = DomainGuard.Collect(
+            ConditionThreshold.Create(threshold, hysteresis), errors);
+
+        if (errors.Count != 0)
         {
-            return Result.Failure(conditionThresholdResult.Error);
+            return Result.Failure(Error.Validation<RuleCondition>(string.Join(", ", errors)));
         }
 
         Condition = condition;
-        ConditionThreshold = conditionThresholdResult.Value;
+        ConditionThreshold = conditionThreshold!;
 
         return Result.Success();
     }
