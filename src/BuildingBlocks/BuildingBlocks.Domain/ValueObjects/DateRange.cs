@@ -9,10 +9,10 @@ public sealed record DateRange
     public DateTime StartDate { get; }
     public DateTime EndDate { get; }
 
-    private DateRange(DateTime start, DateTime end)
+    private DateRange(DateTime startDate, DateTime endDate)
     {
-        StartDate = start;
-        EndDate = end;
+        StartDate = startDate;
+        EndDate = endDate;
     }
 
     public static Result<DateRange> Create(DateTime start, DateTime end)
