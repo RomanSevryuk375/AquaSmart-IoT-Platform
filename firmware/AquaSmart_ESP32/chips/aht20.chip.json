@@ -1,0 +1,23 @@
+{
+  "name": "AHT20 Temp & Humidity",
+  "author": "AquaSmart",
+  "pins": ["VCC", "GND", "SCL", "SDA"],
+  "controls": [
+    {
+      "id": "temperature",
+      "label": "Air Temperature (°C)",
+      "type": "range",
+      "min": -10,
+      "max": 60,
+      "step": 0.5
+    },
+    {
+      "id": "humidity",
+      "label": "Air Humidity (%)",
+      "type": "range",
+      "min": 0,
+      "max": 100,
+      "step": 1
+    }
+  ]
+}

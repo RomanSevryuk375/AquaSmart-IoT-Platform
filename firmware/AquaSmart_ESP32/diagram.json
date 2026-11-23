@@ -1,0 +1,370 @@
+{
+  "version": 1,
+  "author": "AquaSmart",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-devkit-c-v4",
+      "id": "esp",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+
+    {
+      "type": "wokwi-lcd1602",
+      "id": "lcd1",
+      "top": -340,
+      "left": 180,
+      "attrs": { "pins": "i2c", "i2cAddress": "0x27" }
+    },
+    {
+      "type": "wokwi-ds1307",
+      "id": "rtc1",
+      "top": -185,
+      "left": 195,
+      "attrs": {}
+    },
+    {
+      "type": "chip-aht20",
+      "id": "aht1",
+      "top": -90,
+      "left": 195,
+      "attrs": { "temperature": "24.5", "humidity": "55" }
+    },
+    {
+      "type": "chip-soil-i2c",
+      "id": "soil1",
+      "top": -25,
+      "left": 195,
+      "attrs": { "moistureRaw": "2200" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_sda",
+      "top": -115,
+      "left": 100,
+      "rotate": 90,
+      "attrs": { "value": "4700" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_scl",
+      "top": -115,
+      "left": 130,
+      "rotate": 90,
+      "attrs": { "value": "4700" }
+    },
+
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn_back",
+      "top": -275,
+      "left": -255,
+      "attrs": { "color": "blue", "label": "BACK (39)" }
+    },
+    {
+      "type": "wokwi-ky-040",
+      "id": "enc1",
+      "top": -175,
+      "left": -275,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-slide-switch",
+      "id": "sw_level",
+      "top": -45,
+      "left": -240,
+      "attrs": { "label": "Water Level (34)" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_back",
+      "top": -245,
+      "left": -125,
+      "attrs": { "value": "10000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_sw",
+      "top": -185,
+      "left": -125,
+      "attrs": { "value": "10000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_dt",
+      "top": -145,
+      "left": -125,
+      "attrs": { "value": "10000" }
+    },
+
+    {
+      "type": "wokwi-led",
+      "id": "led_wifi",
+      "top": 270,
+      "left": -245,
+      "attrs": { "color": "blue", "label": "WiFi (14)" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_led_wifi",
+      "top": 300,
+      "left": -155,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_error",
+      "top": 345,
+      "left": -245,
+      "attrs": { "color": "red", "label": "Error (12)" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_led_error",
+      "top": 375,
+      "left": -155,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_online",
+      "top": 420,
+      "left": -245,
+      "attrs": { "color": "green", "label": "Online (13)" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_led_online",
+      "top": 450,
+      "left": -155,
+      "attrs": { "value": "220" }
+    },
+
+    {
+      "type": "wokwi-led",
+      "id": "led_degraded",
+      "top": 25,
+      "left": 185,
+      "attrs": { "color": "yellow", "label": "Degraded (23)" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_led_degraded",
+      "top": 55,
+      "left": 255,
+      "attrs": { "value": "220" }
+    },
+
+    {
+      "type": "wokwi-ds18b20",
+      "id": "ds_water",
+      "top": 235,
+      "left": 195,
+      "attrs": { "deviceID": "000000000001", "temperature": "25.4" }
+    },
+    {
+      "type": "wokwi-ds18b20",
+      "id": "ds_surface",
+      "top": 235,
+      "left": 275,
+      "attrs": { "deviceID": "000000000002", "temperature": "23.1" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_ow",
+      "top": 265,
+      "left": 120,
+      "rotate": 90,
+      "attrs": { "value": "4700" }
+    },
+
+    {
+      "type": "wokwi-led",
+      "id": "led_activity",
+      "top": 365,
+      "left": 185,
+      "attrs": { "color": "white", "label": "Activity (2)" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_led_activity",
+      "top": 395,
+      "left": 255,
+      "attrs": { "value": "220" }
+    },
+
+    {
+      "type": "wokwi-relay-module",
+      "id": "relay8",
+      "top": -30,
+      "left": -540,
+      "rotate": 180,
+      "attrs": { "transistor": "pnp" }
+    },
+    {
+      "type": "wokwi-relay-module",
+      "id": "relay5",
+      "top": 85,
+      "left": -540,
+      "rotate": 180,
+      "attrs": { "transistor": "pnp" }
+    },
+    {
+      "type": "wokwi-relay-module",
+      "id": "relay6",
+      "top": 200,
+      "left": -540,
+      "rotate": 180,
+      "attrs": { "transistor": "pnp" }
+    },
+    {
+      "type": "wokwi-relay-module",
+      "id": "relay7",
+      "top": 315,
+      "left": -540,
+      "rotate": 180,
+      "attrs": { "transistor": "pnp" }
+    },
+
+    {
+      "type": "wokwi-relay-module",
+      "id": "relay4",
+      "top": -30,
+      "left": 480,
+      "attrs": { "transistor": "pnp" }
+    },
+    {
+      "type": "wokwi-relay-module",
+      "id": "relay3",
+      "top": 85,
+      "left": 480,
+      "attrs": { "transistor": "pnp" }
+    },
+    {
+      "type": "wokwi-relay-module",
+      "id": "relay2",
+      "top": 200,
+      "left": 480,
+      "attrs": { "transistor": "pnp" }
+    },
+    {
+      "type": "wokwi-relay-module",
+      "id": "relay1",
+      "top": 315,
+      "left": 480,
+      "attrs": { "transistor": "pnp" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+
+    [ "esp:21", "r_sda:2", "blue", [ "h20", "v-130", "*" ] ],
+    [ "r_sda:2", "lcd1:SDA", "blue", [ "v-165", "h40", "*" ] ],
+    [ "r_sda:2", "rtc1:SDA", "blue", [ "v-65", "h55", "*" ] ],
+    [ "r_sda:2", "aht1:SDA", "blue", [ "v-5", "h285", "v25", "*" ] ],
+    [ "aht1:SDA", "soil1:SDA", "blue", [ "h20", "v65", "*" ] ],
+
+    [ "esp:22", "r_scl:2", "gold", [ "h45", "v-100", "*" ] ],
+    [ "r_scl:2", "lcd1:SCL", "gold", [ "v-155", "h10", "*" ] ],
+    [ "r_scl:2", "rtc1:SCL", "gold", [ "v-50", "h25", "*" ] ],
+    [ "r_scl:2", "aht1:SCL", "gold", [ "v-15", "h265", "v55", "*" ] ],
+    [ "aht1:SCL", "soil1:SCL", "gold", [ "h30", "v65", "*" ] ],
+
+    [ "esp:3V3", "r_dt:2", "red", [ "h-35", "v-170", "*" ] ],
+    [ "r_dt:2", "r_sw:2", "red", [ "h0", "v-40" ] ],
+    [ "r_sw:2", "r_back:2", "red", [ "h0", "v-60" ] ],
+    [ "r_dt:2", "enc1:VCC", "red", [ "h0", "v40", "*" ] ],
+    [ "r_dt:2", "sw_level:1", "red", [ "h0", "v145", "*" ] ],
+
+    [ "esp:3V3", "r_sda:1", "red", [ "h-15", "v-175", "h145", "*" ] ],
+    [ "r_sda:1", "r_scl:1", "red", [ "h30", "v0" ] ],
+    [ "r_scl:1", "aht1:VCC", "red", [ "v50", "h35", "*" ] ],
+    [ "aht1:VCC", "soil1:VCC", "red", [ "h-15", "v65", "*" ] ],
+    [ "esp:3V3", "r_ow:1", "red", [ "h-15", "v-45", "h170", "v255", "*" ] ],
+    [ "r_ow:1", "ds_water:VCC", "red", [ "v35", "h85", "*" ] ],
+    [ "ds_water:VCC", "ds_surface:VCC", "red", [ "v15", "h80", "*" ] ],
+
+    [ "esp:5V", "relay7:VCC", "orange", [ "h-30", "v175", "h-330", "*" ] ],
+    [ "relay7:VCC", "relay6:VCC", "orange", [ "h20", "v-115", "*" ] ],
+    [ "relay6:VCC", "relay5:VCC", "orange", [ "h20", "v-115", "*" ] ],
+    [ "relay5:VCC", "relay8:VCC", "orange", [ "h20", "v-115", "*" ] ],
+
+    [ "esp:5V", "relay1:VCC", "orange", [ "h-15", "v210", "h450", "*" ] ],
+    [ "relay1:VCC", "relay2:VCC", "orange", [ "h-20", "v-115", "*" ] ],
+    [ "relay2:VCC", "relay3:VCC", "orange", [ "h-20", "v-115", "*" ] ],
+    [ "relay3:VCC", "relay4:VCC", "orange", [ "h-20", "v-115", "*" ] ],
+    [ "relay4:VCC", "rtc1:5V", "orange", [ "h-25", "v-175", "*" ] ],
+    [ "rtc1:5V", "lcd1:VCC", "orange", [ "h-25", "v-140", "*" ] ],
+
+    [ "esp:GND.1", "led_wifi:C", "black", [ "h-15", "v160", "h-260", "*" ] ],
+    [ "led_wifi:C", "led_error:C", "black", [ "h-15", "v75", "*" ] ],
+    [ "led_error:C", "led_online:C", "black", [ "h-15", "v75", "*" ] ],
+    [ "led_wifi:C", "relay7:GND", "black", [ "h-45", "v60", "*" ] ],
+    [ "relay7:GND", "relay6:GND", "black", [ "h35", "v-115", "*" ] ],
+    [ "relay6:GND", "relay5:GND", "black", [ "h35", "v-115", "*" ] ],
+    [ "relay5:GND", "relay8:GND", "black", [ "h35", "v-115", "*" ] ],
+    [ "relay8:GND", "btn_back:2.l", "black", [ "h35", "v-255", "*" ] ],
+    [ "btn_back:2.l", "enc1:GND", "black", [ "h-25", "v160", "*" ] ],
+    [ "enc1:GND", "sw_level:3", "black", [ "h0", "v85", "*" ] ],
+
+    [ "esp:GND.2", "lcd1:GND", "black", [ "h15", "v-350", "*" ] ],
+    [ "lcd1:GND", "rtc1:GND", "black", [ "h-15", "v145", "*" ] ],
+    [ "rtc1:GND", "aht1:GND", "black", [ "h-15", "v95", "*" ] ],
+    [ "aht1:GND", "soil1:GND", "black", [ "h-25", "v65", "*" ] ],
+
+    [ "esp:GND.3", "led_degraded:C", "black", [ "h15", "v-20", "*" ] ],
+    [ "esp:GND.3", "ds_water:GND", "black", [ "h65", "v195", "*" ] ],
+    [ "ds_water:GND", "ds_surface:GND", "black", [ "v25", "h80", "*" ] ],
+    [ "ds_water:GND", "led_activity:C", "black", [ "v25", "h-25", "v95", "*" ] ],
+    [ "esp:GND.3", "relay4:GND", "black", [ "h340", "v-100", "*" ] ],
+    [ "relay4:GND", "relay3:GND", "black", [ "h-35", "v115", "*" ] ],
+    [ "relay3:GND", "relay2:GND", "black", [ "h-35", "v115", "*" ] ],
+    [ "relay2:GND", "relay1:GND", "black", [ "h-35", "v115", "*" ] ],
+
+    [ "esp:VN", "r_back:1", "magenta", [ "h-45", "v-295", "*" ] ],
+    [ "r_back:1", "btn_back:1.r", "magenta", [ "h-40", "v0", "*" ] ],
+
+    [ "esp:VP", "r_sw:1", "purple", [ "h-55", "v-230", "*" ] ],
+    [ "r_sw:1", "enc1:SW", "purple", [ "h-20", "v65", "*" ] ],
+
+    [ "esp:35", "r_dt:1", "gold", [ "h-65", "v-220", "*" ] ],
+    [ "r_dt:1", "enc1:DT", "gold", [ "h-30", "v10", "*" ] ],
+
+    [ "esp:33", "enc1:CLK", "orange", [ "h-75", "v-240", "*" ] ],
+
+    [ "esp:34", "sw_level:2", "green", [ "h-85", "v-70", "*" ] ],
+
+    [ "esp:4", "r_ow:2", "cyan", [ "h25", "v155", "*" ] ],
+    [ "r_ow:2", "ds_water:DQ", "cyan", [ "v25", "h75", "*" ] ],
+    [ "ds_water:DQ", "ds_surface:DQ", "cyan", [ "v15", "h80", "*" ] ],
+
+    [ "esp:14", "r_led_wifi:2", "blue", [ "h-35", "v165", "*" ] ],
+    [ "r_led_wifi:1", "led_wifi:A", "blue", [ "h-30", "v0", "*" ] ],
+
+    [ "esp:12", "r_led_error:2", "red", [ "h-45", "v230", "*" ] ],
+    [ "r_led_error:1", "led_error:A", "red", [ "h-30", "v0", "*" ] ],
+
+    [ "esp:13", "r_led_online:2", "green", [ "h-55", "v290", "*" ] ],
+    [ "r_led_online:1", "led_online:A", "green", [ "h-30", "v0", "*" ] ],
+
+    [ "esp:23", "r_led_degraded:2", "gold", [ "h15", "v-25", "h200", "v45", "*" ] ],
+    [ "r_led_degraded:1", "led_degraded:A", "gold", [ "h-25", "v0", "*" ] ],
+
+    [ "esp:2", "r_led_activity:2", "white", [ "h15", "v240", "h200", "*" ] ],
+    [ "r_led_activity:1", "led_activity:A", "white", [ "h-25", "v0", "*" ] ],
+
+    [ "esp:32", "relay8:IN", "teal", [ "h-290", "v-80", "*" ] ],
+    [ "esp:25", "relay5:IN", "teal", [ "h-300", "v15", "*" ] ],
+    [ "esp:26", "relay6:IN", "teal", [ "h-310", "v115", "*" ] ],
+    [ "esp:27", "relay7:IN", "teal", [ "h-320", "v220", "*" ] ],
+
+    [ "esp:19", "relay4:IN", "green", [ "h315", "v-90", "*" ] ],
+    [ "esp:18", "relay3:IN", "green", [ "h325", "v15", "*" ] ],
+    [ "esp:17", "relay2:IN", "green", [ "h335", "v110", "*" ] ],
+    [ "esp:16", "relay1:IN", "green", [ "h345", "v215", "*" ] ]
+  ],
+  "dependencies": {}
+}
