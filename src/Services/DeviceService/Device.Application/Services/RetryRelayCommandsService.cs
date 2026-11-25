@@ -4,6 +4,7 @@ using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
 using Device.Application.Extesions;
 using Device.Application.Interfaces;
+using Device.Domain.ValueObjects;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -112,6 +113,72 @@ public sealed class RetryRelayCommandsService(
             }
 
             return Result<int>.Success(processedCount);
+        }
+        catch (Exception ex)
+        {
+            return Result<int>.Failure(Error.Failure(ErrorMessages.DatabaseError, ex.Message));
+        }
+    }
+
+    public async Task<Result<int>> RedeliverPendingForControllerAsync(
+        string macAddress,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            Result<MacAddress> macResult = MacAddress.Create(macAddress);
+            if (macResult.IsFailure)
+            {
+                return Result<int>.Success(0);
+            }
+
+            Controller? controller = await controllerRepository.GetByMacAddressAsync(
+                macResult.Value.Value, cancellationToken);
+            if (controller is null || !controller.IsOnline)
+            {
+                return Result<int>.Success(0);
+            }
+
+            DateTime now = DateTime.UtcNow;
+            IReadOnlyList<RelayCommand> pendingCommands = await commandsRepository.GetUnexpiredPendingByControllerIdAsync(
+                controller.Id, now, cancellationToken);
+            if (pendingCommands.Count == 0)
+            {
+                return Result<int>.Success(0);
+            }
+
+            int deliveredCount = 0;
+            foreach (RelayCommand command in pendingCommands)
+            {
+                var payload = new RelayCommandMqttPayload
+                {
+                    CommandId = command.Id,
+                    RelayId = command.RelayId,
+                    TargetState = command.TargetState,
+                    ExpireAt = command.ExpireAt,
+                    CreatedAt = command.CreatedAt,
+                };
+
+                bool published = await mqttCommandPublisher.PublishRelayCommandAsync(
+                    controller.MacAddress.Value, payload, cancellationToken);
+
+                if (published)
+                {
+                    command.MarkAsSent();
+                    deliveredCount++;
+                }
+            }
+
+            if (deliveredCount > 0)
+            {
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+                logger.LogInformation(
+                    "Redelivered {DeliveredCount} pending relay command(s) to reconnected Controller {ControllerId}.",
+                    deliveredCount,
+                    controller.Id);
+            }
+
+            return Result<int>.Success(deliveredCount);
         }
         catch (Exception ex)
         {

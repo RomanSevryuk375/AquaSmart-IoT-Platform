@@ -30,17 +30,21 @@ public sealed class MqttGatewayBackgroundService : BackgroundService, IMqttComma
 
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly MqttOptions _options;
+    private readonly DeviceSettings _deviceSettings;
     private readonly ILogger<MqttGatewayBackgroundService> _logger;
     private readonly IMqttClient _mqttClient;
     private readonly SemaphoreSlim _connectLock = new(1, 1);
+    private CancellationToken _stoppingToken = CancellationToken.None;
 
     public MqttGatewayBackgroundService(
         IServiceScopeFactory serviceScopeFactory,
         IOptions<MqttOptions> options,
+        IOptions<DeviceSettings> deviceSettings,
         ILogger<MqttGatewayBackgroundService> logger)
     {
         _serviceScopeFactory = serviceScopeFactory;
         _options = options.Value;
+        _deviceSettings = deviceSettings.Value;
         _logger = logger;
         _mqttClient = new MqttFactory().CreateMqttClient();
 
@@ -67,6 +71,8 @@ public sealed class MqttGatewayBackgroundService : BackgroundService, IMqttComma
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        _stoppingToken = stoppingToken;
+
         if (!_options.Enabled)
         {
             _logger.LogInformation("MQTT gateway worker is disabled via MqttOptions:Enabled=false.");
@@ -232,9 +238,7 @@ public sealed class MqttGatewayBackgroundService : BackgroundService, IMqttComma
                     await DispatchStatusAsync(sender, topicMac, rawPayload);
                     break;
                 case "relays/state":
-                    _logger.LogDebug(
-                        "MQTT relays/state received for MAC {Mac} (handler will be wired in Stage 4).",
-                        topicMac);
+                    await DispatchRelayStateSyncAsync(sender, topicMac, rawPayload);
                     break;
                 default:
                     _logger.LogWarning("MQTT message ignored: unsupported suffix '{Suffix}' on topic '{Topic}'.", suffix, topic);
@@ -320,6 +324,63 @@ public sealed class MqttGatewayBackgroundService : BackgroundService, IMqttComma
         };
 
         await sender.Send(command, CancellationToken.None);
+
+        if (string.Equals(command.Status.Trim(), "online", StringComparison.OrdinalIgnoreCase))
+        {
+            SchedulePendingRedelivery(topicMac);
+        }
+    }
+
+    private async Task DispatchRelayStateSyncAsync(ISender sender, string topicMac, string rawPayload)
+    {
+        RelayStateSyncMessagePayload? payload = JsonSerializer.Deserialize<RelayStateSyncMessagePayload>(rawPayload, _jsonOptions);
+        if (payload is null)
+        {
+            _logger.LogWarning("MQTT relays/state dropped: null JSON payload for MAC {Mac}.", topicMac);
+            return;
+        }
+
+        var command = new ProcessRelayStateSyncCommand
+        {
+            TopicMac = topicMac,
+            PayloadMacAddress = payload.MacAddress,
+            Source = payload.Source ?? string.Empty,
+            RecordedAt = payload.RecordedAt,
+            Relays = payload.Relays ?? [],
+        };
+
+        await sender.Send(command, CancellationToken.None);
+    }
+
+    private void SchedulePendingRedelivery(string topicMac)
+    {
+        int delayMs = Math.Max(0, _deviceSettings.OnlineRedeliveryDelayMs);
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                if (delayMs > 0)
+                {
+                    await Task.Delay(delayMs, _stoppingToken);
+                }
+
+                using IServiceScope scope = _serviceScopeFactory.CreateScope();
+                IRelayCommandRetryService retryService = scope.ServiceProvider.GetRequiredService<IRelayCommandRetryService>();
+                await retryService.RedeliverPendingForControllerAsync(topicMac, _stoppingToken);
+            }
+            catch (OperationCanceledException) when (_stoppingToken.IsCancellationRequested)
+            {
+                // Host is shutting down; ignore cancellation.
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Delayed pending command redelivery failed for reconnected MAC {Mac}.",
+                    topicMac);
+            }
+        }, _stoppingToken);
     }
 
     private async Task<bool> PublishJsonAsync<TPayload>(
@@ -413,4 +474,10 @@ public sealed class MqttGatewayBackgroundService : BackgroundService, IMqttComma
         int? Rssi,
         long? UptimeSec,
         DateTime? Timestamp);
+
+    private sealed record RelayStateSyncMessagePayload(
+        string? MacAddress,
+        string? Source,
+        DateTime? RecordedAt,
+        List<MqttRelayStateItemDto>? Relays);
 }

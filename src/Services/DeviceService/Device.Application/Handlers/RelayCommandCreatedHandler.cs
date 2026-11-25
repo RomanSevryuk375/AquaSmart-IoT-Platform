@@ -40,6 +40,15 @@ public sealed class RelayCommandCreatedHandler(
             return;
         }
 
+        if (!controller.IsOnline)
+        {
+            logger.LogDebug(
+                "Controller {ControllerId} is offline; RelayCommand {CommandId} stays Pending until reconnect.",
+                controller.Id,
+                command.Id);
+            return;
+        }
+
         var payload = new RelayCommandMqttPayload
         {
             CommandId = command.Id,

@@ -227,6 +227,44 @@ public class ToggleRelayStateHandlerTests
     }
 
     [Fact]
+    public async Task RelayCommandCreatedHandler_WhenControllerOffline_KeepsCommandPendingWithoutPublishing()
+    {
+        // Arrange
+        var logger = Substitute.For<ILogger<RelayCommandCreatedHandler>>();
+        var handler = new RelayCommandCreatedHandler(
+            _controllerRepoMock, _queueRepoMock, _mqttPublisherMock, _unitOfWorkMock, logger);
+
+        Controller offlineController = new ControllerBuilder()
+            .WithMacAddress("AA:BB:CC:DD:EE:09")
+            .AsOffline()
+            .Build();
+        RelayCommand command = new RelayCommandBuilder()
+            .WithControllerId(offlineController.Id)
+            .WithTargetState(true)
+            .Build();
+
+        _queueRepoMock.GetByIdAsync(command.Id, Arg.Any<CancellationToken>()).Returns(command);
+        _controllerRepoMock.GetByIdAsync(offlineController.Id, Arg.Any<CancellationToken>()).Returns(offlineController);
+
+        // Act
+        await handler.Handle(new RelayCommandCreatedDomainEvent
+        {
+            CommandId = command.Id,
+            ControllerId = offlineController.Id,
+            RelayId = command.RelayId,
+            TargetState = command.TargetState,
+            ExpireAt = command.ExpireAt,
+            CreatedAt = command.CreatedAt
+        }, CancellationToken.None);
+
+        // Assert
+        command.Status.Should().Be(CommandStatus.Pending);
+        command.AttemptCount.Should().Be(0);
+        await _mqttPublisherMock.DidNotReceiveWithAnyArgs()
+            .PublishRelayCommandAsync(default!, default!, default);
+    }
+
+    [Fact]
     public async Task ControllerConfigChangedHandler_PublishesConfigNotifyToMqtt()
     {
         // Arrange

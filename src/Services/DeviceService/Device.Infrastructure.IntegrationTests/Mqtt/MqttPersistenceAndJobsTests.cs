@@ -276,4 +276,69 @@ public class MqttPersistenceAndJobsTests(
         postUpdateOldToken.Value.IsValid.Should().BeFalse();
         postUpdateNewToken.Value.IsValid.Should().BeTrue();
     }
+
+    [Fact]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+    public async Task ProcessRelayStateSync_ManualOverride_PersistsStateModeAndCancelsActiveCommandsInPostgres()
+    {
+        // Arrange
+        Controller controller = new ControllerBuilder()
+            .WithId(Guid.NewGuid())
+            .WithMacAddress("AA:11:22:33:44:AA")
+            .Build();
+        Relay relay = new RelayBuilder()
+            .WithId(Guid.NewGuid())
+            .WithControllerId(controller.Id)
+            .AsActive(true)
+            .AsAuto()
+            .Build();
+
+        RelayCommand pendingCmd = new RelayCommandBuilder()
+            .WithId(Guid.NewGuid())
+            .WithControllerId(controller.Id)
+            .WithRelayId(relay.Id)
+            .Build();
+        RelayCommand sentCmd = new RelayCommandBuilder()
+            .WithId(Guid.NewGuid())
+            .WithControllerId(controller.Id)
+            .WithRelayId(relay.Id)
+            .Build();
+        sentCmd.MarkAsSent();
+
+        DbContext.Controllers.Add(controller);
+        DbContext.Relays.Add(relay);
+        DbContext.RelayCommands.AddRange(pendingCmd, sentCmd);
+        await DbContext.SaveChangesAsync();
+        DbContext.ChangeTracker.Clear();
+
+        // Act
+        Result syncResult = await Sender.Send(new Device.Application.Features.Mqtt.ProcessRelayStateSyncCommand
+        {
+            TopicMac = "AA11223344AA",
+            Source = "manual",
+            RecordedAt = DateTime.UtcNow,
+            Relays =
+            [
+                new Device.Application.Features.Mqtt.MqttRelayStateItemDto
+                {
+                    RelayId = relay.Id,
+                    State = false,
+                    IsManual = true
+                }
+            ]
+        });
+        DbContext.ChangeTracker.Clear();
+
+        // Assert
+        syncResult.IsSuccess.Should().BeTrue();
+        Relay? dbRelay = await DbContext.Relays.AsNoTracking().FirstOrDefaultAsync(r => r.Id == relay.Id);
+        dbRelay!.IsActive.Should().BeFalse();
+        dbRelay.IsManual.Should().BeTrue();
+
+        List<RelayCommand> dbCommands = await DbContext.RelayCommands
+            .AsNoTracking()
+            .Where(c => c.RelayId == relay.Id)
+            .ToListAsync();
+        dbCommands.Should().OnlyContain(c => c.Status == CommandStatus.Cancelled);
+    }
 }

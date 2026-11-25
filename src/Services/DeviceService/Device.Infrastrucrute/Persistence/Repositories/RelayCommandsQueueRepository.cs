@@ -46,6 +46,19 @@ public sealed class RelayCommandsQueueRepository(DeviceDbContext dbContext)
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<RelayCommand>> GetUnexpiredPendingByControllerIdAsync(
+        Guid controllerId,
+        DateTime utcNow,
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.RelayCommands
+            .Where(x => x.ControllerId == controllerId &&
+                        x.Status == CommandStatus.Pending &&
+                        (x.ExpireAt == null || x.ExpireAt > utcNow))
+            .OrderBy(x => x.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<int> DeleteCompletedAsync(
         CancellationToken cancellationToken = default)
     {

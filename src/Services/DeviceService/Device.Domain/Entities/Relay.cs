@@ -260,6 +260,37 @@ public sealed class Relay : AggregateRoot, IEntity
         IncrementVersion();
     }
 
+    public void SyncStateFromDevice(bool state, Guid userId)
+    {
+        IsActive = state;
+
+        RaiseEvent(new RelayStateChangedDomainEvent
+        {
+            UserId = userId,
+            ControllerId = ControllerId,
+            RelayId = Id,
+            TargetState = IsActive,
+            ExpireAt = DateTime.UtcNow.AddMinutes(RelayCommandConstants.DefaultExpiryMinutes)
+        });
+
+        IncrementVersion();
+    }
+
+    public void SyncModeFromDevice(bool isManual, Guid userId)
+    {
+        IsManual = isManual;
+
+        RaiseEvent(new RelayModeChangedDomainEvent
+        {
+            ControllerId = ControllerId,
+            UserId = userId,
+            RelayId = Id,
+            IsManual = IsManual
+        });
+
+        IncrementVersion();
+    }
+
     public void MarkAsDeleted(Guid userId)
     {
         RaiseEvent(new RelayDeletedDomainEvent

@@ -160,4 +160,41 @@ public class RetryRelayCommandsLogicTests
         await _mqttPublisherMock.DidNotReceiveWithAnyArgs()
             .PublishRelayCommandAsync(default!, default!, default);
     }
+
+    [Fact]
+    public async Task RedeliverPendingForController_WhenControllerOnlineWithPending_PublishesAndMarksSent()
+    {
+        // Arrange
+        IOptions<DeviceSettings> options = Options.Create(new DeviceSettings { CommandRetryCooldownSeconds = 60 });
+        var service = new RetryRelayCommandsService(
+            _commandsRepoMock, _controllerRepoMock, _mqttPublisherMock, _unitOfWorkMock, options, _loggerMock);
+
+        Controller onlineController = new ControllerBuilder()
+            .WithMacAddress("AA:BB:CC:DD:EE:14")
+            .Build();
+
+        RelayCommand pendingCmd = new RelayCommandBuilder()
+            .WithControllerId(onlineController.Id)
+            .WithExpireAt(DateTime.UtcNow.AddMinutes(10))
+            .Build();
+
+        _controllerRepoMock.GetByMacAddressAsync("AA:BB:CC:DD:EE:14", Arg.Any<CancellationToken>())
+            .Returns(onlineController);
+        _commandsRepoMock.GetUnexpiredPendingByControllerIdAsync(
+                onlineController.Id, Arg.Any<DateTime>(), Arg.Any<CancellationToken>())
+            .Returns([pendingCmd]);
+        _mqttPublisherMock.PublishRelayCommandAsync(
+                onlineController.MacAddress.Value, Arg.Any<RelayCommandMqttPayload>(), Arg.Any<CancellationToken>())
+            .Returns(true);
+
+        // Act
+        Result<int> result = await service.RedeliverPendingForControllerAsync("AABBCCDDEE14", CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(1);
+        pendingCmd.Status.Should().Be(CommandStatus.Sent);
+        pendingCmd.AttemptCount.Should().Be(1);
+        await _unitOfWorkMock.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
 }
