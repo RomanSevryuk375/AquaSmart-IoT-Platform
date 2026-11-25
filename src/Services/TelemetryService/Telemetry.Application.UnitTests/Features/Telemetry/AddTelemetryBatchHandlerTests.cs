@@ -3,6 +3,7 @@ using BuildingBlocks.IntegrationEvents.Events.Telemetrys;
 using Telemetry.Application.DTOs;
 using Telemetry.Application.Features.Telemetry.Commands.AddTelemetryBatch;
 using Telemetry.Application.Interfaces;
+using Telemetry.Application.Services;
 using Telemetry.Domain.Interfaces;
 
 namespace Telemetry.Application.UnitTests.Features.Telemetry;
@@ -22,11 +23,14 @@ public class AddTelemetryBatchHandlerTests
         _ecosystemRepositoryMock = Substitute.For<IEcosystemRepository>();
         _deviceTokenValidatorMock = Substitute.For<IDeviceTokenValidator>();
 
-        _handler = new AddTelemetryBatchHandler(
+        var ingestionService = new TelemetryBatchIngestionService(
             _telemetryRepositoryMock,
             _sensorRepositoryMock,
-            _ecosystemRepositoryMock,
-            _deviceTokenValidatorMock);
+            _ecosystemRepositoryMock);
+
+        _handler = new AddTelemetryBatchHandler(
+            _deviceTokenValidatorMock,
+            ingestionService);
     }
 
     [Fact]

@@ -1,6 +1,7 @@
 using AutoMapper;
 using BuildingBlocks.IntegrationEvents.Events.Telemetrys;
 using Telemetry.Application.DTOs;
+using Telemetry.Application.Features.Telemetry.Commands.IngestDeviceTelemetryBatch;
 using Telemetry.Domain.Entities;
 using Telemetry.Domain.Events;
 
@@ -19,5 +20,7 @@ public sealed class TelemetryRawProfile : Profile
         CreateMap<RawTelemetryAddedDomainEvent, TelemetryRawChartPointDto>();
 
         CreateMap<RawTelemetryAddedDomainEvent, TelemetryReceivedEvent>();
+
+        CreateMap<TelemetryBatchReceivedFromDeviceEvent, IngestDeviceTelemetryBatchCommand>();
     }
 }

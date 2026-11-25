@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Telemetry.Application.Features.BackgroundJobs.Commands.Shared;
 using Telemetry.Application.Interfaces;
+using Telemetry.Application.Services;
 
 namespace Telemetry.Application.Extensions;
 
@@ -13,6 +14,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<ICompressorHelper, CompressorHelper>();
+        services.AddScoped<ITelemetryBatchIngestionService, TelemetryBatchIngestionService>();
 
         Assembly assembly = typeof(DependencyInjection).Assembly;
 

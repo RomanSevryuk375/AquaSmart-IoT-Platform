@@ -127,6 +127,30 @@ public sealed class Relay : AggregateRoot, IEntity
         IncrementVersion();
     }
 
+    public void SyncState(bool isActive)
+    {
+        if (IsActive == isActive)
+        {
+            return;
+        }
+
+        IsActive = isActive;
+
+        IncrementVersion();
+    }
+
+    public void SyncMode(bool isManual)
+    {
+        if (IsManual == isManual)
+        {
+            return;
+        }
+
+        IsManual = isManual;
+
+        IncrementVersion();
+    }
+
     public void SetPowerSensorId(Guid powerSensorId)
     {
         PowerSensorId = powerSensorId;

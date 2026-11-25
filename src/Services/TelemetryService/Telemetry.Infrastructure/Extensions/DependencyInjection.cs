@@ -13,6 +13,7 @@ using Telemetry.Infrastructure.BackgroundJobs;
 using Telemetry.Infrastructure.GrpcClients;
 using Telemetry.Infrastructure.Messaging.EcosystemConsumers;
 using Telemetry.Infrastructure.Messaging.SensorConsumers;
+using Telemetry.Infrastructure.Messaging.TelemetryConsumers;
 using Telemetry.Infrastructure.Persistence;
 using Telemetry.Infrastructure.Persistence.Repositories;
 using Telemetry.Infrastructure.SignalR;
@@ -106,6 +107,7 @@ public static class DependencyInjection
             cfg.AddConsumer<SensorDeletedConsumer>();
             cfg.AddConsumer<SensorRenamedConsumer>();
             cfg.AddConsumer<SensorStateChangedConsumer>();
+            cfg.AddConsumer<TelemetryBatchReceivedFromDeviceConsumer>();
         });
     }
 

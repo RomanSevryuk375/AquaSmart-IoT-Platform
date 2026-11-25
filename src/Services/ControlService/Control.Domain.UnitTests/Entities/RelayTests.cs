@@ -165,6 +165,70 @@ public class RelayTests
     }
 
     [Fact]
+    public void SyncState_WithNewState_UpdatesIsActiveAndVersionWithoutRaisingDomainEvents()
+    {
+        // Arrange
+        Relay relay = new RelayBuilder().WithIsActive(false).Build();
+        Guid initialVersion = relay.Version;
+
+        // Act
+        relay.SyncState(true);
+
+        // Assert
+        relay.IsActive.Should().BeTrue();
+        relay.Version.Should().NotBe(initialVersion);
+        relay.DomainEvents.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void SyncState_WithSameState_DoesNotChangeVersionOrRaiseEvents()
+    {
+        // Arrange
+        Relay relay = new RelayBuilder().WithIsActive(true).Build();
+        Guid initialVersion = relay.Version;
+
+        // Act
+        relay.SyncState(true);
+
+        // Assert
+        relay.IsActive.Should().BeTrue();
+        relay.Version.Should().Be(initialVersion);
+        relay.DomainEvents.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void SyncMode_WithNewMode_UpdatesIsManualAndVersionWithoutRaisingDomainEvents()
+    {
+        // Arrange
+        Relay relay = new RelayBuilder().WithIsManual(false).Build();
+        Guid initialVersion = relay.Version;
+
+        // Act
+        relay.SyncMode(true);
+
+        // Assert
+        relay.IsManual.Should().BeTrue();
+        relay.Version.Should().NotBe(initialVersion);
+        relay.DomainEvents.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void SyncMode_WithSameMode_DoesNotChangeVersionOrRaiseEvents()
+    {
+        // Arrange
+        Relay relay = new RelayBuilder().WithIsManual(true).Build();
+        Guid initialVersion = relay.Version;
+
+        // Act
+        relay.SyncMode(true);
+
+        // Assert
+        relay.IsManual.Should().BeTrue();
+        relay.Version.Should().Be(initialVersion);
+        relay.DomainEvents.Should().BeEmpty();
+    }
+
+    [Fact]
     public void SetPowerSensorId_UpdatesPowerSensorIdAndIncrementsVersion()
     {
         // Arrange

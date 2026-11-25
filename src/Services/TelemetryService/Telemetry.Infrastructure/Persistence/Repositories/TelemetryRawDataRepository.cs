@@ -73,4 +73,92 @@ public sealed class TelemetryRawDataRepository(TelemetryDbContext dbContext)
                         !x.IsAggregated)
             .ExecuteUpdateAsync(x => x.SetProperty(p => p.IsAggregated, true), cancellationToken);
     }
+
+    public async Task SaveBatchWithDuplicateHandlingAsync(
+        CancellationToken cancellationToken = default)
+    {
+        Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction? tx = Context.Database.CurrentTransaction;
+
+        if (tx is not null)
+        {
+            const string BatchSavepoint = "telemetry_batch";
+            await tx.CreateSavepointAsync(BatchSavepoint, cancellationToken);
+
+            try
+            {
+                await Context.SaveChangesAsync(cancellationToken);
+                return;
+            }
+            catch (DbUpdateException ex) when (IsUniqueViolation(ex))
+            {
+                await tx.RollbackToSavepointAsync(BatchSavepoint, cancellationToken);
+            }
+        }
+        else
+        {
+            try
+            {
+                await Context.SaveChangesAsync(cancellationToken);
+                return;
+            }
+            catch (DbUpdateException ex) when (IsUniqueViolation(ex))
+            {
+                // Fall back to per-item save with duplicate detection below.
+            }
+        }
+
+        await RetryPendingEntriesIndividuallyAsync(tx, cancellationToken);
+    }
+
+    private async Task RetryPendingEntriesIndividuallyAsync(
+        Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction? tx,
+        CancellationToken cancellationToken)
+    {
+        List<RawTelemetry> pendingEntries = Context.ChangeTracker
+            .Entries<RawTelemetry>()
+            .Where(e => e.State == EntityState.Added)
+            .Select(e => e.Entity)
+            .ToList();
+
+        foreach (var entry in Context.ChangeTracker.Entries<RawTelemetry>().Where(e => e.State == EntityState.Added).ToList())
+        {
+            entry.State = EntityState.Detached;
+        }
+
+        foreach (RawTelemetry item in pendingEntries)
+        {
+            bool alreadyExists = await Context.TelemetryRawData
+                .AsNoTracking()
+                .AnyAsync(x => x.ExternalMessageId == item.ExternalMessageId, cancellationToken);
+            if (alreadyExists)
+            {
+                continue;
+            }
+
+            const string ItemSavepoint = "telemetry_item";
+            if (tx is not null)
+            {
+                await tx.CreateSavepointAsync(ItemSavepoint, cancellationToken);
+            }
+
+            await Context.TelemetryRawData.AddAsync(item, cancellationToken);
+
+            try
+            {
+                await Context.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateException ex) when (IsUniqueViolation(ex))
+            {
+                if (tx is not null)
+                {
+                    await tx.RollbackToSavepointAsync(ItemSavepoint, cancellationToken);
+                }
+
+                Context.Entry(item).State = EntityState.Detached;
+            }
+        }
+    }
+
+    private static bool IsUniqueViolation(DbUpdateException exception) =>
+        exception.InnerException is Npgsql.PostgresException { SqlState: Npgsql.PostgresErrorCodes.UniqueViolation };
 }

@@ -17,9 +17,9 @@ public sealed class RelayProfile : Profile
 
         CreateMap<RelayDeletedEvent, SyncRelayDeletedCommand>();
 
-        CreateMap<RelayModeChangedEvent, SyncRelayModeCommand>();
+        CreateMap<RelayModeSyncedEvent, SyncRelayModeCommand>();
 
-        CreateMap<ChangeRelayStateEvent, SyncRelayStateCommand>();
+        CreateMap<RelayStateSyncedEvent, SyncRelayStateCommand>();
 
         CreateMap<RelayUpdatedEvent, SyncRelayUpdatedCommand>();
 

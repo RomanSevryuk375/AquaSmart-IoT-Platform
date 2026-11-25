@@ -6,6 +6,5 @@ public sealed record SyncRelayStateCommand : ICommand
 {
     public Guid ControllerId { get; init; }
     public Guid RelayId { get; init; }
-    public bool TargetState { get; init; }
-    public DateTime? ExpireAt { get; init; }
+    public bool IsActive { get; init; }
 }
