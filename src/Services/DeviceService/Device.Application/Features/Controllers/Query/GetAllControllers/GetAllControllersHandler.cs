@@ -16,13 +16,23 @@ public sealed class GetAllControllersHandler(ISqlConnectionFactory sqlConnection
         using IDbConnection connection = sqlConnectionFactory.CreateConnection();
 
         const string Sql = """
-            SELECT id, mac_address, name, is_online, last_seen_at
+            SELECT
+                id,
+                mac_address,
+                name,
+                is_online,
+                last_seen_at,
+                config_version,
+                firmware_version,
+                ip_address,
+                rssi,
+                uptime_sec,
+                offline_alert_sent
             FROM controllers
             WHERE user_id = @UserId
               AND (@SearchTerm IS NULL OR name ILIKE '%' || @SearchTerm || '%'
                                        OR mac_address ILIKE '%' || @SearchTerm || '%')
               AND (@IsOnline IS NULL OR is_online = @IsOnline)
-              AND user_id = @UserId
             ORDER BY created_at DESC
             LIMIT @Take OFFSET @Skip
             """;

@@ -1,5 +1,4 @@
 using BuildingBlocks.Domain.Abstractions;
-
 using BuildingBlocks.Domain.Results;
 using BuildingBlocks.Presentation.Authorization;
 using BuildingBlocks.Presentation.Constants;
@@ -26,12 +25,14 @@ public sealed class ToggleRelayStateEndpoint : IEndpoint
                 UserId = userContext.UserId
             };
 
-            Result<bool> result = await sender.Send(command, cancellationToken);
+            Result<RelayCommandQueuedResponse> result = await sender.Send(command, cancellationToken);
 
-            return result.ToIResult();
+            return result.IsSuccess
+                ? Results.Accepted(value: result.Value)
+                : result.ToIResult();
         })
         .WithTags("Relay Commands")
-        .Produces<bool>()
+        .Produces<RelayCommandQueuedResponse>(StatusCodes.Status202Accepted)
         .Produces(StatusCodes.Status403Forbidden)
         .Produces(StatusCodes.Status404NotFound)
         .RequireAuthorization(SubPermissions.DeviceControl);

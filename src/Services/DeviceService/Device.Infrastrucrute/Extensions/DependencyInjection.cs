@@ -4,8 +4,10 @@ using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Infrastructure.Data.Outbox;
 using BuildingBlocks.Infrastructure.Extensions;
 using BuildingBlocks.IntegrationEvents;
+using Device.Application.Interfaces;
 using Device.Infrastructure.BackgroundJobs;
 using Device.Infrastructure.Messaging;
+using Device.Infrastructure.Mqtt;
 using Device.Infrastructure.Persistence.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,11 +22,21 @@ public static class DependencyInjection
         return services.AddPostgresDbContext<DeviceDbContext>(configuration)
                        .AddDapper<DeviceDbContext>()
                        .AddRepositories()
+                       .AddMqttGateway()
                        .AddRabbitMq(configuration)
                        .AddOutboxProcessorQuartzJob<DeviceDbContext>(configuration)
                        .AddQuartzJobs(configuration)
                        .AddUserContext()
                        .AddCache(configuration);
+    }
+
+    private static IServiceCollection AddMqttGateway(this IServiceCollection services)
+    {
+        services.AddSingleton<MqttGatewayBackgroundService>();
+        services.AddSingleton<IMqttCommandPublisher>(sp => sp.GetRequiredService<MqttGatewayBackgroundService>());
+        services.AddHostedService(sp => sp.GetRequiredService<MqttGatewayBackgroundService>());
+
+        return services;
     }
 
     private static IServiceCollection AddRepositories(this IServiceCollection services)
@@ -61,6 +73,15 @@ public static class DependencyInjection
                 .ForJob(offlineControllerJobKey)
                 .WithIdentity($"{offlineControllerJobKey}-trigger")
                 .WithSimpleSchedule(x => x.WithIntervalInSeconds(backgroundJobOptions.OfflineCheckerIntervalSeconds)
+                .RepeatForever()));
+
+            var retryCommandsJobKey = new JobKey(nameof(RetryRelayCommandsJob));
+            opts.AddJob<RetryRelayCommandsJob>(jobOpts =>
+                jobOpts.WithIdentity(retryCommandsJobKey));
+            opts.AddTrigger(triggerOpts => triggerOpts
+                .ForJob(retryCommandsJobKey)
+                .WithIdentity($"{retryCommandsJobKey}-trigger")
+                .WithSimpleSchedule(x => x.WithIntervalInSeconds(backgroundJobOptions.RetryCommandsIntervalSeconds)
                 .RepeatForever()));
         });
 

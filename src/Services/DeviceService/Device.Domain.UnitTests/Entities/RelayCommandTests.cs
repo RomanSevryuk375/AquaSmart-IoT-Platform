@@ -1,5 +1,6 @@
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
+using Device.Domain.Events.RelayCommandEvents;
 
 namespace Device.Domain.UnitTests.Entities;
 
@@ -106,5 +107,135 @@ public class RelayCommandTests
         // Assert
         command.Status.Should().Be(CommandStatus.Completed);
         command.ProcessedAt.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void Create_WithValidParameters_SetsPendingAndRaisesRelayCommandCreatedDomainEvent()
+    {
+        // Arrange
+        var commandId = Guid.NewGuid();
+        DateTime expireAt = DateTime.UtcNow.AddMinutes(10);
+
+        // Act
+        Result<RelayCommand> result = RelayCommand.Create(
+            commandId,
+            TestConstants.ControllerId,
+            TestConstants.RelayId,
+            targetState: true,
+            expireAt);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Status.Should().Be(CommandStatus.Pending);
+        result.Value.DomainEvents.Should().ContainSingle()
+            .Which.Should().BeOfType<RelayCommandCreatedDomainEvent>()
+            .Which.Should().Match<RelayCommandCreatedDomainEvent>(e =>
+                e.CommandId == commandId &&
+                e.ControllerId == TestConstants.ControllerId &&
+                e.RelayId == TestConstants.RelayId &&
+                e.TargetState &&
+                e.ExpireAt == expireAt);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Cancel_WhenPendingOrSent_SetsCancelledAndIncrementsVersion(bool markSentFirst)
+    {
+        // Arrange
+        RelayCommand command = new RelayCommandBuilder().Build();
+        if (markSentFirst)
+        {
+            command.MarkAsSent();
+        }
+
+        Guid versionBefore = command.Version;
+
+        // Act
+        Result result = command.Cancel();
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        command.Status.Should().Be(CommandStatus.Cancelled);
+        command.ProcessedAt.Should().NotBeNull();
+        command.Version.Should().NotBe(versionBefore);
+    }
+
+    [Theory]
+    [InlineData(CommandStatus.Completed)]
+    [InlineData(CommandStatus.Failed)]
+    public void Cancel_WhenAlreadyCompletedOrFailed_ReturnsFailureDoesNotMutate(CommandStatus terminalStatus)
+    {
+        // Arrange
+        RelayCommand command = new RelayCommandBuilder().Build();
+        if (terminalStatus == CommandStatus.Completed)
+        {
+            command.MarkAsCompleted();
+        }
+        else
+        {
+            command.MarkAsFailed("Device fault");
+        }
+
+        Guid versionBefore = command.Version;
+
+        // Act
+        Result result = command.Cancel();
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        command.Status.Should().Be(terminalStatus);
+        command.Version.Should().Be(versionBefore);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Expire_WhenPendingOrSent_SetsExpiredAndIncrementsVersion(bool markSentFirst)
+    {
+        // Arrange
+        RelayCommand command = new RelayCommandBuilder().Build();
+        if (markSentFirst)
+        {
+            command.MarkAsSent();
+        }
+
+        Guid versionBefore = command.Version;
+
+        // Act
+        Result result = command.Expire();
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        command.Status.Should().Be(CommandStatus.Expired);
+        command.ProcessedAt.Should().NotBeNull();
+        command.Version.Should().NotBe(versionBefore);
+    }
+
+    [Theory]
+    [InlineData(CommandStatus.Completed)]
+    [InlineData(CommandStatus.Cancelled)]
+    public void Expire_WhenAlreadyCompletedOrCancelled_ReturnsFailureDoesNotMutate(CommandStatus terminalStatus)
+    {
+        // Arrange
+        RelayCommand command = new RelayCommandBuilder().Build();
+        if (terminalStatus == CommandStatus.Completed)
+        {
+            command.MarkAsCompleted();
+        }
+        else
+        {
+            command.Cancel();
+        }
+
+        Guid versionBefore = command.Version;
+
+        // Act
+        Result result = command.Expire();
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        command.Status.Should().Be(terminalStatus);
+        command.Version.Should().Be(versionBefore);
     }
 }

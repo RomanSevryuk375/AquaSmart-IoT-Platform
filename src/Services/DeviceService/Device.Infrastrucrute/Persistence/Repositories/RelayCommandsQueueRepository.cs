@@ -26,11 +26,33 @@ public sealed class RelayCommandsQueueRepository(DeviceDbContext dbContext)
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<RelayCommand>> GetActiveCommandsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.RelayCommands
+            .Where(x => x.Status == CommandStatus.Pending || x.Status == CommandStatus.Sent)
+            .OrderBy(x => x.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<RelayCommand>> GetActiveByRelayIdAsync(
+        Guid relayId,
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.RelayCommands
+            .Where(x => x.RelayId == relayId &&
+                       (x.Status == CommandStatus.Pending || x.Status == CommandStatus.Sent))
+            .OrderBy(x => x.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<int> DeleteCompletedAsync(
         CancellationToken cancellationToken = default)
     {
         return await Context.RelayCommands
             .Where(x => x.Status == CommandStatus.Completed
+                     || x.Status == CommandStatus.Cancelled
+                     || x.Status == CommandStatus.Expired
                      || x.ExpireAt < DateTime.UtcNow.AddDays(-1))
             .ExecuteDeleteAsync(cancellationToken);
     }

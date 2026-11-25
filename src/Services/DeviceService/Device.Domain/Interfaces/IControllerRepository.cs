@@ -15,4 +15,8 @@ public interface IControllerRepository : IRepository<Controller>
     public Task<IReadOnlyList<Controller>> GetOfflineControllersAsync(
         DateTime offlineThreshold,
         CancellationToken cancellationToken = default);
+
+    public Task<IReadOnlyList<Controller>> GetOfflinePendingAlertAsync(
+        DateTime graceThreshold,
+        CancellationToken cancellationToken = default);
 }

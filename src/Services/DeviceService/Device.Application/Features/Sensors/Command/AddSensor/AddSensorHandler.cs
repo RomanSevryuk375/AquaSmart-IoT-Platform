@@ -6,6 +6,7 @@ namespace Device.Application.Features.Sensors.Command.AddSensor;
 
 public sealed class AddSensorHandler(
     ISensorRepository sensorRepository,
+    IControllerRepository controllerRepository,
     IMapper mapper) : IRequestHandler<AddSensorCommand, Result<SensorCreatedResponse>>
 {
     public async Task<Result<SensorCreatedResponse>> Handle(
@@ -23,6 +24,9 @@ public sealed class AddSensorHandler(
         }
 
         await sensorRepository.AddAsync(sensor.Value, cancellationToken);
+
+        Controller? controller = await controllerRepository.GetByIdAsync(request.ControllerId, cancellationToken);
+        controller?.IncrementConfigVersion("sensor_added");
 
         return Result<SensorCreatedResponse>.Success(
             mapper.Map<SensorCreatedResponse>(sensor.Value));

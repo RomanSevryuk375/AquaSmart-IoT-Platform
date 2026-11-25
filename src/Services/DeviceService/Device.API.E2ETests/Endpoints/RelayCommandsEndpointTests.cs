@@ -1,7 +1,11 @@
+using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Presentation.Constants;
 using Device.Application.Extesions;
+using Device.Application.Features.Controllers.Query.GetControllerConfig;
+using Device.Application.Features.RelayCommands.Command.ToggleRelayState;
 using Device.Application.Features.RelayCommands.Query.GetPending;
 using Device.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Device.API.E2ETests.Endpoints;
 
@@ -326,10 +330,14 @@ public class RelayCommandsEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task ToggleRelayState_WithValidAuth_Returns200Ok()
+    public async Task ToggleRelayState_WithValidAuth_Returns202AcceptedAndUpdatesIsActiveOnlyAfterComplete()
     {
         // Arrange
-        Controller controller = new ControllerBuilder().Build();
+        var hasher = new MyHasher();
+        Controller controller = new ControllerBuilder()
+            .WithMacAddress("00:11:22:33:44:C1")
+            .WithDeviceTokenHash(hasher.Generate(TestConstants.ValidRawToken))
+            .Build();
 
         Relay relay = new RelayBuilder()
             .WithControllerId(controller.Id)
@@ -340,23 +348,51 @@ public class RelayCommandsEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
         DbContext.Controllers.Add(controller);
         DbContext.Relays.Add(relay);
         await DbContext.SaveChangesAsync();
+        DbContext.ChangeTracker.Clear();
 
-        // Act
-        HttpResponseMessage response = await Client.PostAsync(
+        // Act 1: Toggle relay state (should queue command without mutating Relay.IsActive)
+        HttpResponseMessage toggleResponse = await Client.PostAsync(
             $"{ApiConstants.Routes.Commands}/toggle-state/{relay.Id}", null);
 
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        bool content = await response.Content.ReadFromJsonAsync<bool>();
-        content.Should().BeTrue();
+        // Assert 1: 202 Accepted + queued payload + DB IsActive still false
+        toggleResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
+        RelayCommandQueuedResponse? queued = await toggleResponse.Content
+            .ReadFromJsonAsync<RelayCommandQueuedResponse>();
+        queued.Should().NotBeNull();
+        queued!.CommandId.Should().NotBeEmpty();
+        queued.RelayId.Should().Be(relay.Id);
+        queued.TargetState.Should().BeTrue();
+        queued.Status.Should().Be(CommandStatus.Pending.ToString());
+
+        Relay? relayBeforeAck = await DbContext.Relays.AsNoTracking().FirstOrDefaultAsync(r => r.Id == relay.Id);
+        relayBeforeAck.Should().NotBeNull();
+        relayBeforeAck!.IsActive.Should().BeFalse();
+
+        // Act 2: Device confirms via HTTP fallback /complete
+        var completeRequest = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"{ApiConstants.Routes.Commands}/{queued.CommandId}/complete");
+        completeRequest.Headers.Add(ApiConstants.Headers.DeviceToken, TestConstants.ValidRawToken);
+        HttpResponseMessage completeResponse = await Client.SendAsync(completeRequest);
+
+        // Assert 2: Relay.IsActive is now true and command is Completed
+        completeResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        Relay? relayAfterAck = await DbContext.Relays.AsNoTracking().FirstOrDefaultAsync(r => r.Id == relay.Id);
+        relayAfterAck!.IsActive.Should().BeTrue();
+        RelayCommand? commandAfterAck = await DbContext.RelayCommands.AsNoTracking().FirstOrDefaultAsync(c => c.Id == queued.CommandId);
+        commandAfterAck!.Status.Should().Be(CommandStatus.Completed);
     }
 
     [Fact]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    public async Task ToggleRelayMode_WithValidAuth_Returns200Ok()
+    public async Task ToggleRelayMode_WithValidAuth_Returns200OkAndIncrementsConfigVersion()
     {
         // Arrange
-        Controller controller = new ControllerBuilder().Build();
+        var hasher = new MyHasher();
+        Controller controller = new ControllerBuilder()
+            .WithMacAddress("00:11:22:33:44:C2")
+            .WithDeviceTokenHash(hasher.Generate(TestConstants.ValidRawToken))
+            .Build();
 
         Relay relay = new RelayBuilder()
             .WithControllerId(controller.Id)
@@ -365,6 +401,7 @@ public class RelayCommandsEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
         DbContext.Controllers.Add(controller);
         DbContext.Relays.Add(relay);
         await DbContext.SaveChangesAsync();
+        DbContext.ChangeTracker.Clear();
 
         // Act
         HttpResponseMessage response = await Client.PostAsync(
@@ -374,5 +411,22 @@ public class RelayCommandsEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         bool content = await response.Content.ReadFromJsonAsync<bool>();
         content.Should().BeFalse();
+
+        Controller? dbController = await DbContext.Controllers.AsNoTracking().FirstOrDefaultAsync(c => c.Id == controller.Id);
+        dbController!.ConfigVersion.Should().Be(2);
+
+        // Regression check: /me/config exposes updated configVersion and /ping still returns 200 OK
+        var configReq = new HttpRequestMessage(HttpMethod.Get, $"{ApiConstants.Routes.Controllers}/me/config");
+        configReq.Headers.Add(ApiConstants.Headers.MacAddress, controller.MacAddress.Value);
+        configReq.Headers.Add(ApiConstants.Headers.DeviceToken, TestConstants.ValidRawToken);
+        HttpResponseMessage configResp = await Client.SendAsync(configReq);
+        configResp.StatusCode.Should().Be(HttpStatusCode.OK);
+        ControllerConfig? config = await configResp.Content.ReadFromJsonAsync<ControllerConfig>();
+        config!.ConfigVersion.Should().Be(2);
+
+        var pingReq = new HttpRequestMessage(HttpMethod.Post, $"{ApiConstants.Routes.Controllers}/{controller.Id}/ping");
+        pingReq.Headers.Add(ApiConstants.Headers.DeviceToken, TestConstants.ValidRawToken);
+        HttpResponseMessage pingResp = await Client.SendAsync(pingReq);
+        pingResp.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 }

@@ -1,5 +1,4 @@
 using BuildingBlocks.Domain.Constants;
-using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
 
 namespace Device.Application.Features.RelayCommands.Command.MarkAsCompleted;
@@ -20,6 +19,11 @@ internal sealed class MarkAsCompletedHandler(
                     string.Format(ErrorMessages.RelayCommandNotFound, request.CommandId)));
         }
 
+        if (command.IsTerminal)
+        {
+            return Result.Success();
+        }
+
         Relay? existingRelay = await relayRepository.GetByIdAsync(
             command.RelayId, cancellationToken);
         if (existingRelay is null)
@@ -29,11 +33,6 @@ internal sealed class MarkAsCompletedHandler(
         }
 
         existingRelay.SetState(command.TargetState, existingRelay.UserId);
-        if (command.Status == CommandStatus.Completed)
-        {
-            return Result.Success();
-        }
-
         command.MarkAsCompleted();
 
         return Result.Success();

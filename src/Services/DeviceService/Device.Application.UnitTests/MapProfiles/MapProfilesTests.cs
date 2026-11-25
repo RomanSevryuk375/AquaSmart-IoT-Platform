@@ -106,11 +106,23 @@ public class MapProfilesTests
         var created = _mapper.Map<RelayCreatedEvent>(new RelayCreatedDomainEvent { RelayId = Guid.NewGuid() });
         created.Should().NotBeNull();
 
-        var mode = _mapper.Map<RelayModeChangedEvent>(new RelayModeChangedDomainEvent { RelayId = Guid.NewGuid(), IsManual = true });
+        var mode = _mapper.Map<RelayModeSyncedEvent>(new RelayModeChangedDomainEvent
+        {
+            ControllerId = Guid.NewGuid(),
+            RelayId = Guid.NewGuid(),
+            IsManual = true
+        });
         mode.Should().NotBeNull();
+        mode.IsManual.Should().BeTrue();
 
-        var state = _mapper.Map<ChangeRelayStateEvent>(new RelayStateChangedDomainEvent { RelayId = Guid.NewGuid(), TargetState = true });
+        var state = _mapper.Map<RelayStateSyncedEvent>(new RelayStateChangedDomainEvent
+        {
+            ControllerId = Guid.NewGuid(),
+            RelayId = Guid.NewGuid(),
+            TargetState = true
+        });
         state.Should().NotBeNull();
+        state.IsActive.Should().BeTrue();
 
         var updated = _mapper.Map<RelayUpdatedEvent>(new RelayUpdatedDomainEvent { RelayId = Guid.NewGuid() });
         updated.Should().NotBeNull();

@@ -18,6 +18,7 @@ internal sealed class DeleteControllerHandler(
         await controllerRepository.DeleteAsync(request.ControllerId, cancellationToken);
 
         await cache.RemoveAsync(CacheKeys.Controller(request.UserId, request.ControllerId), token: cancellationToken);
+        await cache.RemoveAsync(CacheKeys.ControllerTokenAuth(request.ControllerId), token: cancellationToken);
         if (controller is not null)
         {
             await cache.RemoveAsync(CacheKeys.ControllerMqttAuth(controller.MacAddress.Value), token: cancellationToken);

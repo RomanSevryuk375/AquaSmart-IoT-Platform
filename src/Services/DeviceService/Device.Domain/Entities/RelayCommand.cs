@@ -3,6 +3,7 @@ using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
+using Device.Domain.Events.RelayCommandEvents;
 
 namespace Device.Domain.Entities;
 
@@ -46,6 +47,7 @@ public sealed class RelayCommand : AggregateRoot, IEntity
     public DateTime? ProcessedAt { get; private set; }
     public string? ErrorMessage { get; private set; }
     public DateTime CreatedAt { get; private set; }
+    public bool IsTerminal => Status is CommandStatus.Completed or CommandStatus.Failed or CommandStatus.Cancelled or CommandStatus.Expired;
 
     public static Result<RelayCommand> Create(
         Guid id,
@@ -65,25 +67,37 @@ public sealed class RelayCommand : AggregateRoot, IEntity
             return DomainGuard.ValidationFailure<RelayCommand>(errors);
         }
 
+        DateTime createdAt = DateTime.UtcNow;
+        DateTime resolvedExpireAt = expireAt ?? createdAt.AddMinutes(RelayCommandConstants.DefaultExpiryMinutes);
+
         var command = new RelayCommand(
             id,
             controllerId,
             relayId,
             targetState,
             status: CommandStatus.Pending,
-            expireAt ?? DateTime.UtcNow.AddMinutes(RelayCommandConstants.DefaultExpiryMinutes),
+            resolvedExpireAt,
             attemptCount: 0,
             processedAt: null,
             errorMessage: null,
-            createdAt: DateTime.UtcNow);
+            createdAt: createdAt);
+
+        command.RaiseEvent(new RelayCommandCreatedDomainEvent
+        {
+            CommandId = command.Id,
+            ControllerId = command.ControllerId,
+            RelayId = command.RelayId,
+            TargetState = command.TargetState,
+            ExpireAt = command.ExpireAt,
+            CreatedAt = command.CreatedAt,
+        });
 
         return Result<RelayCommand>.Success(command);
     }
 
     public void MarkAsSent()
     {
-        if (Status == CommandStatus.Completed ||
-            Status == CommandStatus.Failed)
+        if (IsTerminal)
         {
             return;
         }
@@ -97,7 +111,7 @@ public sealed class RelayCommand : AggregateRoot, IEntity
 
     public void MarkAsCompleted()
     {
-        if (Status == CommandStatus.Completed)
+        if (IsTerminal)
         {
             return;
         }
@@ -110,14 +124,47 @@ public sealed class RelayCommand : AggregateRoot, IEntity
 
     public void MarkAsFailed(string errorMessage)
     {
-        if (Status == CommandStatus.Failed)
+        if (IsTerminal)
         {
             return;
         }
 
         ErrorMessage = errorMessage;
         Status = CommandStatus.Failed;
+        ProcessedAt = DateTime.UtcNow;
 
         IncrementVersion();
+    }
+
+    public Result Cancel()
+    {
+        if (IsTerminal)
+        {
+            return Result.Failure(Error.Conflict<RelayCommand>(
+                $"Relay command {Id} cannot be cancelled from terminal status {Status}."));
+        }
+
+        Status = CommandStatus.Cancelled;
+        ProcessedAt = DateTime.UtcNow;
+
+        IncrementVersion();
+
+        return Result.Success();
+    }
+
+    public Result Expire()
+    {
+        if (IsTerminal)
+        {
+            return Result.Failure(Error.Conflict<RelayCommand>(
+                $"Relay command {Id} cannot be expired from terminal status {Status}."));
+        }
+
+        Status = CommandStatus.Expired;
+        ProcessedAt = DateTime.UtcNow;
+
+        IncrementVersion();
+
+        return Result.Success();
     }
 }

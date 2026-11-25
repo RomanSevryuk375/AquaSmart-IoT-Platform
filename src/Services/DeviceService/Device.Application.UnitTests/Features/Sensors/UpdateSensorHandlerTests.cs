@@ -7,12 +7,13 @@ namespace Device.Application.UnitTests.Features.Sensors;
 public class UpdateSensorHandlerTests
 {
     private readonly ISensorRepository _sensorRepoMock = Substitute.For<ISensorRepository>();
+    private readonly IControllerRepository _controllerRepoMock = Substitute.For<IControllerRepository>();
     private readonly IDeviceSecurityService _securityServiceMock = Substitute.For<IDeviceSecurityService>();
     private readonly UpdateSensorHandler _handler;
 
     public UpdateSensorHandlerTests()
     {
-        _handler = new UpdateSensorHandler(_sensorRepoMock, _securityServiceMock);
+        _handler = new UpdateSensorHandler(_sensorRepoMock, _controllerRepoMock, _securityServiceMock);
     }
 
     [Fact]

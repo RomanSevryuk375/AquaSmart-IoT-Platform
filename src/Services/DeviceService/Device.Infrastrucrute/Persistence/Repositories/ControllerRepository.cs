@@ -37,4 +37,13 @@ public sealed class ControllerRepository(DeviceDbContext dbContext)
             .Where(x => x.IsOnline && x.LastSeenAt < offlineThreshold)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Controller>> GetOfflinePendingAlertAsync(
+        DateTime graceThreshold,
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.Controllers
+            .Where(x => !x.IsOnline && !x.OfflineAlertSent && x.LastSeenAt < graceThreshold)
+            .ToListAsync(cancellationToken);
+    }
 }

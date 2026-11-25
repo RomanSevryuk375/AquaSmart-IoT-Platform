@@ -9,4 +9,10 @@ public sealed record ControllerDto
     public string Name { get; init; } = string.Empty;
     public bool IsOnline { get; init; }
     public DateTime LastSeenAt { get; init; }
+    public long ConfigVersion { get; init; }
+    public string? FirmwareVersion { get; init; }
+    public string? IpAddress { get; init; }
+    public int? Rssi { get; init; }
+    public long? UptimeSec { get; init; }
+    public bool OfflineAlertSent { get; init; }
 }

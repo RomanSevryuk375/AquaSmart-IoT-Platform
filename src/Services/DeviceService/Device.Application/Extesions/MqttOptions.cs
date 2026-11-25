@@ -4,6 +4,7 @@ public sealed record MqttOptions
 {
     public const string SectionName = "MqttOptions";
 
+    public bool Enabled { get; init; } = true;
     public string Host { get; init; } = "localhost";
     public int Port { get; init; } = 1883;
     public bool UseTls { get; init; }

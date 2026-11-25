@@ -5,6 +5,7 @@ namespace Device.Application.Features.Relays.Command.AddRelay;
 
 internal sealed class AddRelayHandler(
     IRelayRepository relayRepository,
+    IControllerRepository controllerRepository,
     IMapper mapper) : IRequestHandler<AddRelayCommand, Result<RelayCreatedResponse>>
 {
     public async Task<Result<RelayCreatedResponse>> Handle(
@@ -23,6 +24,9 @@ internal sealed class AddRelayHandler(
         }
 
         await relayRepository.AddAsync(relay.Value, cancellationToken);
+
+        Controller? controller = await controllerRepository.GetByIdAsync(request.ControllerId, cancellationToken);
+        controller?.IncrementConfigVersion("relay_added");
 
         return Result<RelayCreatedResponse>.Success(
             mapper.Map<RelayCreatedResponse>(relay.Value));

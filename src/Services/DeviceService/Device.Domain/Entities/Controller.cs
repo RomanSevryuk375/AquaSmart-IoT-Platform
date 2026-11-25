@@ -26,6 +26,8 @@ public sealed class Controller : AggregateRoot, IEntity
         IsOnline = isOnline;
         LastSeenAt = lastSeenAt;
         CreatedAt = createdAt;
+        ConfigVersion = 1;
+        OfflineAlertSent = false;
     }
 
 #pragma warning disable CS8618
@@ -40,6 +42,12 @@ public sealed class Controller : AggregateRoot, IEntity
     public bool IsOnline { get; private set; }
     public DateTime LastSeenAt { get; private set; }
     public DateTime CreatedAt { get; private set; }
+    public long ConfigVersion { get; private set; } = 1;
+    public string? FirmwareVersion { get; private set; }
+    public string? IpAddress { get; private set; }
+    public int? Rssi { get; private set; }
+    public long? UptimeSec { get; private set; }
+    public bool OfflineAlertSent { get; private set; }
 
     public static Result<Controller> Create(
         Guid id, Guid userId, string rawMacAddress, string deviceTokenHash, string rawName, bool isOnline)
@@ -96,10 +104,89 @@ public sealed class Controller : AggregateRoot, IEntity
     public void RecordPing()
     {
         LastSeenAt = DateTime.UtcNow;
+        OfflineAlertSent = false;
         if (!IsOnline)
         {
             IsOnline = true;
         }
+
+        IncrementVersion();
+    }
+
+    public void RecordMqttOnline(
+        string? firmwareVersion,
+        string? ipAddress,
+        int? rssi,
+        long? uptimeSec)
+    {
+        IsOnline = true;
+        LastSeenAt = DateTime.UtcNow;
+        OfflineAlertSent = false;
+
+        if (!string.IsNullOrWhiteSpace(firmwareVersion))
+        {
+            FirmwareVersion = firmwareVersion.Trim();
+        }
+
+        if (!string.IsNullOrWhiteSpace(ipAddress))
+        {
+            IpAddress = ipAddress.Trim();
+        }
+
+        if (rssi.HasValue)
+        {
+            Rssi = rssi;
+        }
+
+        if (uptimeSec.HasValue && uptimeSec.Value >= 0)
+        {
+            UptimeSec = uptimeSec;
+        }
+
+        IncrementVersion();
+    }
+
+    public void MarkOfflineFromLwt()
+    {
+        if (!IsOnline)
+        {
+            return;
+        }
+
+        IsOnline = false;
+        IncrementVersion();
+    }
+
+    public void MarkOfflineAlertSent()
+    {
+        if (OfflineAlertSent)
+        {
+            return;
+        }
+
+        OfflineAlertSent = true;
+
+        RaiseEvent(new ControllerNotOnlineDomainEvent
+        {
+            UserId = UserId,
+            ControllerId = Id,
+            LastSeenAt = LastSeenAt,
+        });
+
+        IncrementVersion();
+    }
+
+    public void IncrementConfigVersion(string reason = "relay_or_sensor_updated")
+    {
+        ConfigVersion++;
+
+        RaiseEvent(new ControllerConfigChangedDomainEvent
+        {
+            ControllerId = Id,
+            MacAddress = MacAddress.Value,
+            ConfigVersion = ConfigVersion,
+            Reason = string.IsNullOrWhiteSpace(reason) ? "relay_or_sensor_updated" : reason.Trim(),
+        });
 
         IncrementVersion();
     }
@@ -110,12 +197,17 @@ public sealed class Controller : AggregateRoot, IEntity
 
         if (!IsOnline)
         {
+            OfflineAlertSent = true;
             RaiseEvent(new ControllerNotOnlineDomainEvent
             {
                 UserId = UserId,
                 ControllerId = Id,
                 LastSeenAt = LastSeenAt,
             });
+        }
+        else
+        {
+            OfflineAlertSent = false;
         }
 
         IncrementVersion();
@@ -124,6 +216,7 @@ public sealed class Controller : AggregateRoot, IEntity
     public void SetOffline()
     {
         IsOnline = false;
+        OfflineAlertSent = true;
 
         RaiseEvent(new ControllerNotOnlineDomainEvent
         {

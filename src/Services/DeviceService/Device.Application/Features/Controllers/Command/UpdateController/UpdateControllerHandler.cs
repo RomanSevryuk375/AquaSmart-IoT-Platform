@@ -28,6 +28,7 @@ internal sealed class UpdateControllerHandler(
         {
             await cache.RemoveAsync(CacheKeys.Controller(
                 request.UserId, request.ControllerId), token: cancellationToken);
+            await cache.RemoveAsync(CacheKeys.ControllerTokenAuth(request.ControllerId), token: cancellationToken);
             await cache.RemoveAsync(CacheKeys.ControllerMqttAuth(previousMac), token: cancellationToken);
 
             string updatedMac = controller.MacAddress.Value;

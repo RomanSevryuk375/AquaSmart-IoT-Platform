@@ -14,6 +14,12 @@ public sealed class ControllerConfiguration : IEntityTypeConfiguration<Controlle
         builder.Property(x => x.IsOnline).IsRequired();
         builder.Property(x => x.LastSeenAt).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
+        builder.Property(x => x.ConfigVersion).IsRequired().HasDefaultValue(1L);
+        builder.Property(x => x.FirmwareVersion).HasMaxLength(64);
+        builder.Property(x => x.IpAddress).HasMaxLength(64);
+        builder.Property(x => x.Rssi);
+        builder.Property(x => x.UptimeSec);
+        builder.Property(x => x.OfflineAlertSent).IsRequired().HasDefaultValue(false);
 
         builder.HasMany<Sensor>()
             .WithOne()

@@ -29,9 +29,15 @@ public sealed class RelayProfile : Profile
 
         CreateMap<RelayCreatedDomainEvent, RelayCreatedEvent>();
 
-        CreateMap<RelayModeChangedDomainEvent, RelayModeChangedEvent>();
+        CreateMap<RelayModeChangedDomainEvent, RelayModeSyncedEvent>()
+            .ForMember(dest => dest.SyncedAt,
+                       opt => opt.MapFrom(src => src.OccurredOn));
 
-        CreateMap<RelayStateChangedDomainEvent, ChangeRelayStateEvent>();
+        CreateMap<RelayStateChangedDomainEvent, RelayStateSyncedEvent>()
+            .ForMember(dest => dest.IsActive,
+                       opt => opt.MapFrom(src => src.TargetState))
+            .ForMember(dest => dest.SyncedAt,
+                       opt => opt.MapFrom(src => src.OccurredOn));
 
         CreateMap<RelayUpdatedDomainEvent, RelayUpdatedEvent>();
 

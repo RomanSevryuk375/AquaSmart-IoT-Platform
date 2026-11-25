@@ -15,6 +15,7 @@ namespace Device.Application.UnitTests.Features.Relays;
 public class RelayCommandHandlersTests
 {
     private readonly IRelayRepository _relayRepoMock = Substitute.For<IRelayRepository>();
+    private readonly IControllerRepository _controllerRepoMock = Substitute.For<IControllerRepository>();
     private readonly ISensorRepository _sensorRepoMock = Substitute.For<ISensorRepository>();
     private readonly IRelayCommandsRepository _queueRepoMock = Substitute.For<IRelayCommandsRepository>();
     private readonly IDeviceSecurityService _securityServiceMock = Substitute.For<IDeviceSecurityService>();
@@ -24,10 +25,12 @@ public class RelayCommandHandlersTests
     public async Task AddRelayHandler_WithValidCommand_AddsToRepositoryAndReturnsSuccess()
     {
         // Arrange
-        var handler = new AddRelayHandler(_relayRepoMock, _mapperMock);
+        var handler = new AddRelayHandler(_relayRepoMock, _controllerRepoMock, _mapperMock);
+        Controller controller = new ControllerBuilder().Build();
+        _controllerRepoMock.GetByIdAsync(controller.Id, Arg.Any<CancellationToken>()).Returns(controller);
         var command = new AddRelayCommand
         {
-            ControllerId = TestConstants.ControllerId,
+            ControllerId = controller.Id,
             UserId = TestConstants.UserId,
             PowerSensorId = null,
             Name = "Main Pump",
@@ -48,6 +51,7 @@ public class RelayCommandHandlersTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().Be(responseDto);
+        controller.ConfigVersion.Should().Be(2);
         await _relayRepoMock.Received(1).AddAsync(Arg.Any<Relay>(), Arg.Any<CancellationToken>());
     }
 
@@ -55,7 +59,7 @@ public class RelayCommandHandlersTests
     public async Task AddRelayHandler_WithInvalidCommand_ReturnsFailure()
     {
         // Arrange
-        var handler = new AddRelayHandler(_relayRepoMock, _mapperMock);
+        var handler = new AddRelayHandler(_relayRepoMock, _controllerRepoMock, _mapperMock);
         var command = new AddRelayCommand
         {
             ControllerId = TestConstants.ControllerId,
@@ -77,9 +81,11 @@ public class RelayCommandHandlersTests
     public async Task UpdateRelayHandler_WhenSameController_UpdatesSuccessfully()
     {
         // Arrange
-        var handler = new UpdateRelayHandler(_relayRepoMock, _securityServiceMock);
-        Relay relay = new RelayBuilder().Build();
+        var handler = new UpdateRelayHandler(_relayRepoMock, _controllerRepoMock, _securityServiceMock);
+        Controller controller = new ControllerBuilder().Build();
+        Relay relay = new RelayBuilder().WithControllerId(controller.Id).Build();
         _relayRepoMock.GetByIdAsync(relay.Id, Arg.Any<CancellationToken>()).Returns(relay);
+        _controllerRepoMock.GetByIdAsync(controller.Id, Arg.Any<CancellationToken>()).Returns(controller);
 
         var command = new UpdateRelayCommand
         {
@@ -98,13 +104,14 @@ public class RelayCommandHandlersTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         relay.Purpose.Should().Be(RelayPurpose.Light);
+        controller.ConfigVersion.Should().Be(2);
     }
 
     [Fact]
     public async Task UpdateRelayHandler_WhenControllerChangedAndNotOwned_ReturnsFailure()
     {
         // Arrange
-        var handler = new UpdateRelayHandler(_relayRepoMock, _securityServiceMock);
+        var handler = new UpdateRelayHandler(_relayRepoMock, _controllerRepoMock, _securityServiceMock);
         Relay relay = new RelayBuilder().Build();
         _relayRepoMock.GetByIdAsync(relay.Id, Arg.Any<CancellationToken>()).Returns(relay);
 
@@ -134,9 +141,11 @@ public class RelayCommandHandlersTests
     public async Task DeleteRelayHandler_WhenValid_MarksAsDeletedAndDeletesFromRepo()
     {
         // Arrange
-        var handler = new DeleteRelayHandler(_relayRepoMock);
-        Relay relay = new RelayBuilder().Build();
+        var handler = new DeleteRelayHandler(_relayRepoMock, _controllerRepoMock);
+        Controller controller = new ControllerBuilder().Build();
+        Relay relay = new RelayBuilder().WithControllerId(controller.Id).Build();
         _relayRepoMock.GetByIdAsync(relay.Id, Arg.Any<CancellationToken>()).Returns(relay);
+        _controllerRepoMock.GetByIdAsync(controller.Id, Arg.Any<CancellationToken>()).Returns(controller);
 
         var command = new DeleteRelayCommand
         {
@@ -149,6 +158,7 @@ public class RelayCommandHandlersTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
+        controller.ConfigVersion.Should().Be(2);
         await _relayRepoMock.Received(1).DeleteAsync(relay.Id, Arg.Any<CancellationToken>());
     }
 
@@ -231,7 +241,7 @@ public class RelayCommandHandlersTests
     }
 
     [Fact]
-    public async Task ToggleRelayStateHandler_WhenValid_TogglesStateAndEnqueuesCommand()
+    public async Task ToggleRelayStateHandler_WhenValid_EnqueuesPendingCommandWithoutMutatingIsActive()
     {
         // Arrange
         IOptions<DeviceSettings> options = Options.Create(new DeviceSettings { CommandTtlMinutes = 10 });
@@ -247,12 +257,17 @@ public class RelayCommandHandlersTests
         };
 
         // Act
-        Result<bool> result = await handler.Handle(command, CancellationToken.None);
+        Result<RelayCommandQueuedResponse> result = await handler.Handle(command, CancellationToken.None);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().BeTrue();
-        relay.IsActive.Should().BeTrue();
-        await _queueRepoMock.Received(1).AddAsync(Arg.Is<RelayCommand>(c => c.TargetState), Arg.Any<CancellationToken>());
+        result.Value.CommandId.Should().NotBeEmpty();
+        result.Value.RelayId.Should().Be(relay.Id);
+        result.Value.TargetState.Should().BeTrue();
+        result.Value.Status.Should().Be(CommandStatus.Pending.ToString());
+        relay.IsActive.Should().BeFalse();
+        await _queueRepoMock.Received(1).AddAsync(
+            Arg.Is<RelayCommand>(c => c.TargetState && c.Status == CommandStatus.Pending),
+            Arg.Any<CancellationToken>());
     }
 }

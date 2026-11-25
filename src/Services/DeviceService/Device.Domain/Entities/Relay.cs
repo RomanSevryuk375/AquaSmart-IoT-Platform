@@ -251,6 +251,7 @@ public sealed class Relay : AggregateRoot, IEntity
 
         RaiseEvent(new RelayModeChangedDomainEvent
         {
+            ControllerId = ControllerId,
             UserId = userId,
             RelayId = Id,
             IsManual = IsManual

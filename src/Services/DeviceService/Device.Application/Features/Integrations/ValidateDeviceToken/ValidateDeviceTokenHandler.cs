@@ -1,9 +1,9 @@
-
 using System.Data;
 using BuildingBlocks.Domain.Abstractions;
 using BuildingBlocks.Domain.Results;
 using Dapper;
 using Device.Application.Interfaces;
+using Device.Domain.ValueObjects;
 
 namespace Device.Application.Features.Integrations.ValidateDeviceToken;
 
@@ -14,6 +14,19 @@ public sealed class ValidateDeviceTokenHandler(ISqlConnectionFactory sqlConnecti
         ValidateDeviceTokenQuery request,
         CancellationToken cancellationToken)
     {
+        Result<MacAddress> macResult = MacAddress.Create(request.MacAddress);
+        if (macResult.IsFailure)
+        {
+            return Result<ValidateDeviceTokenDto>.Success(new ValidateDeviceTokenDto
+            {
+                IsValid = false,
+                ControllerId = Guid.Empty,
+                UserId = Guid.Empty,
+            });
+        }
+
+        string normalizedMac = macResult.Value.Value;
+
         using IDbConnection connection = sqlConnectionFactory.CreateConnection();
         const string Sql = """
             SELECT
@@ -26,7 +39,7 @@ public sealed class ValidateDeviceTokenHandler(ISqlConnectionFactory sqlConnecti
             """;
 
         ControllerAuthData? controllerData = await connection.QuerySingleOrDefaultAsync<ControllerAuthData>(
-            Sql, new { request.MacAddress });
+            Sql, new { MacAddress = normalizedMac });
 
         if (controllerData is null ||
             !tokenHasher.Verify(request.RawDeviceToken, controllerData.DeviceTokenHash))

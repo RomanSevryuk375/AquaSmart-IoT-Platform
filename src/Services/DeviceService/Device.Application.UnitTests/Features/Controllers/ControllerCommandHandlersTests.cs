@@ -92,7 +92,12 @@ public class ControllerCommandHandlersTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         await _controllerRepoMock.Received(1).DeleteAsync(controllerId, Arg.Any<CancellationToken>());
-        await _cacheMock.Received(1).RemoveAsync(Arg.Any<string>(), token: Arg.Any<CancellationToken>());
+        await _cacheMock.Received(1).RemoveAsync(
+            $"controller:{userId}:{controllerId}",
+            token: Arg.Any<CancellationToken>());
+        await _cacheMock.Received(1).RemoveAsync(
+            $"controller:token-auth:{controllerId}",
+            token: Arg.Any<CancellationToken>());
     }
 
     [Fact]
