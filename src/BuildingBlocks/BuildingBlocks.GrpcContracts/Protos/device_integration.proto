@@ -6,6 +6,7 @@ package aquasmart.devices.v1;
 service DeviceIntegrationGrpc {
   rpc GetMetadata (GetMetadataRequest) returns (GetMetadataResponse);
   rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
+  rpc ValidateTokenByControllerId (ValidateTokenByControllerIdRequest) returns (ValidateTokenResponse);
   rpc ValidateHardwareAssignment (ValidateHardwareAssignmentRequest) returns (ValidateHardwareAssignmentResponse);
 }
 
@@ -24,6 +25,11 @@ message GetMetadataResponse {
 message ValidateTokenRequest {
   string mac_address = 1; 
   string device_token = 2; 
+}
+
+message ValidateTokenByControllerIdRequest {
+  string controller_id = 1;
+  string device_token = 2;
 }
 
 message ValidateTokenResponse {

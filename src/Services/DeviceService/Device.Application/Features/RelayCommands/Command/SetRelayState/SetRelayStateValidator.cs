@@ -12,8 +12,5 @@ internal sealed class SetRelayStateValidator
 
         RuleFor(x => x.RelayId)
             .NotEmpty();
-
-        RuleFor(x => x.TargetState)
-            .NotEmpty();
     }
 }

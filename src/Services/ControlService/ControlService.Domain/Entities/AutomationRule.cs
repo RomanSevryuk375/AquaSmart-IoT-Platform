@@ -179,14 +179,6 @@ public sealed class AutomationRule : AggregateRoot, IEntity
             return null;
         }
 
-        bool? isRuleTriggered = RuleOperatorFactory.CalculateTargetState(results, Operator, Action);
-        if (isRuleTriggered == null)
-        {
-            return null;
-        }
-
-        return isRuleTriggered.Value
-            ? Action == RuleAction.SwitchOn
-            : Action == RuleAction.SwitchOff;
+        return RuleOperatorFactory.CalculateTargetState(results, Operator, Action);
     }
 }
