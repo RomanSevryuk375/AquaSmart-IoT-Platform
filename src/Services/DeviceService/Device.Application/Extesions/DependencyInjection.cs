@@ -38,6 +38,8 @@ public static class DependencyInjection
         services.AddAutoMapper(cfg => cfg.AddMaps(assembly));
 
         services.Configure<DeviceSettings>(configuration.GetSection(DeviceSettings.SectionName));
+        services.Configure<MqttOptions>(configuration.GetSection(MqttOptions.SectionName));
+        services.Configure<MqttBrokerOptions>(configuration.GetSection(MqttBrokerOptions.SectionName));
 
         return services;
     }

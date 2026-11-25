@@ -67,6 +67,26 @@ services:
     networks:
       - aqua-network
 
+  mqtt-broker:
+    image: emqx/emqx:5.8
+    container_name: aqua-emqx
+    ports:
+      - "1883:1883"
+      - "8883:8883"
+      - "18083:18083"
+    volumes:
+      - ./ops/emqx/emqx.conf:/opt/emqx/etc/emqx.conf.tmpl:ro
+    environment:
+      - MQTT_WEBHOOK_SECRET=${MQTT_WEBHOOK_SECRET}
+    entrypoint: ["/bin/sh", "-c", "sed \"s|__MQTT_WEBHOOK_SECRET__|$${MQTT_WEBHOOK_SECRET}|g\" /opt/emqx/etc/emqx.conf.tmpl > /opt/emqx/etc/emqx.conf && exec /usr/bin/docker-entrypoint.sh /opt/emqx/bin/emqx foreground"]
+    healthcheck:
+      test: ["CMD", "/opt/emqx/bin/emqx", "ctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aqua-network
+
   minio:
     image: ghcr.io/coollabsio/minio:latest
     container_name: aqua-minio
@@ -207,6 +227,14 @@ services:
       - JwtOptions__Audience=${JWT_AUDIENCE}
       - JwtOptions__ExpiresHours=${JWT_EXPIRES_HOURS}
       - GrpcConfiguration__DeviceServiceUrl=http://device-api:50051
+      - MqttOptions__Host=mqtt-broker
+      - MqttOptions__Port=1883
+      - MqttOptions__UseTls=false
+      - MqttOptions__Username=device-service-worker
+      - MqttOptions__Password=${MQTT_WORKER_PASSWORD}
+      - MqttOptions__ClientIdPrefix=aqua-device-service
+      - MqttOptions__SharedGroup=device-service
+      - MqttBrokerOptions__WebhookSecret=${MQTT_WEBHOOK_SECRET}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 15s

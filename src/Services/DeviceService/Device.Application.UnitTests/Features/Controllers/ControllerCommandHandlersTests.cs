@@ -64,7 +64,12 @@ public class ControllerCommandHandlersTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         controller.Name.Value.Should().Be("New Name");
-        await _cacheMock.Received(1).RemoveAsync(Arg.Any<string>(), token: Arg.Any<CancellationToken>());
+        await _cacheMock.Received(1).RemoveAsync(
+            $"controller:{controller.UserId}:{controller.Id}",
+            token: Arg.Any<CancellationToken>());
+        await _cacheMock.Received(1).RemoveAsync(
+            "controller:mqtt-auth:11:22:33:44:55:66",
+            token: Arg.Any<CancellationToken>());
     }
 
     [Fact]
