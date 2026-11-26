@@ -57,31 +57,31 @@ void SensorManager::applyRuntimeConfig(BackendRuntimeConfig& runtimeConfig, cons
 
         switch (sensor.role) {
             case SensorRole::WATER_LEVEL:
-                sensor.localKey = "water_level";
+                copyCString(sensor.localKey, sizeof(sensor.localKey), "water_level");
                 sensor.pollIntervalMs = 1000;
                 break;
             case SensorRole::SOIL_MOISTURE:
-                sensor.localKey = "soil_moisture";
+                copyCString(sensor.localKey, sizeof(sensor.localKey), "soil_moisture");
                 sensor.pollIntervalMs = 10000;
                 break;
             case SensorRole::WATER_TEMPERATURE:
-                sensor.localKey = "water_temperature";
+                copyCString(sensor.localKey, sizeof(sensor.localKey), "water_temperature");
                 sensor.pollIntervalMs = 5000;
                 break;
             case SensorRole::SURFACE_TEMPERATURE:
-                sensor.localKey = "surface_temperature";
+                copyCString(sensor.localKey, sizeof(sensor.localKey), "surface_temperature");
                 sensor.pollIntervalMs = 5000;
                 break;
             case SensorRole::AIR_TEMPERATURE:
-                sensor.localKey = "air_temperature";
+                copyCString(sensor.localKey, sizeof(sensor.localKey), "air_temperature");
                 sensor.pollIntervalMs = 5000;
                 break;
             case SensorRole::AIR_HUMIDITY:
-                sensor.localKey = "air_humidity";
+                copyCString(sensor.localKey, sizeof(sensor.localKey), "air_humidity");
                 sensor.pollIntervalMs = 5000;
                 break;
             default:
-                sensor.localKey = "sensor";
+                copyCString(sensor.localKey, sizeof(sensor.localKey), "sensor");
                 break;
         }
     }
@@ -277,9 +277,9 @@ bool SensorManager::readSoilMoisture(SensorRuntimeConfig& sensor) {
 }
 
 SensorRole SensorManager::inferRole(const SensorRuntimeConfig& sensor) const {
-    const String name = toLower(sensor.name);
-    const String address = toLower(sensor.connectionAddress);
-    const String unit = toLower(sensor.unit);
+    const String name = toLower(String(sensor.name));
+    const String address = toLower(String(sensor.connectionAddress));
+    const String unit = toLower(String(sensor.unit));
 
     // 1. Water Level
     if (name.indexOf("water level") >= 0 || name.indexOf("level") >= 0) {
@@ -389,7 +389,7 @@ bool SensorManager::tryReadSoilRaw(uint16_t& rawValue) {
     if (_runtimeConfig != nullptr) {
         for (size_t index = 0; index < _runtimeConfig->sensorCount; ++index) {
             if (_runtimeConfig->sensors[index].role == SensorRole::SOIL_MOISTURE) {
-                const uint8_t parsed = parseI2cAddress(_runtimeConfig->sensors[index].connectionAddress);
+                const uint8_t parsed = parseI2cAddress(String(_runtimeConfig->sensors[index].connectionAddress));
                 if (parsed != 0) {
                     address = parsed;
                 }

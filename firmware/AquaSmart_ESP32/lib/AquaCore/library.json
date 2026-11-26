@@ -1,0 +1,9 @@
+{
+  "name": "AquaCore",
+  "version": "1.0.0",
+  "description": "Hardware-independent core logic for AquaSmart ESP32 firmware (queue, relays, UI, codecs, OTA FSM)",
+  "build": {
+    "srcDir": "src",
+    "includeDir": "src"
+  }
+}

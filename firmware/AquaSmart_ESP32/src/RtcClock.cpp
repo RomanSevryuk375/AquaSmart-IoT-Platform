@@ -14,12 +14,14 @@ bool RtcClock::update(ErrorCode& errorCode, bool wifiConnected) {
         if (syncFromNtp()) {
             _lastSyncAtMs = nowMs;
             _timeValid = true;
+            _syncedFromNtp = true;
             return true;
         }
     }
 
     if (!_timeValid && syncFromRtc()) {
         _timeValid = true;
+        _syncedFromNtp = false;
         return true;
     }
 
@@ -36,6 +38,37 @@ bool RtcClock::isTimeValid() const {
 
 bool RtcClock::isRtcAvailable() const {
     return _rtcAvailable;
+}
+
+bool RtcClock::isSyncedFromNtp() const {
+    return _syncedFromNtp;
+}
+
+void RtcClock::getShortTime(char* out, size_t outSize) const {
+    if (!_timeValid) {
+        snprintf(out, outSize, "--:--");
+        return;
+    }
+    time_t now = time(nullptr);
+    struct tm utcTime {};
+    gmtime_r(&now, &utcTime);
+    snprintf(out, outSize, "%02d:%02d", utcTime.tm_hour, utcTime.tm_min);
+}
+
+void RtcClock::getFullDateTime(char* out, size_t outSize) const {
+    if (!_timeValid) {
+        snprintf(out, outSize, "---- -- -- --:--");
+        return;
+    }
+    time_t now = time(nullptr);
+    struct tm utcTime {};
+    gmtime_r(&now, &utcTime);
+    snprintf(out, outSize, "%04d-%02d-%02d %02d:%02d",
+             utcTime.tm_year + 1900,
+             utcTime.tm_mon + 1,
+             utcTime.tm_mday,
+             utcTime.tm_hour,
+             utcTime.tm_min);
 }
 
 String RtcClock::getIsoTimestampUtc() const {

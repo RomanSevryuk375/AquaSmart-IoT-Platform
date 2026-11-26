@@ -1,6 +1,7 @@
 #include "ApiClient.h"
 
 #include <ArduinoJson.h>
+#include <ProtocolCodecs.h>
 #include "PinMap.h"
 
 namespace {
@@ -34,37 +35,11 @@ ApiResult ApiClient::fetchRuntimeConfig(BackendRuntimeConfig& runtimeConfig) {
         return {false, statusCode, message.length() > 0 ? message : httpMessage(statusCode)};
     }
 
-    JsonDocument doc;
-    const DeserializationError error = deserializeJson(doc, http.getString());
+    const String payload = http.getString();
     http.end();
-    if (error) {
-        return {false, -1, error.c_str()};
+    if (!ProtocolCodecs::decodeControllerConfig(payload.c_str(), runtimeConfig)) {
+        return {false, -1, "config json decode failed"};
     }
-
-    runtimeConfig.sendIntervalMs = doc["sendIntervalMs"] | runtimeConfig.sendIntervalMs;
-    runtimeConfig.maxBatchSize = doc["maxBatchSize"] | runtimeConfig.maxBatchSize;
-
-    runtimeConfig.sensorCount = 0;
-    JsonArrayConst sensors = doc["sensors"].as<JsonArrayConst>();
-    for (JsonObjectConst item : sensors) {
-        if (runtimeConfig.sensorCount >= MAX_SENSOR_COUNT) {
-            break;
-        }
-        parseSensor(item, runtimeConfig.sensors[runtimeConfig.sensorCount], runtimeConfig.sensorCount);
-        ++runtimeConfig.sensorCount;
-    }
-
-    runtimeConfig.relayCount = 0;
-    JsonArrayConst relays = doc["relays"].as<JsonArrayConst>();
-    for (JsonObjectConst item : relays) {
-        if (runtimeConfig.relayCount >= MAX_RELAY_COUNT) {
-            break;
-        }
-        parseRelay(item, runtimeConfig.relays[runtimeConfig.relayCount], runtimeConfig.relayCount);
-        ++runtimeConfig.relayCount;
-    }
-
-    runtimeConfig.isLoaded = true;
     return {true, statusCode, "ok"};
 }
 
@@ -99,10 +74,20 @@ ApiResult ApiClient::sendTelemetry(const TelemetryRecord* items, size_t itemCoun
         return {false, statusCode, responseBody.length() > 0 ? responseBody : httpMessage(statusCode)};
     }
 
+    if (responseBody.length() == 0) {
+        response.acceptedCount = static_cast<int>(itemCount);
+        response.skippedCount = 0;
+        response.validationErrorCount = 0;
+        return {true, statusCode, "accepted"};
+    }
+
     JsonDocument responseDocument;
     const DeserializationError error = deserializeJson(responseDocument, responseBody);
     if (error) {
-        return {false, -1, error.c_str()};
+        response.acceptedCount = static_cast<int>(itemCount);
+        response.skippedCount = 0;
+        response.validationErrorCount = 0;
+        return {true, statusCode, "accepted"};
     }
 
     response.acceptedCount = responseDocument["acceptedCount"] | 0;
@@ -224,29 +209,30 @@ String ApiClient::buildUrl(const String& path) const {
 }
 
 void ApiClient::parseSensor(const JsonObjectConst& item, SensorRuntimeConfig& sensorConfig, size_t) {
+    sensorConfig = SensorRuntimeConfig{};
     sensorConfig.enabled = true;
-    sensorConfig.sensorId = item["sensorId"].as<String>();
-    sensorConfig.name = item["name"].as<String>();
+    copyCString(sensorConfig.sensorId, sizeof(sensorConfig.sensorId), item["sensorId"] | "");
+    copyCString(sensorConfig.name, sizeof(sensorConfig.name), item["name"] | "");
     sensorConfig.connectionProtocol = item["connectionProtocol"] | 0;
-    sensorConfig.connectionAddress = item["connectionAddress"].as<String>();
+    copyCString(sensorConfig.connectionAddress, sizeof(sensorConfig.connectionAddress), item["connectionAddress"] | "");
     sensorConfig.sensorType = item["type"] | 0;
-    sensorConfig.unit = item["unit"].as<String>();
-    sensorConfig.localKey = "";
-    sensorConfig.pollIntervalMs = sensorConfig.name.indexOf("level") >= 0 ? 1000 : 5000;
-    sensorConfig.hasValue = false;
-    sensorConfig.hasError = false;
-    sensorConfig.lastQueuedAtMs = 0;
-    sensorConfig.lastPollAtMs = 0;
+    copyCString(sensorConfig.unit, sizeof(sensorConfig.unit), item["unit"] | "");
+    sensorConfig.pollIntervalMs = 5000;
 }
 
 void ApiClient::parseRelay(const JsonObjectConst& item, RelayRuntimeConfig& relayConfig, size_t index) {
-    relayConfig.enabled = true;
+    relayConfig = RelayRuntimeConfig{};
+    relayConfig.configured = true;
     relayConfig.channel = static_cast<uint8_t>(index + 1);
     relayConfig.pin = RELAY_PINS[index];
-    relayConfig.relayId = item["relayId"].as<String>();
-    relayConfig.name = item["name"].as<String>();
-    relayConfig.activeLow = !(item["isNormalyOpen"] | false);
-    relayConfig.purpose = static_cast<RelayPurpose>(item["purpose"] | 5);
+    copyCString(relayConfig.relayId, sizeof(relayConfig.relayId), item["relayId"] | "");
+    copyCString(relayConfig.name, sizeof(relayConfig.name), item["name"] | "");
+    copyCString(relayConfig.connectionAddress, sizeof(relayConfig.connectionAddress), item["connectionAddress"] | "");
+    const bool isNormallyOpen = item["isNormallyOpen"].is<bool>()
+        ? item["isNormallyOpen"].as<bool>()
+        : (item["isNormalyOpen"] | true);
+    relayConfig.activeLow = isNormallyOpen;
+    relayConfig.purpose = static_cast<RelayPurpose>(item["purpose"] | static_cast<int>(RelayPurpose::RESERVE));
     relayConfig.currentState = item["isActive"] | false;
     relayConfig.backendState = relayConfig.currentState;
     relayConfig.isManual = item["isManual"] | false;
