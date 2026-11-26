@@ -8,7 +8,10 @@
 class RelayManager {
 public:
     void begin(const DeviceConfig& config);
-    void applyRuntimeConfig(const BackendRuntimeConfig& runtimeConfig, const DeviceConfig& config);
+    void applyRuntimeConfig(
+        const BackendRuntimeConfig& runtimeConfig,
+        const DeviceConfig& config,
+        bool applyBackendState = true);
     void setAllSafe();
     bool manualToggle(uint8_t channel, bool isOnline);
     bool manualToggleMode(uint8_t channel, bool isOnline);
@@ -28,6 +31,7 @@ public:
     const RelayRuntimeConfig* getRelayByIndex(size_t index) const;
     const RelayRuntimeConfig* channels() const;
     bool hasAnyPendingSync() const;
+    void markChannelSynced(uint8_t channel);
     void markAllSynced();
 
 private:

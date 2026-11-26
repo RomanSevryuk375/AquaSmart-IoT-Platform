@@ -32,15 +32,16 @@ private:
     uint32_t _lastDsRequestAtMs = 0;
     bool _dsConversionRequested = false;
 
-    bool handleSensor(SensorRuntimeConfig& sensor, uint32_t nowMs);
+    bool handleSensor(SensorRuntimeConfig& sensor, uint32_t nowMs, bool& dsReadInCycle);
     bool readAht20(SensorRuntimeConfig& sensor);
-    bool readDs18b20(SensorRuntimeConfig& sensor, uint32_t nowMs);
+    bool readDs18b20(SensorRuntimeConfig& sensor, uint32_t nowMs, bool& readPerformed);
     bool readWaterLevel(SensorRuntimeConfig& sensor, uint32_t nowMs);
     bool readSoilMoisture(SensorRuntimeConfig& sensor);
     SensorRole inferRole(const SensorRuntimeConfig& sensor) const;
     String toLower(const String& value) const;
     uint8_t parseI2cAddress(const String& address) const;
-    bool readDsAddressByRole(SensorRole role, DeviceAddress address) const;
+    bool resolveDsAddress(const SensorRuntimeConfig& sensor, DeviceAddress address);
+    bool parseDsAddressHex(const char* raw, uint8_t* outBytes, size_t maxBytes, size_t& outLen) const;
     bool tryReadSoilRaw(uint16_t& rawValue);
     float calibrateSoilMoisture(uint16_t rawValue) const;
     String normalizeAddress(const String& value) const;

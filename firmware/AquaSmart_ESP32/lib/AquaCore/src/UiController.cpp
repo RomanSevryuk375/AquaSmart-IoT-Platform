@@ -207,6 +207,8 @@ void format(const UiController& ui, const LcdViewContext& ctx, LcdLines& out) {
             connLabel = "SAFE   ";
         } else if (ctx.mqttConnected) {
             connLabel = "MQTT OK";
+        } else if (ctx.wifiConnected && ctx.httpHealthy) {
+            connLabel = "HTTP FB";
         } else if (ctx.wifiConnected) {
             connLabel = "WIFI OK";
         }

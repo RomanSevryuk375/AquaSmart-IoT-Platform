@@ -9,6 +9,11 @@ public:
     static bool begin();
     static void load(DeviceConfig& config);
     static void save(const DeviceConfig& config);
+    static void savePendingOta(const char* campaignId, const char* version);
+    static void clearPendingOta();
+    static bool saveRuntimeConfigCache(const char* rawJson, uint64_t configVersion);
+    static bool loadRuntimeConfigCache(BackendRuntimeConfig& outConfig);
+    static void clearRuntimeConfigCache();
     static bool isConfigured();
     static bool isValid(const DeviceConfig& config);
     static void reset();

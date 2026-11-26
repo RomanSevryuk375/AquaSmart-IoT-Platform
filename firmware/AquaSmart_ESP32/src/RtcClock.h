@@ -8,6 +8,7 @@ class RtcClock {
 public:
     bool begin();
     bool update(ErrorCode& errorCode, bool wifiConnected);
+    bool syncFromServerEpoch(int64_t epochSec);
     bool isTimeValid() const;
     bool isRtcAvailable() const;
     bool isSyncedFromNtp() const;

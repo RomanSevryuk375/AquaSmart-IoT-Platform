@@ -28,7 +28,10 @@ void RelayController::begin(const DeviceConfig& config, GpioWriteCallback gpioWr
     }
 }
 
-void RelayController::applyServerConfig(const BackendRuntimeConfig& serverConfig, const DeviceConfig& deviceConfig) {
+void RelayController::applyServerConfig(
+    const BackendRuntimeConfig& serverConfig,
+    const DeviceConfig& deviceConfig,
+    bool applyBackendState) {
     bool bound[MAX_RELAY_COUNT] = {};
 
     for (size_t i = 0; i < MAX_RELAY_COUNT; ++i) {
@@ -63,10 +66,12 @@ void RelayController::applyServerConfig(const BackendRuntimeConfig& serverConfig
         copyCString(dst.connectionAddress, sizeof(dst.connectionAddress), src.connectionAddress);
 
         if (!dst.pendingSync) {
-            dst.currentState = src.backendState;
             dst.isManual = src.isManual;
-            dst.lastChangeSource = RelayChangeSource::SYNC;
-            writePhysical(dst, dst.currentState);
+            if (applyBackendState) {
+                dst.currentState = src.backendState;
+                dst.lastChangeSource = RelayChangeSource::SYNC;
+                writePhysical(dst, dst.currentState);
+            }
         }
     }
 

@@ -8,38 +8,68 @@ namespace {
 String httpMessage(int statusCode) {
     return "HTTP " + String(statusCode);
 }
-}
+}  // namespace
 
 void ApiClient::begin(const DeviceConfig& config) {
     _baseUrl = config.apiBaseUrl;
     _deviceToken = config.deviceToken;
-    _telemetryPath = config.telemetryPath;
+    _telemetryPath = config.telemetryPath[0] != '\0' ? config.telemetryPath : DEFAULT_TELEMETRY_PATH;
 }
 
 void ApiClient::setMacAddress(const String& macAddress) {
     _macAddress = macAddress;
 }
 
-ApiResult ApiClient::fetchRuntimeConfig(BackendRuntimeConfig& runtimeConfig) {
+ApiResult ApiClient::fetchRuntimeConfig(BackendRuntimeConfig& runtimeConfig, String* outRawJson) {
     HTTPClient http;
     const String url = buildUrl(DEFAULT_CONFIG_PATH);
     if (!prepareRequest(http, url)) {
         return {false, -1, "begin failed"};
     }
 
-    http.addHeader("X-Mac-Address", _macAddress);
     const int statusCode = http.GET();
-    if (statusCode != HTTP_CODE_OK) {
-        const String message = http.getString();
-        http.end();
-        return {false, statusCode, message.length() > 0 ? message : httpMessage(statusCode)};
-    }
-
     const String payload = http.getString();
     http.end();
+
+    if (statusCode != HTTP_CODE_OK) {
+        return {false, statusCode, payload.length() > 0 ? payload : httpMessage(statusCode)};
+    }
+
     if (!ProtocolCodecs::decodeControllerConfig(payload.c_str(), runtimeConfig)) {
         return {false, -1, "config json decode failed"};
     }
+
+    if (outRawJson != nullptr) {
+        *outRawJson = payload;
+    }
+
+    return {true, statusCode, "ok"};
+}
+
+ApiResult ApiClient::pingController(const char* controllerId, int64_t& outServerEpochSec) {
+    outServerEpochSec = 0;
+    if (controllerId == nullptr || controllerId[0] == '\0') {
+        return {false, -1, "missing controllerId"};
+    }
+
+    HTTPClient http;
+    const String url = buildUrl(String("/api/device/v1/controllers/") + controllerId + "/ping");
+    if (!prepareRequest(http, url)) {
+        return {false, -1, "begin failed"};
+    }
+
+    const int statusCode = http.POST("");
+    const String responseBody = http.getString();
+    http.end();
+
+    if (statusCode < 200 || statusCode >= 300) {
+        return {false, statusCode, responseBody.length() > 0 ? responseBody : httpMessage(statusCode)};
+    }
+
+    if (responseBody.length() > 0) {
+        ProtocolCodecs::decodePingResponsePayload(responseBody.c_str(), outServerEpochSec);
+    }
+
     return {true, statusCode, "ok"};
 }
 
@@ -70,7 +100,7 @@ ApiResult ApiClient::sendTelemetry(const TelemetryRecord* items, size_t itemCoun
     const String responseBody = http.getString();
     http.end();
 
-    if (statusCode != HTTP_CODE_ACCEPTED) {
+    if (statusCode != HTTP_CODE_ACCEPTED && statusCode != HTTP_CODE_OK) {
         return {false, statusCode, responseBody.length() > 0 ? responseBody : httpMessage(statusCode)};
     }
 
@@ -90,7 +120,7 @@ ApiResult ApiClient::sendTelemetry(const TelemetryRecord* items, size_t itemCoun
         return {true, statusCode, "accepted"};
     }
 
-    response.acceptedCount = responseDocument["acceptedCount"] | 0;
+    response.acceptedCount = responseDocument["acceptedCount"] | static_cast<int>(itemCount);
     response.skippedCount = responseDocument["skippedCount"] | 0;
     response.validationErrorCount = 0;
     JsonArrayConst validationErrors = responseDocument["validationErrors"].as<JsonArrayConst>();
@@ -170,7 +200,11 @@ ApiResult ApiClient::failCommand(const String& commandId, const String& reason) 
     }
 
     http.addHeader("Content-Type", "application/json");
-    const String body = "\"" + reason + "\"";
+    JsonDocument doc;
+    doc.set(reason);
+    String body;
+    serializeJson(doc, body);
+
     const int statusCode = http.POST(body);
     const String responseBody = http.getString();
     http.end();
@@ -178,27 +212,83 @@ ApiResult ApiClient::failCommand(const String& commandId, const String& reason) 
     return {statusCode >= 200 && statusCode < 300, statusCode, responseBody};
 }
 
-bool ApiClient::prepareRequest(HTTPClient& http, const String& url) {
+ApiResult ApiClient::checkOtaUpdate(const char* controllerId, OtaCheckInfo& outCheck) {
+    outCheck = OtaCheckInfo{};
+    if (controllerId == nullptr || controllerId[0] == '\0') {
+        return {false, -1, "missing controllerId"};
+    }
+
+    HTTPClient http;
+    const String url = buildUrl(String(DEFAULT_OTA_CHECK_PATH) + "?controller_id=" + controllerId);
+    if (!prepareRequest(http, url, 8000)) {
+        return {false, -1, "begin failed"};
+    }
+
+    const int statusCode = http.GET();
+    const String payload = http.getString();
+    http.end();
+
+    if (statusCode != HTTP_CODE_OK) {
+        return {false, statusCode, payload.length() > 0 ? payload : httpMessage(statusCode)};
+    }
+
+    if (!ProtocolCodecs::decodeOtaCheckPayload(payload.c_str(), outCheck)) {
+        return {false, -1, "ota check decode failed"};
+    }
+
+    return {true, statusCode, "ok"};
+}
+
+ApiResult ApiClient::reportOtaStatus(
+    const char* campaignId,
+    const char* controllerId,
+    OtaTargetStatus status,
+    const char* errorMessage) {
+    char payload[320] = {};
+    const size_t len = ProtocolCodecs::encodeOtaStatusPayload(
+        campaignId,
+        controllerId,
+        status,
+        errorMessage,
+        payload,
+        sizeof(payload));
+    if (len == 0) {
+        return {false, -1, "ota status encode failed"};
+    }
+
+    HTTPClient http;
+    const String url = buildUrl(DEFAULT_OTA_STATUS_PATH);
+    if (!prepareRequest(http, url, 8000)) {
+        return {false, -1, "begin failed"};
+    }
+
+    http.addHeader("Content-Type", "application/json");
+    const int statusCode = http.POST(reinterpret_cast<uint8_t*>(payload), len);
+    const String responseBody = http.getString();
+    http.end();
+
+    const bool ok = (statusCode >= 200 && statusCode < 300);
+    return {ok, statusCode, responseBody.length() > 0 ? responseBody : httpMessage(statusCode)};
+}
+
+bool ApiClient::prepareRequest(HTTPClient& http, const String& url, uint16_t timeoutMs) {
     if (!http.begin(url)) {
         return false;
     }
 
-    Serial.printf("[DEBUG] URL: %s\n", url.c_str());
-    Serial.printf("[DEBUG] Mac: %s\n", _macAddress.c_str());
-    if (_deviceToken.length() >= 8) {
-        Serial.printf("[DEBUG] Token: %.8s****\n", _deviceToken.c_str());
-    } else {
-        Serial.println("[DEBUG] Token: ****");
-    }
-
     http.addHeader("X-Device-Token", _deviceToken);
-    http.addHeader("X-Mac-Address", _macAddress);
+    if (_macAddress.length() > 0) {
+        http.addHeader("X-Mac-Address", _macAddress);
+    }
     http.addHeader("X-Firmware-Version", FIRMWARE_VERSION);
-    http.setTimeout(5000);
+    http.setTimeout(timeoutMs);
     return true;
 }
 
 String ApiClient::buildUrl(const String& path) const {
+    if (path.startsWith("http://") || path.startsWith("https://")) {
+        return path;
+    }
     if (_baseUrl.endsWith("/") && path.startsWith("/")) {
         return _baseUrl.substring(0, _baseUrl.length() - 1) + path;
     }
@@ -206,34 +296,4 @@ String ApiClient::buildUrl(const String& path) const {
         return _baseUrl + "/" + path;
     }
     return _baseUrl + path;
-}
-
-void ApiClient::parseSensor(const JsonObjectConst& item, SensorRuntimeConfig& sensorConfig, size_t) {
-    sensorConfig = SensorRuntimeConfig{};
-    sensorConfig.enabled = true;
-    copyCString(sensorConfig.sensorId, sizeof(sensorConfig.sensorId), item["sensorId"] | "");
-    copyCString(sensorConfig.name, sizeof(sensorConfig.name), item["name"] | "");
-    sensorConfig.connectionProtocol = item["connectionProtocol"] | 0;
-    copyCString(sensorConfig.connectionAddress, sizeof(sensorConfig.connectionAddress), item["connectionAddress"] | "");
-    sensorConfig.sensorType = item["type"] | 0;
-    copyCString(sensorConfig.unit, sizeof(sensorConfig.unit), item["unit"] | "");
-    sensorConfig.pollIntervalMs = 5000;
-}
-
-void ApiClient::parseRelay(const JsonObjectConst& item, RelayRuntimeConfig& relayConfig, size_t index) {
-    relayConfig = RelayRuntimeConfig{};
-    relayConfig.configured = true;
-    relayConfig.channel = static_cast<uint8_t>(index + 1);
-    relayConfig.pin = RELAY_PINS[index];
-    copyCString(relayConfig.relayId, sizeof(relayConfig.relayId), item["relayId"] | "");
-    copyCString(relayConfig.name, sizeof(relayConfig.name), item["name"] | "");
-    copyCString(relayConfig.connectionAddress, sizeof(relayConfig.connectionAddress), item["connectionAddress"] | "");
-    const bool isNormallyOpen = item["isNormallyOpen"].is<bool>()
-        ? item["isNormallyOpen"].as<bool>()
-        : (item["isNormalyOpen"] | true);
-    relayConfig.activeLow = isNormallyOpen;
-    relayConfig.purpose = static_cast<RelayPurpose>(item["purpose"] | static_cast<int>(RelayPurpose::RESERVE));
-    relayConfig.currentState = item["isActive"] | false;
-    relayConfig.backendState = relayConfig.currentState;
-    relayConfig.isManual = item["isManual"] | false;
 }

@@ -2,6 +2,7 @@
 #define AQUA_CORE_PROTOCOL_CODECS_H
 
 #include "CoreTypes.h"
+#include "OtaStateMachine.h"
 
 struct RelaySyncItem {
     char relayId[40] = {};
@@ -71,6 +72,15 @@ bool decodeCommandPayload(const char* json, MqttRelayCommand& outCmd);
 bool decodeConfigNotifyPayload(const char* json, ConfigNotifyMessage& outNotify);
 bool shouldTriggerConfigSync(uint64_t incomingVersion, uint64_t localConfigVersion);
 bool decodeControllerConfig(const char* json, BackendRuntimeConfig& outConfig);
+bool decodePingResponsePayload(const char* json, int64_t& outServerEpochSec);
+bool decodeOtaCheckPayload(const char* json, OtaCheckInfo& outCheck);
+size_t encodeOtaStatusPayload(
+    const char* campaignId,
+    const char* controllerId,
+    OtaTargetStatus status,
+    const char* errorMessage,
+    char* outJson,
+    size_t outSize);
 
 bool parseIso8601UtcToEpoch(const char* isoUtc, int64_t& outEpochSec);
 

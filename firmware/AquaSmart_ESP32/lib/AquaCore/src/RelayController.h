@@ -16,7 +16,10 @@ using GpioWriteCallback = void (*)(uint8_t pin, bool highLevel, void* context);
 class RelayController {
 public:
     void begin(const DeviceConfig& config, GpioWriteCallback gpioWrite = nullptr, void* gpioContext = nullptr);
-    void applyServerConfig(const BackendRuntimeConfig& serverConfig, const DeviceConfig& deviceConfig);
+    void applyServerConfig(
+        const BackendRuntimeConfig& serverConfig,
+        const DeviceConfig& deviceConfig,
+        bool applyBackendState = true);
 
     bool manualToggle(uint8_t channel, bool isOnline);
     bool manualToggleMode(uint8_t channel, bool isOnline);

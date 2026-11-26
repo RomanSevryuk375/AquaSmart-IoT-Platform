@@ -10,6 +10,7 @@ class DisplayManager {
 public:
     void begin();
     void render(const UiController& ui, const LcdViewContext& ctx);
+    void showBanner(const char* line0, const char* line1);
 
 private:
     LiquidCrystal_I2C _lcd = LiquidCrystal_I2C(LCD_I2C_ADDRESS, 16, 2);

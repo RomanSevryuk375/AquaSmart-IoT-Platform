@@ -93,6 +93,7 @@ bool SensorManager::update(ErrorCode& errorCode) {
     }
 
     bool allOk = true;
+    bool dsReadInCycle = false;
     const uint32_t nowMs = millis();
 
     _snapshot.ahtAvailable = _ahtAvailable;
@@ -105,11 +106,18 @@ bool SensorManager::update(ErrorCode& errorCode) {
             continue;
         }
 
-        const bool ok = handleSensor(sensor, nowMs);
+        const bool ok = handleSensor(sensor, nowMs, dsReadInCycle);
         if (!ok) {
             allOk = false;
             errorCode = ErrorCode::E007_SENSOR_READ_FAILED;
         }
+    }
+
+    // Trigger next OneWire conversion ONCE after all DS18B20 sensors in this pass are read.
+    if (_dsAvailable && (dsReadInCycle || !_dsConversionRequested)) {
+        _ds18b20.requestTemperatures();
+        _lastDsRequestAtMs = nowMs;
+        _dsConversionRequested = true;
     }
 
     return allOk;
@@ -119,7 +127,7 @@ const SensorSnapshot& SensorManager::getSnapshot() const {
     return _snapshot;
 }
 
-bool SensorManager::handleSensor(SensorRuntimeConfig& sensor, uint32_t nowMs) {
+bool SensorManager::handleSensor(SensorRuntimeConfig& sensor, uint32_t nowMs, bool& dsReadInCycle) {
     if (nowMs - sensor.lastPollAtMs < sensor.pollIntervalMs) {
         return !sensor.hasError;
     }
@@ -133,7 +141,7 @@ bool SensorManager::handleSensor(SensorRuntimeConfig& sensor, uint32_t nowMs) {
             break;
         case SensorRole::WATER_TEMPERATURE:
         case SensorRole::SURFACE_TEMPERATURE:
-            ok = readDs18b20(sensor, nowMs);
+            ok = readDs18b20(sensor, nowMs, dsReadInCycle);
             break;
         case SensorRole::WATER_LEVEL:
             ok = readWaterLevel(sensor, nowMs);
@@ -191,7 +199,7 @@ bool SensorManager::readAht20(SensorRuntimeConfig& sensor) {
     return false;
 }
 
-bool SensorManager::readDs18b20(SensorRuntimeConfig& sensor, uint32_t nowMs) {
+bool SensorManager::readDs18b20(SensorRuntimeConfig& sensor, uint32_t nowMs, bool& readPerformed) {
     if (!_dsAvailable) {
         return false;
     }
@@ -208,14 +216,12 @@ bool SensorManager::readDs18b20(SensorRuntimeConfig& sensor, uint32_t nowMs) {
     }
 
     DeviceAddress address {};
-    if (!readDsAddressByRole(sensor.role, address)) {
+    if (!resolveDsAddress(sensor, address)) {
         return false;
     }
 
     const float value = _ds18b20.getTempC(address);
-    _ds18b20.requestTemperatures();
-    _lastDsRequestAtMs = nowMs;
-    _dsConversionRequested = true;
+    readPerformed = true;
 
     if (!isValidTemperature(value)) {
         return false;
@@ -281,42 +287,19 @@ SensorRole SensorManager::inferRole(const SensorRuntimeConfig& sensor) const {
     const String address = toLower(String(sensor.connectionAddress));
     const String unit = toLower(String(sensor.unit));
 
-    // 1. Water Level
-    if (name.indexOf("water level") >= 0 || name.indexOf("level") >= 0) {
+    // 1. Water Level (Digital / GPIO 34 or name)
+    if (name.indexOf("water level") >= 0 || name.indexOf("level") >= 0 ||
+        (sensor.connectionProtocol == 1 && (address == "34" || address == "gpio34"))) {
         return SensorRole::WATER_LEVEL;
     }
 
-    // 2. Soil Moisture
-    if (name.indexOf("soil") >= 0 || name.indexOf("moisture") >= 0) {
+    // 2. Soil Moisture (I2C 0x36 or name)
+    if (name.indexOf("soil") >= 0 || name.indexOf("moisture") >= 0 ||
+        (sensor.connectionProtocol == 3 && address.indexOf("0x36") >= 0)) {
         return SensorRole::SOIL_MOISTURE;
     }
 
-    // 3. Air Humidity
-    if (name.indexOf("humidity") >= 0 || (unit == "%" && name.indexOf("soil") < 0)) {
-        return SensorRole::AIR_HUMIDITY;
-    }
-
-    // 4. Specific Temperatures by name
-    if (name.indexOf("surface") >= 0 && (name.indexOf("temp") >= 0 || unit.indexOf("c") >= 0)) {
-        return SensorRole::SURFACE_TEMPERATURE;
-    }
-    if (name.indexOf("water") >= 0 && (name.indexOf("temp") >= 0 || unit.indexOf("c") >= 0)) {
-        return SensorRole::WATER_TEMPERATURE;
-    }
-    if (name.indexOf("air") >= 0 && (name.indexOf("temp") >= 0 || unit.indexOf("c") >= 0)) {
-        return SensorRole::AIR_TEMPERATURE;
-    }
-
-    // 5. Hardware address mappings (DS18B20 1-Wire)
-    if (address.indexOf("28-") >= 0 || address.indexOf("28:") >= 0) {
-        if (_deviceConfig && _deviceConfig->ds18SurfaceAddress[0] != '\0' &&
-            normalizeAddress(address) == normalizeAddress(_deviceConfig->ds18SurfaceAddress)) {
-            return SensorRole::SURFACE_TEMPERATURE;
-        }
-        return SensorRole::WATER_TEMPERATURE;
-    }
-
-    // 6. Hardware address mappings (AHT20 I2C 0x38)
+    // 3. Hardware address / protocol mappings (AHT20 I2C 0x38)
     if (address.indexOf("0x38") >= 0) {
         if (sensor.sensorType == 3 || unit == "%" || name.indexOf("humid") >= 0) {
             return SensorRole::AIR_HUMIDITY;
@@ -324,8 +307,33 @@ SensorRole SensorManager::inferRole(const SensorRuntimeConfig& sensor) const {
         return SensorRole::AIR_TEMPERATURE;
     }
 
+    // 4. Air Humidity
+    if (name.indexOf("humidity") >= 0 || sensor.sensorType == 3 || (unit == "%" && name.indexOf("soil") < 0)) {
+        return SensorRole::AIR_HUMIDITY;
+    }
+
+    // 5. Specific Temperatures by name
+    if (name.indexOf("surface") >= 0 && (name.indexOf("temp") >= 0 || unit.indexOf("c") >= 0 || sensor.sensorType == 1)) {
+        return SensorRole::SURFACE_TEMPERATURE;
+    }
+    if (name.indexOf("water") >= 0 && (name.indexOf("temp") >= 0 || unit.indexOf("c") >= 0 || sensor.sensorType == 1)) {
+        return SensorRole::WATER_TEMPERATURE;
+    }
+    if (name.indexOf("air") >= 0 && (name.indexOf("temp") >= 0 || unit.indexOf("c") >= 0 || sensor.sensorType == 1)) {
+        return SensorRole::AIR_TEMPERATURE;
+    }
+
+    // 6. Hardware address / protocol mappings (DS18B20 1-Wire)
+    if (sensor.connectionProtocol == 4 || address.indexOf("28-") >= 0 || address.indexOf("28:") >= 0) {
+        if (_deviceConfig && _deviceConfig->ds18SurfaceAddress[0] != '\0' &&
+            normalizeAddress(address) == normalizeAddress(_deviceConfig->ds18SurfaceAddress)) {
+            return SensorRole::SURFACE_TEMPERATURE;
+        }
+        return SensorRole::WATER_TEMPERATURE;
+    }
+
     // 7. General temperature fallback
-    if (name.indexOf("temp") >= 0 || unit.indexOf("c") >= 0) {
+    if (name.indexOf("temp") >= 0 || unit.indexOf("c") >= 0 || sensor.sensorType == 1) {
         return SensorRole::AIR_TEMPERATURE;
     }
 
@@ -349,39 +357,86 @@ uint8_t SensorManager::parseI2cAddress(const String& address) const {
     return normalized.length() > 0 ? static_cast<uint8_t>(normalized.toInt()) : 0;
 }
 
-bool SensorManager::readDsAddressByRole(SensorRole role, DeviceAddress address) const {
-    if (_deviceConfig == nullptr) {
+bool SensorManager::parseDsAddressHex(const char* raw, uint8_t* outBytes, size_t maxBytes, size_t& outLen) const {
+    outLen = 0;
+    if (raw == nullptr || raw[0] == '\0' || outBytes == nullptr || maxBytes == 0) {
         return false;
     }
 
-    const char* raw = role == SensorRole::SURFACE_TEMPERATURE
-        ? _deviceConfig->ds18SurfaceAddress
-        : _deviceConfig->ds18WaterAddress;
+    // Strip separators ('-', ':', spaces) into pure hex digits.
+    char hexDigits[32] = {};
+    size_t hexCount = 0;
+    for (const char* p = raw; *p != '\0'; ++p) {
+        if (*p == '-' || *p == ':' || *p == ' ') {
+            continue;
+        }
+        if (!isxdigit(static_cast<unsigned char>(*p)) || hexCount >= sizeof(hexDigits) - 1) {
+            return false;
+        }
+        hexDigits[hexCount++] = *p;
+    }
 
-    if (strlen(raw) == 0) {
+    if (hexCount < 2 || (hexCount % 2) != 0) {
         return false;
     }
 
-    String normalized = normalizeAddress(raw);
-    int outputIndex = 0;
-    int tokenStart = 0;
+    const size_t byteCount = hexCount / 2;
+    if (byteCount > maxBytes) {
+        return false;
+    }
 
-    while (tokenStart < static_cast<int>(normalized.length()) && outputIndex < 8) {
-        const int separator = normalized.indexOf('-', tokenStart);
-        const String token = separator >= 0
-            ? normalized.substring(tokenStart, separator)
-            : normalized.substring(tokenStart);
+    for (size_t i = 0; i < byteCount; ++i) {
+        char pair[3] = {hexDigits[i * 2], hexDigits[i * 2 + 1], '\0'};
+        outBytes[i] = static_cast<uint8_t>(strtol(pair, nullptr, 16));
+    }
+    outLen = byteCount;
+    return true;
+}
 
-        address[outputIndex++] = static_cast<uint8_t>(strtol(token.c_str(), nullptr, 16));
+bool SensorManager::resolveDsAddress(const SensorRuntimeConfig& sensor, DeviceAddress address) {
+    const char* raw = sensor.connectionAddress;
+    if ((raw == nullptr || raw[0] == '\0') && _deviceConfig != nullptr) {
+        raw = sensor.role == SensorRole::SURFACE_TEMPERATURE
+            ? _deviceConfig->ds18SurfaceAddress
+            : _deviceConfig->ds18WaterAddress;
+    }
 
-        if (separator < 0) {
-            break;
+    uint8_t parsed[8] = {};
+    size_t parsedLen = 0;
+    if (raw != nullptr && raw[0] != '\0' && parseDsAddressHex(raw, parsed, sizeof(parsed), parsedLen)) {
+        // Case 1: Full 8-byte ROM address (family + 6-byte serial + CRC)
+        if (parsedLen == 8) {
+            memcpy(address, parsed, 8);
+            return true;
         }
 
-        tokenStart = separator + 1;
+        // Case 2: 7-byte w1/Wokwi format ("28-000000000001": family + 6-byte serial, no CRC)
+        if (parsedLen == 7) {
+            const uint8_t deviceCount = _ds18b20.getDeviceCount();
+            DeviceAddress candidate {};
+            for (uint8_t i = 0; i < deviceCount; ++i) {
+                if (!_ds18b20.getAddress(candidate, i)) {
+                    continue;
+                }
+                // Match direct order (bytes 0..6) OR reversed 6-byte serial order (Wokwi/Linux w1)
+                const bool directMatch = (memcmp(candidate, parsed, 7) == 0);
+                bool reversedSerialMatch = (candidate[0] == parsed[0]);
+                for (size_t k = 0; k < 6 && reversedSerialMatch; ++k) {
+                    if (candidate[1 + k] != parsed[6 - k]) {
+                        reversedSerialMatch = false;
+                    }
+                }
+                if (directMatch || reversedSerialMatch) {
+                    memcpy(address, candidate, 8);
+                    return true;
+                }
+            }
+        }
     }
 
-    return outputIndex == 8;
+    // Fallback: resolve by OneWire bus index (0 = water, 1 = surface) if bus has devices.
+    const uint8_t fallbackIdx = (sensor.role == SensorRole::SURFACE_TEMPERATURE) ? 1 : 0;
+    return _ds18b20.getAddress(address, fallbackIdx);
 }
 
 bool SensorManager::tryReadSoilRaw(uint16_t& rawValue) {

@@ -32,6 +32,25 @@ bool RtcClock::update(ErrorCode& errorCode, bool wifiConnected) {
     return _timeValid;
 }
 
+bool RtcClock::syncFromServerEpoch(int64_t epochSec) {
+    if (epochSec <= 1704067200LL) {  // 2024-01-01T00:00:00Z
+        return false;
+    }
+
+    timeval tv{};
+    tv.tv_sec = static_cast<time_t>(epochSec);
+    tv.tv_usec = 0;
+    settimeofday(&tv, nullptr);
+
+    if (_rtcAvailable) {
+        _rtc.adjust(DateTime(static_cast<uint32_t>(epochSec)));
+    }
+
+    _timeValid = true;
+    _lastSyncAtMs = millis();
+    return true;
+}
+
 bool RtcClock::isTimeValid() const {
     return _timeValid;
 }

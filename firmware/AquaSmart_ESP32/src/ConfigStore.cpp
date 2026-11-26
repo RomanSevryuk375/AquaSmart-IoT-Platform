@@ -1,10 +1,13 @@
 #include "ConfigStore.h"
 
+#include <ProtocolCodecs.h>
 #include <cstring>
 
 Preferences ConfigStore::preferences;
 
 namespace {
+constexpr size_t MAX_CACHED_CONFIG_JSON_BYTES = 6144;
+
 void copyString(char* destination, size_t capacity, const String& value) {
     memset(destination, 0, capacity);
     value.toCharArray(destination, capacity);
@@ -90,6 +93,67 @@ void ConfigStore::save(const DeviceConfig& config) {
         preferences.putBool(safeKey.c_str(), config.relaySafeState[index]);
         preferences.putBool(activeLowKey.c_str(), config.relayActiveLow[index]);
     }
+}
+
+void ConfigStore::savePendingOta(const char* campaignId, const char* version) {
+    preferences.putString("otaCampId", campaignId != nullptr ? campaignId : "");
+    preferences.putString("otaVer", version != nullptr ? version : "");
+}
+
+void ConfigStore::clearPendingOta() {
+    preferences.remove("otaCampId");
+    preferences.remove("otaVer");
+}
+
+bool ConfigStore::saveRuntimeConfigCache(const char* rawJson, uint64_t configVersion) {
+    if (rawJson == nullptr) {
+        return false;
+    }
+    const size_t len = std::strlen(rawJson);
+    if (len == 0 || len >= MAX_CACHED_CONFIG_JSON_BYTES) {
+        return false;
+    }
+
+    const size_t written = preferences.putBytes("cfgJson", rawJson, len);
+    if (written != len) {
+        return false;
+    }
+    preferences.putULong64("cfgVer", configVersion);
+    return true;
+}
+
+bool ConfigStore::loadRuntimeConfigCache(BackendRuntimeConfig& outConfig) {
+    const size_t len = preferences.getBytesLength("cfgJson");
+    if (len == 0 || len >= MAX_CACHED_CONFIG_JSON_BYTES) {
+        return false;
+    }
+
+    char* buffer = static_cast<char*>(std::malloc(len + 1));
+    if (buffer == nullptr) {
+        return false;
+    }
+
+    const size_t readLen = preferences.getBytes("cfgJson", buffer, len);
+    buffer[readLen] = '\0';
+
+    BackendRuntimeConfig parsed{};
+    const bool ok = (readLen == len) && ProtocolCodecs::decodeControllerConfig(buffer, parsed);
+    std::free(buffer);
+
+    if (!ok) {
+        return false;
+    }
+
+    if (parsed.configVersion == 0) {
+        parsed.configVersion = preferences.getULong64("cfgVer", 0);
+    }
+    outConfig = parsed;
+    return true;
+}
+
+void ConfigStore::clearRuntimeConfigCache() {
+    preferences.remove("cfgJson");
+    preferences.remove("cfgVer");
 }
 
 bool ConfigStore::isConfigured() {

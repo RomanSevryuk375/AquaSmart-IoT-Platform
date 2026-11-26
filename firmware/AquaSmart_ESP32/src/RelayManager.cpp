@@ -11,8 +11,11 @@ void RelayManager::begin(const DeviceConfig& config) {
     _controller.begin(config, &RelayManager::writeArduinoGpio, nullptr);
 }
 
-void RelayManager::applyRuntimeConfig(const BackendRuntimeConfig& runtimeConfig, const DeviceConfig& config) {
-    _controller.applyServerConfig(runtimeConfig, config);
+void RelayManager::applyRuntimeConfig(
+    const BackendRuntimeConfig& runtimeConfig,
+    const DeviceConfig& config,
+    bool applyBackendState) {
+    _controller.applyServerConfig(runtimeConfig, config, applyBackendState);
 }
 
 void RelayManager::setAllSafe() {
@@ -65,6 +68,10 @@ const RelayRuntimeConfig* RelayManager::channels() const {
 
 bool RelayManager::hasAnyPendingSync() const {
     return _controller.hasAnyPendingSync();
+}
+
+void RelayManager::markChannelSynced(uint8_t channel) {
+    _controller.markChannelSynced(channel);
 }
 
 void RelayManager::markAllSynced() {

@@ -313,7 +313,13 @@ bool decodeControllerConfig(const char* json, BackendRuntimeConfig& outConfig) {
 
     outConfig.configVersion = doc["configVersion"] | outConfig.configVersion;
     outConfig.sendIntervalMs = doc["sendIntervalMs"] | outConfig.sendIntervalMs;
+    if (outConfig.sendIntervalMs < 1000) {
+        outConfig.sendIntervalMs = 10000;
+    }
     outConfig.maxBatchSize = doc["maxBatchSize"] | outConfig.maxBatchSize;
+    if (outConfig.maxBatchSize == 0 || outConfig.maxBatchSize > MAX_HTTP_BATCH_SIZE) {
+        outConfig.maxBatchSize = MAX_HTTP_BATCH_SIZE;
+    }
 
     outConfig.sensorCount = 0;
     JsonArrayConst sensors = doc["sensors"].as<JsonArrayConst>();
@@ -361,6 +367,77 @@ bool decodeControllerConfig(const char* json, BackendRuntimeConfig& outConfig) {
 
     outConfig.isLoaded = true;
     return true;
+}
+
+bool decodePingResponsePayload(const char* json, int64_t& outServerEpochSec) {
+    outServerEpochSec = 0;
+    if (json == nullptr || json[0] == '\0') {
+        return false;
+    }
+
+    JsonDocument doc;
+    if (deserializeJson(doc, json)) {
+        return false;
+    }
+
+    const char* serverTime = doc["serverTimeUtc"] | "";
+    if (serverTime[0] == '\0') {
+        return false;
+    }
+
+    return parseIso8601UtcToEpoch(serverTime, outServerEpochSec);
+}
+
+bool decodeOtaCheckPayload(const char* json, OtaCheckInfo& outCheck) {
+    outCheck = OtaCheckInfo{};
+    if (json == nullptr || json[0] == '\0') {
+        return false;
+    }
+
+    JsonDocument doc;
+    if (deserializeJson(doc, json)) {
+        return false;
+    }
+
+    if (!doc["has_update"].is<bool>()) {
+        return false;
+    }
+
+    outCheck.hasUpdate = doc["has_update"].as<bool>();
+    copyCString(outCheck.campaignId, sizeof(outCheck.campaignId), doc["campaign_id"] | "");
+    copyCString(outCheck.version, sizeof(outCheck.version), doc["version"] | "");
+    copyCString(outCheck.downloadUrl, sizeof(outCheck.downloadUrl), doc["download_url"] | "");
+    copyCString(outCheck.fileHash, sizeof(outCheck.fileHash), doc["file_hash"] | "");
+    return true;
+}
+
+size_t encodeOtaStatusPayload(
+    const char* campaignId,
+    const char* controllerId,
+    OtaTargetStatus status,
+    const char* errorMessage,
+    char* outJson,
+    size_t outSize) {
+    if (outJson == nullptr || outSize == 0 ||
+        campaignId == nullptr || campaignId[0] == '\0' ||
+        controllerId == nullptr || controllerId[0] == '\0') {
+        return 0;
+    }
+
+    // Strict 4-field contract matching FirmwareService DisallowUnknownFields().
+    JsonDocument doc;
+    doc["campaign_id"] = campaignId;
+    doc["controller_id"] = controllerId;
+    doc["status"] = static_cast<int>(status);
+    doc["error_message"] = (errorMessage != nullptr) ? errorMessage : "";
+
+    const size_t required = measureJson(doc);
+    if (required >= outSize) {
+        outJson[0] = '\0';
+        return 0;
+    }
+
+    return serializeJson(doc, outJson, outSize);
 }
 
 bool parseIso8601UtcToEpoch(const char* isoUtc, int64_t& outEpochSec) {
