@@ -105,4 +105,62 @@ public class ProtectedRoutesAuthorizationTests(GatewayFactoriesFixture fixture)
         authenticatedResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
         factory.ForwardedRequests.Should().BeEmpty();
     }
+
+    [Theory]
+    [InlineData("Development", "POST", "/swagger-docs/device/internal/mqtt/auth")]
+    [InlineData("Development", "POST", "/swagger-docs/device/internal/mqtt/acl")]
+    [InlineData("Development", "POST", "/swagger-docs/firmware/api/firmware/v1/campaigns")]
+    [InlineData("Development", "GET", "/swagger-docs/device/api/device/v1/controllers")]
+    [InlineData("Production", "POST", "/swagger-docs/device/internal/mqtt/auth")]
+    [InlineData("Production", "POST", "/swagger-docs/device/internal/mqtt/acl")]
+    [InlineData("Production", "POST", "/swagger-docs/firmware/api/firmware/v1/campaigns")]
+    [InlineData("Production", "GET", "/swagger-docs/device/api/device/v1/controllers")]
+    public async Task SwaggerRoutes_ForNonSwaggerPathsOrNonGetMethods_Return404AndDoNotForward(
+        string environmentName,
+        string methodName,
+        string path)
+    {
+        // Arrange
+        GatewayTestWebAppFactory factory = fixture.GetFactory(environmentName);
+        using HttpClient client = factory.CreateClient();
+        factory.ClearForwardedRequests();
+
+        using var request = new HttpRequestMessage(new HttpMethod(methodName), path);
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        factory.ForwardedRequests.Should().BeEmpty();
+    }
+
+    [Theory]
+    [InlineData("Development", "/swagger-docs/device/swagger/v1/swagger.json", "device-api", "/swagger/v1/swagger.json")]
+    [InlineData("Development", "/swagger-docs/firmware/swagger/doc.json", "firmware-api", "/swagger/doc.json")]
+    [InlineData("Production", "/swagger-docs/device/swagger/v1/swagger.json", "device-api", "/swagger/v1/swagger.json")]
+    [InlineData("Production", "/swagger-docs/firmware/swagger/doc.json", "firmware-api", "/swagger/doc.json")]
+    public async Task SwaggerRoutes_GetSwaggerDocs_ForwardWithPrefixRemoved(
+        string environmentName,
+        string path,
+        string expectedHost,
+        string expectedDownstreamPath)
+    {
+        // Arrange
+        GatewayTestWebAppFactory factory = fixture.GetFactory(environmentName);
+        using HttpClient client = factory.CreateClient();
+        factory.ClearForwardedRequests();
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, path);
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        factory.ForwardedRequests.Should().ContainSingle();
+        GatewayTestWebAppFactory.RecordedDownstreamRequest forwarded = factory.ForwardedRequests.Single();
+        forwarded.RequestUri!.Host.Should().Be(expectedHost);
+        forwarded.RequestUri.AbsolutePath.Should().Be(expectedDownstreamPath);
+    }
 }

@@ -17,6 +17,7 @@ public sealed partial class AddTelemetryBatchValidator : AbstractValidator<AddTe
             .WithMessage("MacAddress must be a valid MAC address.");
 
         RuleFor(x => x.Items)
+            .Cascade(CascadeMode.Stop)
             .NotEmpty()
             .Must(items => items.Count <= MaxBatchSize)
             .WithMessage($"Batch must contain between 1 and {MaxBatchSize} telemetry items.");

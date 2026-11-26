@@ -138,7 +138,7 @@ func (rc *RolloutCampaign) UpdateTargetStatus(controllerId uuid.UUID, newStatus 
 	case TargetFlashing:
 		err = target.MarkAsFlashing()
 	case TargetSuccess:
-		target.MarkAsSuccess()
+		err = target.MarkAsSuccess()
 	case TargetFailed:
 		target.MarkAsFailed(errMsg)
 	default:

@@ -37,6 +37,25 @@ public class AddTelemetryBatchValidatorTests
     }
 
     [Fact]
+    public void Validate_WithNullItems_FailsValidationWithoutThrowing()
+    {
+        // Arrange
+        var command = new AddTelemetryBatchCommand
+        {
+            MacAddress = "AA:BB:CC:DD:EE:FF",
+            DeviceToken = "ak_token",
+            Items = null!
+        };
+
+        // Act
+        ValidationResult result = _validator.Validate(command);
+
+        // Assert
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.PropertyName == nameof(AddTelemetryBatchCommand.Items));
+    }
+
+    [Fact]
     public void Validate_WithOver50Items_FailsValidation()
     {
         // Arrange

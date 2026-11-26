@@ -1,5 +1,6 @@
 using BuildingBlocks.Domain.Results;
 using Device.Application.Features.Controllers.Command.AddController;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace Device.Application.UnitTests.Features.Controllers;
 
@@ -7,11 +8,12 @@ public class AddControllerHandlerTests
 {
     private readonly IDeviceTokenHasher _hasherMock = Substitute.For<IDeviceTokenHasher>();
     private readonly IControllerRepository _controllerRepoMock = Substitute.For<IControllerRepository>();
+    private readonly IFusionCache _cacheMock = Substitute.For<IFusionCache>();
     private readonly AddControllerHandler _handler;
 
     public AddControllerHandlerTests()
     {
-        _handler = new AddControllerHandler(_hasherMock, _controllerRepoMock);
+        _handler = new AddControllerHandler(_hasherMock, _controllerRepoMock, _cacheMock);
     }
 
     [Fact]
@@ -47,6 +49,9 @@ public class AddControllerHandlerTests
             Arg.Is<Controller>(c => c.DeviceTokenHash == expectedHash &&
                                     c.MacAddress.Value == TestConstants.ValidMacAddress),
             Arg.Any<CancellationToken>());
+        await _cacheMock.Received(1).RemoveAsync(
+            $"controller:mqtt-auth:{TestConstants.ValidMacAddress}",
+            token: Arg.Any<CancellationToken>());
     }
 
     [Fact]

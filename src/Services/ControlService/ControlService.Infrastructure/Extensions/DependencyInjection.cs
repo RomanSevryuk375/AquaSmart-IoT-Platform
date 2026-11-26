@@ -53,8 +53,8 @@ public static class DependencyInjection
         {
             cfg.AddConsumer<RelayCreatedEventConsumer>();
             cfg.AddConsumer<RelayDeletedEventConsumer>();
-            cfg.AddConsumer<RelayModeChangedComandConsumer>();
-            cfg.AddConsumer<RelayStateChangedComandConsumer>();
+            cfg.AddConsumer<RelayModeChangedComandConsumer>((_, c) => c.ConcurrentMessageLimit = 1);
+            cfg.AddConsumer<RelayStateChangedComandConsumer>((_, c) => c.ConcurrentMessageLimit = 1);
             cfg.AddConsumer<RelayUpdatedEventConsumer>();
 
             cfg.AddConsumer<SensorCreatedEventconsumer>();

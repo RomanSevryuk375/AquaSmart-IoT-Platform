@@ -31,7 +31,7 @@ public sealed class ValidateDeviceTokenByControllerIdHandler(
 
         ControllerTokenCacheItem? controllerData = await cache.GetOrSetAsync<ControllerTokenCacheItem?>(
             CacheKeys.ControllerTokenAuth(request.ControllerId),
-            async (_, _) =>
+            async (ctx, _) =>
             {
                 using IDbConnection connection = sqlConnectionFactory.CreateConnection();
                 const string Sql = """
@@ -44,8 +44,14 @@ public sealed class ValidateDeviceTokenByControllerIdHandler(
                     LIMIT 1;
                     """;
 
-                return await connection.QuerySingleOrDefaultAsync<ControllerTokenCacheItem>(
+                ControllerTokenCacheItem? item = await connection.QuerySingleOrDefaultAsync<ControllerTokenCacheItem>(
                     Sql, new { request.ControllerId });
+                if (item is null)
+                {
+                    ctx.Options.Duration = TimeSpan.Zero;
+                }
+
+                return item;
             },
             _cacheOptions,
             cancellationToken);

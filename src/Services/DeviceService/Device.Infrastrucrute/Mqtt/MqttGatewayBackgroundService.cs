@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -34,6 +35,7 @@ public sealed class MqttGatewayBackgroundService : BackgroundService, IMqttComma
     private readonly ILogger<MqttGatewayBackgroundService> _logger;
     private readonly IMqttClient _mqttClient;
     private readonly SemaphoreSlim _connectLock = new(1, 1);
+    private readonly ConcurrentDictionary<string, CancellationTokenSource> _pendingRedeliveries = new(StringComparer.OrdinalIgnoreCase);
     private CancellationToken _stoppingToken = CancellationToken.None;
 
     public MqttGatewayBackgroundService(
@@ -147,6 +149,13 @@ public sealed class MqttGatewayBackgroundService : BackgroundService, IMqttComma
 
     public override void Dispose()
     {
+        foreach (CancellationTokenSource cts in _pendingRedeliveries.Values)
+        {
+            cts.Cancel();
+            cts.Dispose();
+        }
+        _pendingRedeliveries.Clear();
+
         _mqttClient.Dispose();
         _connectLock.Dispose();
         base.Dispose();
@@ -355,6 +364,17 @@ public sealed class MqttGatewayBackgroundService : BackgroundService, IMqttComma
     private void SchedulePendingRedelivery(string topicMac)
     {
         int delayMs = Math.Max(0, _deviceSettings.OnlineRedeliveryDelayMs);
+        var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(_stoppingToken);
+
+        _pendingRedeliveries.AddOrUpdate(
+            topicMac,
+            linkedCts,
+            (_, existing) =>
+            {
+                existing.Cancel();
+                existing.Dispose();
+                return linkedCts;
+            });
 
         _ = Task.Run(async () =>
         {
@@ -362,16 +382,26 @@ public sealed class MqttGatewayBackgroundService : BackgroundService, IMqttComma
             {
                 if (delayMs > 0)
                 {
-                    await Task.Delay(delayMs, _stoppingToken);
+                    await Task.Delay(delayMs, linkedCts.Token);
                 }
 
                 using IServiceScope scope = _serviceScopeFactory.CreateScope();
                 IRelayCommandRetryService retryService = scope.ServiceProvider.GetRequiredService<IRelayCommandRetryService>();
-                await retryService.RedeliverPendingForControllerAsync(topicMac, _stoppingToken);
+                Result<int> redeliveryResult = await retryService.RedeliverPendingForControllerAsync(
+                    topicMac, linkedCts.Token);
+
+                if (redeliveryResult.IsFailure)
+                {
+                    _logger.LogWarning(
+                        "Delayed pending command redelivery failed for MAC {Mac}: {ErrorCode} - {ErrorMessage}",
+                        topicMac,
+                        redeliveryResult.Error.Code,
+                        redeliveryResult.Error.Message);
+                }
             }
-            catch (OperationCanceledException) when (_stoppingToken.IsCancellationRequested)
+            catch (OperationCanceledException) when (linkedCts.IsCancellationRequested)
             {
-                // Host is shutting down; ignore cancellation.
+                // Superseded by newer online notification or host is shutting down.
             }
             catch (Exception ex)
             {
@@ -380,7 +410,14 @@ public sealed class MqttGatewayBackgroundService : BackgroundService, IMqttComma
                     "Delayed pending command redelivery failed for reconnected MAC {Mac}.",
                     topicMac);
             }
-        }, _stoppingToken);
+            finally
+            {
+                if (_pendingRedeliveries.TryRemove(new KeyValuePair<string, CancellationTokenSource>(topicMac, linkedCts)))
+                {
+                    linkedCts.Dispose();
+                }
+            }
+        }, linkedCts.Token);
     }
 
     private async Task<bool> PublishJsonAsync<TPayload>(

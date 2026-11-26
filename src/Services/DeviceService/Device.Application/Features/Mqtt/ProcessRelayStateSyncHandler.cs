@@ -55,6 +55,11 @@ public sealed class ProcessRelayStateSyncHandler(
 
         foreach (MqttRelayStateItemDto item in request.Relays)
         {
+            if (item is null)
+            {
+                continue;
+            }
+
             if (item.RelayId == Guid.Empty || !relaysById.TryGetValue(item.RelayId, out Relay? relay))
             {
                 logger.LogWarning(

@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/google/uuid"
+	"github.com/romansevryuk375/aquasmart-firmware/internal/application"
 )
 
 type S3BlobStorage struct {
@@ -54,4 +55,32 @@ func (s *S3BlobStorage) GeneratePreSignedURL(ctx context.Context, storageKey str
 		return "", fmt.Errorf("failed to generate pre-signed url: %w", err)
 	}
 	return req.URL, nil
+}
+
+func (s *S3BlobStorage) GetFile(ctx context.Context, storageKey string) (*application.BlobObject, error) {
+	input := &s3.GetObjectInput{
+		Bucket: aws.String(s.bucketName),
+		Key:    aws.String(storageKey),
+	}
+
+	out, err := s.client.GetObject(ctx, input)
+	if err != nil {
+		return nil, fmt.Errorf("failed to download file from S3: %w", err)
+	}
+
+	contentLength := int64(-1)
+	if out.ContentLength != nil {
+		contentLength = *out.ContentLength
+	}
+
+	contentType := "application/octet-stream"
+	if out.ContentType != nil && *out.ContentType != "" {
+		contentType = *out.ContentType
+	}
+
+	return &application.BlobObject{
+		Body:          out.Body,
+		ContentLength: contentLength,
+		ContentType:   contentType,
+	}, nil
 }

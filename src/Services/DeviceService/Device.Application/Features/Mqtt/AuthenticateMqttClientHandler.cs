@@ -69,12 +69,17 @@ public sealed class AuthenticateMqttClientHandler(
 
         ControllerMqttAuthCacheItem? authItem = await cache.GetOrSetAsync<ControllerMqttAuthCacheItem?>(
             CacheKeys.ControllerMqttAuth(canonicalMac),
-            async (_, ct) =>
+            async (ctx, ct) =>
             {
                 Controller? controller = await controllerRepository.GetByMacAddressAsync(canonicalMac, ct);
-                return controller is null
-                    ? null
-                    : new ControllerMqttAuthCacheItem(controller.Id, controller.DeviceTokenHash);
+                if (controller is null)
+                {
+                    // Avoid negative cache poisoning when an ESP32 connects before controller registration.
+                    ctx.Options.Duration = TimeSpan.Zero;
+                    return null;
+                }
+
+                return new ControllerMqttAuthCacheItem(controller.Id, controller.DeviceTokenHash);
             },
             _cacheOptions,
             cancellationToken);

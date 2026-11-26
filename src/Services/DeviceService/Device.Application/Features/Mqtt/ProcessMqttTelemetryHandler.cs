@@ -59,7 +59,8 @@ public sealed class ProcessMqttTelemetryHandler(
 
         foreach (MqttTelemetryItemDto item in request.Items)
         {
-            if (item.SensorId == Guid.Empty ||
+            if (item is null ||
+                item.SensorId == Guid.Empty ||
                 !ownedSensorIds.Contains(item.SensorId) ||
                 string.IsNullOrWhiteSpace(item.ExternalMessageId) ||
                 item.ExternalMessageId.Length > MaxExternalMessageIdLength ||
