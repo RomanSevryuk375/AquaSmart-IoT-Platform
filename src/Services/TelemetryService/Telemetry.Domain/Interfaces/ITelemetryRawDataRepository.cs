@@ -25,4 +25,7 @@ public interface ITelemetryRawDataRepository : IRepository<RawTelemetry>
         DateTime from,
         DateTime to,
         CancellationToken cancellationToken = default);
+
+    public Task SaveBatchWithDuplicateHandlingAsync(
+        CancellationToken cancellationToken = default);
 }

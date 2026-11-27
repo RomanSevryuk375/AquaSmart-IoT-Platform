@@ -115,15 +115,21 @@ func (s *CampaignService) HandleTargetStatusUpdate(ctx context.Context, campaign
 		return fmt.Errorf("failed to get campaign: %w", err)
 	}
 	if rc == nil {
-		return errors.New("campaign not found")
+		return ErrCampaignNotFound
+	}
+	if rc.Status() != entities.RolloutCampaignActive {
+		return ErrCampaignNotActive
+	}
+	if _, exists := rc.FindTargets(controllerId); !exists {
+		return ErrControllerNotTarget
 	}
 
 	if err := rc.UpdateTargetStatus(controllerId, status, errorMsg); err != nil {
-		return fmt.Errorf("failed to update target status: %w", err)
+		return fmt.Errorf("%w: %v", ErrInvalidTargetStatusTransition, err)
 	}
 
 	if err = s.campaignRepo.Save(ctx, rc); err != nil {
-		return fmt.Errorf("failed to save campaign: %w:", err)
+		return fmt.Errorf("failed to save campaign: %w", err)
 	}
 	return nil
 }

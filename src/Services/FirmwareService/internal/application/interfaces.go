@@ -26,7 +26,24 @@ type CampaignRepository interface {
 	Delete(ctx context.Context, rc *entities.RolloutCampaign) error
 }
 
+type BlobObject struct {
+	Body          io.ReadCloser
+	ContentLength int64
+	ContentType   string
+}
+
 type BlobStorage interface {
 	UploadFile(ctx context.Context, fileStream io.Reader, expectedSizeBytes int) (string, error)
 	GeneratePreSignedURL(ctx context.Context, storageKey string) (string, error)
+	GetFile(ctx context.Context, storageKey string) (*BlobObject, error)
+}
+
+type DeviceAuthResult struct {
+	IsValid      bool
+	ControllerID uuid.UUID
+	UserID       uuid.UUID
+}
+
+type DeviceTokenValidator interface {
+	ValidateTokenByControllerID(ctx context.Context, controllerID uuid.UUID, deviceToken string) (*DeviceAuthResult, error)
 }

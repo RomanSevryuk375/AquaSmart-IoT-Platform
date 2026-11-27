@@ -297,4 +297,103 @@ public class TelemetryDataEndpointTests(E2ETestWebAppFactory factory) : BaseE2ET
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
+
+    [Fact]
+    public async Task ReceiveBatchTelemetry_WithoutDeviceTokenHeader_Returns401Unauthorized()
+    {
+        // Arrange
+        var payload = new AddTelemetryBatchRequestDto
+        {
+            MacAddress = TestConstants.ValidMacAddress,
+            Items =
+            [
+                new TelemetryBatchEventItem
+                {
+                    SensorId = Guid.NewGuid(),
+                    Value = 22.0,
+                    ExternalMessageId = "missing-header-1",
+                    RecordedAt = DateTime.UtcNow
+                }
+            ]
+        };
+
+        // Act
+        HttpResponseMessage response = await Client.PostAsJsonAsync("api/telemetry/v1/data", payload);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task ReceiveBatchTelemetry_WithEmptyItems_Returns400BadRequest()
+    {
+        // Arrange
+        var payload = new AddTelemetryBatchRequestDto
+        {
+            MacAddress = TestConstants.ValidMacAddress,
+            Items = []
+        };
+        Client.DefaultRequestHeaders.Add("X-Device-Token", TestConstants.ValidDeviceToken);
+
+        // Act
+        HttpResponseMessage response = await Client.PostAsJsonAsync("api/telemetry/v1/data", payload);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task ReceiveBatchTelemetry_WithOver50Items_Returns400BadRequest()
+    {
+        // Arrange
+        List<TelemetryBatchEventItem> items = Enumerable.Range(0, 51)
+            .Select(i => new TelemetryBatchEventItem
+            {
+                SensorId = Guid.NewGuid(),
+                Value = 20.0 + i,
+                ExternalMessageId = $"over-limit-{i}",
+                RecordedAt = DateTime.UtcNow
+            })
+            .ToList();
+
+        var payload = new AddTelemetryBatchRequestDto
+        {
+            MacAddress = TestConstants.ValidMacAddress,
+            Items = items
+        };
+        Client.DefaultRequestHeaders.Add("X-Device-Token", TestConstants.ValidDeviceToken);
+
+        // Act
+        HttpResponseMessage response = await Client.PostAsJsonAsync("api/telemetry/v1/data", payload);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task ReceiveBatchTelemetry_WithExternalMessageIdOver100Chars_Returns400BadRequest()
+    {
+        // Arrange
+        var payload = new AddTelemetryBatchRequestDto
+        {
+            MacAddress = TestConstants.ValidMacAddress,
+            Items =
+            [
+                new TelemetryBatchEventItem
+                {
+                    SensorId = Guid.NewGuid(),
+                    Value = 22.0,
+                    ExternalMessageId = new string('a', 101),
+                    RecordedAt = DateTime.UtcNow
+                }
+            ]
+        };
+        Client.DefaultRequestHeaders.Add("X-Device-Token", TestConstants.ValidDeviceToken);
+
+        // Act
+        HttpResponseMessage response = await Client.PostAsJsonAsync("api/telemetry/v1/data", payload);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
 }

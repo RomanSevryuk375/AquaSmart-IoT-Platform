@@ -1,10 +1,8 @@
 using BuildingBlocks.Domain.Abstractions;
-using Device.Application.Interfaces;
 
 namespace Device.Application.Features.RelayCommands.Command.SetRelayState;
 
-public sealed record SetRelayStateCommand
-    : ICommand, IControllerBoundRequest
+public sealed record SetRelayStateCommand : ICommand
 {
     public Guid UserId { get; init; }
     public Guid ControllerId { get; init; }

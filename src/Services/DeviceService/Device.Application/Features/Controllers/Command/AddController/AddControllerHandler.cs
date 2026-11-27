@@ -1,12 +1,15 @@
 using BuildingBlocks.Domain.Results;
+using Device.Application.Constants;
 using Device.Application.Interfaces;
 using MassTransit;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace Device.Application.Features.Controllers.Command.AddController;
 
 public sealed class AddControllerHandler(
     IDeviceTokenHasher tokenHasher,
-    IControllerRepository controllerRepository) : IRequestHandler<AddControllerCommand, Result<ControllerRegisteredResponse>>
+    IControllerRepository controllerRepository,
+    IFusionCache cache) : IRequestHandler<AddControllerCommand, Result<ControllerRegisteredResponse>>
 {
     public async Task<Result<ControllerRegisteredResponse>> Handle(
         AddControllerCommand request,
@@ -29,6 +32,9 @@ public sealed class AddControllerHandler(
         }
 
         await controllerRepository.AddAsync(controller.Value, cancellationToken);
+        await cache.RemoveAsync(
+            CacheKeys.ControllerMqttAuth(controller.Value.MacAddress.Value),
+            token: cancellationToken);
 
         return Result<ControllerRegisteredResponse>.Success(
             new ControllerRegisteredResponse

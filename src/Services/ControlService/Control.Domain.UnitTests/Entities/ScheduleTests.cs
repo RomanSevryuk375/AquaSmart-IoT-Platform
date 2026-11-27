@@ -62,7 +62,7 @@ public class ScheduleTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("CronSchedule.Invalid");
+        result.Error.Code.Should().Be("Schedule.Invalid");
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public class ScheduleTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("CronSchedule.Invalid");
+        result.Error.Code.Should().Be("Schedule.Invalid");
         schedule.CronExpression.Value.Should().Be("0 12 * * *");
         schedule.Version.Should().Be(initialVersion);
     }

@@ -1,5 +1,4 @@
 using BuildingBlocks.Domain.Constants;
-using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
 
 namespace Device.Application.Features.RelayCommands.Command.MarkAsFailed;
@@ -19,7 +18,7 @@ internal sealed class MarkAsFailedHandler(IRelayCommandsRepository queueReposito
                     string.Format(ErrorMessages.RelayCommandNotFound, request.CommandId)));
         }
 
-        if (command.Status == CommandStatus.Failed)
+        if (command.IsTerminal)
         {
             return Result.Success();
         }

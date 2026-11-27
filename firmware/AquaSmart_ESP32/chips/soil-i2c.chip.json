@@ -1,0 +1,15 @@
+{
+  "name": "I2C Soil Moisture",
+  "author": "AquaSmart",
+  "pins": ["VCC", "GND", "SCL", "SDA"],
+  "controls": [
+    {
+      "id": "moistureRaw",
+      "label": "Soil Raw (1200=Wet .. 3200=Dry)",
+      "type": "range",
+      "min": 1000,
+      "max": 3500,
+      "step": 50
+    }
+  ]
+}

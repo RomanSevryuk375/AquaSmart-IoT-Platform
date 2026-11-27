@@ -48,6 +48,7 @@ appsettings.Local.json
 .env.*
 !.env.example
 secrets/
+scripts/.dev-seed.json
 
 # Certificates
 *.pfx

@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Constants;
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
@@ -15,56 +16,51 @@ public static class SensorFactory
         string rawAddress,
         SensorType type)
     {
-        Result<DeviceName> nameResult = DeviceName.Create(rawName);
-        if (nameResult.IsFailure)
-        {
-            return Result<Sensor>.Failure(nameResult.Error);
-        }
-
-        Result<ConnectionAddress> addressResult = ConnectionAddress.Create(protocol, rawAddress);
-        if (addressResult.IsFailure)
-        {
-            return Result<Sensor>.Failure(addressResult.Error);
-        }
+        var errors = new List<string>();
 
         if (id == Guid.Empty)
         {
-            return Result<Sensor>.Failure(Error.Validation<Sensor>(
-                CommonErrors.IdEmpty));
+            errors.Add(CommonErrors.IdEmpty);
         }
 
         if (controllerId == Guid.Empty)
         {
-            return Result<Sensor>.Failure(Error.Validation<Sensor>(
-                ControllerErrors.ControllerIdEmpty));
+            errors.Add(ControllerErrors.ControllerIdEmpty);
         }
 
         if (userId == Guid.Empty)
         {
-            return Result<Sensor>.Failure(Error.Validation<Sensor>(
-                UserErrors.UserIdEmpty));
+            errors.Add(UserErrors.UserIdEmpty);
+        }
+
+        DeviceName? name = DomainGuard.Collect(DeviceName.Create(rawName), errors);
+        ConnectionAddress? address = DomainGuard.Collect(
+            ConnectionAddress.Create(protocol, rawAddress), errors);
+
+        if (!Enum.IsDefined(type))
+        {
+            errors.Add(SensorErrors.InvalidType);
+        }
+
+        if (errors.Count != 0)
+        {
+            return DomainGuard.ValidationFailure<Sensor>(errors);
         }
 
         DateTime now = DateTime.UtcNow;
 
-        Sensor? sensor = type switch
+        Sensor sensor = type switch
         {
             SensorType.Humidity => new HumiditySensor(
-                id, controllerId, userId, nameResult.Value, addressResult.Value, now),
+                id, controllerId, userId, name!, address!, now),
             SensorType.Pressure => new PressureSensor(
-                id, controllerId, userId, nameResult.Value, addressResult.Value, now),
+                id, controllerId, userId, name!, address!, now),
             SensorType.Temperature => new TemperatureSensor(
-                id, controllerId, userId, nameResult.Value, addressResult.Value, now),
+                id, controllerId, userId, name!, address!, now),
             SensorType.Voltage => new VoltageSensor(
-                id, controllerId, userId, nameResult.Value, addressResult.Value, now),
-
-            _ => null
+                id, controllerId, userId, name!, address!, now),
+            _ => throw new InvalidOperationException("Unreachable sensor type.")
         };
-
-        if (sensor is null)
-        {
-            return Result<Sensor>.Failure(Error.Validation<Sensor>(SensorErrors.InvalidType));
-        }
 
         sensor.RaiseCreatedEvent();
 

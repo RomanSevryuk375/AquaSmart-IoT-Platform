@@ -49,7 +49,7 @@ public class AutomationRuleTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Name.Invalid");
+        result.Error.Code.Should().Be("AutomationRule.Invalid");
     }
 
     [Fact]
@@ -287,10 +287,10 @@ public class AutomationRuleTests
     [InlineData(RuleAction.SwitchOn, 24.0, false)]
     [InlineData(RuleAction.SwitchOn, 25.0, null)]
     // SwitchOff Action:
-    // If Rule is triggered (true) -> return true
-    // If Rule is not triggered (false) -> return false
-    [InlineData(RuleAction.SwitchOff, 26.0, true)]
-    [InlineData(RuleAction.SwitchOff, 24.0, false)]
+    // If Rule is triggered (true) -> return false (SwitchOff)
+    // If Rule is not triggered (false) -> return true (SwitchOn)
+    [InlineData(RuleAction.SwitchOff, 26.0, false)]
+    [InlineData(RuleAction.SwitchOff, 24.0, true)]
     [InlineData(RuleAction.SwitchOff, 25.0, null)]
     public void EvaluateTargetState_SingleCondition_EvaluatesCorrectly(
         RuleAction action,

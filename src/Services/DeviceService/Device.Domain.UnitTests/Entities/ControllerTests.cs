@@ -136,7 +136,130 @@ public class ControllerTests
 
         // Assert
         controller.IsOnline.Should().BeFalse();
+        controller.OfflineAlertSent.Should().BeTrue();
         controller.DomainEvents.Should().ContainSingle()
             .Which.Should().BeOfType<ControllerNotOnlineDomainEvent>();
+    }
+
+    [Fact]
+    public void IncrementConfigVersion_OnMutation_IncrementsConfigVersionVersionAndRaisesEvent()
+    {
+        // Arrange
+        Controller controller = new ControllerBuilder().Build();
+        long initialConfigVersion = controller.ConfigVersion;
+        Guid initialVersion = controller.Version;
+
+        // Act
+        controller.IncrementConfigVersion("sensor_added");
+
+        // Assert
+        controller.ConfigVersion.Should().Be(initialConfigVersion + 1);
+        controller.Version.Should().NotBe(initialVersion);
+        controller.DomainEvents.Should().ContainSingle()
+            .Which.Should().BeOfType<ControllerConfigChangedDomainEvent>()
+            .Which.Should().Match<ControllerConfigChangedDomainEvent>(e =>
+                e.ControllerId == controller.Id &&
+                e.MacAddress == controller.MacAddress.Value &&
+                e.ConfigVersion == initialConfigVersion + 1 &&
+                e.Reason == "sensor_added");
+    }
+
+    [Fact]
+    public void RecordMqttOnline_WithDiagnostics_UpdatesOnlineLastSeenDiagnosticsAndResetsAlertFlag()
+    {
+        // Arrange
+        Controller controller = new ControllerBuilder().Build();
+        controller.SetOffline();
+        controller.ClearDomainEvents();
+        Guid versionBefore = controller.Version;
+
+        // Act
+        controller.RecordMqttOnline("1.2.3", "192.168.1.45", -58, 1240);
+
+        // Assert
+        controller.IsOnline.Should().BeTrue();
+        controller.OfflineAlertSent.Should().BeFalse();
+        controller.FirmwareVersion.Should().Be("1.2.3");
+        controller.IpAddress.Should().Be("192.168.1.45");
+        controller.Rssi.Should().Be(-58);
+        controller.UptimeSec.Should().Be(1240);
+        controller.Version.Should().NotBe(versionBefore);
+        controller.DomainEvents.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void MarkOfflineFromLwt_WhenOnline_SetsOfflineWithoutRaisingAlertEventAndPreservesLastSeenAt()
+    {
+        // Arrange
+        Controller controller = new ControllerBuilder().Build();
+        DateTime lastSeenBefore = controller.LastSeenAt;
+        Guid versionBefore = controller.Version;
+
+        // Act
+        controller.MarkOfflineFromLwt();
+
+        // Assert
+        controller.IsOnline.Should().BeFalse();
+        controller.OfflineAlertSent.Should().BeFalse();
+        controller.LastSeenAt.Should().Be(lastSeenBefore);
+        controller.Version.Should().NotBe(versionBefore);
+        controller.DomainEvents.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void MarkOfflineFromLwt_WhenAlreadyOffline_IsIdempotentDoesNotChangeVersionOrRaiseEvents()
+    {
+        // Arrange
+        Controller controller = new ControllerBuilder().AsOffline().Build();
+        Guid versionBefore = controller.Version;
+        DateTime lastSeenBefore = controller.LastSeenAt;
+
+        // Act
+        controller.MarkOfflineFromLwt();
+
+        // Assert
+        controller.IsOnline.Should().BeFalse();
+        controller.LastSeenAt.Should().Be(lastSeenBefore);
+        controller.Version.Should().Be(versionBefore);
+        controller.DomainEvents.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void MarkOfflineAlertSent_WhenNotSent_SetsFlagAndRaisesControllerNotOnlineDomainEvent()
+    {
+        // Arrange
+        Controller controller = new ControllerBuilder().AsOffline().Build();
+        Guid versionBefore = controller.Version;
+
+        // Act
+        controller.MarkOfflineAlertSent();
+
+        // Assert
+        controller.OfflineAlertSent.Should().BeTrue();
+        controller.Version.Should().NotBe(versionBefore);
+        controller.DomainEvents.Should().ContainSingle()
+            .Which.Should().BeOfType<ControllerNotOnlineDomainEvent>()
+            .Which.Should().Match<ControllerNotOnlineDomainEvent>(e =>
+                e.ControllerId == controller.Id &&
+                e.UserId == controller.UserId &&
+                e.LastSeenAt == controller.LastSeenAt);
+    }
+
+    [Fact]
+    public void MarkOfflineAlertSent_WhenAlreadySent_IsIdempotentNoOp()
+    {
+        // Arrange
+        Controller controller = new ControllerBuilder().AsOffline().Build();
+        controller.MarkOfflineAlertSent();
+        controller.ClearDomainEvents();
+        Guid versionBefore = controller.Version;
+
+        // Act
+        controller.MarkOfflineAlertSent();
+
+        // Assert
+        controller.OfflineAlertSent.Should().BeTrue();
+        controller.Version.Should().Be(versionBefore);
+        controller.DomainEvents.Should().BeEmpty();
     }
 }

@@ -177,6 +177,25 @@ public class ValidatorsTests
     }
 
     [Fact]
+    public void SetRelayStateValidator_WithTargetStateFalse_PassesValidation()
+    {
+        // Arrange
+        var validator = new SetRelayStateValidator();
+        var command = new SetRelayStateCommand
+        {
+            ControllerId = Guid.NewGuid(),
+            RelayId = Guid.NewGuid(),
+            TargetState = false
+        };
+
+        // Act
+        FluentValidation.Results.ValidationResult result = validator.Validate(command);
+
+        // Assert
+        result.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
     public void ToggleRelayStateValidator_ValidAndInvalid()
     {
         var validator = new ToggleRelayStateValidator();

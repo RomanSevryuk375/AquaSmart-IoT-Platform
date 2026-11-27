@@ -1,0 +1,12 @@
+[wokwi]
+version = 1
+firmware = '.pio/build/esp32dev/firmware.bin'
+elf = '.pio/build/esp32dev/firmware.elf'
+
+[[chip]]
+name = 'aht20'
+binary = 'chips/aht20.chip.wasm'
+
+[[chip]]
+name = 'soil-i2c'
+binary = 'chips/soil-i2c.chip.wasm'

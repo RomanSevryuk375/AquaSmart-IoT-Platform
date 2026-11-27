@@ -1,9 +1,11 @@
 // Ignore Spelling: Hmac
 
+using BuildingBlocks.Domain.Results;
 using BuildingBlocks.Presentation.Constants;
 using Device.Application.Interfaces;
 using Device.Domain.Entities;
 using Device.Domain.Interfaces;
+using Device.Domain.ValueObjects;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace Device.API.Filters;
@@ -61,16 +63,20 @@ public class DeviceAuthenticationFilter(
             return Results.Unauthorized();
         }
 
-        if (DeviceAuthenticationFilterHelpers.TryGetMacAddress(httpContext, out string requestMac) &&
-            !string.Equals(controller.MacAddress, requestMac, StringComparison.OrdinalIgnoreCase))
+        if (DeviceAuthenticationFilterHelpers.TryGetMacAddress(httpContext, out string requestMac))
         {
-            logger.LogWarning(
-                "Device auth failed: MAC address mismatch for Controller {ControllerId}. Expected: {ExpectedMac}, Received: {ReceivedMac}.",
-                controller.Id,
-                controller.MacAddress,
-                requestMac);
+            Result<MacAddress> normalizedRequestMac = MacAddress.Create(requestMac);
+            string comparableMac = normalizedRequestMac.IsSuccess ? normalizedRequestMac.Value.Value : requestMac;
+            if (!string.Equals(controller.MacAddress, comparableMac, StringComparison.OrdinalIgnoreCase))
+            {
+                logger.LogWarning(
+                    "Device auth failed: MAC address mismatch for Controller {ControllerId}. Expected: {ExpectedMac}, Received: {ReceivedMac}.",
+                    controller.Id,
+                    controller.MacAddress,
+                    requestMac);
 
-            return Results.StatusCode(StatusCodes.Status403Forbidden);
+                return Results.StatusCode(StatusCodes.Status403Forbidden);
+            }
         }
 
         httpContext.Items[HttpContextItemKey] = controller;
@@ -140,12 +146,14 @@ public class DeviceAuthenticationFilter(
 
     private async Task<ControllerAuthCacheItem?> GetControllerByMacAdddressAsync(string macAddress, CancellationToken cancellationToken)
     {
-        string cacheKey = $"controller:mac:{macAddress}";
+        Result<MacAddress> normalized = MacAddress.Create(macAddress);
+        string cacheMac = normalized.IsSuccess ? normalized.Value.Value : macAddress;
+        string cacheKey = $"controller:mac:{cacheMac}";
         return await fusionCache.GetOrSetAsync<ControllerAuthCacheItem?>(
             cacheKey,
             async (ctx, ct) =>
             {
-                Domain.Entities.Controller? c = await controllerRepository.GetByMacAddressAsync(macAddress, ct);
+                Domain.Entities.Controller? c = await controllerRepository.GetByMacAddressAsync(cacheMac, ct);
                 return c is not null
                     ? new ControllerAuthCacheItem(c.Id, c.MacAddress.Value, c.DeviceTokenHash)
                     : null;

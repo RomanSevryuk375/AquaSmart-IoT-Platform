@@ -29,11 +29,9 @@ public sealed class SyncRelayUpdatedHandler(
             return Result.Success();
         }
 
-        DateTime expireAt = DateTime.UtcNow.AddMinutes(5);
-
         existingRelay!.SetPurpose(request.Purpose);
-        existingRelay.SetMode(request.IsManual);
-        existingRelay.SetState(request.IsActive, expireAt);
+        existingRelay.SyncMode(request.IsManual);
+        existingRelay.SyncState(request.IsActive);
         Result nameResult = existingRelay.SetName(request.Name);
         if (nameResult.IsFailure)
         {

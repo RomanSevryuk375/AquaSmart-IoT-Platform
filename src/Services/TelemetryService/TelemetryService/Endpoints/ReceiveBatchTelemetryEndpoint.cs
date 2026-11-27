@@ -15,10 +15,15 @@ public sealed class ReceiveBatchTelemetryEndpoint : IEndpoint
     {
         app.MapPost($"{ApiConstants.Routes.Data}", async (
             [FromBody] AddTelemetryBatchRequestDto request,
-            [FromHeader(Name = ApiConstants.Headers.DeviceToken)] string deviceToken,
+            [FromHeader(Name = ApiConstants.Headers.DeviceToken)] string? deviceToken,
             ISender sender,
             CancellationToken cancellationToken) =>
         {
+            if (string.IsNullOrWhiteSpace(deviceToken))
+            {
+                return Results.Unauthorized();
+            }
+
             var command = new AddTelemetryBatchCommand
             {
                 MacAddress = request.MacAddress,

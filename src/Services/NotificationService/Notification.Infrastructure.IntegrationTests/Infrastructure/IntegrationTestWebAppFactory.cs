@@ -1,4 +1,4 @@
-using BuildingBlocks.IntegrationTests;
+using BuildingBlocks.TestShared;
 using Microsoft.AspNetCore.TestHost;
 using Notification.Domain.Interfaces;
 using Notification.Infrastructure.Persistence;

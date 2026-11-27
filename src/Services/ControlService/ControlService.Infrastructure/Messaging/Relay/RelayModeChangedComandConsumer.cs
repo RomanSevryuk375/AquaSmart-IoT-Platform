@@ -6,4 +6,4 @@ using MediatR;
 namespace Control.Infrastructure.Messaging.Relay;
 
 internal sealed class RelayModeChangedComandConsumer(ISender sender, IMapper mapper) :
-    MediatRIntegrationEventConsumer<RelayModeChangedEvent, SyncRelayModeCommand>(sender, mapper);
+    MediatRIntegrationEventConsumer<RelayModeSyncedEvent, SyncRelayModeCommand>(sender, mapper);

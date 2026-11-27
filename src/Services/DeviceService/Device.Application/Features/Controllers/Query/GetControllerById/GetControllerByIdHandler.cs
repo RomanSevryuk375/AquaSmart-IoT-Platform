@@ -17,7 +17,18 @@ public sealed class GetControllerByIdHandler(ISqlConnectionFactory sqlConnection
         using IDbConnection connection = sqlConnectionFactory.CreateConnection();
 
         const string Sql = """
-            SELECT id, mac_address, name, is_online, last_seen_at
+            SELECT
+                id,
+                mac_address,
+                name,
+                is_online,
+                last_seen_at,
+                config_version,
+                firmware_version,
+                ip_address,
+                rssi,
+                uptime_sec,
+                offline_alert_sent
             FROM controllers
             WHERE id = @ControllerId
               AND user_id = @UserId

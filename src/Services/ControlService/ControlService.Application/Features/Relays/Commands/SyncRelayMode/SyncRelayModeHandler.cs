@@ -18,7 +18,7 @@ public sealed class SyncRelayModeHandler(IRelayRepository relayRepository)
                 $"Relay {request.RelayId} not found. "));
         }
 
-        existingRelay.SetMode(request.IsManual);
+        existingRelay.SyncMode(request.IsManual);
 
         return Result.Success();
     }

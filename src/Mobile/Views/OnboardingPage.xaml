@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Mobile.ViewModels"
+             xmlns:models="clr-namespace:Mobile.Models"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
+             xmlns:loc="clr-namespace:Mobile.Converters"
+             x:Class="Mobile.Views.OnboardingPage"
+             x:DataType="vm:OnboardingViewModel"
+             BackgroundColor="#FFFFFF"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="20,36,20,24">
+        <!-- Top bar: Segmented progress dashes + Skip button -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+            <!-- 5 Segmented dashes -->
+            <HorizontalStackLayout Grid.Column="0" Spacing="6" VerticalOptions="Center">
+                <Border x:Name="Dash0" WidthRequest="36" HeightRequest="4" StrokeShape="RoundRectangle 2" BackgroundColor="#4152B0" StrokeThickness="0" />
+                <Border x:Name="Dash1" WidthRequest="36" HeightRequest="4" StrokeShape="RoundRectangle 2" BackgroundColor="#DCE2F9" StrokeThickness="0" />
+                <Border x:Name="Dash2" WidthRequest="36" HeightRequest="4" StrokeShape="RoundRectangle 2" BackgroundColor="#DCE2F9" StrokeThickness="0" />
+                <Border x:Name="Dash3" WidthRequest="36" HeightRequest="4" StrokeShape="RoundRectangle 2" BackgroundColor="#DCE2F9" StrokeThickness="0" />
+                <Border x:Name="Dash4" WidthRequest="36" HeightRequest="4" StrokeShape="RoundRectangle 2" BackgroundColor="#DCE2F9" StrokeThickness="0" />
+            </HorizontalStackLayout>
+
+            <!-- Skip button -->
+            <Button Grid.Column="1"
+                    Text="{loc:Translate Onboarding_Skip}"
+                    Command="{Binding SkipCommand}"
+                    TextColor="#4152B0"
+                    BackgroundColor="Transparent"
+                    FontFamily="OpenSansSemibold"
+                    FontSize="13"
+                    Padding="8,4" />
+        </Grid>
+
+        <!-- Center: Carousel of Slides -->
+        <CarouselView x:Name="Carousel"
+                      Grid.Row="1"
+                      ItemsSource="{Binding Slides}"
+                      Position="{Binding CurrentPosition, Mode=TwoWay}"
+                      IsSwipeEnabled="True">
+            <CarouselView.ItemTemplate>
+                <DataTemplate x:DataType="models:OnboardingSlideModel">
+                    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="18">
+                        <!-- Mascot Banner Card -->
+                        <controls:FishMascotCard Grid.Row="0"
+                                                 BadgeText="{Binding BadgeText}"
+                                                 HeightOverride="240"
+                                                 HorizontalOptions="Fill" />
+
+                        <!-- Title -->
+                        <Label Grid.Row="1"
+                               Text="{Binding Title}"
+                               TextColor="#141414"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Start" />
+
+                        <!-- Description -->
+                        <Label Grid.Row="2"
+                               Text="{Binding Description}"
+                               TextColor="#6E6E6E"
+                               FontFamily="OpenSansRegular"
+                               FontSize="14"
+                               LineHeight="1.35"
+                               HorizontalTextAlignment="Start" />
+                    </Grid>
+                </DataTemplate>
+            </CarouselView.ItemTemplate>
+        </CarouselView>
+
+        <!-- Bottom: Next / Finish button -->
+        <VerticalStackLayout Grid.Row="2" x:Name="BottomContainer" Spacing="16" Margin="0,12,0,0">
+            <Button x:Name="NextButton"
+                    Text="{loc:Translate Onboarding_Next}"
+                    Command="{Binding NextOrFinishCommand}"
+                    BackgroundColor="#4152B0"
+                    TextColor="#FFFFFF"
+                    FontFamily="OpenSansSemibold"
+                    FontSize="15"
+                    CornerRadius="12"
+                    HeightRequest="48">
+                <Button.Shadow>
+                    <Shadow Brush="#254152B0" Offset="0,4" Radius="8" Opacity="0.6" />
+                </Button.Shadow>
+            </Button>
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

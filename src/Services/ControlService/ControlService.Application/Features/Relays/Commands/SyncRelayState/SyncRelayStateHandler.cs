@@ -18,9 +18,7 @@ public sealed class SyncRelayStateHandler(IRelayRepository relayRepository)
                 $"Relay {request.RelayId} not found. "));
         }
 
-        DateTime expireAt = request.ExpireAt ?? DateTime.UtcNow.AddMinutes(5);
-
-        existingRelay.SetState(request.TargetState, expireAt);
+        existingRelay.SyncState(request.IsActive);
 
         return Result.Success();
     }

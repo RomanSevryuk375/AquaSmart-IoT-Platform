@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:loc="clr-namespace:Mobile.Converters"
+             x:Class="Mobile.MainPage"
+             BackgroundColor="#4152B0"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False">
+
+    <Grid RowDefinitions="*,Auto"
+          Padding="0">
+
+        <!-- Center Section: Brand Logo (SMART AQUA + Fish) and Preloader -->
+        <Grid Grid.Row="0"
+              VerticalOptions="Center"
+              HorizontalOptions="Center">
+
+            <!-- Preloader Animation Container (Figma Preloader 8-stage component) -->
+            <Grid x:Name="PreloaderContainer"
+                  WidthRequest="144"
+                  HeightRequest="91"
+                  HorizontalOptions="Center"
+                  VerticalOptions="Center"
+                  TranslationX="-320">
+
+                <!-- Swimming Fish Mascot (without bubbles) -->
+                <Image x:Name="SwimmingFish"
+                       Source="preloader_fish.png"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"
+                       Aspect="AspectFit" />
+
+                <!-- Rising Bubble 1 (exact Figma vector position) -->
+                <Image x:Name="Bubble1"
+                       Source="preloader_bubble1.png"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"
+                       Aspect="AspectFit"
+                       Opacity="0"
+                       Scale="0.3" />
+
+                <!-- Rising Bubble 2 (exact Figma vector position) -->
+                <Image x:Name="Bubble2"
+                       Source="preloader_bubble2.png"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"
+                       Aspect="AspectFit"
+                       Opacity="0"
+                       Scale="0.3" />
+
+                <!-- Rising Bubble 3 (exact Figma vector position) -->
+                <Image x:Name="Bubble3"
+                       Source="preloader_bubble3.png"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"
+                       Aspect="AspectFit"
+                       Opacity="0"
+                       Scale="0.3" />
+            </Grid>
+
+            <!-- Final Brand Logo Image (SMART AQUA + Mascot) -->
+            <Image x:Name="LogoImage"
+                   Source="smart_aqua_logo.png"
+                   WidthRequest="320"
+                   Aspect="AspectFit"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   Opacity="0"
+                   Scale="0.88" />
+        </Grid>
+
+        <!-- Bottom Actions Section: Onboarding & Authorization Buttons -->
+        <VerticalStackLayout Grid.Row="1"
+                             x:Name="ActionsContainer"
+                             VerticalOptions="End"
+                             Spacing="12"
+                             Padding="24,0,24,48"
+                             Opacity="0"
+                             TranslationY="30">
+
+            <!-- "Знакомство с приложением" Button -->
+            <Button x:Name="OnboardingBtn"
+                    Text="{loc:Translate Main_ExploreApp}"
+                    BackgroundColor="#EDEFFB"
+                    TextColor="#4152B0"
+                    FontFamily="OpenSansSemibold"
+                    FontSize="16"
+                    CornerRadius="12"
+                    HeightRequest="52"
+                    Clicked="OnOnboardingClicked">
+                <Button.Shadow>
+                    <Shadow Brush="#1A000000"
+                            Offset="0,4"
+                            Radius="8"
+                            Opacity="0.8" />
+                </Button.Shadow>
+            </Button>
+
+            <!-- "Авторизация" Button -->
+            <Button x:Name="AuthBtn"
+                    Text="{loc:Translate Main_Auth}"
+                    BackgroundColor="#EDEFFB"
+                    TextColor="#4152B0"
+                    FontFamily="OpenSansSemibold"
+                    FontSize="16"
+                    CornerRadius="12"
+                    HeightRequest="52"
+                    Clicked="OnAuthorizationClicked">
+                <Button.Shadow>
+                    <Shadow Brush="#1A000000"
+                            Offset="0,4"
+                            Radius="8"
+                            Opacity="0.8" />
+                </Button.Shadow>
+            </Button>
+        </VerticalStackLayout>
+    </Grid>
+
+</ContentPage>

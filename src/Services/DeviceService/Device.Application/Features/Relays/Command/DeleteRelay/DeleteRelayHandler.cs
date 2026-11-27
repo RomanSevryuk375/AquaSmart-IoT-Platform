@@ -2,7 +2,9 @@ using BuildingBlocks.Domain.Results;
 
 namespace Device.Application.Features.Relays.Command.DeleteRelay;
 
-public sealed class DeleteRelayHandler(IRelayRepository relayRepository)
+public sealed class DeleteRelayHandler(
+    IRelayRepository relayRepository,
+    IControllerRepository controllerRepository)
     : IRequestHandler<DeleteRelayCommand, Result>
 {
     public async Task<Result> Handle(
@@ -12,9 +14,13 @@ public sealed class DeleteRelayHandler(IRelayRepository relayRepository)
         Relay? existingRelay = await relayRepository.GetByIdAsync(
             request.RelayId, cancellationToken);
 
-        existingRelay!.MarkAsDeleted(request.UserId);
+        Guid controllerId = existingRelay!.ControllerId;
+        existingRelay.MarkAsDeleted(request.UserId);
 
         await relayRepository.DeleteAsync(request.RelayId, cancellationToken);
+
+        Controller? controller = await controllerRepository.GetByIdAsync(controllerId, cancellationToken);
+        controller?.IncrementConfigVersion("relay_deleted");
 
         return Result.Success();
     }

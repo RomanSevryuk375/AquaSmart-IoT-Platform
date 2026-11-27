@@ -20,6 +20,44 @@ public class MacAddressTests
     }
 
     [Theory]
+    [InlineData("aa:bb:cc:dd:ee:ff", "AA:BB:CC:DD:EE:FF")]
+    [InlineData("aa-bb-cc-dd-ee-ff", "AA:BB:CC:DD:EE:FF")]
+    [InlineData("AA-BB-CC-DD-EE-FF", "AA:BB:CC:DD:EE:FF")]
+    [InlineData("aabbccddeeff", "AA:BB:CC:DD:EE:FF")]
+    [InlineData("AABBCCDDEEFF", "AA:BB:CC:DD:EE:FF")]
+    [InlineData("  aaBbCcDdEeFf  ", "AA:BB:CC:DD:EE:FF")]
+    public void Create_WithCompactHexOrColonFormat_ProducesCanonicalUppercaseColonFormat(
+        string input,
+        string expectedCanonical)
+    {
+        // Act
+        Result<MacAddress> result = MacAddress.Create(input);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Value.Should().Be(expectedCanonical);
+        result.Value.ToCompactHex().Should().Be("AABBCCDDEEFF");
+    }
+
+    [Theory]
+    [InlineData("AA:BB:CC:DD:EE:FF", "AABBCCDDEEFF")]
+    [InlineData("aa:bb:cc:dd:ee:ff", "AABBCCDDEEFF")]
+    [InlineData("aa-bb-cc-dd-ee-ff", "AABBCCDDEEFF")]
+    [InlineData("aabbccddeeff", "AABBCCDDEEFF")]
+    [InlineData("  00-1A-2b-3c-4D-5e ", "001A2B3C4D5E")]
+    public void NormalizeToCompactHex_WithColonsDashesOrLowercase_Returns12CharUppercaseHex(
+        string input,
+        string expectedCompactHex)
+    {
+        // Act
+        Result<string> result = MacAddress.NormalizeToCompactHex(input);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(expectedCompactHex);
+    }
+
+    [Theory]
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null!)]
@@ -50,13 +88,15 @@ public class MacAddressTests
     [Theory]
     [InlineData("00:1A:2B:3C:4D:5Z")]
     [InlineData("00-1A-2B-3C-4D_5E")]
-    public void Create_WithInvalidFormat_ReturnsValidationFailure(string invalidMac)
+    [InlineData("AABBCCDDEEFG")]
+    [InlineData("AABBCCDDEEF")]
+    [InlineData("AABBCCDDEEFF1")]
+    public void Create_WithInvalidLengthOrChars_ReturnsFailure(string invalidMac)
     {
         // Act
         Result<MacAddress> result = MacAddress.Create(invalidMac);
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Message.Should().Be(ControllerErrors.InvalidMacAddressFormat);
     }
 }

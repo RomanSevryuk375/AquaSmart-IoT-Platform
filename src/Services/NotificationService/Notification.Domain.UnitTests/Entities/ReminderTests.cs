@@ -31,7 +31,7 @@ public class ReminderTests
         result.Value.LastNotifiedAt.Should().BeNull();
         result.Value.NextDueAt.Should().BeCloseTo(DateTime.UtcNow.AddDays(intervalDays), TimeSpan.FromSeconds(5));
         result.Value.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
-        result.Value.Version.Should().Be(Guid.Empty);
+        result.Value.Version.Should().NotBeEmpty();
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class ReminderTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Name.Invalid");
+        result.Error.Code.Should().Be("Reminder.Invalid");
     }
 
     [Fact]
@@ -159,7 +159,7 @@ public class ReminderTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Name.Invalid");
+        result.Error.Code.Should().Be("Reminder.Invalid");
         reminder.Version.Should().Be(initialVersion);
     }
 

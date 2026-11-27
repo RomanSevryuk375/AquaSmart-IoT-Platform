@@ -2,6 +2,7 @@ using BuildingBlocks.Domain.Results;
 using Contracts.gRPC.Devices;
 using Device.Application.Features.Integrations.GetDeviceMetadata;
 using Device.Application.Features.Integrations.ValidateDeviceToken;
+using Device.Application.Features.Integrations.ValidateDeviceTokenByControllerId;
 using Device.Application.Features.Integrations.ValidateHardwareAssignment;
 using Grpc.Core;
 using MediatR;
@@ -49,6 +50,36 @@ public sealed class DeviceIntegrationEndpoint(ISender sender)
         var query = new ValidateDeviceTokenQuery
         {
             MacAddress = request.MacAddress,
+            RawDeviceToken = request.DeviceToken,
+        };
+
+        Result<ValidateDeviceTokenDto> result = await sender.Send(query, context.CancellationToken);
+        if (result.IsFailure)
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, result.Error.Message));
+        }
+
+        return new ValidateTokenResponse
+        {
+            IsValid = result.Value.IsValid,
+            ControllerId = result.Value.ControllerId.ToString(),
+            UserId = result.Value.UserId.ToString(),
+        };
+    }
+
+    public override async Task<ValidateTokenResponse> ValidateTokenByControllerId(
+        ValidateTokenByControllerIdRequest request,
+        ServerCallContext context)
+    {
+        if (string.IsNullOrWhiteSpace(request.DeviceToken) ||
+            !Guid.TryParse(request.ControllerId, out Guid controllerId))
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid device token or controller ID"));
+        }
+
+        var query = new ValidateDeviceTokenByControllerIdQuery
+        {
+            ControllerId = controllerId,
             RawDeviceToken = request.DeviceToken,
         };
 

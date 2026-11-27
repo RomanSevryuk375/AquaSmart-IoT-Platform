@@ -14,12 +14,14 @@ bool RtcClock::update(ErrorCode& errorCode, bool wifiConnected) {
         if (syncFromNtp()) {
             _lastSyncAtMs = nowMs;
             _timeValid = true;
+            _syncedFromNtp = true;
             return true;
         }
     }
 
     if (!_timeValid && syncFromRtc()) {
         _timeValid = true;
+        _syncedFromNtp = false;
         return true;
     }
 
@@ -30,12 +32,62 @@ bool RtcClock::update(ErrorCode& errorCode, bool wifiConnected) {
     return _timeValid;
 }
 
+bool RtcClock::syncFromServerEpoch(int64_t epochSec) {
+    if (epochSec <= 1704067200LL) {  // 2024-01-01T00:00:00Z
+        return false;
+    }
+
+    timeval tv{};
+    tv.tv_sec = static_cast<time_t>(epochSec);
+    tv.tv_usec = 0;
+    settimeofday(&tv, nullptr);
+
+    if (_rtcAvailable) {
+        _rtc.adjust(DateTime(static_cast<uint32_t>(epochSec)));
+    }
+
+    _timeValid = true;
+    _lastSyncAtMs = millis();
+    return true;
+}
+
 bool RtcClock::isTimeValid() const {
     return _timeValid;
 }
 
 bool RtcClock::isRtcAvailable() const {
     return _rtcAvailable;
+}
+
+bool RtcClock::isSyncedFromNtp() const {
+    return _syncedFromNtp;
+}
+
+void RtcClock::getShortTime(char* out, size_t outSize) const {
+    if (!_timeValid) {
+        snprintf(out, outSize, "--:--");
+        return;
+    }
+    time_t now = time(nullptr);
+    struct tm utcTime {};
+    gmtime_r(&now, &utcTime);
+    snprintf(out, outSize, "%02d:%02d", utcTime.tm_hour, utcTime.tm_min);
+}
+
+void RtcClock::getFullDateTime(char* out, size_t outSize) const {
+    if (!_timeValid) {
+        snprintf(out, outSize, "---- -- -- --:--");
+        return;
+    }
+    time_t now = time(nullptr);
+    struct tm utcTime {};
+    gmtime_r(&now, &utcTime);
+    snprintf(out, outSize, "%04d-%02d-%02d %02d:%02d",
+             utcTime.tm_year + 1900,
+             utcTime.tm_mon + 1,
+             utcTime.tm_mday,
+             utcTime.tm_hour,
+             utcTime.tm_min);
 }
 
 String RtcClock::getIsoTimestampUtc() const {

@@ -1,8 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
         <ProjectReference Include="..\ControlService.Application\Control.Application.csproj" />
         <ProjectReference Include="..\ControlService.Domain\Control.Domain.csproj" />
         <ProjectReference Include="..\ControlService.Infrastructure\Control.Infrastructure.csproj" />
         <ProjectReference Include="..\ControlService\Control.API.csproj" />
+        <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.ArchitectureTestShared\BuildingBlocks.ArchitectureTestShared.csproj" />
     </ItemGroup>
 </Project>

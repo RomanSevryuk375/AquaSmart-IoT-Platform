@@ -1,4 +1,4 @@
-using IdentityService.Domain.ValueObjects;
+using BuildingBlocks.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace IdentityService.Infrastructure.Persistence.Converters;

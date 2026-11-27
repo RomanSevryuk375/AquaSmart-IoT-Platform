@@ -29,5 +29,6 @@ public static class ApiConstants
         public const string TelegramBotSecret = "X-Bot-Secret";
         public const string HmacSignature = "X-Signature";
         public const string Timestamp = "X-Timestamp";
+        public const string InternalApiKey = "X-Internal-Api-Key";
     }
 }

@@ -2,7 +2,7 @@ namespace BuildingBlocks.Domain.Abstractions;
 
 public abstract class AggregateRoot : IHasDomainEvents, IHasVersion
 {
-    public Guid Version { get; private set; }
+    public Guid Version { get; private set; } = Guid.NewGuid();
 
     private readonly List<IDomainEvent> _domainEvents = [];
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();

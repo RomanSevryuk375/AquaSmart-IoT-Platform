@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
 using Device.Domain.Events.SensorEvents;
@@ -50,28 +51,20 @@ public abstract class Sensor : AggregateRoot, IEntity
         string rawConnectionAddress)
     {
         var errors = new List<string>();
-        Result<DeviceName> nameResut = DeviceName.Create(rawName);
-        if (nameResut.IsFailure)
-        {
-            errors.Add(nameResut.Error.Message);
-        }
 
-        Result<ConnectionAddress> addressResult = ConnectionAddress.Create(
-            connectionProtocol, rawConnectionAddress);
-        if (addressResult.IsFailure)
-        {
-            errors.Add(addressResult.Error.Message);
-        }
+        DomainGuard.CheckNotEmpty(controllerId, nameof(ControllerId), errors);
+        DeviceName? name = DomainGuard.Collect(DeviceName.Create(rawName), errors);
+        ConnectionAddress? address = DomainGuard.Collect(
+            ConnectionAddress.Create(connectionProtocol, rawConnectionAddress), errors);
 
         if (errors.Count != 0)
         {
-            return Result.Failure(Error.Validation<Sensor>(
-                string.Join(", ", errors)));
+            return Result.Failure(Error.Validation<Sensor>(string.Join(", ", errors)));
         }
 
         ControllerId = controllerId;
-        Name = nameResut.Value;
-        ConnectionAddress = addressResult.Value;
+        Name = name!;
+        ConnectionAddress = address!;
 
         RaiseEvent(new SensorUpdatedDomainEvent
         {

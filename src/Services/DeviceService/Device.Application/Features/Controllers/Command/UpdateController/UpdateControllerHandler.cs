@@ -22,11 +22,20 @@ internal sealed class UpdateControllerHandler(
                 string.Format(ErrorMessages.ControllerNotFound, request.ControllerId)));
         }
 
+        string previousMac = controller.MacAddress.Value;
         Result? result = controller.Update(request.MacAddress, request.Name);
         if (result.IsSuccess)
         {
             await cache.RemoveAsync(CacheKeys.Controller(
                 request.UserId, request.ControllerId), token: cancellationToken);
+            await cache.RemoveAsync(CacheKeys.ControllerTokenAuth(request.ControllerId), token: cancellationToken);
+            await cache.RemoveAsync(CacheKeys.ControllerMqttAuth(previousMac), token: cancellationToken);
+
+            string updatedMac = controller.MacAddress.Value;
+            if (!string.Equals(previousMac, updatedMac, StringComparison.Ordinal))
+            {
+                await cache.RemoveAsync(CacheKeys.ControllerMqttAuth(updatedMac), token: cancellationToken);
+            }
         }
 
         return result.IsFailure

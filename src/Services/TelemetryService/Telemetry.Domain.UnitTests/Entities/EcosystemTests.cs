@@ -23,7 +23,7 @@ public class EcosystemTests
         result.Value.ControllerId.Should().Be(controllerId);
         result.Value.UserId.Should().Be(userId);
         result.Value.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
-        result.Value.Version.Should().BeEmpty();
+        result.Value.Version.Should().NotBeEmpty();
     }
 
     [Fact]
@@ -40,6 +40,6 @@ public class EcosystemTests
         ecosystem.Id.Should().NotBeEmpty();
         ecosystem.ControllerId.Should().NotBeEmpty();
         ecosystem.UserId.Should().NotBeEmpty();
-        ecosystem.Version.Should().BeEmpty();
+        ecosystem.Version.Should().NotBeEmpty();
     }
 }

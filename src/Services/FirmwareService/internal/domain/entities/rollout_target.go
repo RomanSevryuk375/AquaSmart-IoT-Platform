@@ -78,9 +78,13 @@ func (t *RolloutTarget) MarkAsFlashing() error {
 	return nil
 }
 
-func (t *RolloutTarget) MarkAsSuccess() {
+func (t *RolloutTarget) MarkAsSuccess() error {
+	if t.status == TargetFailed {
+		return errors.New("cannot mark failed target as success")
+	}
 	t.status = TargetSuccess
 	t.updatedAt = time.Now().UTC()
+	return nil
 }
 
 func (t *RolloutTarget) MarkAsFailed(err string) {

@@ -15,6 +15,7 @@ public static class DependencyInjection
         Assembly assembly = typeof(DependencyInjection).Assembly;
 
         services.AddScoped<IControllerOfflineCheckerService, ControllerOfflineCheckerService>();
+        services.AddScoped<IRelayCommandRetryService, RetryRelayCommandsService>();
         services.AddScoped<IDeviceSecurityService, DeviceSecurityService>();
         services.AddSingleton<IDeviceTokenHasher, HmacDeviceTokenHasher>();
         services.AddSingleton<IMyHasher, MyHasher>();
@@ -38,6 +39,8 @@ public static class DependencyInjection
         services.AddAutoMapper(cfg => cfg.AddMaps(assembly));
 
         services.Configure<DeviceSettings>(configuration.GetSection(DeviceSettings.SectionName));
+        services.Configure<MqttOptions>(configuration.GetSection(MqttOptions.SectionName));
+        services.Configure<MqttBrokerOptions>(configuration.GetSection(MqttBrokerOptions.SectionName));
 
         return services;
     }

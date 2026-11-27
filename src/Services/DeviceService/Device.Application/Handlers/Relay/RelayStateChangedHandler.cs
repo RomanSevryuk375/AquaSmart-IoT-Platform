@@ -13,6 +13,6 @@ public sealed class RelayStateChangedHandler(
         CancellationToken cancellationToken)
     {
         await publishEndpoint.Publish(
-            mapper.Map<ChangeRelayStateEvent>(notification), cancellationToken);
+            mapper.Map<RelayStateSyncedEvent>(notification), cancellationToken);
     }
 }

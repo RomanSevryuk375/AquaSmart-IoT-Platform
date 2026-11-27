@@ -8,8 +8,8 @@ namespace Identity.ArchitectureTests;
 
 public abstract class BaseArchitectureTest
 {
-    protected static readonly Assembly DomainAssembly = typeof(User).Assembly;
-    protected static readonly Assembly ApplicationAssembly = typeof(LoginResponseDto).Assembly;
-    protected static readonly Assembly InfrastructureAssembly = typeof(IdentityDbContext).Assembly;
-    protected static readonly Assembly ApiAssembly = typeof(GetMyProfileEndpoint).Assembly;
+    internal static readonly Assembly DomainAssembly = typeof(User).Assembly;
+    internal static readonly Assembly ApplicationAssembly = typeof(LoginResponseDto).Assembly;
+    internal static readonly Assembly InfrastructureAssembly = typeof(IdentityDbContext).Assembly;
+    internal static readonly Assembly ApiAssembly = typeof(GetMyProfileEndpoint).Assembly;
 }

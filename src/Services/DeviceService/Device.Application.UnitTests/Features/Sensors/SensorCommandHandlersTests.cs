@@ -10,16 +10,19 @@ namespace Device.Application.UnitTests.Features.Sensors;
 public class SensorCommandHandlersTests
 {
     private readonly ISensorRepository _sensorRepoMock = Substitute.For<ISensorRepository>();
+    private readonly IControllerRepository _controllerRepoMock = Substitute.For<IControllerRepository>();
     private readonly IMapper _mapperMock = Substitute.For<IMapper>();
 
     [Fact]
     public async Task AddSensorHandler_WithValidCommand_AddsToRepoAndReturnsSuccess()
     {
         // Arrange
-        var handler = new AddSensorHandler(_sensorRepoMock, _mapperMock);
+        var handler = new AddSensorHandler(_sensorRepoMock, _controllerRepoMock, _mapperMock);
+        Controller controller = new ControllerBuilder().Build();
+        _controllerRepoMock.GetByIdAsync(controller.Id, Arg.Any<CancellationToken>()).Returns(controller);
         var command = new AddSensorCommand
         {
-            ControllerId = TestConstants.ControllerId,
+            ControllerId = controller.Id,
             UserId = TestConstants.UserId,
             Name = "Water Temp",
             ConnectionProtocol = ConnectionProtocol.I2C,
@@ -36,6 +39,7 @@ public class SensorCommandHandlersTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().Be(responseDto);
+        controller.ConfigVersion.Should().Be(2);
         await _sensorRepoMock.Received(1).AddAsync(Arg.Any<Sensor>(), Arg.Any<CancellationToken>());
     }
 
@@ -43,7 +47,7 @@ public class SensorCommandHandlersTests
     public async Task AddSensorHandler_WithInvalidCommand_ReturnsFailure()
     {
         // Arrange
-        var handler = new AddSensorHandler(_sensorRepoMock, _mapperMock);
+        var handler = new AddSensorHandler(_sensorRepoMock, _controllerRepoMock, _mapperMock);
         var command = new AddSensorCommand
         {
             ControllerId = TestConstants.ControllerId,
@@ -66,9 +70,11 @@ public class SensorCommandHandlersTests
     public async Task DeleteSensorHandler_WhenValid_MarksAsDeletedAndDeletesFromRepo()
     {
         // Arrange
-        var handler = new DeleteSensorHandler(_sensorRepoMock);
-        Sensor sensor = new SensorBuilder().Build();
+        var handler = new DeleteSensorHandler(_sensorRepoMock, _controllerRepoMock);
+        Controller controller = new ControllerBuilder().Build();
+        Sensor sensor = new SensorBuilder().WithControllerId(controller.Id).Build();
         _sensorRepoMock.GetByIdAsync(sensor.Id, Arg.Any<CancellationToken>()).Returns(sensor);
+        _controllerRepoMock.GetByIdAsync(controller.Id, Arg.Any<CancellationToken>()).Returns(controller);
 
         var command = new DeleteSensorCommand
         {
@@ -81,6 +87,7 @@ public class SensorCommandHandlersTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
+        controller.ConfigVersion.Should().Be(2);
         await _sensorRepoMock.Received(1).DeleteAsync(sensor.Id, Arg.Any<CancellationToken>());
     }
 

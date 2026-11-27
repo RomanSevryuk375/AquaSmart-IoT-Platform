@@ -4,7 +4,7 @@ using Notification.Infrastructure.Persistence;
 using Npgsql;
 using NSubstitute;
 using Respawn;
-using BuildingBlocks.IntegrationTests;
+using BuildingBlocks.TestShared;
 
 namespace Notification.Infrastructure.IntegrationTests.Infrastructure;
 

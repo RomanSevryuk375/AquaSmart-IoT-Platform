@@ -89,9 +89,15 @@ public class DomainEventHandlersTests
     public async Task RelayModeChangedHandler_PublishesIntegrationEvent()
     {
         var handler = new RelayModeChangedHandler(_publishEndpointMock, _mapperMock);
-        var domainEvent = new RelayModeChangedDomainEvent { UserId = Guid.NewGuid(), RelayId = Guid.NewGuid(), IsManual = true };
-        var integrationEvent = new RelayModeChangedEvent();
-        _mapperMock.Map<RelayModeChangedEvent>(domainEvent).Returns(integrationEvent);
+        var domainEvent = new RelayModeChangedDomainEvent
+        {
+            ControllerId = Guid.NewGuid(),
+            UserId = Guid.NewGuid(),
+            RelayId = Guid.NewGuid(),
+            IsManual = true
+        };
+        var integrationEvent = new RelayModeSyncedEvent();
+        _mapperMock.Map<RelayModeSyncedEvent>(domainEvent).Returns(integrationEvent);
 
         await handler.Handle(domainEvent, CancellationToken.None);
 
@@ -109,8 +115,8 @@ public class DomainEventHandlersTests
             RelayId = Guid.NewGuid(),
             TargetState = true
         };
-        var integrationEvent = new ChangeRelayStateEvent();
-        _mapperMock.Map<ChangeRelayStateEvent>(domainEvent).Returns(integrationEvent);
+        var integrationEvent = new RelayStateSyncedEvent();
+        _mapperMock.Map<RelayStateSyncedEvent>(domainEvent).Returns(integrationEvent);
 
         await handler.Handle(domainEvent, CancellationToken.None);
 

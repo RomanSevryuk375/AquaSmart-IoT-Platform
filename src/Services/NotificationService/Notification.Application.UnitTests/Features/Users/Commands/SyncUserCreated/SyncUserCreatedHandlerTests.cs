@@ -101,7 +101,7 @@ public class SyncUserCreatedHandlerTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("EmailAddress.Invalid");
+        result.Error.Code.Should().Be("User.Invalid");
         result.Error.Message.Should().Be("Invalid email address format.");
 
         await _userRepoMock.DidNotReceive().AddAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());

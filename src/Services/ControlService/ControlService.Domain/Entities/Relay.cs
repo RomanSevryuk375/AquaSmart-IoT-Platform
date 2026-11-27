@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
 using Control.Domain.Events;
@@ -55,15 +56,22 @@ public sealed class Relay : AggregateRoot, IEntity
         bool isActive,
         DateTime createdAt)
     {
-        Result<Name> nameResult = Name.Create(rawName);
-        if (nameResult.IsFailure)
+        var errors = new List<string>();
+
+        DomainGuard.CheckNotEmpty(relayId, "Relay Id", errors);
+        DomainGuard.CheckNotEmpty(ecosystemId, nameof(EcosystemId), errors);
+        DomainGuard.CheckNotEmpty(controllerId, nameof(ControllerId), errors);
+        Name? name = DomainGuard.Collect(Name.Create(rawName), errors);
+        DomainGuard.CheckEnum(purpose, nameof(Purpose), errors);
+
+        if (errors.Count != 0)
         {
-            return Result<Relay>.Failure(nameResult.Error);
+            return DomainGuard.ValidationFailure<Relay>(errors);
         }
 
         var relay = new Relay(
             relayId, ecosystemId, controllerId, powerSensorId,
-            nameResult.Value, purpose, isManual, isActive,
+            name!, purpose, isManual, isActive,
             createdAt);
 
         return Result<Relay>.Success(relay);
@@ -119,6 +127,30 @@ public sealed class Relay : AggregateRoot, IEntity
         IncrementVersion();
     }
 
+    public void SyncState(bool isActive)
+    {
+        if (IsActive == isActive)
+        {
+            return;
+        }
+
+        IsActive = isActive;
+
+        IncrementVersion();
+    }
+
+    public void SyncMode(bool isManual)
+    {
+        if (IsManual == isManual)
+        {
+            return;
+        }
+
+        IsManual = isManual;
+
+        IncrementVersion();
+    }
+
     public void SetPowerSensorId(Guid powerSensorId)
     {
         PowerSensorId = powerSensorId;
@@ -131,7 +163,7 @@ public sealed class Relay : AggregateRoot, IEntity
         Result<Name> nameResult = Name.Create(rawName);
         if (nameResult.IsFailure)
         {
-            return Result<Relay>.Failure(nameResult.Error);
+            return Result.Failure(nameResult.Error);
         }
 
         Name = nameResult.Value;

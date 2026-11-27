@@ -30,7 +30,7 @@ public class MaintenanceLogTests
         result.Value.Metrics.Should().ContainKey("temp").WhoseValue.Should().Be(25.5);
         result.Value.Notes.Should().Be("Cleaned the glass filter.");
         result.Value.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
-        result.Value.Version.Should().Be(Guid.Empty);
+        result.Value.Version.Should().NotBeEmpty();
     }
 
     [Fact]

@@ -24,7 +24,7 @@ public class EcosystemTests
         result.Value.UserId.Should().Be(userId);
         result.Value.EcosystemName.Value.Should().Be(name);
         result.Value.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
-        result.Value.Version.Should().Be(Guid.Empty);
+        result.Value.Version.Should().NotBeEmpty();
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public class EcosystemTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Name.Invalid");
+        result.Error.Code.Should().Be("Ecosystem.Invalid");
     }
 
     [Fact]

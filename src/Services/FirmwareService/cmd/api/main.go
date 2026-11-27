@@ -62,6 +62,18 @@ func main() {
 		o.UsePathStyle = true
 	})
 
+	deviceGrpcURL := os.Getenv("DEVICE_GRPC_URL")
+	if deviceGrpcURL == "" {
+		deviceGrpcURL = "device-api:50051"
+	}
+	logger.Info("Configuring DeviceService gRPC auth client...", "target", deviceGrpcURL)
+	deviceTokenValidator, err := infrastructure.NewGrpcDeviceTokenValidator(deviceGrpcURL)
+	if err != nil {
+		logger.Error("Failed to initialize DeviceService gRPC client", "error", err)
+		os.Exit(1)
+	}
+	defer deviceTokenValidator.Close()
+
 	blobStorage := infrastructure.NewS3BlobStorage(s3Client, s3Bucket)
 	hwRepo := infrastructure.NewPostgresHardwareProfileRepository(db)
 	fwRepo := infrastructure.NewPostgresFirmwareRepository(db)
@@ -83,9 +95,10 @@ func main() {
 		httpSwagger.URL("/swagger/doc.json"),
 	))
 
-	// --- Device API (ESP32) ---
-	mux.HandleFunc("GET /api/firmware/v1/ota/check", otaHandler.CheckUpdate)
-	mux.HandleFunc("POST /api/firmware/v1/ota/status", otaHandler.HandleUpdateTargetStatus)
+	// --- Device API (ESP32, authenticated via X-Device-Token + DeviceService gRPC) ---
+	mux.HandleFunc("GET /api/firmware/v1/ota/check", presentation.DeviceAuthMiddleware(deviceTokenValidator, otaHandler.CheckUpdate))
+	mux.HandleFunc("GET /api/firmware/v1/ota/download/{campaignId}", presentation.DeviceAuthMiddleware(deviceTokenValidator, otaHandler.HandleDownloadFirmware))
+	mux.HandleFunc("POST /api/firmware/v1/ota/status", presentation.DeviceAuthMiddleware(deviceTokenValidator, otaHandler.HandleUpdateTargetStatus))
 
 	// --- Admin API ---
 	// Hardware Profiles
@@ -114,8 +127,8 @@ func main() {
 	srv := &http.Server{
 		Addr:         ":" + port,
 		Handler:      mux,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 30 * time.Second,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 120 * time.Second,
 		IdleTimeout:  120 * time.Second,
 	}
 

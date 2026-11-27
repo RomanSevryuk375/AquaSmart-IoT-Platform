@@ -4,7 +4,7 @@
     <ProjectReference Include="..\Telemetry.Infrastructure\Telemetry.Infrastructure.csproj" />
     <ProjectReference Include="..\Telemetry.TestShared\Telemetry.TestShared.csproj" />
     <ProjectReference Include="..\TelemetryService\Telemetry.API.csproj" />
-    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.IntegrationTests\BuildingBlocks.IntegrationTests.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.TestShared\BuildingBlocks.TestShared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

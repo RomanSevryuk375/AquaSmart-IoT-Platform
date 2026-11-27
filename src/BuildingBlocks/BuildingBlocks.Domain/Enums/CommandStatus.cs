@@ -6,4 +6,6 @@ public enum CommandStatus
     Sent = 2,
     Completed = 3,
     Failed = 4,
+    Cancelled = 5,
+    Expired = 6,
 }

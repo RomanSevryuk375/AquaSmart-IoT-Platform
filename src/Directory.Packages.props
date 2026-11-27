@@ -25,6 +25,7 @@
     <PackageVersion Include="MassTransit" Version="8.2.2" />
     <PackageVersion Include="MassTransit.RabbitMQ" Version="8.2.2" />
     <PackageVersion Include="MediatR" Version="14.2.0" />
+    <PackageVersion Include="MQTTnet" Version="4.3.7.1207" />
     <!-- Background Jobs -->
     <PackageVersion Include="Quartz.Extensions.Hosting" Version="3.17.1" />
     <PackageVersion Include="Cronos" Version="0.12.0" />

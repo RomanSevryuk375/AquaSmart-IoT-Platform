@@ -1,5 +1,3 @@
-﻿version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -69,8 +67,28 @@ services:
     networks:
       - aqua-network
 
+  mqtt-broker:
+    image: emqx/emqx:5.8
+    container_name: aqua-emqx
+    ports:
+      - "1883:1883"
+      - "8883:8883"
+      - "18083:18083"
+    volumes:
+      - ./ops/emqx/emqx.conf:/opt/emqx/etc/emqx.conf.tmpl:ro
+    environment:
+      - MQTT_WEBHOOK_SECRET=${MQTT_WEBHOOK_SECRET}
+    entrypoint: ["/bin/sh", "-c", "perl -pe 's/__MQTT_WEBHOOK_SECRET__/$$ENV{MQTT_WEBHOOK_SECRET}/g' /opt/emqx/etc/emqx.conf.tmpl > /opt/emqx/etc/emqx.conf && exec /usr/bin/docker-entrypoint.sh /opt/emqx/bin/emqx foreground"]
+    healthcheck:
+      test: ["CMD", "/opt/emqx/bin/emqx", "ctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aqua-network
+
   minio:
-    image: minio/minio
+    image: ghcr.io/coollabsio/minio:latest
     container_name: aqua-minio
     ports:
       - "9000:9000" 
@@ -82,7 +100,7 @@ services:
     volumes:
       - minio-data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "mc", "ready", "local"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -90,7 +108,7 @@ services:
       - aqua-network
 
   minio-setup:
-    image: minio/mc
+    image: ghcr.io/coollabsio/minio:latest
     container_name: aqua-minio-setup
     depends_on:
       minio:
@@ -99,9 +117,9 @@ services:
       - aqua-network
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc config host add myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} || /usr/bin/mc config host add myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
       /usr/bin/mc mb myminio/${MINIO_BUCKET_NAME} --ignore-existing;
-      /usr/bin/mc policy download myminio/${MINIO_BUCKET_NAME};
+      /usr/bin/mc anonymous set download myminio/${MINIO_BUCKET_NAME} || /usr/bin/mc policy set download myminio/${MINIO_BUCKET_NAME} || /usr/bin/mc policy download myminio/${MINIO_BUCKET_NAME} || true;
       exit 0;
       "
 
@@ -195,6 +213,8 @@ services:
       rabbitmq:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      mqtt-broker:
         condition: service_healthy 
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -209,6 +229,14 @@ services:
       - JwtOptions__Audience=${JWT_AUDIENCE}
       - JwtOptions__ExpiresHours=${JWT_EXPIRES_HOURS}
       - GrpcConfiguration__DeviceServiceUrl=http://device-api:50051
+      - MqttOptions__Host=mqtt-broker
+      - MqttOptions__Port=1883
+      - MqttOptions__UseTls=false
+      - MqttOptions__Username=device-service-worker
+      - MqttOptions__Password=${MQTT_WORKER_PASSWORD}
+      - MqttOptions__ClientIdPrefix=aqua-device-service
+      - MqttOptions__SharedGroup=device-service
+      - MqttBrokerOptions__WebhookSecret=${MQTT_WEBHOOK_SECRET}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 15s
@@ -323,7 +351,7 @@ services:
       - aqua-network
 
   firmware-migrations:
-    image: migrate/migrate
+    image: migrate/migrate:v4.17.0
     container_name: firmware-migrations
     depends_on:
       postgres-init:
@@ -351,6 +379,7 @@ services:
       - AWS_ACCESS_KEY_ID=${MINIO_ROOT_USER}
       - AWS_SECRET_ACCESS_KEY=${MINIO_ROOT_PASSWORD}
       - AWS_ENDPOINT_URL=http://minio:9000 
+      - DEVICE_GRPC_URL=device-api:50051
     ports:
       - "5238:8080"
     healthcheck:

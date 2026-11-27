@@ -1,0 +1,805 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Mobile.ViewModels"
+             xmlns:models="clr-namespace:Mobile.Models"
+             xmlns:controls="clr-namespace:Mobile.Views.Controls"
+             xmlns:loc="clr-namespace:Mobile.Converters"
+             x:Class="Mobile.Views.AddAquariumPage"
+             x:DataType="vm:AddAquariumViewModel"
+             BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#12131A'}"
+             Shell.NavBarIsVisible="False"
+             Title="{loc:Translate Wizard_Title}">
+
+    <Grid>
+        <!-- MAIN WIZARD CONTENT -->
+        <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="20,16,20,20">
+
+            <!-- Top Navigation Bar: Back Arrow, Title, Close (X) -->
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,14">
+                <Border Grid.Column="0"
+                        WidthRequest="38" HeightRequest="38"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
+                        StrokeThickness="0"
+                        VerticalOptions="Center">
+                    <ImageButton Source="{AppThemeBinding Light='icon_arrow_left.png', Dark='icon_arrow_left_white.png'}"
+                                 Command="{Binding PrevStepCommand}"
+                                 BackgroundColor="Transparent"
+                                 WidthRequest="20" HeightRequest="20"
+                                 Padding="0"
+                                 HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+
+                <Label Grid.Column="1"
+                       Text="{loc:Translate Wizard_Title}"
+                       TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center"
+                       Margin="10,0,0,0" />
+
+                <Border Grid.Column="2"
+                        WidthRequest="38" HeightRequest="38"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#1E202C'}"
+                        StrokeThickness="0"
+                        VerticalOptions="Center">
+                    <ImageButton Source="{AppThemeBinding Light='icon_close.png', Dark='icon_close_white.png'}"
+                                 Command="{Binding PromptCancelCommand}"
+                                 BackgroundColor="Transparent"
+                                 WidthRequest="18" HeightRequest="18"
+                                 Padding="0"
+                                 HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+            </Grid>
+
+            <!-- 7-Segment Step Progress Indicator matching Figma -->
+            <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*,*,*,*" ColumnSpacing="6" Margin="0,0,0,20">
+                <BoxView Grid.Column="0" HeightRequest="4" CornerRadius="2" Color="#4152B0" />
+                <BoxView Grid.Column="1" HeightRequest="4" CornerRadius="2" Color="{Binding CurrentStep, Converter={StaticResource StepProgressColorConverter}, ConverterParameter=2}" />
+                <BoxView Grid.Column="2" HeightRequest="4" CornerRadius="2" Color="{Binding CurrentStep, Converter={StaticResource StepProgressColorConverter}, ConverterParameter=3}" />
+                <BoxView Grid.Column="3" HeightRequest="4" CornerRadius="2" Color="{Binding CurrentStep, Converter={StaticResource StepProgressColorConverter}, ConverterParameter=4}" />
+                <BoxView Grid.Column="4" HeightRequest="4" CornerRadius="2" Color="{Binding CurrentStep, Converter={StaticResource StepProgressColorConverter}, ConverterParameter=5}" />
+                <BoxView Grid.Column="5" HeightRequest="4" CornerRadius="2" Color="{Binding CurrentStep, Converter={StaticResource StepProgressColorConverter}, ConverterParameter=6}" />
+                <BoxView Grid.Column="6" HeightRequest="4" CornerRadius="2" Color="{Binding CurrentStep, Converter={StaticResource StepProgressColorConverter}, ConverterParameter=7}" />
+            </Grid>
+
+            <!-- Scrollable Step Contents -->
+            <ScrollView Grid.Row="2">
+                <Grid>
+                    <!-- ================= STEP 1: Какая у вас ёмкость? ================= -->
+                    <VerticalStackLayout Spacing="16" IsVisible="False">
+                        <VerticalStackLayout.Triggers>
+                            <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding CurrentStep}" Value="1">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </VerticalStackLayout.Triggers>
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding CurrentStepText}" TextColor="#8C93A8" FontSize="12" />
+                            <Label Text="{loc:Translate Wizard_Step1_Title}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
+                            <Label Text="{loc:Translate Wizard_Step1_Subtitle}" TextColor="#6E6E6E" FontSize="13" />
+                        </VerticalStackLayout>
+
+                        <!-- Tank Type Cards matching Figma -->
+                        <VerticalStackLayout Spacing="10">
+                            <!-- 0. Аквариум -->
+                            <Border StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Stroke" Value="#E4E7F4" />
+                                        <Setter Property="StrokeThickness" Value="1" />
+                                        <Style.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsAquariumSelected}" Value="True">
+                                                <Setter Property="Stroke" Value="#4152B0" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}">
+                                        <TapGestureRecognizer.CommandParameter>
+                                            <x:Int32>0</x:Int32>
+                                        </TapGestureRecognizer.CommandParameter>
+                                    </TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Label Text="🐟" FontSize="22" VerticalOptions="Center" />
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{loc:Translate TankType_Aquarium}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
+                                        <Label Text="{loc:Translate TankType_AquariumDesc}" TextColor="#8C93A8" FontSize="12" />
+                                    </VerticalStackLayout>
+                                    <Border Grid.Column="2" WidthRequest="22" HeightRequest="22" StrokeShape="RoundRectangle 6" VerticalOptions="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="BackgroundColor" Value="#FFFFFF" />
+                                                <Setter Property="Stroke" Value="#D0D5DD" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                                <Style.Triggers>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding IsAquariumSelected}" Value="True">
+                                                        <Setter Property="BackgroundColor" Value="#4152B0" />
+                                                        <Setter Property="Stroke" Value="#4152B0" />
+                                                        <Setter Property="StrokeThickness" Value="0" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Label Text="✓" TextColor="#FFFFFF" FontSize="13" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsAquariumSelected}" />
+                                    </Border>
+                                </Grid>
+                            </Border>
+
+                            <!-- 1. Террариум -->
+                            <Border StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Stroke" Value="#E4E7F4" />
+                                        <Setter Property="StrokeThickness" Value="1" />
+                                        <Style.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsTerrariumSelected}" Value="True">
+                                                <Setter Property="Stroke" Value="#4152B0" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}">
+                                        <TapGestureRecognizer.CommandParameter>
+                                            <x:Int32>1</x:Int32>
+                                        </TapGestureRecognizer.CommandParameter>
+                                    </TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Label Text="🦎" FontSize="22" VerticalOptions="Center" />
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{loc:Translate TankType_Terrarium}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
+                                        <Label Text="{loc:Translate TankType_TerrariumDesc}" TextColor="#8C93A8" FontSize="12" />
+                                    </VerticalStackLayout>
+                                    <Border Grid.Column="2" WidthRequest="22" HeightRequest="22" StrokeShape="RoundRectangle 6" VerticalOptions="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="BackgroundColor" Value="#FFFFFF" />
+                                                <Setter Property="Stroke" Value="#D0D5DD" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                                <Style.Triggers>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding IsTerrariumSelected}" Value="True">
+                                                        <Setter Property="BackgroundColor" Value="#4152B0" />
+                                                        <Setter Property="Stroke" Value="#4152B0" />
+                                                        <Setter Property="StrokeThickness" Value="0" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Label Text="✓" TextColor="#FFFFFF" FontSize="13" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsTerrariumSelected}" />
+                                    </Border>
+                                </Grid>
+                            </Border>
+
+                            <!-- 2. Гроубокс -->
+                            <Border StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Stroke" Value="#E4E7F4" />
+                                        <Setter Property="StrokeThickness" Value="1" />
+                                        <Style.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsGrowboxSelected}" Value="True">
+                                                <Setter Property="Stroke" Value="#4152B0" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}">
+                                        <TapGestureRecognizer.CommandParameter>
+                                            <x:Int32>2</x:Int32>
+                                        </TapGestureRecognizer.CommandParameter>
+                                    </TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Label Text="🌱" FontSize="22" VerticalOptions="Center" />
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{loc:Translate TankType_Growbox}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
+                                        <Label Text="{loc:Translate TankType_GrowboxDesc}" TextColor="#8C93A8" FontSize="12" />
+                                    </VerticalStackLayout>
+                                    <Border Grid.Column="2" WidthRequest="22" HeightRequest="22" StrokeShape="RoundRectangle 6" VerticalOptions="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="BackgroundColor" Value="#FFFFFF" />
+                                                <Setter Property="Stroke" Value="#D0D5DD" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                                <Style.Triggers>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding IsGrowboxSelected}" Value="True">
+                                                        <Setter Property="BackgroundColor" Value="#4152B0" />
+                                                        <Setter Property="Stroke" Value="#4152B0" />
+                                                        <Setter Property="StrokeThickness" Value="0" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Label Text="✓" TextColor="#FFFFFF" FontSize="13" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsGrowboxSelected}" />
+                                    </Border>
+                                </Grid>
+                            </Border>
+
+                            <!-- 3. Флорариум -->
+                            <Border StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Stroke" Value="#E4E7F4" />
+                                        <Setter Property="StrokeThickness" Value="1" />
+                                        <Style.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsFlorariumSelected}" Value="True">
+                                                <Setter Property="Stroke" Value="#4152B0" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}">
+                                        <TapGestureRecognizer.CommandParameter>
+                                            <x:Int32>3</x:Int32>
+                                        </TapGestureRecognizer.CommandParameter>
+                                    </TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Label Text="🌸" FontSize="22" VerticalOptions="Center" />
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{loc:Translate TankType_Florarium}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
+                                        <Label Text="{loc:Translate TankType_FlorariumDesc}" TextColor="#8C93A8" FontSize="12" />
+                                    </VerticalStackLayout>
+                                    <Border Grid.Column="2" WidthRequest="22" HeightRequest="22" StrokeShape="RoundRectangle 6" VerticalOptions="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="BackgroundColor" Value="#FFFFFF" />
+                                                <Setter Property="Stroke" Value="#D0D5DD" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                                <Style.Triggers>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding IsFlorariumSelected}" Value="True">
+                                                        <Setter Property="BackgroundColor" Value="#4152B0" />
+                                                        <Setter Property="Stroke" Value="#4152B0" />
+                                                        <Setter Property="StrokeThickness" Value="0" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Label Text="✓" TextColor="#FFFFFF" FontSize="13" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsFlorariumSelected}" />
+                                    </Border>
+                                </Grid>
+                            </Border>
+
+                            <!-- 4. Формикарий -->
+                            <Border StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF" Padding="16,14">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Stroke" Value="#E4E7F4" />
+                                        <Setter Property="StrokeThickness" Value="1" />
+                                        <Style.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsFormicariumSelected}" Value="True">
+                                                <Setter Property="Stroke" Value="#4152B0" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectTankTypeCommand}">
+                                        <TapGestureRecognizer.CommandParameter>
+                                            <x:Int32>4</x:Int32>
+                                        </TapGestureRecognizer.CommandParameter>
+                                    </TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Label Text="🐜" FontSize="22" VerticalOptions="Center" />
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{loc:Translate TankType_Formicarium}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
+                                        <Label Text="{loc:Translate TankType_FormicariumDesc}" TextColor="#8C93A8" FontSize="12" />
+                                    </VerticalStackLayout>
+                                    <Border Grid.Column="2" WidthRequest="22" HeightRequest="22" StrokeShape="RoundRectangle 6" VerticalOptions="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="BackgroundColor" Value="#FFFFFF" />
+                                                <Setter Property="Stroke" Value="#D0D5DD" />
+                                                <Setter Property="StrokeThickness" Value="1.5" />
+                                                <Style.Triggers>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding IsFormicariumSelected}" Value="True">
+                                                        <Setter Property="BackgroundColor" Value="#4152B0" />
+                                                        <Setter Property="Stroke" Value="#4152B0" />
+                                                        <Setter Property="StrokeThickness" Value="0" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Label Text="✓" TextColor="#FFFFFF" FontSize="13" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsFormicariumSelected}" />
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- ================= STEP 2: Как назовёте ёмкость? ================= -->
+                    <VerticalStackLayout Spacing="16" IsVisible="False">
+                        <VerticalStackLayout.Triggers>
+                            <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding CurrentStep}" Value="2">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </VerticalStackLayout.Triggers>
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding CurrentStepText}" TextColor="#8C93A8" FontSize="12" />
+                            <Label Text="{loc:Translate Wizard_Step2_Title}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
+                            <Label Text="{loc:Translate Wizard_Step2_Subtitle}" TextColor="#6E6E6E" FontSize="13" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="6" Margin="0,10,0,0">
+                            <Label Text="{loc:Translate Wizard_Step2_NameLabel}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="52" Padding="14,0">
+                                <Entry Text="{Binding Name}"
+                                       Placeholder="{loc:Translate Wizard_Step2_Placeholder}"
+                                       PlaceholderColor="#8C93A8"
+                                       TextColor="#141414"
+                                       VerticalOptions="Center" />
+                            </Border>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- ================= STEP 3: Какой объём? ================= -->
+                    <VerticalStackLayout Spacing="16" IsVisible="False">
+                        <VerticalStackLayout.Triggers>
+                            <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding CurrentStep}" Value="3">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </VerticalStackLayout.Triggers>
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding CurrentStepText}" TextColor="#8C93A8" FontSize="12" />
+                            <Label Text="{loc:Translate Wizard_Step3_Title}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
+                            <Label Text="{loc:Translate Wizard_Step3_Subtitle}" TextColor="#6E6E6E" FontSize="13" />
+                        </VerticalStackLayout>
+
+                        <!-- Counter with - and + matching Figma -->
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Margin="0,20,0,0" HeightRequest="56">
+                            <Button Grid.Column="0"
+                                    Text="−"
+                                    Command="{Binding DecrementVolumeCommand}"
+                                    BackgroundColor="#4152B0"
+                                    TextColor="#FFFFFF"
+                                    FontSize="22"
+                                    WidthRequest="56"
+                                    HeightRequest="56"
+                                    CornerRadius="14" />
+
+                            <Border Grid.Column="1" StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 14" BackgroundColor="#FFFFFF">
+                                <Grid ColumnDefinitions="*,Auto" Padding="16,0">
+                                    <Entry Text="{Binding Volume}"
+                                           Keyboard="Numeric"
+                                           TextColor="#141414"
+                                           FontFamily="OpenSansSemibold"
+                                           FontSize="22"
+                                           HorizontalTextAlignment="Center"
+                                           VerticalOptions="Center" />
+                                    <Label Grid.Column="1" Text="{loc:Translate Wizard_Step3_Liter}" TextColor="#8C93A8" FontSize="16" VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+
+                            <Button Grid.Column="2"
+                                    Text="+"
+                                    Command="{Binding IncrementVolumeCommand}"
+                                    BackgroundColor="#4152B0"
+                                    TextColor="#FFFFFF"
+                                    FontSize="22"
+                                    WidthRequest="56"
+                                    HeightRequest="56"
+                                    CornerRadius="14" />
+                        </Grid>
+                    </VerticalStackLayout>
+
+                    <!-- ================= STEP 4: Кто будет жить в ёмкости? ================= -->
+                    <VerticalStackLayout Spacing="16" IsVisible="False">
+                        <VerticalStackLayout.Triggers>
+                            <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding CurrentStep}" Value="4">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </VerticalStackLayout.Triggers>
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding CurrentStepText}" TextColor="#8C93A8" FontSize="12" />
+                            <Label Text="{loc:Translate Wizard_Step4_Title}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
+                            <Label Text="{loc:Translate Wizard_Step4_Subtitle}" TextColor="#6E6E6E" FontSize="13" />
+                        </VerticalStackLayout>
+
+                        <!-- Inhabitants Chips FlexLayout matching Figma -->
+                        <FlexLayout BindableLayout.ItemsSource="{Binding InhabitantsList}"
+                                    Wrap="Wrap"
+                                    Direction="Row"
+                                    JustifyContent="Start"
+                                    AlignItems="Center"
+                                    Margin="0,10,0,0">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="vm:InhabitantChipModel">
+                                    <Border StrokeThickness="1"
+                                            Stroke="#E4E7F4"
+                                            StrokeShape="RoundRectangle 20"
+                                            BackgroundColor="{Binding IsSelected, Converter={StaticResource InhabitantBgConverter}}"
+                                            Padding="14,10"
+                                            Margin="0,0,8,10">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AddAquariumViewModel}}, Path=ToggleInhabitantCommand}"
+                                                                  CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                        <Label Text="{Binding Title}"
+                                               TextColor="{Binding IsSelected, Converter={StaticResource InhabitantTextConverter}}"
+                                               FontFamily="OpenSansSemibold"
+                                               FontSize="13" />
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </FlexLayout>
+                    </VerticalStackLayout>
+
+                    <!-- ================= STEP 5: Когда запустили ёмкость? ================= -->
+                    <VerticalStackLayout Spacing="16" IsVisible="False">
+                        <VerticalStackLayout.Triggers>
+                            <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding CurrentStep}" Value="5">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </VerticalStackLayout.Triggers>
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding CurrentStepText}" TextColor="#8C93A8" FontSize="12" />
+                            <Label Text="{loc:Translate Wizard_Step5_Title}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
+                            <Label Text="{loc:Translate Wizard_Step5_Subtitle}" TextColor="#6E6E6E" FontSize="13" />
+                        </VerticalStackLayout>
+
+                        <!-- Date input with Calendar icon -->
+                        <VerticalStackLayout Spacing="6" Margin="0,14,0,0">
+                            <Label Text="{loc:Translate Wizard_Step5_DateLabel}" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontFamily="OpenSansSemibold" FontSize="14" />
+                            <Border StrokeThickness="1" Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}" StrokeShape="RoundRectangle 12" BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}" HeightRequest="52" Padding="14,0">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <DatePicker Grid.Column="0"
+                                                Date="{Binding SelectedLaunchDate}"
+                                                MaximumDate="{Binding MaxLaunchDate}"
+                                                Format="dd.MM.yyyy"
+                                                BackgroundColor="Transparent"
+                                                TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
+                                                FontFamily="OpenSansSemibold"
+                                                FontSize="15"
+                                                VerticalOptions="Center"
+                                                HorizontalOptions="Fill" />
+                                    <ImageButton Grid.Column="1"
+                                                 Command="{Binding OpenCalendarCommand}"
+                                                 Source="{AppThemeBinding Light='icon_calendar.png', Dark='icon_calendar_white.png'}"
+                                                 WidthRequest="22" HeightRequest="22"
+                                                 BackgroundColor="Transparent"
+                                                 VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- ================= STEP 6: Выберите контроллер ================= -->
+                    <VerticalStackLayout Spacing="16" IsVisible="False">
+                        <VerticalStackLayout.Triggers>
+                            <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding CurrentStep}" Value="6">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </VerticalStackLayout.Triggers>
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding CurrentStepText}" TextColor="#8C93A8" FontSize="12" />
+                            <Label Text="{loc:Translate Wizard_Step6_Title}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
+                            <Label Text="{loc:Translate Wizard_Step6_Subtitle}" TextColor="#6E6E6E" FontSize="13" />
+                        </VerticalStackLayout>
+
+                        <!-- Controller dropdown selector -->
+                        <VerticalStackLayout Spacing="6" Margin="0,14,0,0">
+                            <Label Text="{loc:Translate Wizard_Step6_ControllerLabel}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="14" />
+                            <Border StrokeThickness="1" Stroke="#E4E7F4" StrokeShape="RoundRectangle 12" BackgroundColor="#FFFFFF" HeightRequest="52" Padding="14,0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenControllerPickerCommand}" />
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="{Binding SelectedControllerName}" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontSize="15" VerticalOptions="Center" />
+                                    <Image Grid.Column="1" Source="{AppThemeBinding Light='icon_chevron_down.png', Dark='icon_chevron_down_white.png'}" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- ================= STEP 7: Настройте внешний вид ================= -->
+                    <VerticalStackLayout Spacing="16" IsVisible="False">
+                        <VerticalStackLayout.Triggers>
+                            <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding CurrentStep}" Value="7">
+                                <Setter Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </VerticalStackLayout.Triggers>
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding CurrentStepText}" TextColor="#8C93A8" FontSize="12" />
+                            <Label Text="{loc:Translate Wizard_Step7_Title}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold" />
+                            <Label Text="{loc:Translate Wizard_Step7_Subtitle}" TextColor="#6E6E6E" FontSize="13" />
+                        </VerticalStackLayout>
+
+                        <!-- Color Palette Circles matching Figma -->
+                        <HorizontalStackLayout Spacing="14" HorizontalOptions="Center" Margin="0,12,0,16">
+                            <!-- Blue (0) -->
+                            <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="#4152B0" StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>0</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Label Text="✓" TextColor="#FFFFFF" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsTheme0Selected}" />
+                            </Border>
+
+                            <!-- Cyan (1) -->
+                            <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="#00BCD4" StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>1</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Label Text="✓" TextColor="#FFFFFF" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsTheme1Selected}" />
+                            </Border>
+
+                            <!-- Green (2) -->
+                            <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="#4CAF50" StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>2</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Label Text="✓" TextColor="#FFFFFF" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsTheme2Selected}" />
+                            </Border>
+
+                            <!-- Yellow (3) -->
+                            <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="#FFC107" StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>3</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Label Text="✓" TextColor="#FFFFFF" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsTheme3Selected}" />
+                            </Border>
+
+                            <!-- Orange (4) -->
+                            <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="#FF9800" StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>4</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Label Text="✓" TextColor="#FFFFFF" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsTheme4Selected}" />
+                            </Border>
+
+                            <!-- Gray (5) -->
+                            <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="#9E9E9E" StrokeThickness="0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectThemeCommand}"><TapGestureRecognizer.CommandParameter><x:Int32>5</x:Int32></TapGestureRecognizer.CommandParameter></TapGestureRecognizer>
+                                </Border.GestureRecognizers>
+                                <Label Text="✓" TextColor="#FFFFFF" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsTheme5Selected}" />
+                            </Border>
+                        </HorizontalStackLayout>
+
+                        <!-- Live Card Preview matching Figma -->
+                        <Border StrokeThickness="1"
+                                Stroke="{Binding PreviewBorderColor}"
+                                StrokeShape="RoundRectangle 16"
+                                BackgroundColor="{Binding PreviewThemeColor}"
+                                Padding="16,14">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                <Label Text="{Binding TankTypeIcon}" FontSize="24" VerticalOptions="Center" />
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                    <Label Text="{Binding Name}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
+                                    <Label Text="{Binding SpeciesInfo}" TextColor="#6E6E6E" FontSize="12" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+                </Grid>
+            </ScrollView>
+
+            <!-- Bottom Primary Wizard Button ("Далее" or "Готово") -->
+            <Button Grid.Row="3"
+                    Text="{Binding CurrentStep, Converter={StaticResource StepButtonTextConverter}}"
+                    Command="{Binding NextStepCommand}"
+                    BackgroundColor="#4152B0"
+                    TextColor="#FFFFFF"
+                    CornerRadius="14"
+                    HeightRequest="52"
+                    FontFamily="OpenSansSemibold"
+                    FontSize="15"
+                    Margin="0,12,0,0" />
+        </Grid>
+
+        <!-- CALENDAR BOTTOM SHEET OVERLAY -->
+        <Grid BackgroundColor="#80000000" IsVisible="{Binding IsCalendarOpen}">
+            <Border VerticalOptions="End"
+                    StrokeShape="RoundRectangle 24 24 0 0"
+                    BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
+                    StrokeThickness="0"
+                    Padding="24,20,24,28">
+                <VerticalStackLayout Spacing="16">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="{loc:Translate Wizard_Step5_Title}" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Button Grid.Column="1" Text="{loc:Translate Wizard_Calendar_Select}" Command="{Binding CloseCalendarCommand}" BackgroundColor="#4152B0" TextColor="#FFFFFF" CornerRadius="8" HeightRequest="36" Padding="14,0" />
+                    </Grid>
+                    <Label Text="{loc:Translate Wizard_Calendar_Subtitle}" TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" FontSize="13" />
+
+                    <!-- Native DatePicker inside interactive container -->
+                    <Border StrokeThickness="1" Stroke="{AppThemeBinding Light='#E4E7F4', Dark='#2C2F42'}" StrokeShape="RoundRectangle 12" BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#252836'}" HeightRequest="52" Padding="14,0">
+                        <DatePicker Date="{Binding SelectedLaunchDate}"
+                                    MaximumDate="{Binding MaxLaunchDate}"
+                                    Format="dd.MM.yyyy"
+                                    TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}"
+                                    FontSize="16"
+                                    FontFamily="OpenSansSemibold"
+                                    VerticalOptions="Center"
+                                    HorizontalOptions="Fill" />
+                    </Border>
+
+                    <!-- Shortcut actions -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Button Grid.Column="0" Text="{loc:Translate Common_Today}" Command="{Binding SetTodayDateCommand}" BackgroundColor="{AppThemeBinding Light='#F0F2FA', Dark='#2B2E40'}" TextColor="{AppThemeBinding Light='#4152B0', Dark='#738AFF'}" HeightRequest="38" CornerRadius="8" FontSize="13" FontFamily="OpenSansSemibold" />
+                        <Button Grid.Column="1" Text="{loc:Translate Common_Close}" Command="{Binding CloseCalendarCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light='#6E6E6E', Dark='#9FA3B8'}" HeightRequest="38" FontSize="13" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- CONTROLLER PICKER BOTTOM SHEET OVERLAY -->
+        <Grid BackgroundColor="#80000000" IsVisible="{Binding IsControllerPickerOpen}">
+            <Border VerticalOptions="End"
+                    StrokeShape="RoundRectangle 24 24 0 0"
+                    BackgroundColor="{AppThemeBinding Light='#FFFFFF', Dark='#1E202C'}"
+                    StrokeThickness="0"
+                    Padding="24,20,24,28">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="{loc:Translate Wizard_Controller_PickerTitle}" TextColor="{AppThemeBinding Light='#141414', Dark='#FFFFFF'}" FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold" />
+
+                    <!-- List of available controllers from account -->
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding AvailableControllers}" Spacing="8">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="models:ControllerModel">
+                                <Button Text="{Binding Name}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AddAquariumViewModel}}, Path=SelectControllerCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="{AppThemeBinding Light='#F6F7FC', Dark='#252836'}"
+                                        TextColor="{AppThemeBinding Light='#141414', Dark='#F4F5FB'}"
+                                        CornerRadius="10"
+                                        HeightRequest="46"
+                                        HorizontalOptions="Fill" />
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
+                    <!-- Option to auto-create a dedicated hub -->
+                    <Button Text="{loc:Translate Wizard_Controller_Auto}"
+                            Command="{Binding SelectAutoControllerCommand}"
+                            BackgroundColor="{AppThemeBinding Light='#EDEFFB', Dark='#202438'}"
+                            TextColor="{AppThemeBinding Light='#4152B0', Dark='#738AFF'}"
+                            CornerRadius="10"
+                            HeightRequest="46"
+                            FontFamily="OpenSansSemibold"
+                            HorizontalOptions="Fill" />
+
+                    <Button Text="{loc:Translate Common_Cancel}"
+                            Command="{Binding CloseControllerPickerCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="#D93829"
+                            HeightRequest="40" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- SUCCESS SCREEN (Figma: Ёмкость создана!) -->
+        <Grid BackgroundColor="#FFFFFF" IsVisible="{Binding IsSuccessOpen}">
+            <ScrollView>
+                <VerticalStackLayout Spacing="20" Padding="24,30,24,30" VerticalOptions="Center">
+                    <!-- Mascot with Cube badge -->
+                    <controls:FishMascotCard HeightOverride="240" BadgeText="📦" BadgeColor="#7BA028" />
+
+                    <!-- Created Tank Card Preview -->
+                    <Border StrokeThickness="1"
+                            Stroke="{Binding PreviewBorderColor}"
+                            StrokeShape="RoundRectangle 16"
+                            BackgroundColor="{Binding PreviewThemeColor}"
+                            Padding="16,14">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Label Text="{Binding TankTypeIcon}" FontSize="24" VerticalOptions="Center" />
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                <Label Text="{Binding Name}" TextColor="#141414" FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold" />
+                                <Label Text="{Binding SpeciesInfo}" TextColor="#6E6E6E" FontSize="12" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+
+                    <!-- Title & Subtitle -->
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{loc:Translate Wizard_Success_Title}"
+                               TextColor="#141414"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="{loc:Translate Wizard_Success_Subtitle}"
+                               TextColor="#6E6E6E"
+                               FontSize="14"
+                               LineHeight="1.3"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Buttons: "Настроить датчики и оборудование" & "Вернуться на главную" -->
+                    <VerticalStackLayout Spacing="10" Margin="0,10,0,0">
+                        <Button Text="{loc:Translate Wizard_Success_ConfigureEquipment}"
+                                Command="{Binding GoToEquipmentCommand}"
+                                BackgroundColor="#4152B0"
+                                TextColor="#FFFFFF"
+                                CornerRadius="14"
+                                HeightRequest="52"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="13"
+                                Padding="4,0" />
+
+                        <Button Text="{loc:Translate Wizard_Success_BackToMain}"
+                                Command="{Binding GoToMainCommand}"
+                                BackgroundColor="#FFFFFF"
+                                BorderColor="#E4E7F4"
+                                BorderWidth="1"
+                                TextColor="#6A738A"
+                                CornerRadius="14"
+                                HeightRequest="52"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+        </Grid>
+
+        <!-- CANCEL CONFIRMATION MODAL (Figma: Отменить создание?) -->
+        <Grid BackgroundColor="#80000000" IsVisible="{Binding IsCancelDialogOpen}">
+            <Border VerticalOptions="End"
+                    StrokeShape="RoundRectangle 24 24 0 0"
+                    BackgroundColor="#FFFFFF"
+                    StrokeThickness="0"
+                    Padding="24,24,24,32">
+                <VerticalStackLayout Spacing="18">
+                    <!-- Fish Mascot with Question Badge -->
+                    <controls:FishMascotCard HeightOverride="180" BadgeText="?" BadgeColor="#7BA028" />
+
+                    <!-- Titles -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="{loc:Translate Wizard_Cancel_Title}"
+                               TextColor="#141414"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="{loc:Translate Wizard_Cancel_Subtitle}"
+                               TextColor="#6E6E6E"
+                               FontSize="14"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Buttons: "Продолжить заполнение" & "Да, отменить" -->
+                    <VerticalStackLayout Spacing="10" Margin="0,6,0,0">
+                        <Button Text="{loc:Translate Wizard_Cancel_Continue}"
+                                Command="{Binding ResumeEditingCommand}"
+                                BackgroundColor="#4152B0"
+                                TextColor="#FFFFFF"
+                                CornerRadius="14"
+                                HeightRequest="50"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+
+                        <Button Text="{loc:Translate Wizard_Cancel_Confirm}"
+                                Command="{Binding ConfirmCancelCommand}"
+                                BackgroundColor="#FFFFFF"
+                                BorderColor="#E4E7F4"
+                                BorderWidth="1"
+                                TextColor="#6A738A"
+                                CornerRadius="14"
+                                HeightRequest="50"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="15" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+    </Grid>
+</ContentPage>

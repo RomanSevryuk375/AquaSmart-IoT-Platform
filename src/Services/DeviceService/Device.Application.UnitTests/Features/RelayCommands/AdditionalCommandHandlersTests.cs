@@ -97,14 +97,17 @@ public class AdditionalCommandHandlersTests
     [Fact]
     public async Task ToggleRelayModeHandler_WhenValid_TogglesMode()
     {
-        var handler = new ToggleRelayModeHandler(_relayRepoMock);
-        Relay relay = new RelayBuilder().Build(); // IsManual = true by default
+        var handler = new ToggleRelayModeHandler(_relayRepoMock, _controllerRepoMock);
+        Controller controller = new ControllerBuilder().Build();
+        Relay relay = new RelayBuilder().WithControllerId(controller.Id).Build(); // IsManual = true by default
         _relayRepoMock.GetByIdAsync(relay.Id, Arg.Any<CancellationToken>()).Returns(relay);
+        _controllerRepoMock.GetByIdAsync(controller.Id, Arg.Any<CancellationToken>()).Returns(controller);
 
         var result = await handler.Handle(new ToggleRelayModeCommand { RelayId = relay.Id, UserId = relay.UserId }, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         relay.IsManual.Should().BeFalse();
+        controller.ConfigVersion.Should().Be(2);
     }
 
     [Fact]

@@ -33,6 +33,12 @@ public static class MessagingExtensions
                     h.Password(rabbitOptions.Password);
                 });
                 cfg.UseDelayedMessageScheduler();
+                cfg.UseMessageRetry(r =>
+                {
+                    r.Handle<InvalidOperationException>(ex =>
+                        ex.Message.Contains("modified by another process", StringComparison.OrdinalIgnoreCase));
+                    r.Intervals(50, 150, 350, 750, 1500);
+                });
                 cfg.ConfigureEndpoints(context);
             });
         });

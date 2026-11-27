@@ -1,0 +1,67 @@
+using Mobile.ViewModels;
+using Mobile.Views;
+
+namespace Mobile;
+
+public partial class AppShell : Shell
+{
+    private static bool _routesRegistered;
+
+    public AppShell(AppShellViewModel viewModel)
+    {
+        InitializeComponent();
+        BindingContext = viewModel;
+        RegisterRoutes();
+    }
+
+    public AppShell()
+    {
+        InitializeComponent();
+        RegisterRoutes();
+    }
+
+    protected override void OnNavigated(ShellNavigatedEventArgs args)
+    {
+        base.OnNavigated(args);
+        if (BindingContext is AppShellViewModel vm)
+        {
+            vm.RefreshUserData();
+        }
+    }
+
+    private static void RegisterRoutes()
+    {
+        if (_routesRegistered) return;
+        _routesRegistered = true;
+
+        // Register secondary / sub-pages that are navigated to dynamically
+        // Note: Top-level pages defined in AppShell.xaml (MainPage, DashboardPage, AquariumsPage,
+        // KnowledgeBasePage, ProfilePage, ControllersPage) already have shell routes and must not be re-registered.
+        Routing.RegisterRoute(nameof(OnboardingPage), typeof(OnboardingPage));
+        Routing.RegisterRoute(nameof(LoginPage), typeof(LoginPage));
+        Routing.RegisterRoute(nameof(RegistrationPage), typeof(RegistrationPage));
+        Routing.RegisterRoute(nameof(ForgotPasswordPage), typeof(ForgotPasswordPage));
+
+        Routing.RegisterRoute(nameof(AquariumDetailsPage), typeof(AquariumDetailsPage));
+        Routing.RegisterRoute(nameof(AddAquariumPage), typeof(AddAquariumPage));
+        Routing.RegisterRoute(nameof(AddSensorPage), typeof(AddSensorPage));
+        Routing.RegisterRoute(nameof(AddRelayPage), typeof(AddRelayPage));
+        Routing.RegisterRoute(nameof(AddScenarioPage), typeof(AddScenarioPage));
+
+        Routing.RegisterRoute(nameof(ControllersPage), typeof(ControllersPage));
+        Routing.RegisterRoute(nameof(AddControllerPage), typeof(AddControllerPage));
+        Routing.RegisterRoute(nameof(ControllerDetailsPage), typeof(ControllerDetailsPage));
+
+        Routing.RegisterRoute(nameof(EditProfilePage), typeof(EditProfilePage));
+        Routing.RegisterRoute(nameof(ChangeAvatarPage), typeof(ChangeAvatarPage));
+        Routing.RegisterRoute(nameof(AppSettingsPage), typeof(AppSettingsPage));
+        Routing.RegisterRoute(nameof(DataHistoryPage), typeof(DataHistoryPage));
+        Routing.RegisterRoute(nameof(SecuritySettingsPage), typeof(SecuritySettingsPage));
+        Routing.RegisterRoute(nameof(HelpSupportPage), typeof(HelpSupportPage));
+        Routing.RegisterRoute(nameof(AboutAppPage), typeof(AboutAppPage));
+        Routing.RegisterRoute(nameof(DeleteAccountPage), typeof(DeleteAccountPage));
+        Routing.RegisterRoute(nameof(ArticleDetailsPage), typeof(ArticleDetailsPage));
+        Routing.RegisterRoute(nameof(NotificationsPage), typeof(NotificationsPage));
+        Routing.RegisterRoute(nameof(EditAquariumPage), typeof(EditAquariumPage));
+    }
+}

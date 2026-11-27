@@ -60,7 +60,7 @@ public class AggregateTelemetryTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("TelemetrySummary.Invalid");
+        result.Error.Code.Should().Be("AggregateTelemetry.Invalid");
         result.Error.Message.Should().Contain("MinValue cannot be greater than MaxValue.");
     }
 

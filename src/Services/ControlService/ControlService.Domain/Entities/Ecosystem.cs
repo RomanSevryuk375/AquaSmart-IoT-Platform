@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Common;
 using BuildingBlocks.Domain.Enums;
 using BuildingBlocks.Domain.Results;
 using Control.Domain.Events;
@@ -45,37 +46,25 @@ public sealed class Ecosystem : AggregateRoot, IEntity
         double? rawVolume,
         Guid controllerId)
     {
-        var errors = new List<Error>();
+        var errors = new List<string>();
 
-        Result<Name> nameResult = Name.Create(rawName);
-        if (nameResult.IsFailure)
-        {
-            errors.Add(nameResult.Error);
-        }
+        DomainGuard.CheckNotEmpty(ecosystemId, "Ecosystem Id", errors);
+        DomainGuard.CheckNotEmpty(userId, nameof(UserId), errors);
+        DomainGuard.CheckNotEmpty(controllerId, nameof(ControllerId), errors);
+        DomainGuard.CheckEnum(type, nameof(Type), errors);
+        Name? name = DomainGuard.Collect(Name.Create(rawName), errors);
+        Volume? validVolume = rawVolume.HasValue
+            ? DomainGuard.Collect(Volume.Create(rawVolume.Value), errors)
+            : null;
 
-        Volume? validVolume = null;
-        if (rawVolume.HasValue)
+        if (errors.Count != 0)
         {
-            Result<Volume> volumeResult = Volume.Create(rawVolume.Value);
-            if (volumeResult.IsFailure)
-            {
-                errors.Add(volumeResult.Error);
-            }
-            else
-            {
-                validVolume = volumeResult.Value;
-            }
-        }
-
-        if (errors.Count > 0)
-        {
-            return Result<Ecosystem>.Failure(Error.Validation<Ecosystem>(
-                    string.Join(", ", errors)));
+            return DomainGuard.ValidationFailure<Ecosystem>(errors);
         }
 
         var ecosystem = new Ecosystem(
             ecosystemId, userId, controllerId,
-            type, nameResult.Value, validVolume,
+            type, name!, validVolume,
             createdAt: DateTime.UtcNow);
 
         ecosystem.RaiseEvent(new EcosystemCreatedDomainEvent

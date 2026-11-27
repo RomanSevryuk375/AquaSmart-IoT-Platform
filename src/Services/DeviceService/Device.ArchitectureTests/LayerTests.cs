@@ -1,48 +1,42 @@
+using System.Reflection;
+using BuildingBlocks.ArchitectureTestShared;
+using FluentAssertions;
+using NetArchTest.Rules;
+
 namespace Device.ArchitectureTests;
 
-public class LayerTests : BaseArchitectureTest
+public class LayerTests : ServiceLayerArchitectureTestsBase
 {
+    private const string MqttNetNamespace = "MQTTnet";
+
+    protected override Assembly DomainAssembly => BaseArchitectureTest.DomainAssembly;
+    protected override Assembly ApplicationAssembly => BaseArchitectureTest.ApplicationAssembly;
+    protected override Assembly InfrastructureAssembly => BaseArchitectureTest.InfrastructureAssembly;
+    protected override string ApplicationNamespace => "Device.Application";
+    protected override string InfrastructureNamespace => "Device.Infrastructure";
+    protected override string ApiNamespace => "Device.API";
+
     [Fact]
-    public void DomainLayer_ShouldNotHaveDependencyOn_ApplicationLayer()
+    public void DomainLayer_ShouldNotDependOn_MqttNet()
     {
         TestResult result = Types.InAssembly(DomainAssembly)
-            .Should()
-            .NotHaveDependencyOn("Device.Application")
+            .ShouldNot()
+            .HaveDependencyOn(MqttNetNamespace)
             .GetResult();
 
-        result.IsSuccessful.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue(
+            $"Domain layer must not depend on {MqttNetNamespace}. Failing types: {string.Join(", ", result.FailingTypeNames ?? [])}");
     }
 
     [Fact]
-    public void DomainLayer_ShouldNotHaveDependencyOn_InfrastructureLayer()
-    {
-        TestResult result = Types.InAssembly(DomainAssembly)
-            .Should()
-            .NotHaveDependencyOn("Device.Infrastructure")
-            .GetResult();
-
-        result.IsSuccessful.Should().BeTrue();
-    }
-
-    [Fact]
-    public void ApplicationLayer_ShouldNotHaveDependencyOn_InfrastructureLayer()
+    public void ApplicationLayer_ShouldNotDependOn_MqttNet()
     {
         TestResult result = Types.InAssembly(ApplicationAssembly)
-            .Should()
-            .NotHaveDependencyOn("Device.Infrastructure")
+            .ShouldNot()
+            .HaveDependencyOn(MqttNetNamespace)
             .GetResult();
 
-        result.IsSuccessful.Should().BeTrue();
-    }
-
-    [Fact]
-    public void ApplicationLayer_ShouldNotHaveDependencyOn_ApiLayer()
-    {
-        TestResult result = Types.InAssembly(ApplicationAssembly)
-            .Should()
-            .NotHaveDependencyOn("Device.API")
-            .GetResult();
-
-        result.IsSuccessful.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue(
+            $"Application layer must not depend on {MqttNetNamespace}. Failing types: {string.Join(", ", result.FailingTypeNames ?? [])}");
     }
 }
