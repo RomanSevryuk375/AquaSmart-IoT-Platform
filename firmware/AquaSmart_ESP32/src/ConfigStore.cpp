@@ -3,6 +3,29 @@
 #include <ProtocolCodecs.h>
 #include <cstring>
 
+#if __has_include("LocalDevSecrets.h")
+#include "LocalDevSecrets.h"
+#endif
+
+#ifndef LOCAL_DEV_WIFI_SSID
+#define LOCAL_DEV_WIFI_SSID "Wokwi-GUEST"
+#endif
+#ifndef LOCAL_DEV_WIFI_PASS
+#define LOCAL_DEV_WIFI_PASS ""
+#endif
+#ifndef LOCAL_DEV_API_URL
+#define LOCAL_DEV_API_URL "http://172.20.10.2:5055"
+#endif
+#ifndef LOCAL_DEV_MQTT_HOST
+#define LOCAL_DEV_MQTT_HOST "172.20.10.2"
+#endif
+#ifndef LOCAL_DEV_DEVICE_TOKEN
+#define LOCAL_DEV_DEVICE_TOKEN "39392510-96dc-4aa4-bc8e-b01310aa9b50"
+#endif
+#ifndef LOCAL_DEV_CONTROLLER_ID
+#define LOCAL_DEV_CONTROLLER_ID "3afee932-b839-439c-b31b-45d83bb5569b"
+#endif
+
 Preferences ConfigStore::preferences;
 
 namespace {
@@ -19,13 +42,13 @@ bool ConfigStore::begin() {
 }
 
 void ConfigStore::load(DeviceConfig& config) {
-    copyString(config.wifiSsid, sizeof(config.wifiSsid), preferences.getString("ssid", "Wokwi-GUEST"));
-    copyString(config.wifiPass, sizeof(config.wifiPass), preferences.getString("pass", ""));
-    copyString(config.apiBaseUrl, sizeof(config.apiBaseUrl), preferences.getString("url", "http://172.20.10.2:5055"));
-    copyString(config.deviceToken, sizeof(config.deviceToken), preferences.getString("token", "39392510-96dc-4aa4-bc8e-b01310aa9b50"));
-    copyString(config.controllerId, sizeof(config.controllerId), preferences.getString("cid", "3afee932-b839-439c-b31b-45d83bb5569b"));
+    copyString(config.wifiSsid, sizeof(config.wifiSsid), preferences.getString("ssid", LOCAL_DEV_WIFI_SSID));
+    copyString(config.wifiPass, sizeof(config.wifiPass), preferences.getString("pass", LOCAL_DEV_WIFI_PASS));
+    copyString(config.apiBaseUrl, sizeof(config.apiBaseUrl), preferences.getString("url", LOCAL_DEV_API_URL));
+    copyString(config.deviceToken, sizeof(config.deviceToken), preferences.getString("token", LOCAL_DEV_DEVICE_TOKEN));
+    copyString(config.controllerId, sizeof(config.controllerId), preferences.getString("cid", LOCAL_DEV_CONTROLLER_ID));
     copyString(config.telemetryPath, sizeof(config.telemetryPath), preferences.getString("telemetryPath", DEFAULT_TELEMETRY_PATH));
-    copyString(config.mqttHost, sizeof(config.mqttHost), preferences.getString("mqttHost", "172.20.10.2"));
+    copyString(config.mqttHost, sizeof(config.mqttHost), preferences.getString("mqttHost", LOCAL_DEV_MQTT_HOST));
     config.mqttPort = static_cast<uint16_t>(preferences.getUInt("mqttPort", 1883));
     config.mqttUseTls = preferences.getBool("mqttTls", false);
     config.mqttKeepAliveSec = static_cast<uint16_t>(preferences.getUInt("mqttKeepAlive", 30));
